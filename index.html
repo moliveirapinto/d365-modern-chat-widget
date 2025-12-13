@@ -515,31 +515,25 @@
                         console.log('✅ LCW Ready - Setting up context provider');
                         
                         Microsoft.Omnichannel.LiveChatWidget.SDK.setContextProvider(function contextProvider() {
-                            // Check if pre-chat form is disabled - use default contact info
-                            if (adminSettings?.enablePrechatForm === false) {
-                                const defaultName = adminSettings.defaultContactName || 'Anonymous User';
-                                const defaultEmail = adminSettings.defaultContactEmail || 'anonymous@example.com';
-                                console.log('🔒 Using default contact info (pre-chat disabled):', { defaultName, defaultEmail });
+                            // Check if standard widget auto-authentication is enabled
+                            if (adminSettings?.enableStandardAuth === true) {
+                                const authName = adminSettings.standardAuthName || 'Anonymous User';
+                                const authEmail = adminSettings.standardAuthEmail || 'anonymous@example.com';
+                                console.log('🔒 Using standard widget auto-authentication:', { authName, authEmail });
                                 
                                 return {
-                                    'emailaddress1': defaultEmail, // Contact email in Dynamics 365
-                                    'Name': { value: defaultName, isDisplayable: true }, // Contact name in Dynamics 365
+                                    'emailaddress1': authEmail, // Contact email in Dynamics 365
+                                    'Name': { value: authName, isDisplayable: true }, // Contact name in Dynamics 365
                                     'Authenticated': { value: 'Authenticated', isDisplayable: true } // Authentication status
                                 };
                             }
                             
-                            // Get form values from localStorage (when pre-chat is enabled)
-                            const storedContext = JSON.parse(localStorage.getItem('d365ChatContext') || '{}');
-                            
-                            return {
-                                'emailaddress1': storedContext.email || '', // Contact email in Dynamics 365
-                                'Name': { value: storedContext.name || '', isDisplayable: true }, // Contact name in Dynamics 365
-                                'Authenticated': { value: 'Authenticated', isDisplayable: true }, // Authentication status
-                                'InitialQuestion': { value: storedContext.question || '', isDisplayable: true }
-                            };
+                            // If auto-auth is disabled, return empty context (native LCW pre-chat form will be used)
+                            console.log('ℹ️ Standard widget auth disabled - using native D365 pre-chat form');
+                            return {};
                         });
                         
-                        console.log('✅ Context provider configured for D365 contact authentication');
+                        console.log('✅ Context provider configured for D365 standard widget');
                     });
                     
                     // Listen for pre-chat form submission to capture user data

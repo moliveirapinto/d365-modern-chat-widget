@@ -1062,6 +1062,56 @@
                 </div>
             </div>
 
+            <!-- Standard Widget Settings Container -->
+            <div id="standardWidgetSettings" class="hidden">
+                <!-- Contact Authentication for Standard Mode -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <div class="card-header-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                        <div>
+                            <h2>Contact Authentication</h2>
+                            <p>Automatically authenticate users with D365 contact records</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="enableStandardAuth" class="toggle-input">
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Enable Auto-Authentication</span>
+                            </label>
+                            <p class="form-help">When enabled, the widget will automatically authenticate users using the contact information below. This links chat sessions to existing D365 contact records without requiring a pre-chat form.</p>
+                        </div>
+                        <div id="standardAuthFields" class="hidden">
+                            <div class="form-group">
+                                <label class="form-label">Default Contact Name</label>
+                                <input type="text" class="form-input" id="standardAuthName" placeholder="e.g., John Smith">
+                                <p class="form-help">The name to authenticate with D365 (maps to 'Name' field in contact record)</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Default Contact Email</label>
+                                <input type="email" class="form-input" id="standardAuthEmail" placeholder="e.g., john@example.com">
+                                <p class="form-help">The email to authenticate with D365 (maps to 'emailaddress1' field in contact record)</p>
+                            </div>
+                            <div class="info-box" style="margin-top: 16px;">
+                                <div class="info-icon">💡</div>
+                                <div>
+                                    <strong>Use Cases:</strong>
+                                    <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+                                        <li>Authenticated portal users (pass their logged-in credentials)</li>
+                                        <li>Quick demos without form friction</li>
+                                        <li>Skip pre-chat form for known contacts</li>
+                                        <li>Single sign-on (SSO) scenarios</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Custom Widget Settings Container -->
             <div id="customWidgetSettings">
 
@@ -1539,6 +1589,10 @@
             widgetId: '',
             // Widget Mode
             widgetMode: 'custom',
+            // Standard Widget Authentication
+            enableStandardAuth: false,
+            standardAuthName: '',
+            standardAuthEmail: '',
             // Demo Settings
             backgroundImageUrl: '',
             // Header & Branding
@@ -1949,6 +2003,16 @@
             document.getElementById('modeCustom').checked = (widgetMode === 'custom');
             toggleWidgetMode(widgetMode);
 
+            // Standard Widget Authentication
+            const enableStandardAuth = settings.enableStandardAuth || false;
+            const standardAuthCheckbox = document.getElementById('enableStandardAuth');
+            if (standardAuthCheckbox) {
+                standardAuthCheckbox.checked = enableStandardAuth;
+                document.getElementById('standardAuthName').value = settings.standardAuthName || '';
+                document.getElementById('standardAuthEmail').value = settings.standardAuthEmail || '';
+                toggleStandardAuthFields(enableStandardAuth);
+            }
+
             // Text fields
             const bgImageInput = document.getElementById('backgroundImageUrl');
             bgImageInput.value = settings.backgroundImageUrl || '';
@@ -2159,6 +2223,24 @@
                 }
             });
 
+            // Standard widget authentication toggle
+            document.getElementById('enableStandardAuth').addEventListener('change', (e) => {
+                toggleStandardAuthFields(e.target.checked);
+                updateSettingsFromForm();
+                // Auto-save
+                if (!isInitializing && activeProfileId) {
+                    const profile = profiles.find(p => p.id === activeProfileId);
+                    if (profile) {
+                        profile.settings = { ...settings };
+                        profile.updatedAt = new Date().toISOString();
+                        saveProfiles();
+                    }
+                }
+                if (!isInitializing) {
+                    localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+                }
+            });
+
             // LCW Code textarea
             document.getElementById('lcwCode').addEventListener('input', (e) => {
                 const code = e.target.value;
@@ -2262,13 +2344,16 @@
 
         function toggleWidgetMode(mode) {
             const customSettings = document.getElementById('customWidgetSettings');
+            const standardSettings = document.getElementById('standardWidgetSettings');
             const previewPanel = document.querySelector('.preview-panel');
             
             if (mode === 'standard') {
                 customSettings.classList.add('hidden');
+                standardSettings.classList.remove('hidden');
                 if (previewPanel) previewPanel.classList.add('hidden');
             } else {
                 customSettings.classList.remove('hidden');
+                standardSettings.classList.add('hidden');
                 if (previewPanel) previewPanel.classList.remove('hidden');
             }
             
@@ -2446,6 +2531,17 @@
             document.getElementById('defaultContactInfo').style.display = enabled ? 'none' : 'block';
         }
 
+        function toggleStandardAuthFields(enabled) {
+            const fieldsContainer = document.getElementById('standardAuthFields');
+            if (fieldsContainer) {
+                if (enabled) {
+                    fieldsContainer.classList.remove('hidden');
+                } else {
+                    fieldsContainer.classList.add('hidden');
+                }
+            }
+        }
+
         function updateSettingsFromForm() {
             // D365 Connection - lcwCode is updated via its own event listener
             // orgId, orgUrl, widgetId are already set by parseLCWCode()
@@ -2454,6 +2550,14 @@
 
             // Widget Mode
             settings.widgetMode = document.querySelector('input[name="widgetMode"]:checked')?.value || 'custom';
+
+            // Standard Widget Authentication
+            const standardAuthCheckbox = document.getElementById('enableStandardAuth');
+            if (standardAuthCheckbox) {
+                settings.enableStandardAuth = standardAuthCheckbox.checked;
+                settings.standardAuthName = document.getElementById('standardAuthName').value;
+                settings.standardAuthEmail = document.getElementById('standardAuthEmail').value;
+            }
 
             // Demo Settings
             const bgImageValue = document.getElementById('backgroundImageUrl').value;
