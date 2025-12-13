@@ -1,0 +1,2757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Widget Admin - Customization</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600&family=Crimson+Text:wght@400;600&family=DM+Sans:wght@400;500;600&family=Fira+Code:wght@400;500&family=Fira+Sans:wght@400;500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Lato:wght@400;700&family=Lexend:wght@400;500;600&family=Libre+Baskerville:wght@400;700&family=Lora:wght@400;500;600&family=Manrope:wght@400;500;600&family=Merriweather:wght@400;700&family=Montserrat:wght@400;500;600&family=Nunito:wght@400;600;700&family=Open+Sans:wght@400;600&family=Outfit:wght@400;500;600&family=Playfair+Display:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600&family=Poppins:wght@400;500;600&family=Quicksand:wght@400;500;600&family=Raleway:wght@400;500;600&family=Righteous&family=Roboto:wght@400;500&family=Rubik:wght@400;500;600&family=Source+Code+Pro:wght@400;500&family=Source+Sans+Pro:wght@400;600&family=Ubuntu:wght@400;500;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --admin-primary: #6366f1;
+            --admin-primary-dark: #4f46e5;
+            --admin-bg: #f8fafc;
+            --admin-card: #ffffff;
+            --admin-text: #1e293b;
+            --admin-text-light: #64748b;
+            --admin-border: #e2e8f0;
+            --admin-success: #10b981;
+            --admin-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --admin-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--admin-bg);
+            color: var(--admin-text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+            border: 2px solid #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Header */
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px 32px;
+            box-shadow: var(--admin-shadow-lg);
+        }
+        .admin-header h1 { font-size: 24px; font-weight: 600; }
+        .admin-header p { opacity: 0.9; margin-top: 4px; font-size: 14px; }
+
+        /* Main Layout */
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 32px;
+        }
+
+        @media (max-width: 1200px) {
+            .admin-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .settings-card {
+            background: var(--admin-card);
+            border-radius: 12px;
+            box-shadow: var(--admin-shadow);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--admin-border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .card-header-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-header-icon svg { width: 20px; height: 20px; fill: white; }
+        .card-header h2 { font-size: 16px; font-weight: 600; }
+        .card-header p { font-size: 13px; color: var(--admin-text-light); margin-top: 2px; }
+
+        .card-body { padding: 24px; }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 24px;
+        }
+        .form-group:last-child { margin-bottom: 0; }
+        
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--admin-text);
+            margin-bottom: 6px;
+        }
+        .form-hint {
+            font-size: 12px;
+            color: var(--admin-text-light);
+            margin-top: 4px;
+        }
+
+        /* Widget Mode Selector */
+        .widget-mode-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .mode-option {
+            cursor: pointer;
+        }
+        .mode-option input[type="radio"] {
+            display: none;
+        }
+        .mode-card {
+            padding: 20px;
+            border: 2px solid var(--admin-border);
+            border-radius: 12px;
+            background: var(--admin-card);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .mode-option input[type="radio"]:checked + .mode-card {
+            border-color: var(--admin-primary);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        .mode-card:hover {
+            border-color: var(--admin-primary);
+        }
+        .mode-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px;
+            background: linear-gradient(135deg, var(--admin-primary), #8b5cf6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mode-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+        .mode-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--admin-text);
+            margin-bottom: 6px;
+        }
+        .mode-desc {
+            font-size: 13px;
+            color: var(--admin-text-light);
+            line-height: 1.4;
+        }
+
+        /* Font Preview */
+        .font-preview {
+            margin-top: 16px;
+            padding: 16px;
+            background: var(--admin-bg);
+            border-radius: 8px;
+            border: 1px solid var(--admin-border);
+        }
+        .font-preview-label {
+            font-size: 12px;
+            color: var(--admin-text-light);
+            margin-bottom: 8px;
+        }
+        .font-preview-text {
+            font-size: 16px;
+            color: var(--admin-text);
+            line-height: 1.5;
+        }
+        /* Font families */
+        .font-inter { font-family: 'Inter', sans-serif; }
+        .font-roboto { font-family: 'Roboto', sans-serif; }
+        .font-opensans { font-family: 'Open Sans', sans-serif; }
+        .font-lato { font-family: 'Lato', sans-serif; }
+        .font-poppins { font-family: 'Poppins', sans-serif; }
+        .font-montserrat { font-family: 'Montserrat', sans-serif; }
+        .font-nunito { font-family: 'Nunito', sans-serif; }
+        .font-sourcesans { font-family: 'Source Sans Pro', sans-serif; }
+        .font-raleway { font-family: 'Raleway', sans-serif; }
+        .font-system { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+
+        /* Custom Widget Settings visibility */
+        #customWidgetSettings {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            transition: opacity 0.3s ease, max-height 0.3s ease;
+        }
+        #customWidgetSettings.hidden {
+            display: none;
+        }
+        .preview-panel.hidden {
+            display: none;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--admin-border);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--admin-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+
+        /* LCW Textarea */
+        .lcw-textarea {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            min-height: 100px;
+        }
+        .extracted-values {
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 8px;
+        }
+        .extracted-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: #10b981;
+            font-size: 13px;
+        }
+        .extracted-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .extracted-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+        .extracted-label {
+            color: var(--admin-text-light);
+            min-width: 60px;
+        }
+        .extracted-value {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            color: var(--admin-text);
+            background: var(--admin-bg);
+            padding: 4px 8px;
+            border-radius: 4px;
+            word-break: break-all;
+        }
+
+        /* Color Picker Grid */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .color-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .color-item label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--admin-text-light);
+        }
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--admin-bg);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--admin-border);
+        }
+        .color-picker-wrapper input[type="color"] {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            padding: 0;
+            background: none;
+        }
+        .color-picker-wrapper input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        .color-picker-wrapper input[type="color"]::-webkit-color-swatch {
+            border: 2px solid white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .color-hex-input {
+            flex: 1;
+            border: none;
+            background: none;
+            font-size: 13px;
+            font-family: monospace;
+            color: var(--admin-text);
+            text-transform: uppercase;
+        }
+        .color-hex-input:focus { outline: none; }
+
+        /* Image Upload */
+        .image-upload-area {
+            border: 2px dashed var(--admin-border);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--admin-bg);
+        }
+        .image-upload-area:hover {
+            border-color: var(--admin-primary);
+            background: rgba(99, 102, 241, 0.02);
+        }
+        .image-upload-area.has-image {
+            padding: 12px;
+            border-style: solid;
+        }
+        .image-upload-area.processing {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .upload-icon {
+            width: 48px; height: 48px; margin: 0 auto 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .upload-icon svg { width: 24px; height: 24px; fill: white; }
+        .upload-text { font-size: 14px; color: var(--admin-text); font-weight: 500; }
+        .upload-hint { font-size: 12px; color: var(--admin-text-light); margin-top: 4px; }
+
+        .uploaded-image-preview {
+            position: relative;
+            display: inline-block;
+        }
+        .uploaded-image-preview img {
+            max-width: 120px;
+            max-height: 120px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        .uploaded-image-preview.avatar img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+        }
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            border-radius: 8px;
+        }
+        .uploaded-image-preview.avatar .image-overlay {
+            border-radius: 50%;
+        }
+        .uploaded-image-preview:hover .image-overlay {
+            opacity: 1;
+        }
+        .change-image-btn, .remove-image-btn {
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+        }
+        .change-image-btn {
+            background: var(--admin-primary);
+        }
+        .change-image-btn:hover {
+            background: var(--admin-primary-dark);
+        }
+        .remove-image-btn {
+            background: #ef4444;
+        }
+        .remove-image-btn:hover {
+            background: #dc2626;
+        }
+
+        /* Preview Panel */
+        .preview-panel {
+            position: sticky;
+            top: 32px;
+            height: fit-content;
+        }
+
+        .preview-card {
+            background: var(--admin-card);
+            border-radius: 12px;
+            box-shadow: var(--admin-shadow-lg);
+            overflow: hidden;
+        }
+        .preview-card .card-header {
+            background: var(--admin-bg);
+        }
+
+        .preview-widget-container {
+            padding: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Mini Widget Preview */
+        .widget-preview {
+            width: 100%;
+            max-width: 340px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .preview-header {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .preview-header-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .preview-header-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .preview-header-avatar svg { width: 24px; height: 24px; fill: white; }
+        .preview-header-info { flex: 1; }
+        .preview-header-title { color: white; font-weight: 600; font-size: 15px; }
+        .preview-header-status { color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 2px; }
+
+        .preview-messages {
+            padding: 16px;
+            background: #f8fafc;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .preview-message {
+            display: flex;
+            gap: 8px;
+            max-width: 85%;
+        }
+        .preview-message.agent { align-self: flex-start; }
+        .preview-message.user { align-self: flex-end; flex-direction: row-reverse; }
+
+        .preview-msg-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .preview-msg-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-msg-bubble {
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .preview-message.agent .preview-msg-bubble {
+            background: white;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+            border-bottom-left-radius: 4px;
+        }
+        .preview-message.user .preview-msg-bubble {
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .preview-input-area {
+            padding: 12px 16px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .preview-input {
+            flex: 1;
+            padding: 10px 14px;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #64748b;
+        }
+        .preview-send-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .preview-send-btn svg { width: 18px; height: 18px; fill: white; }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: var(--admin-bg);
+            color: var(--admin-text);
+            border: 1px solid var(--admin-border);
+        }
+        .btn-secondary:hover {
+            background: var(--admin-border);
+        }
+        .btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            padding: 20px;
+            background: var(--admin-bg);
+            border-top: 1px solid var(--admin-border);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #10b981;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast svg { width: 20px; height: 20px; fill: white; }
+
+        /* Image upload inputs (hidden) */
+        .hidden-input { display: none; }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            padding: 4px;
+            background: var(--admin-bg);
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            background: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--admin-text-light);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: white;
+            color: var(--admin-text);
+            box-shadow: var(--admin-shadow);
+        }
+        .tab-btn:hover:not(.active) {
+            color: var(--admin-text);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Gradient Picker */
+        .gradient-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: var(--admin-border);
+            border-radius: 24px;
+            transition: 0.3s;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+            box-shadow: var(--admin-shadow);
+        }
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--admin-primary);
+        }
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+        .toggle-label {
+            font-size: 13px;
+            color: var(--admin-text-light);
+        }
+
+        .gradient-colors {
+            display: none;
+            gap: 12px;
+        }
+        .gradient-colors.show {
+            display: flex;
+        }
+        .gradient-colors .color-item {
+            flex: 1;
+        }
+
+        /* Demo Profiles */
+        .profile-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .profile-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--admin-bg);
+            border-radius: 8px;
+            border: 1px solid var(--admin-border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .profile-item:hover {
+            border-color: var(--admin-primary);
+            background: rgba(99, 102, 241, 0.02);
+        }
+        .profile-item.active {
+            border-color: var(--admin-primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+        .profile-info { flex: 1; }
+        .profile-name { font-weight: 500; font-size: 14px; color: var(--admin-text); }
+        .profile-desc { font-size: 12px; color: var(--admin-text-light); margin-top: 2px; }
+        .profile-actions { display: flex; gap: 4px; }
+        .profile-btn {
+            width: 32px; height: 32px; border: none; background: none;
+            border-radius: 6px; cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            color: var(--admin-text-light); transition: all 0.2s;
+        }
+        .profile-btn:hover { background: var(--admin-border); color: var(--admin-text); }
+        .profile-btn.delete:hover { background: #fee2e2; color: #ef4444; }
+        .profile-btn svg { width: 16px; height: 16px; fill: currentColor; }
+
+        .new-profile-row {
+            display: flex;
+            gap: 8px;
+        }
+        .new-profile-row input {
+            flex: 1;
+        }
+
+        /* Config code block */
+        .config-code {
+            background: #1e293b;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+            overflow-x: auto;
+        }
+        .config-code pre {
+            color: #e2e8f0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .config-code .key { color: #7dd3fc; }
+        .config-code .string { color: #86efac; }
+        .config-code .comment { color: #64748b; }
+
+        .copy-btn {
+            position: relative;
+            margin-top: 8px;
+        }
+        .copy-btn.copied::after {
+            content: 'Copied!';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10b981;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            animation: fadeOut 2s forwards;
+        }
+        @keyframes fadeOut {
+            0%, 70% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* Import/Export section */
+        .import-export-btns {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        /* Status indicator */
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: var(--admin-bg);
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #94a3b8;
+        }
+        .status-dot.connected { background: #10b981; }
+        .status-dot.error { background: #ef4444; }
+        .status-text { font-size: 13px; color: var(--admin-text-light); }
+
+        /* Collapsible sections */
+        .section-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 4px 0;
+        }
+        .section-toggle svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--admin-text-light);
+            transition: transform 0.2s;
+        }
+        .section-toggle.expanded svg {
+            transform: rotate(90deg);
+        }
+        .collapsible-content {
+            display: none;
+            padding-top: 12px;
+        }
+        .collapsible-content.show {
+            display: block;
+        }
+
+        /* Quick presets */
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .preset-btn {
+            padding: 12px 8px;
+            border: 1px solid var(--admin-border);
+            background: var(--admin-bg);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .preset-btn:hover {
+            border-color: var(--admin-primary);
+        }
+        .preset-btn.active {
+            border-color: var(--admin-primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+        .preset-preview {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin: 0 auto 6px;
+        }
+        .preset-name {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--admin-text);
+        }
+    </style>
+</head>
+<body>
+    <header class="admin-header">
+        <h1>🎨 Chat Widget Customization</h1>
+        <p>Personalize your chat widget appearance and branding</p>
+    </header>
+
+    <div class="admin-container">
+        <div class="settings-panel">
+            <!-- Demo Profiles -->
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-header-icon">
+                        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                    </div>
+                    <div>
+                        <h2>Demo Profiles</h2>
+                        <p>Save and switch between customer configurations</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="profile-list" id="profileList">
+                        <!-- Profiles will be loaded dynamically -->
+                    </div>
+                    <div class="new-profile-row">
+                        <input type="text" class="form-input" id="newProfileName" placeholder="New profile name (e.g., Contoso Demo)">
+                        <button class="btn btn-primary btn-sm" onclick="saveAsProfile()">
+                            <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo Website Background -->
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-header-icon">
+                        <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                    </div>
+                    <div>
+                        <h2>Demo Website Background</h2>
+                        <p>Set a screenshot as the background behind the widget</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Local Image File Path</label>
+                        <input type="text" class="form-input" id="backgroundImageUrl" placeholder="C:\Users\YourName\Pictures\screenshot.png">
+                        <p class="form-hint">💡 Right-click your screenshot → "Copy as path" → Paste here. The path will be saved in your profile and persist across sessions.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- D365 Configuration -->
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-header-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18l6.9 3.45L12 11.09 5.1 7.64 12 4.18zM4 16.54V9.08l7 3.5v7.46l-7-3.5zm9 3.5v-7.46l7-3.5v7.46l-7 3.5z"/></svg>
+                    </div>
+                    <div>
+                        <h2>D365 Connection</h2>
+                        <p>Paste your Live Chat Widget code snippet</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">LCW Embed Code</label>
+                        <textarea class="form-input lcw-textarea" id="lcwCode" rows="4" placeholder="Paste your D365 Live Chat Widget script here...&#10;&#10;Example: <script id=&quot;Microsoft_Omnichannel_LCWidget&quot; src=&quot;...&quot; data-app-id=&quot;...&quot; data-org-id=&quot;...&quot; data-org-url=&quot;...&quot;></script>"></textarea>
+                        <p class="form-hint">Copy the entire script tag from D365 Omnichannel Administration → Chat Widget → Code Snippet</p>
+                    </div>
+                    <div class="extracted-values" id="extractedValues" style="display: none;">
+                        <div class="extracted-header">
+                            <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#10b981;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>Values extracted successfully</span>
+                        </div>
+                        <div class="extracted-grid">
+                            <div class="extracted-item">
+                                <span class="extracted-label">App ID:</span>
+                                <span class="extracted-value" id="extractedAppId">-</span>
+                            </div>
+                            <div class="extracted-item">
+                                <span class="extracted-label">Org ID:</span>
+                                <span class="extracted-value" id="extractedOrgId">-</span>
+                            </div>
+                            <div class="extracted-item">
+                                <span class="extracted-label">Org URL:</span>
+                                <span class="extracted-value" id="extractedOrgUrl">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="connection-status" id="connectionStatus">
+                        <span class="status-dot" id="statusDot"></span>
+                        <span class="status-text" id="statusText">Not configured</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Widget Mode Selector -->
+            <div class="settings-card" id="widgetModeCard">
+                <div class="card-header">
+                    <div class="card-header-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    </div>
+                    <div>
+                        <h2>Widget Mode</h2>
+                        <p>Choose between standard D365 widget or custom styled widget</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="widget-mode-selector">
+                        <label class="mode-option">
+                            <input type="radio" name="widgetMode" value="standard" id="modeStandard">
+                            <div class="mode-card">
+                                <div class="mode-icon">
+                                    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>
+                                </div>
+                                <div class="mode-title">Standard Widget</div>
+                                <div class="mode-desc">Use the default D365 Live Chat Widget appearance and behavior</div>
+                            </div>
+                        </label>
+                        <label class="mode-option">
+                            <input type="radio" name="widgetMode" value="custom" id="modeCustom" checked>
+                            <div class="mode-card">
+                                <div class="mode-icon">
+                                    <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                                </div>
+                                <div class="mode-title">Custom Widget</div>
+                                <div class="mode-desc">Use our beautifully styled custom chat widget with full customization</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Widget Settings Container -->
+            <div id="customWidgetSettings">
+
+            <!-- Header & Branding -->
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-header-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                    </div>
+                    <div>
+                        <h2>Header & Branding</h2>
+                        <p>Customize the chat header text and logo</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Header Title</label>
+                        <input type="text" class="form-input" id="headerTitle" value="Support Chat" placeholder="e.g., Support Chat, Help Desk">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Header Subtitle</label>
+                        <input type="text" class="form-input" id="headerSubtitle" value="We're here to help" placeholder="e.g., We're here to help">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Company Logo / Header Icon</label>
+                        <div class="image-upload-area" id="logoUploadArea" onclick="handleUploadAreaClick(event, 'logoInput')">
+                            <div class="upload-icon">
+                                <svg viewBox="0 0 24 24"><path d="M19 7v2.99s-1.99.01-2 0V7h-3s.01-1.99 0-2h3V2h2v3h3v2h-3zm-3 4V8h-3V5H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8h-3zM5 19l3-4 2 3 3-4 4 5H5z"/></svg>
+                            </div>
+                            <div class="upload-text">Click to upload logo</div>
+                            <div class="upload-hint">PNG, JPG up to 2MB (recommended: 100x100px)</div>
+                        </div>
+                        <input type="file" id="logoInput" class="hidden-input" accept="image/*">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fonts -->
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-header-icon">
+                        <svg viewBox="0 0 24 24"><path d="M9.93 13.5h4.14L12 7.98 9.93 13.5zM20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-4.05 16.5l-1.14-3H9.17l-1.12 3H5.96l5.11-13h1.86l5.11 13h-2.09z"/></svg>
+                    </div>
+                    <div>
+                        <h2>Fonts</h2>
+                        <p>Choose the typography for your widget</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Font Family</label>
+                        <select class="form-input" id="fontFamily">
+                            <optgroup label="System">
+                                <option value="system">System Default</option>
+                            </optgroup>
+                            <optgroup label="Sans-Serif">
+                                <option value="inter">Inter</option>
+                                <option value="roboto">Roboto</option>
+                                <option value="opensans">Open Sans</option>
+                                <option value="lato">Lato</option>
+                                <option value="poppins">Poppins</option>
+                                <option value="montserrat">Montserrat</option>
+                                <option value="nunito">Nunito</option>
+                                <option value="sourcesans">Source Sans Pro</option>
+                                <option value="raleway">Raleway</option>
+                                <option value="ubuntu">Ubuntu</option>
+                                <option value="rubik">Rubik</option>
+                                <option value="worksans">Work Sans</option>
+                                <option value="firasans">Fira Sans</option>
+                                <option value="dmsans">DM Sans</option>
+                                <option value="manrope">Manrope</option>
+                                <option value="plusjakarta">Plus Jakarta Sans</option>
+                                <option value="outfit">Outfit</option>
+                                <option value="lexend">Lexend</option>
+                            </optgroup>
+                            <optgroup label="Serif">
+                                <option value="playfair">Playfair Display</option>
+                                <option value="merriweather">Merriweather</option>
+                                <option value="lora">Lora</option>
+                                <option value="crimson">Crimson Text</option>
+                                <option value="libre">Libre Baskerville</option>
+                            </optgroup>
+                            <optgroup label="Monospace">
+                                <option value="jetbrains">JetBrains Mono</option>
+                                <option value="firacode">Fira Code</option>
+                                <option value="sourcecodepro">Source Code Pro</option>
+                            </optgroup>
+                            <optgroup label="Display">
+                                <option value="quicksand">Quicksand</option>
+                                <option value="comfortaa">Comfortaa</option>
+                                <option value="righteous">Righteous</option>
+                            </optgroup>
+                        </select>
+                        <p class="form-hint">Select a font style for the chat widget text</p>
+                    </div>
+                    <div class="font-preview" id="fontPreview">
+                        <div class="font-preview-label">Preview:</div>
+                        <div class="font-preview-text" id="fontPreviewText">The quick brown fox jumps over the lazy dog</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colors -->
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-header-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                    </div>
+                    <div>
+                        <h2>Colors</h2>
+                        <p>Define your widget color scheme</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="tabs">
+                        <button class="tab-btn active" data-tab="primary">Primary</button>
+                        <button class="tab-btn" data-tab="messages">Messages</button>
+                        <button class="tab-btn" data-tab="ui">UI Elements</button>
+                    </div>
+
+                    <!-- Primary Colors Tab -->
+                    <div class="tab-content active" id="tab-primary">
+                        <div class="gradient-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="useGradient" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">Use gradient for header & buttons</span>
+                        </div>
+                        <div class="gradient-colors show" id="gradientColors">
+                            <div class="color-item">
+                                <label>Gradient Start</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="gradientStart" value="#667eea">
+                                    <input type="text" class="color-hex-input" id="gradientStartHex" value="#667eea">
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label>Gradient End</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="gradientEnd" value="#764ba2">
+                                    <input type="text" class="color-hex-input" id="gradientEndHex" value="#764ba2">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="color-grid" id="solidColorPicker" style="display:none;">
+                            <div class="color-item">
+                                <label>Primary Color</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="primaryColor" value="#667eea">
+                                    <input type="text" class="color-hex-input" id="primaryColorHex" value="#667eea">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Messages Colors Tab -->
+                    <div class="tab-content" id="tab-messages">
+                        <div class="color-grid">
+                            <div class="color-item">
+                                <label>User Bubble</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="userBubbleColor" value="#667eea">
+                                    <input type="text" class="color-hex-input" id="userBubbleColorHex" value="#667eea">
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label>User Text</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="userTextColor" value="#ffffff">
+                                    <input type="text" class="color-hex-input" id="userTextColorHex" value="#ffffff">
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label>Agent Bubble</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="agentBubbleColor" value="#ffffff">
+                                    <input type="text" class="color-hex-input" id="agentBubbleColorHex" value="#ffffff">
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label>Agent Text</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="agentTextColor" value="#2d3748">
+                                    <input type="text" class="color-hex-input" id="agentTextColorHex" value="#2d3748">
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label>System Message</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="systemMsgColor" value="#e2e8f0">
+                                    <input type="text" class="color-hex-input" id="systemMsgColorHex" value="#e2e8f0">
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label>System Text</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="systemTextColor" value="#64748b">
+                                    <input type="text" class="color-hex-input" id="systemTextColorHex" value="#64748b">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- UI Elements Colors Tab -->
+                    <div class="tab-content" id="tab-ui">
+                        <div class="color-grid">
+                            <div class="color-item">
+                                <label>Chat Background</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="chatBgColor" value="#f8fafc">
+                                    <input type="text" class="color-hex-input" id="chatBgColorHex" value="#f8fafc">
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label>Input Background</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="inputBgColor" value="#ffffff">
+                                    <input type="text" class="color-hex-input" id="inputBgColorHex" value="#ffffff">
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label>Input Border</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="inputBorderColor" value="#e2e8f0">
+                                    <input type="text" class="color-hex-input" id="inputBorderColorHex" value="#e2e8f0">
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label>Send Button</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="sendBtnColor" value="#667eea">
+                                    <input type="text" class="color-hex-input" id="sendBtnColorHex" value="#667eea">
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label>Launcher Button</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="launcherColor" value="#667eea">
+                                    <input type="text" class="color-hex-input" id="launcherColorHex" value="#667eea">
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label>Notification Badge</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="badgeColor" value="#ff4757">
+                                    <input type="text" class="color-hex-input" id="badgeColorHex" value="#ff4757">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pre-chat Form -->
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-header-icon">
+                        <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                    </div>
+                    <div>
+                        <h2>Pre-chat Form</h2>
+                        <p>Customize the initial greeting and form fields</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="enablePrechatForm" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">Enable Pre-chat Form</span>
+                        </div>
+                        <p class="form-hint">When disabled, your customer will be automagically authenticated with the info below, so you don't have to type it during your demo. Make sure your contact details in D365 matches!</p>
+                    </div>
+
+                    <!-- Default Contact Info (shown when pre-chat form is disabled) -->
+                    <div id="defaultContactInfo" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label">Default Contact Name</label>
+                            <input type="text" class="form-input" id="defaultContactName" placeholder="e.g., Anonymous User">
+                            <p class="form-hint">This name will be passed to Dynamics 365 for contact authentication</p>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Default Contact Email</label>
+                            <input type="email" class="form-input" id="defaultContactEmail" placeholder="e.g., anonymous@example.com">
+                            <p class="form-hint">This email will be used for D365 contact identification</p>
+                        </div>
+                    </div>
+
+                    <!-- Pre-chat Form Fields (shown when pre-chat form is enabled) -->
+                    <div id="prechatFormFields">
+                        <div class="form-group">
+                            <label class="form-label">Welcome Title</label>
+                            <input type="text" class="form-input" id="welcomeTitle" value="Start a conversation" placeholder="e.g., Start a conversation">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Welcome Message</label>
+                            <textarea class="form-input" id="welcomeMessage" placeholder="e.g., We're here to help! Please fill out the form below.">We're here to help! Please fill out the form below to start chatting with our team.</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Name Field Label</label>
+                            <input type="text" class="form-input" id="nameFieldLabel" value="Your Name" placeholder="e.g., Your Name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email Field Label</label>
+                            <input type="text" class="form-input" id="emailFieldLabel" value="Email Address" placeholder="e.g., Email Address">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Question Field Label</label>
+                            <input type="text" class="form-input" id="questionFieldLabel" value="How can we help?" placeholder="e.g., How can we help?">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Start Button Text</label>
+                            <input type="text" class="form-input" id="startBtnText" value="Start Chat" placeholder="e.g., Start Chat">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Avatars -->
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-header-icon">
+                        <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                    </div>
+                    <div>
+                        <h2>Avatars</h2>
+                        <p>Upload custom avatars for agents and customers</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">Default Agent Avatar</label>
+                            <div class="image-upload-area" id="agentAvatarArea" onclick="handleUploadAreaClick(event, 'agentAvatarInput')">
+                                <div class="upload-icon">
+                                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                                </div>
+                                <div class="upload-text">Agent photo</div>
+                                <div class="upload-hint">Square image recommended</div>
+                            </div>
+                            <input type="file" id="agentAvatarInput" class="hidden-input" accept="image/*">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Default Customer Avatar</label>
+                            <div class="image-upload-area" id="customerAvatarArea" onclick="handleUploadAreaClick(event, 'customerAvatarInput')">
+                                <div class="upload-icon">
+                                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                                </div>
+                                <div class="upload-text">Customer photo</div>
+                                <div class="upload-hint">Square image recommended</div>
+                            </div>
+                            <input type="file" id="customerAvatarInput" class="hidden-input" accept="image/*">
+                        </div>
+                    </div>
+                    <p class="form-hint" style="margin-top: 12px;">These avatars will be used as defaults. Agent's actual photo from D365 will override if available.</p>
+                </div>
+            </div>
+
+            <!-- Import/Export -->
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-header-icon">
+                        <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+                    </div>
+                    <div>
+                        <h2>Import / Export</h2>
+                        <p>Share configurations or backup your settings</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="import-export-btns">
+                        <button class="btn btn-secondary btn-sm" onclick="exportSettings()">
+                            <svg viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                            Export JSON
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('importFile').click()">
+                            <svg viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
+                            Import JSON
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="copyEmbedCode()">
+                            <svg viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            Copy Embed Code
+                        </button>
+                    </div>
+                    <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importSettings(event)">
+                    
+                    <div class="config-code" id="embedCodeBlock" style="display:none;">
+                        <pre id="embedCode"></pre>
+                    </div>
+                </div>
+            </div>
+
+            </div><!-- End customWidgetSettings -->
+
+            <!-- Actions -->
+            <div class="settings-card">
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="saveBtn" onclick="saveSettings()">
+                        <svg viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+                        Save Settings
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetSettings()">
+                        <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                        Reset to Default
+                    </button>
+                    <a href="index.html" class="btn btn-secondary" id="goToWidgetBtn" style="text-decoration:none;">
+                        <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                        Go to Widget
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Preview -->
+        <div class="preview-panel">
+            <div class="preview-card">
+                <div class="card-header">
+                    <div class="card-header-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                    </div>
+                    <div>
+                        <h2>Live Preview</h2>
+                        <p>See changes in real-time</p>
+                    </div>
+                </div>
+                <div class="preview-widget-container">
+                    <div class="widget-preview">
+                        <div class="preview-header" id="previewHeader">
+                            <div class="preview-header-avatar" id="previewHeaderAvatar">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                            </div>
+                            <div class="preview-header-info">
+                                <div class="preview-header-title" id="previewTitle">Support Chat</div>
+                                <div class="preview-header-status" id="previewStatus">We're here to help</div>
+                            </div>
+                        </div>
+                        <div class="preview-messages" id="previewMessages">
+                            <div class="preview-message agent">
+                                <div class="preview-msg-avatar" id="previewAgentAvatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">A</div>
+                                <div class="preview-msg-bubble" id="previewAgentBubble">Hello! How can I help you today?</div>
+                            </div>
+                            <div class="preview-message user">
+                                <div class="preview-msg-avatar" id="previewUserAvatar" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">U</div>
+                                <div class="preview-msg-bubble" id="previewUserBubble">Hi, I have a question about my order.</div>
+                            </div>
+                        </div>
+                        <div class="preview-input-area" id="previewInputArea">
+                            <div class="preview-input">Type your message...</div>
+                            <button class="preview-send-btn" id="previewSendBtn">
+                                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        <span id="toastMessage">Settings saved successfully!</span>
+    </div>
+
+    <script>
+        // Default settings - comprehensive for demos
+        const defaultSettings = {
+            // D365 Connection
+            lcwCode: '',
+            orgId: '',
+            orgUrl: '',
+            widgetId: '',
+            // Widget Mode
+            widgetMode: 'custom',
+            // Demo Settings
+            backgroundImageUrl: '',
+            // Header & Branding
+            headerTitle: 'Support Chat',
+            headerSubtitle: "We're here to help",
+            headerLogo: null,
+            // Fonts
+            fontFamily: 'system',
+            // Colors
+            useGradient: true,
+            gradientStart: '#667eea',
+            gradientEnd: '#764ba2',
+            primaryColor: '#667eea',
+            userBubbleColor: '#667eea',
+            userTextColor: '#ffffff',
+            agentBubbleColor: '#ffffff',
+            agentTextColor: '#2d3748',
+            systemMsgColor: '#e2e8f0',
+            systemTextColor: '#64748b',
+            chatBgColor: '#f8fafc',
+            inputBgColor: '#ffffff',
+            inputBorderColor: '#e2e8f0',
+            sendBtnColor: '#667eea',
+            launcherColor: '#667eea',
+            badgeColor: '#ff4757',
+            // Avatars
+            agentAvatar: null,
+            customerAvatar: null,
+            // Pre-chat Form
+            enablePrechatForm: true,
+            defaultContactName: '',
+            defaultContactEmail: '',
+            welcomeTitle: 'Start a conversation',
+            welcomeMessage: "We're here to help! Please fill out the form below to start chatting with our team.",
+            nameFieldLabel: 'Your Name',
+            emailFieldLabel: 'Email Address',
+            questionFieldLabel: 'How can we help?',
+            startBtnText: 'Start Chat'
+        };
+
+        let settings = { ...defaultSettings };
+        let profiles = [];
+        let activeProfileId = null;
+        let isInitializing = true; // Flag to prevent auto-save during form population
+
+        const MAX_IMAGE_DATA_LENGTH = 120 * 1024; // ~120KB limit for stored image data URLs
+
+        function isSafeImageData(value) {
+            return typeof value === 'string'
+                && value.startsWith('data:image')
+                && value.length > 0
+                && value.length <= MAX_IMAGE_DATA_LENGTH;
+        }
+
+        function readFileAsDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    if (typeof reader.result === 'string') {
+                        resolve(reader.result);
+                    } else {
+                        reject(new Error('Unsupported image format.'));
+                    }
+                };
+                reader.onerror = () => reject(new Error('Failed to read image file.'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function processImageFile(file, maxDimension, maxDataLength = MAX_IMAGE_DATA_LENGTH) {
+            const originalDataUrl = await readFileAsDataUrl(file);
+
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    try {
+                        const width = img.naturalWidth || img.width;
+                        const height = img.naturalHeight || img.height;
+                        if (!width || !height) {
+                            reject(new Error('Image has invalid dimensions.'));
+                            return;
+                        }
+
+                        if (width <= maxDimension && height <= maxDimension && originalDataUrl.length <= maxDataLength) {
+                            resolve(originalDataUrl);
+                            return;
+                        }
+
+                        const canvas = document.createElement('canvas');
+                        let targetWidth = width;
+                        let targetHeight = height;
+
+                        const scale = Math.min(1, maxDimension / targetWidth, maxDimension / targetHeight);
+                        targetWidth = Math.max(1, Math.round(targetWidth * scale));
+                        targetHeight = Math.max(1, Math.round(targetHeight * scale));
+
+                        canvas.width = targetWidth;
+                        canvas.height = targetHeight;
+                        const ctx = canvas.getContext('2d');
+                        if (!ctx) {
+                            reject(new Error('Unable to create drawing context.'));
+                            return;
+                        }
+
+                        ctx.clearRect(0, 0, targetWidth, targetHeight);
+                        ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+
+                        const supportsTransparency = file.type === 'image/png' || file.type === 'image/gif';
+                        let mimeType = supportsTransparency ? 'image/png' : 'image/jpeg';
+                        let quality = 0.85;
+                        let processed = canvas.toDataURL(mimeType, mimeType === 'image/jpeg' ? quality : undefined);
+
+                        if (processed.length > maxDataLength) {
+                            mimeType = 'image/jpeg';
+                            quality = 0.85;
+                            processed = canvas.toDataURL(mimeType, quality);
+                            while (processed.length > maxDataLength && quality > 0.5) {
+                                quality -= 0.1;
+                                processed = canvas.toDataURL(mimeType, quality);
+                            }
+                        }
+
+                        if (processed.length > maxDataLength) {
+                            reject(new Error('Image is still too large even after compression. Please choose a smaller image.'));
+                        } else {
+                            resolve(processed);
+                        }
+                    } catch (err) {
+                        reject(err);
+                    }
+                };
+                img.onerror = () => reject(new Error('Unable to load the selected image file.'));
+                img.src = originalDataUrl;
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProfiles();
+            loadSettings();
+            setupEventListeners();
+            updatePreview();
+            updateConnectionStatus();
+            // Allow auto-save after initial load is complete
+            setTimeout(() => {
+                isInitializing = false;
+                console.log('✅ Initialization complete - auto-save enabled');
+            }, 100);
+        });
+
+        // ============ PROFILES MANAGEMENT ============
+        function loadProfiles() {
+            const saved = localStorage.getItem('chatWidgetProfiles');
+            console.log('📦 RAW localStorage data:', saved ? saved.substring(0, 200) + '...' : 'EMPTY');
+            if (saved) {
+                profiles = JSON.parse(saved);
+                console.log('📦 Loaded profiles array. First profile gradientStart:', profiles[0]?.settings?.gradientStart);
+            }
+            activeProfileId = localStorage.getItem('chatWidgetActiveProfile');
+            renderProfiles();
+        }
+
+        function saveProfiles() {
+            console.log('💾 Saving profiles to localStorage. Total profiles:', profiles.length);
+            if (activeProfileId) {
+                const activeProfile = profiles.find(p => p.id === activeProfileId);
+                if (activeProfile) {
+                    console.log('💾 Active profile being saved:', {
+                        name: activeProfile.name,
+                        primaryColor: activeProfile.settings?.primaryColor,
+                        gradientStart: activeProfile.settings?.gradientStart,
+                        useGradient: activeProfile.settings?.useGradient,
+                        demoWebsiteUrl: activeProfile.settings?.demoWebsiteUrl
+                    });
+                }
+            }
+            localStorage.setItem('chatWidgetProfiles', JSON.stringify(profiles));
+            
+            // Verify the save actually worked
+            const verification = localStorage.getItem('chatWidgetProfiles');
+            const parsed = JSON.parse(verification);
+            if (activeProfileId) {
+                const verifiedProfile = parsed.find(p => p.id === activeProfileId);
+                console.log('✅ VERIFIED in localStorage:', {
+                    name: verifiedProfile?.name,
+                    gradientStart: verifiedProfile?.settings?.gradientStart,
+                    primaryColor: verifiedProfile?.settings?.primaryColor
+                });
+            }
+            
+            if (activeProfileId) {
+                localStorage.setItem('chatWidgetActiveProfile', activeProfileId);
+            }
+        }
+
+        function renderProfiles() {
+            const container = document.getElementById('profileList');
+            if (profiles.length === 0) {
+                container.innerHTML = '<p style="color: var(--admin-text-light); font-size: 13px; text-align: center; padding: 12px;">No saved profiles. Create one to quickly switch between customer demos.</p>';
+                return;
+            }
+
+            container.innerHTML = profiles.map(p => {
+                let host = 'No D365 configured';
+                try {
+                    if (p.settings && p.settings.orgUrl) {
+                        host = new URL(p.settings.orgUrl).hostname;
+                    }
+                } catch (e) {
+                    host = 'Invalid org URL';
+                }
+
+                return `
+                <div class="profile-item ${p.id === activeProfileId ? 'active' : ''}" onclick="loadProfile('${p.id}')">
+                    <div class="profile-info">
+                        <div class="profile-name">${escapeHtml(p.name)}</div>
+                        <div class="profile-desc">${host}</div>
+                    </div>
+                    <div class="profile-actions">
+                        <button class="profile-btn" onclick="event.stopPropagation(); updateProfile('${p.id}')" title="Update with current settings">
+                            <svg viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+                        </button>
+                        <button class="profile-btn delete" onclick="event.stopPropagation(); deleteProfile('${p.id}')" title="Delete profile">
+                            <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        function saveAsProfile() {
+            const nameInput = document.getElementById('newProfileName');
+            const name = nameInput.value.trim();
+            if (!name) {
+                showToast('Please enter a profile name');
+                return;
+            }
+
+            updateSettingsFromForm();
+            console.log('💾 Saving new profile with backgroundImageUrl:', settings.backgroundImageUrl);
+            
+            const profile = {
+                id: 'profile_' + Date.now(),
+                name: name,
+                settings: { ...settings },
+                createdAt: new Date().toISOString()
+            };
+
+            profiles.push(profile);
+            activeProfileId = profile.id;
+            
+            // Also save to chatWidgetSettings so index.html can load it
+            localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+            
+            saveProfiles();
+            renderProfiles();
+            nameInput.value = '';
+            showToast(`Profile "${name}" saved!`);
+        }
+
+        function loadProfile(id) {
+            console.log('🔄 loadProfile() called with id:', id);
+            const profile = profiles.find(p => p.id === id);
+            if (!profile) {
+                console.log('❌ Profile not found!');
+                return;
+            }
+
+            console.log('📂 Loading profile:', profile.name, 'settings:', {
+                backgroundImageUrl: profile.settings.backgroundImageUrl,
+                gradientStart: profile.settings.gradientStart,
+                primaryColor: profile.settings.primaryColor,
+                headerTitle: profile.settings.headerTitle
+            });
+            
+            // Temporarily disable auto-save while loading profile
+            const wasInitializing = isInitializing;
+            isInitializing = true;
+            
+            // Merge with defaults, ensuring undefined values are replaced with defaults
+            settings = { ...defaultSettings, ...profile.settings };
+            // Clean up any undefined values (from old profiles created before field existed)
+            Object.keys(settings).forEach(key => {
+                if (settings[key] === undefined && defaultSettings[key] !== undefined) {
+                    settings[key] = defaultSettings[key];
+                }
+            });
+            activeProfileId = id;
+            localStorage.setItem('chatWidgetActiveProfile', id);
+            
+            // Also save to chatWidgetSettings so index.html can load it
+            localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+            
+            populateForm();
+            updatePreview();
+            updateConnectionStatus();
+            renderProfiles();
+            
+            // Re-enable auto-save after a short delay
+            setTimeout(() => {
+                isInitializing = wasInitializing;
+                console.log('✅ Profile loaded, auto-save re-enabled');
+            }, 100);
+            
+            showToast(`Loaded "${profile.name}"`);
+        }
+
+        function updateProfile(id) {
+            const profile = profiles.find(p => p.id === id);
+            if (!profile) return;
+
+            if (confirm(`Update "${profile.name}" with current settings?`)) {
+                updateSettingsFromForm();
+                console.log('🔄 Updating profile:', profile.name, 'backgroundImageUrl:', settings.backgroundImageUrl);
+                
+                profile.settings = { ...settings };
+                profile.updatedAt = new Date().toISOString();
+                
+                // If this is the active profile, also update chatWidgetSettings
+                if (activeProfileId === id) {
+                    localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+                }
+                
+                saveProfiles();
+                showToast(`Profile "${profile.name}" updated!`);
+            }
+        }
+
+        function deleteProfile(id) {
+            const profile = profiles.find(p => p.id === id);
+            if (!profile) return;
+
+            if (confirm(`Delete profile "${profile.name}"?`)) {
+                profiles = profiles.filter(p => p.id !== id);
+                if (activeProfileId === id) {
+                    activeProfileId = null;
+                    localStorage.removeItem('chatWidgetActiveProfile');
+                }
+                saveProfiles();
+                renderProfiles();
+                showToast('Profile deleted');
+            }
+        }
+
+        // ============ SETTINGS MANAGEMENT ============
+        // Helper to sanitize image data that's too large
+        function sanitizeImageSettings(settingsObj) {
+            ['headerLogo', 'agentAvatar', 'customerAvatar'].forEach(key => {
+                if (!isSafeImageData(settingsObj[key])) {
+                    if (settingsObj[key]) {
+                        console.warn(`⚠️ Clearing invalid or oversized ${key}`);
+                    }
+                    settingsObj[key] = null;
+                }
+            });
+            return settingsObj;
+        }
+
+        function loadSettings() {
+            console.log('🔍 loadSettings called - activeProfileId:', activeProfileId);
+            // If there's an active profile, load that instead of generic settings
+            if (activeProfileId) {
+                const profile = profiles.find(p => p.id === activeProfileId);
+                if (profile) {
+                    console.log('📂 Loading profile settings:', {
+                        name: profile.name,
+                        primaryColor: profile.settings?.primaryColor,
+                        gradientStart: profile.settings?.gradientStart,
+                        useGradient: profile.settings?.useGradient,
+                        backgroundImageUrl: profile.settings?.backgroundImageUrl
+                    });
+                    settings = sanitizeImageSettings({ ...defaultSettings, ...profile.settings });
+                    populateForm();
+                    return;
+                }
+            }
+            
+            // Otherwise, load generic settings (or reset to defaults if no saved settings)
+            const saved = localStorage.getItem('chatWidgetSettings');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                // Only use saved settings that are NOT profile-specific
+                // This prevents cross-contamination between profiles
+                settings = sanitizeImageSettings({ ...defaultSettings, ...parsed });
+            } else {
+                // No saved settings - start fresh with defaults
+                settings = { ...defaultSettings };
+            }
+            populateForm();
+        }
+
+        function populateForm() {
+            // D365 Connection - LCW Code
+            const lcwTextarea = document.getElementById('lcwCode');
+            if (settings.lcwCode) {
+                lcwTextarea.value = settings.lcwCode;
+                // Parse and display extracted values
+                parseLCWCode(settings.lcwCode);
+            } else if (settings.orgId && settings.orgUrl && settings.widgetId) {
+                // If we have individual values but no lcwCode, reconstruct for display
+                showExtractedValues(settings.widgetId, settings.orgId, settings.orgUrl);
+            }
+
+            // Widget Mode
+            const widgetMode = settings.widgetMode || 'custom';
+            document.getElementById('modeStandard').checked = (widgetMode === 'standard');
+            document.getElementById('modeCustom').checked = (widgetMode === 'custom');
+            toggleWidgetMode(widgetMode);
+
+            // Text fields
+            const bgImageInput = document.getElementById('backgroundImageUrl');
+            bgImageInput.value = settings.backgroundImageUrl || '';
+            console.log('📝 Populating form - backgroundImageUrl:', settings.backgroundImageUrl);
+            
+            document.getElementById('headerTitle').value = settings.headerTitle;
+            document.getElementById('headerSubtitle').value = settings.headerSubtitle;
+            
+            // Font family
+            document.getElementById('fontFamily').value = settings.fontFamily || 'system';
+            updateFontPreview(settings.fontFamily || 'system');
+            
+            // Pre-chat form settings
+            const enablePrechatForm = settings.enablePrechatForm !== false; // Default true
+            document.getElementById('enablePrechatForm').checked = enablePrechatForm;
+            document.getElementById('defaultContactName').value = settings.defaultContactName || '';
+            document.getElementById('defaultContactEmail').value = settings.defaultContactEmail || '';
+            togglePrechatFormFields(enablePrechatForm);
+            
+            // Pre-chat form fields
+            document.getElementById('welcomeTitle').value = settings.welcomeTitle || defaultSettings.welcomeTitle;
+            document.getElementById('welcomeMessage').value = settings.welcomeMessage || defaultSettings.welcomeMessage;
+            document.getElementById('nameFieldLabel').value = settings.nameFieldLabel || defaultSettings.nameFieldLabel;
+            document.getElementById('emailFieldLabel').value = settings.emailFieldLabel || defaultSettings.emailFieldLabel;
+            document.getElementById('questionFieldLabel').value = settings.questionFieldLabel || defaultSettings.questionFieldLabel;
+            document.getElementById('startBtnText').value = settings.startBtnText || defaultSettings.startBtnText;
+
+            // Color pickers - MUST be set BEFORE toggleGradient() which calls updateSettingsFromForm()
+            const colorFields = [
+                'gradientStart', 'gradientEnd', 'primaryColor',
+                'userBubbleColor', 'userTextColor', 'agentBubbleColor', 'agentTextColor',
+                'systemMsgColor', 'systemTextColor', 'chatBgColor', 'inputBgColor',
+                'inputBorderColor', 'sendBtnColor', 'launcherColor', 'badgeColor'
+            ];
+            
+            colorFields.forEach(field => {
+                const picker = document.getElementById(field);
+                const hex = document.getElementById(field + 'Hex');
+                if (picker && settings[field]) {
+                    picker.value = settings[field];
+                    if (hex) hex.value = settings[field];
+                }
+            });
+
+            // Gradient toggle - call AFTER colors are populated
+            document.getElementById('useGradient').checked = settings.useGradient;
+            toggleGradient();
+
+            // Images
+            [
+                { key: 'headerLogo', areaId: 'logoUploadArea', isAvatar: false },
+                { key: 'agentAvatar', areaId: 'agentAvatarArea', isAvatar: true },
+                { key: 'customerAvatar', areaId: 'customerAvatarArea', isAvatar: true }
+            ].forEach(({ key, areaId, isAvatar }) => {
+                const area = document.getElementById(areaId);
+                if (!area) return;
+
+                if (isSafeImageData(settings[key])) {
+                    showUploadedImage(areaId, settings[key], isAvatar);
+                } else if (area.classList.contains('has-image')) {
+                    removeImage({ stopPropagation: () => {} }, areaId);
+                }
+            });
+        }
+
+        function setupEventListeners() {
+            // Tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+                });
+            });
+
+            // Widget Mode selector
+            document.querySelectorAll('input[name="widgetMode"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    toggleWidgetMode(e.target.value);
+                    updateSettingsFromForm();
+                    // Auto-save to active profile
+                    if (!isInitializing && activeProfileId) {
+                        const profile = profiles.find(p => p.id === activeProfileId);
+                        if (profile) {
+                            profile.settings = { ...settings };
+                            profile.updatedAt = new Date().toISOString();
+                            saveProfiles();
+                        }
+                    }
+                    if (!isInitializing) {
+                        localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+                    }
+                });
+            });
+
+            // Gradient toggle
+            document.getElementById('useGradient').addEventListener('change', toggleGradient);
+
+            // Color pickers sync
+            document.querySelectorAll('input[type="color"]').forEach(picker => {
+                const hexInput = document.getElementById(picker.id + 'Hex');
+                picker.addEventListener('input', () => {
+                    if (hexInput) hexInput.value = picker.value;
+                    updateSettingsFromForm();
+                    updatePreview();
+                    // Auto-save to active profile and localStorage (but not during initialization)
+                    if (!isInitializing && activeProfileId) {
+                        const profile = profiles.find(p => p.id === activeProfileId);
+                        if (profile) {
+                            profile.settings = { ...settings };
+                            profile.updatedAt = new Date().toISOString();
+                            saveProfiles();
+                        }
+                    }
+                    if (!isInitializing) {
+                        localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+                    }
+                });
+            });
+
+            // Hex inputs sync
+            document.querySelectorAll('.color-hex-input').forEach(input => {
+                const pickerId = input.id.replace('Hex', '');
+                const picker = document.getElementById(pickerId);
+                input.addEventListener('input', () => {
+                    let val = input.value;
+                    if (!val.startsWith('#')) val = '#' + val;
+                    if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+                        picker.value = val;
+                        updateSettingsFromForm();
+                        updatePreview();
+                        // Auto-save to active profile and localStorage (but not during initialization)
+                        if (!isInitializing && activeProfileId) {
+                            const profile = profiles.find(p => p.id === activeProfileId);
+                            if (profile) {
+                                profile.settings = { ...settings };
+                                profile.updatedAt = new Date().toISOString();
+                                saveProfiles();
+                            }
+                        }
+                        if (!isInitializing) {
+                            localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+                        }
+                    }
+                });
+            });
+
+            // Font family selector
+            document.getElementById('fontFamily').addEventListener('change', (e) => {
+                updateFontPreview(e.target.value);
+                updateSettingsFromForm();
+                updatePreview();
+                // Auto-save
+                if (!isInitializing && activeProfileId) {
+                    const profile = profiles.find(p => p.id === activeProfileId);
+                    if (profile) {
+                        profile.settings = { ...settings };
+                        profile.updatedAt = new Date().toISOString();
+                        saveProfiles();
+                    }
+                }
+                if (!isInitializing) {
+                    localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+                }
+            });
+
+            // Text inputs - real-time preview AND auto-save to active profile
+            ['backgroundImageUrl', 'headerTitle', 'headerSubtitle', 'welcomeTitle', 'welcomeMessage', 
+             'nameFieldLabel', 'emailFieldLabel', 'questionFieldLabel', 'startBtnText', 
+             'defaultContactName', 'defaultContactEmail'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', () => {
+                        updateSettingsFromForm();
+                        updatePreview();
+                        // Auto-save to active profile and localStorage (but not during initialization)
+                        if (!isInitializing && activeProfileId) {
+                            const profile = profiles.find(p => p.id === activeProfileId);
+                            if (profile) {
+                                profile.settings = { ...settings };
+                                profile.updatedAt = new Date().toISOString();
+                                saveProfiles();
+                            }
+                        }
+                        if (!isInitializing) {
+                            localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+                        }
+                    });
+                }
+            });
+
+            // Pre-chat form toggle
+            document.getElementById('enablePrechatForm').addEventListener('change', (e) => {
+                togglePrechatFormFields(e.target.checked);
+                updateSettingsFromForm();
+                // Auto-save
+                if (!isInitializing && activeProfileId) {
+                    const profile = profiles.find(p => p.id === activeProfileId);
+                    if (profile) {
+                        profile.settings = { ...settings };
+                        profile.updatedAt = new Date().toISOString();
+                        saveProfiles();
+                    }
+                }
+                if (!isInitializing) {
+                    localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+                }
+            });
+
+            // LCW Code textarea
+            document.getElementById('lcwCode').addEventListener('input', (e) => {
+                const code = e.target.value;
+                settings.lcwCode = code;
+                parseLCWCode(code);
+                updateConnectionStatus();
+            });
+
+            // File uploads
+            document.getElementById('logoInput').addEventListener('change', (e) => handleImageUpload(e, 'headerLogo', 'logoUploadArea', false));
+            document.getElementById('agentAvatarInput').addEventListener('change', (e) => handleImageUpload(e, 'agentAvatar', 'agentAvatarArea', true));
+            document.getElementById('customerAvatarInput').addEventListener('change', (e) => handleImageUpload(e, 'customerAvatar', 'customerAvatarArea', true));
+        }
+
+        // ============ CONNECTION STATUS ============
+        function updateConnectionStatus() {
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            const { orgId, orgUrl, widgetId } = settings;
+
+            if (orgId && orgUrl && widgetId) {
+                dot.className = 'status-dot connected';
+                text.textContent = 'Configuration complete - ready to connect';
+            } else if (orgId || orgUrl || widgetId) {
+                dot.className = 'status-dot error';
+                const missing = [];
+                if (!orgId) missing.push('Org ID');
+                if (!orgUrl) missing.push('Org URL');
+                if (!widgetId) missing.push('App ID');
+                text.textContent = `Missing: ${missing.join(', ')}`;
+            } else {
+                dot.className = 'status-dot';
+                text.textContent = 'Not configured - widget will run in demo mode';
+            }
+        }
+
+        // ============ LCW CODE PARSING ============
+        function parseLCWCode(code) {
+            const extractedContainer = document.getElementById('extractedValues');
+            
+            if (!code || !code.trim()) {
+                extractedContainer.style.display = 'none';
+                settings.orgId = '';
+                settings.orgUrl = '';
+                settings.widgetId = '';
+                return;
+            }
+
+            // Extract data-app-id (widget ID)
+            const appIdMatch = code.match(/data-app-id\s*=\s*["']([^"']+)["']/i);
+            const appId = appIdMatch ? appIdMatch[1] : '';
+
+            // Extract data-org-id
+            const orgIdMatch = code.match(/data-org-id\s*=\s*["']([^"']+)["']/i);
+            const orgId = orgIdMatch ? orgIdMatch[1] : '';
+
+            // Extract data-org-url
+            const orgUrlMatch = code.match(/data-org-url\s*=\s*["']([^"']+)["']/i);
+            const orgUrl = orgUrlMatch ? orgUrlMatch[1] : '';
+
+            // Update settings
+            settings.widgetId = appId;
+            settings.orgId = orgId;
+            settings.orgUrl = orgUrl;
+
+            // Display extracted values
+            if (appId || orgId || orgUrl) {
+                showExtractedValues(appId, orgId, orgUrl);
+            } else {
+                extractedContainer.style.display = 'none';
+            }
+        }
+
+        function showExtractedValues(appId, orgId, orgUrl) {
+            const extractedContainer = document.getElementById('extractedValues');
+            document.getElementById('extractedAppId').textContent = appId || '-';
+            document.getElementById('extractedOrgId').textContent = orgId || '-';
+            document.getElementById('extractedOrgUrl').textContent = orgUrl || '-';
+            extractedContainer.style.display = 'block';
+        }
+
+        function toggleGradient() {
+            const useGradient = document.getElementById('useGradient').checked;
+            document.getElementById('gradientColors').classList.toggle('show', useGradient);
+            document.getElementById('solidColorPicker').style.display = useGradient ? 'none' : 'grid';
+            updateSettingsFromForm();
+            updatePreview();
+            // Auto-save to active profile and localStorage (but not during initialization)
+            if (!isInitializing && activeProfileId) {
+                const profile = profiles.find(p => p.id === activeProfileId);
+                if (profile) {
+                    profile.settings = { ...settings };
+                    profile.updatedAt = new Date().toISOString();
+                    saveProfiles();
+                }
+            }
+            if (!isInitializing) {
+                localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+            }
+        }
+
+        function toggleWidgetMode(mode) {
+            const customSettings = document.getElementById('customWidgetSettings');
+            const previewPanel = document.querySelector('.preview-panel');
+            
+            if (mode === 'standard') {
+                customSettings.classList.add('hidden');
+                if (previewPanel) previewPanel.classList.add('hidden');
+            } else {
+                customSettings.classList.remove('hidden');
+                if (previewPanel) previewPanel.classList.remove('hidden');
+            }
+            
+            settings.widgetMode = mode;
+            console.log('Widget mode changed to:', mode);
+        }
+
+        function updateFontPreview(fontFamily) {
+            const previewText = document.getElementById('fontPreviewText');
+            const widgetPreview = document.querySelector('.widget-preview');
+            
+            const fontMap = {
+                // System
+                'system': '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                // Sans-Serif
+                'inter': '"Inter", sans-serif',
+                'roboto': '"Roboto", sans-serif',
+                'opensans': '"Open Sans", sans-serif',
+                'lato': '"Lato", sans-serif',
+                'poppins': '"Poppins", sans-serif',
+                'montserrat': '"Montserrat", sans-serif',
+                'nunito': '"Nunito", sans-serif',
+                'sourcesans': '"Source Sans Pro", sans-serif',
+                'raleway': '"Raleway", sans-serif',
+                'ubuntu': '"Ubuntu", sans-serif',
+                'rubik': '"Rubik", sans-serif',
+                'worksans': '"Work Sans", sans-serif',
+                'firasans': '"Fira Sans", sans-serif',
+                'dmsans': '"DM Sans", sans-serif',
+                'manrope': '"Manrope", sans-serif',
+                'plusjakarta': '"Plus Jakarta Sans", sans-serif',
+                'outfit': '"Outfit", sans-serif',
+                'lexend': '"Lexend", sans-serif',
+                // Serif
+                'playfair': '"Playfair Display", serif',
+                'merriweather': '"Merriweather", serif',
+                'lora': '"Lora", serif',
+                'crimson': '"Crimson Text", serif',
+                'libre': '"Libre Baskerville", serif',
+                // Monospace
+                'jetbrains': '"JetBrains Mono", monospace',
+                'firacode': '"Fira Code", monospace',
+                'sourcecodepro': '"Source Code Pro", monospace',
+                // Display
+                'quicksand': '"Quicksand", sans-serif',
+                'comfortaa': '"Comfortaa", cursive',
+                'righteous': '"Righteous", cursive'
+            };
+            
+            const fontStack = fontMap[fontFamily] || fontMap['system'];
+            
+            if (previewText) {
+                previewText.style.fontFamily = fontStack;
+            }
+            if (widgetPreview) {
+                widgetPreview.style.fontFamily = fontStack;
+            }
+        }
+
+        function handleUploadAreaClick(event, inputId) {
+            // Only trigger file input if there's no image uploaded yet
+            const area = event.currentTarget;
+            if (!area.classList.contains('has-image')) {
+                document.getElementById(inputId).click();
+            }
+        }
+
+        async function handleImageUpload(event, settingKey, areaId, isAvatar) {
+            const input = event.target;
+            const file = input.files?.[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                alert('Please choose a valid image file (PNG, JPG, GIF, or WEBP).');
+                input.value = '';
+                return;
+            }
+
+            const HARD_SIZE_LIMIT = 2 * 1024 * 1024; // 2MB hard limit before processing
+            if (file.size > HARD_SIZE_LIMIT) {
+                alert('Image too large. Please use an image under 2MB.');
+                input.value = '';
+                return;
+            }
+
+            const area = document.getElementById(areaId);
+            if (area) {
+                area.classList.add('processing');
+            }
+
+            try {
+                const maxDimension = isAvatar ? 180 : 360;
+                const processedDataUrl = await processImageFile(file, maxDimension);
+
+                settings[settingKey] = processedDataUrl;
+                showUploadedImage(areaId, processedDataUrl, isAvatar);
+                updatePreview();
+            } catch (err) {
+                console.error('Image processing error:', err);
+                alert(err.message || 'Unable to process image. Please try a smaller file.');
+            } finally {
+                if (area) {
+                    area.classList.remove('processing');
+                }
+                input.value = '';
+            }
+        }
+
+        function showUploadedImage(areaId, src, isAvatar) {
+            const area = document.getElementById(areaId);
+            if (!area) return;
+            
+            area.classList.add('has-image');
+            
+            let inputId = areaId === 'logoUploadArea' ? 'logoInput' 
+                        : areaId === 'agentAvatarArea' ? 'agentAvatarInput' 
+                        : 'customerAvatarInput';
+            
+            area.innerHTML = `
+                <div class="uploaded-image-preview ${isAvatar ? 'avatar' : ''}">
+                    <img src="${src}" alt="Uploaded">
+                    <div class="image-overlay">
+                        <button type="button" class="change-image-btn">Change</button>
+                        <button type="button" class="remove-image-btn">Remove</button>
+                    </div>
+                </div>
+            `;
+            
+            area.querySelector('.change-image-btn')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.getElementById(inputId).click();
+            });
+            
+            area.querySelector('.remove-image-btn')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                removeImage(e, areaId);
+            });
+        }
+
+        function removeImage(event, areaId) {
+            event.stopPropagation();
+            const area = document.getElementById(areaId);
+            area.classList.remove('has-image');
+            
+            let settingKey, inputId, iconSvg, text;
+            if (areaId === 'logoUploadArea') {
+                settingKey = 'headerLogo';
+                inputId = 'logoInput';
+                iconSvg = '<svg viewBox="0 0 24 24"><path d="M19 7v2.99s-1.99.01-2 0V7h-3s.01-1.99 0-2h3V2h2v3h3v2h-3zm-3 4V8h-3V5H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8h-3zM5 19l3-4 2 3 3-4 4 5H5z"/></svg>';
+                text = 'Click to upload logo';
+            } else if (areaId === 'agentAvatarArea') {
+                settingKey = 'agentAvatar';
+                inputId = 'agentAvatarInput';
+                iconSvg = '<svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+                text = 'Agent photo';
+            } else {
+                settingKey = 'customerAvatar';
+                inputId = 'customerAvatarInput';
+                iconSvg = '<svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+                text = 'Customer photo';
+            }
+
+            settings[settingKey] = null;
+            area.innerHTML = `
+                <div class="upload-icon">${iconSvg}</div>
+                <div class="upload-text">${text}</div>
+                <div class="upload-hint">Square image recommended</div>
+            `;
+            updatePreview();
+        }
+
+        // ============ PRE-CHAT FORM TOGGLE ============
+        function togglePrechatFormFields(enabled) {
+            document.getElementById('prechatFormFields').style.display = enabled ? 'block' : 'none';
+            document.getElementById('defaultContactInfo').style.display = enabled ? 'none' : 'block';
+        }
+
+        function updateSettingsFromForm() {
+            // D365 Connection - lcwCode is updated via its own event listener
+            // orgId, orgUrl, widgetId are already set by parseLCWCode()
+            settings.lcwCode = document.getElementById('lcwCode').value;
+            // Note: orgId, orgUrl, widgetId are already in settings from parseLCWCode
+
+            // Widget Mode
+            settings.widgetMode = document.querySelector('input[name="widgetMode"]:checked')?.value || 'custom';
+
+            // Demo Settings
+            const bgImageValue = document.getElementById('backgroundImageUrl').value;
+            settings.backgroundImageUrl = bgImageValue;
+            console.log('✏️ updateSettingsFromForm - backgroundImageUrl:', bgImageValue);
+
+            // Header & Branding
+            settings.headerTitle = document.getElementById('headerTitle').value;
+            settings.headerSubtitle = document.getElementById('headerSubtitle').value;
+            // Note: headerLogo is already in settings from handleImageUpload
+
+            // Fonts
+            settings.fontFamily = document.getElementById('fontFamily').value;
+
+            // Colors
+            settings.useGradient = document.getElementById('useGradient').checked;
+            settings.gradientStart = document.getElementById('gradientStart').value;
+            settings.gradientEnd = document.getElementById('gradientEnd').value;
+            settings.primaryColor = document.getElementById('primaryColor').value;
+            settings.userBubbleColor = document.getElementById('userBubbleColor').value;
+            settings.userTextColor = document.getElementById('userTextColor').value;
+            settings.agentBubbleColor = document.getElementById('agentBubbleColor').value;
+            settings.agentTextColor = document.getElementById('agentTextColor').value;
+            settings.systemMsgColor = document.getElementById('systemMsgColor').value;
+            settings.systemTextColor = document.getElementById('systemTextColor').value;
+            settings.chatBgColor = document.getElementById('chatBgColor').value;
+            settings.inputBgColor = document.getElementById('inputBgColor').value;
+            settings.inputBorderColor = document.getElementById('inputBorderColor').value;
+            settings.sendBtnColor = document.getElementById('sendBtnColor').value;
+            settings.launcherColor = document.getElementById('launcherColor').value;
+            settings.badgeColor = document.getElementById('badgeColor').value;
+
+            // Pre-chat Form
+            settings.enablePrechatForm = document.getElementById('enablePrechatForm').checked;
+            settings.defaultContactName = document.getElementById('defaultContactName').value;
+            settings.defaultContactEmail = document.getElementById('defaultContactEmail').value;
+            settings.welcomeTitle = document.getElementById('welcomeTitle').value;
+            settings.welcomeMessage = document.getElementById('welcomeMessage').value;
+            settings.nameFieldLabel = document.getElementById('nameFieldLabel').value;
+            settings.emailFieldLabel = document.getElementById('emailFieldLabel').value;
+            settings.questionFieldLabel = document.getElementById('questionFieldLabel').value;
+            settings.startBtnText = document.getElementById('startBtnText').value;
+        }
+
+        function updatePreview() {
+            try {
+                const gradient = settings.useGradient 
+                    ? `linear-gradient(135deg, ${settings.gradientStart} 0%, ${settings.gradientEnd} 100%)`
+                    : settings.primaryColor;
+
+                // Apply font to preview
+                updateFontPreview(settings.fontFamily || 'system');
+
+                // Preview container background
+                const previewContainer = document.querySelector('.preview-widget-container');
+                if (settings.backgroundImageUrl && settings.backgroundImageUrl.trim()) {
+                    // Convert Windows path to file:/// URL format
+                    const imagePath = settings.backgroundImageUrl.replace(/\\/g, '/');
+                    previewContainer.style.backgroundImage = `url("file:///${imagePath}")`;
+                } else {
+                    // Fallback to default gradient
+                    previewContainer.style.backgroundImage = '';
+                    previewContainer.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                }
+
+                // Header
+                document.getElementById('previewHeader').style.background = gradient;
+                document.getElementById('previewTitle').textContent = settings.headerTitle;
+                document.getElementById('previewStatus').textContent = settings.headerSubtitle;
+
+                const headerAvatar = document.getElementById('previewHeaderAvatar');
+                if (isSafeImageData(settings.headerLogo)) {
+                    headerAvatar.innerHTML = `<img src="${settings.headerLogo}" alt="Logo">`;
+                } else {
+                    headerAvatar.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>';
+                }
+
+                // Messages area
+                document.getElementById('previewMessages').style.background = settings.chatBgColor;
+
+                // Agent bubble
+                const agentBubble = document.getElementById('previewAgentBubble');
+                agentBubble.style.background = settings.agentBubbleColor;
+                agentBubble.style.color = settings.agentTextColor;
+
+                const agentAvatar = document.getElementById('previewAgentAvatar');
+                if (isSafeImageData(settings.agentAvatar)) {
+                    agentAvatar.innerHTML = `<img src="${settings.agentAvatar}" alt="Agent">`;
+                    agentAvatar.style.background = 'none';
+                } else {
+                    agentAvatar.innerHTML = 'A';
+                    agentAvatar.style.background = gradient;
+                }
+
+                // User bubble
+                const userBubble = document.getElementById('previewUserBubble');
+                userBubble.style.background = settings.useGradient ? gradient : settings.userBubbleColor;
+                userBubble.style.color = settings.userTextColor;
+
+                const userAvatar = document.getElementById('previewUserAvatar');
+                if (isSafeImageData(settings.customerAvatar)) {
+                    userAvatar.innerHTML = `<img src="${settings.customerAvatar}" alt="User">`;
+                    userAvatar.style.background = 'none';
+                } else {
+                    userAvatar.innerHTML = 'U';
+                    userAvatar.style.background = 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)';
+                }
+
+                // Input area & send button
+                document.getElementById('previewInputArea').style.background = settings.inputBgColor;
+                document.getElementById('previewSendBtn').style.background = settings.useGradient ? gradient : settings.sendBtnColor;
+            } catch (err) {
+                console.error('Error in updatePreview:', err);
+            }
+        }
+
+        function saveSettings() {
+            updateSettingsFromForm();
+            
+            // Create a clean copy without blob URLs (they can't be saved)
+            const settingsToSave = { ...settings };
+            ['headerLogo', 'agentAvatar', 'customerAvatar'].forEach(key => {
+                if (!isSafeImageData(settingsToSave[key])) {
+                    settingsToSave[key] = null; // Only persist sanitized image data URLs
+                }
+                delete settingsToSave[key + '_isBlob'];
+            });
+            
+            localStorage.setItem('chatWidgetSettings', JSON.stringify(settingsToSave));
+            showToast('Settings saved successfully!');
+        }
+
+        function resetSettings() {
+            if (confirm('Are you sure you want to reset all settings to default?')) {
+                settings = { ...defaultSettings };
+                localStorage.removeItem('chatWidgetSettings');
+                activeProfileId = null;
+                localStorage.removeItem('chatWidgetActiveProfile');
+                
+                // Reset D365 LCW code
+                document.getElementById('lcwCode').value = '';
+                document.getElementById('extractedValues').style.display = 'none';
+
+                // Reset form
+                document.getElementById('headerTitle').value = defaultSettings.headerTitle;
+                document.getElementById('headerSubtitle').value = defaultSettings.headerSubtitle;
+                document.getElementById('useGradient').checked = defaultSettings.useGradient;
+
+                // Reset pre-chat form fields
+                document.getElementById('welcomeTitle').value = defaultSettings.welcomeTitle;
+                document.getElementById('welcomeMessage').value = defaultSettings.welcomeMessage;
+                document.getElementById('nameFieldLabel').value = defaultSettings.nameFieldLabel;
+                document.getElementById('emailFieldLabel').value = defaultSettings.emailFieldLabel;
+                document.getElementById('questionFieldLabel').value = defaultSettings.questionFieldLabel;
+                document.getElementById('startBtnText').value = defaultSettings.startBtnText;
+                
+                // Reset colors
+                const colorFields = [
+                    'gradientStart', 'gradientEnd', 'primaryColor',
+                    'userBubbleColor', 'userTextColor', 'agentBubbleColor', 'agentTextColor',
+                    'systemMsgColor', 'systemTextColor', 'chatBgColor', 'inputBgColor',
+                    'inputBorderColor', 'sendBtnColor', 'launcherColor', 'badgeColor'
+                ];
+                colorFields.forEach(field => {
+                    const picker = document.getElementById(field);
+                    const hex = document.getElementById(field + 'Hex');
+                    if (picker) picker.value = defaultSettings[field];
+                    if (hex) hex.value = defaultSettings[field];
+                });
+
+                // Reset image areas
+                ['logoUploadArea', 'agentAvatarArea', 'customerAvatarArea'].forEach(areaId => {
+                    const area = document.getElementById(areaId);
+                    if (area.classList.contains('has-image')) {
+                        // Simulate remove
+                        const fakeEvent = { stopPropagation: () => {} };
+                        removeImage(fakeEvent, areaId);
+                    }
+                });
+
+                toggleGradient();
+                updatePreview();
+                updateConnectionStatus();
+                renderProfiles();
+                showToast('Settings reset to default!');
+            }
+        }
+
+        // ============ IMPORT/EXPORT ============
+        function exportSettings() {
+            updateSettingsFromForm();
+            const exportData = {
+                version: '1.0',
+                exportedAt: new Date().toISOString(),
+                settings: settings,
+                profiles: profiles
+            };
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `chat-widget-config-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Settings exported!');
+        }
+
+        function importSettings(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.settings) {
+                        settings = { ...defaultSettings, ...data.settings };
+                        localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+                    }
+                    
+                    if (data.profiles && Array.isArray(data.profiles)) {
+                        // Merge profiles, avoiding duplicates by name
+                        const existingNames = profiles.map(p => p.name);
+                        data.profiles.forEach(p => {
+                            if (!existingNames.includes(p.name)) {
+                                p.id = 'profile_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                                profiles.push(p);
+                            }
+                        });
+                        saveProfiles();
+                    }
+
+                    populateForm();
+                    updatePreview();
+                    updateConnectionStatus();
+                    renderProfiles();
+                    showToast('Settings imported successfully!');
+                } catch (err) {
+                    alert('Invalid configuration file');
+                    console.error('Import error:', err);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // Reset input
+        }
+
+        function copyEmbedCode() {
+            updateSettingsFromForm();
+            
+            const embedCode = `<!-- D365 Modern Chat Widget -->
+<script>
+  window.chatWidgetConfig = ${JSON.stringify({
+    orgId: settings.orgId,
+    orgUrl: settings.orgUrl,
+    widgetId: settings.widgetId,
+    theme: {
+      headerTitle: settings.headerTitle,
+      headerSubtitle: settings.headerSubtitle,
+      useGradient: settings.useGradient,
+      gradientStart: settings.gradientStart,
+      gradientEnd: settings.gradientEnd,
+      primaryColor: settings.primaryColor
+    }
+  }, null, 2)};
+<\/script>
+<script src="dist/chat-sdk-bundle.js"><\/script>`;
+
+            // Show the code block
+            const codeBlock = document.getElementById('embedCodeBlock');
+            const codeEl = document.getElementById('embedCode');
+            codeEl.textContent = embedCode;
+            codeBlock.style.display = 'block';
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(embedCode).then(() => {
+                const btn = event.target.closest('.btn');
+                btn.classList.add('copied');
+                setTimeout(() => btn.classList.remove('copied'), 2000);
+            });
+        }
+
+        // ============ UTILITY ============
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

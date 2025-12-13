@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Chat Widget</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600&family=Crimson+Text:wght@400;600&family=DM+Sans:wght@400;500;600&family=Fira+Code:wght@400;500&family=Fira+Sans:wght@400;500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Lato:wght@400;700&family=Lexend:wght@400;500;600&family=Libre+Baskerville:wght@400;700&family=Lora:wght@400;500;600&family=Manrope:wght@400;500;600&family=Merriweather:wght@400;700&family=Montserrat:wght@400;500;600&family=Nunito:wght@400;600;700&family=Open+Sans:wght@400;600&family=Outfit:wght@400;500;600&family=Playfair+Display:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600&family=Poppins:wght@400;500;600&family=Quicksand:wght@400;500;600&family=Raleway:wght@400;500;600&family=Righteous&family=Roboto:wght@400;500&family=Rubik:wght@400;500;600&family=Source+Code+Pro:wght@400;500&family=Source+Sans+Pro:wght@400;600&family=Ubuntu:wght@400;500;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="dist/chat-sdk-bundle.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            min-height: 100vh; 
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Background screenshot image */
+        #demoBackground {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: none;
+        }
+        #demoBackground.active {
+            display: block;
+        }
+        
+        /* Elegant pulse animation */
+        @keyframes elegantPulse {
+            0% {
+                box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4), 
+                            0 0 0 0 rgba(102, 126, 234, 0.4);
+            }
+            50% {
+                box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4), 
+                            0 0 0 12px rgba(102, 126, 234, 0);
+            }
+            100% {
+                box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4), 
+                            0 0 0 0 rgba(102, 126, 234, 0);
+            }
+        }
+        
+        /* Chat launcher with elegant pulse */
+        .chat-launcher {
+            position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px;
+            border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none; cursor: pointer; box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease; z-index: 1000; 
+            display: flex; align-items: center; justify-content: center;
+            animation: elegantPulse 2.5s ease-in-out infinite;
+        }
+        .chat-launcher:hover { 
+            transform: scale(1.1); 
+            box-shadow: 0 6px 30px rgba(102, 126, 234, 0.6);
+            animation: none; /* Stop pulse on hover */
+        }
+        .chat-launcher.open {
+            animation: none; /* Stop pulse when chat is open */
+        }
+        .chat-launcher svg { width: 28px; height: 28px; fill: white; }
+        /* Show/hide icons based on state */
+        .chat-launcher .chat-icon { display: block; }
+        .chat-launcher .close-icon { display: none; }
+        .chat-launcher.open .chat-icon { display: none; }
+        .chat-launcher.open .close-icon { display: block; }
+        
+        .chat-badge {
+            position: absolute; top: -4px; right: -4px; background: #ff4757; color: white;
+            font-size: 11px; font-weight: 700; min-width: 20px; height: 20px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0);
+            transition: all 0.2s ease;
+        }
+        .chat-badge.show { opacity: 1; transform: scale(1); }
+
+        /* TALLER chat container */
+        .chat-container {
+            position: fixed; bottom: 100px; right: 24px; width: 400px; height: 700px;
+            max-height: calc(100vh - 120px);
+            background: white; border-radius: 16px; box-shadow: 0 10px 50px rgba(0,0,0,0.2);
+            display: flex; flex-direction: column; overflow: hidden; opacity: 0;
+            transform: translateY(20px) scale(0.95); transition: all 0.3s ease; pointer-events: none; z-index: 999;
+        }
+        .chat-container.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 16px 20px; display: flex; align-items: center; gap: 12px; position: relative;
+        }
+        .header-avatar {
+            width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        .header-avatar svg { width: 26px; height: 26px; fill: white; }
+        .header-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .header-info { flex: 1; }
+        .header-title { color: white; font-weight: 600; font-size: 16px; }
+        .header-status { color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 2px; }
+        .header-actions { display: flex; gap: 8px; }
+        .header-btn {
+            background: rgba(255,255,255,0.2); border: none; width: 32px; height: 32px;
+            border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .header-btn:hover { background: rgba(255,255,255,0.3); }
+        .header-btn svg { width: 18px; height: 18px; fill: white; }
+
+        .chat-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        .prechat-form {
+            padding: 24px; display: flex; flex-direction: column; gap: 16px; flex: 1; justify-content: center;
+        }
+        .prechat-form.hidden { display: none; }
+        .form-title { font-size: 20px; font-weight: 600; color: #2d3748; text-align: center; margin-bottom: 8px; }
+        .form-subtitle { font-size: 14px; color: #718096; text-align: center; margin-bottom: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 13px; font-weight: 500; color: #4a5568; }
+        .form-group input, .form-group textarea {
+            padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .form-group textarea { resize: none; min-height: 80px; }
+        .start-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none; padding: 14px; border-radius: 8px; font-size: 15px;
+            font-weight: 600; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; margin-top: 8px;
+        }
+        .start-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
+        .start-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .connecting-view, .chat-ended {
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            flex: 1; gap: 16px; padding: 24px; text-align: center;
+        }
+        .connecting-view.active, .chat-ended.active { display: flex; }
+        .spinner {
+            width: 48px; height: 48px; border: 3px solid #e2e8f0; border-top-color: #667eea;
+            border-radius: 50%; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .connecting-text { color: #4a5568; font-size: 14px; }
+        .ended-icon { font-size: 48px; }
+        .ended-title { font-size: 18px; font-weight: 600; color: #2d3748; }
+        .ended-text { font-size: 14px; color: #718096; }
+        .new-chat-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 14px;
+            font-weight: 600; cursor: pointer; margin-top: 8px;
+        }
+
+        .chat-messages {
+            display: none; flex-direction: column; flex: 1; overflow-y: auto; padding: 16px;
+            gap: 12px; background: #f8fafc; scroll-behavior: smooth;
+        }
+        .chat-messages.active { display: flex; }
+
+        /* FIXED: Message wrapper with VERTICALLY CENTERED avatar */
+        .message-wrapper { 
+            display: flex; 
+            gap: 10px; 
+            max-width: 85%; 
+            animation: fadeIn 0.3s ease;
+            align-items: flex-start; /* Avatar at top, aligned with sender name */
+        }
+        .message-wrapper.user { flex-direction: row-reverse; align-self: flex-end; }
+        .message-wrapper.agent { align-self: flex-start; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .message-avatar {
+            width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; overflow: hidden;
+            margin-top: 18px; /* Align with message bubble center */
+        }
+        .message-avatar.agent { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .message-avatar.user { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; }
+        .message-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+        .message-content { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+        .message-sender { font-size: 12px; font-weight: 600; color: #64748b; padding: 0 4px; }
+        .message-wrapper.user .message-sender { text-align: right; }
+
+        .message {
+            padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.5;
+            word-wrap: break-word; white-space: pre-wrap;
+        }
+        .message.agent { background: white; color: #2d3748; border-bottom-left-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .message.user { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-bottom-right-radius: 4px; }
+        .message.system {
+            align-self: center; background: #e2e8f0; color: #64748b; font-size: 12px;
+            padding: 6px 12px; border-radius: 12px; max-width: none;
+        }
+
+        .message-time { font-size: 10px; color: #94a3b8; padding: 0 4px; }
+        .message-wrapper.user .message-time { text-align: right; }
+
+        /* Image message styles */
+        .message-image-container { display: flex; flex-direction: column; gap: 4px; }
+        .message-image {
+            max-width: 200px; max-height: 200px; border-radius: 12px; cursor: pointer;
+            transition: transform 0.2s; object-fit: contain;
+        }
+        .message-image:hover { transform: scale(1.02); }
+        .message-file-info { font-size: 11px; color: #64748b; padding: 0 4px; }
+
+        .typing-indicator { display: none; padding: 8px 0; align-items: center; gap: 8px; }
+        .typing-indicator.active { display: flex; }
+        .typing-dots { display: flex; gap: 4px; padding: 12px 16px; background: white; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-left: 46px; }
+        .typing-dots span {
+            width: 8px; height: 8px; background: #a0aec0; border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        /* Input area */
+        .chat-input-area {
+            display: none; padding: 12px 16px 16px; background: white;
+            border-top: 1px solid #e2e8f0; flex-direction: column; gap: 10px;
+        }
+        .chat-input-area.active { display: flex; }
+
+        .chat-input-wrapper { display: flex; flex-direction: column; gap: 10px; }
+
+        .message-input {
+            width: 100%; min-height: 60px; max-height: 120px; padding: 12px 14px;
+            border: 1px solid #e2e8f0; border-radius: 12px; font-size: 14px;
+            resize: none; font-family: inherit; line-height: 1.4; overflow-y: auto;
+        }
+        .message-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+        .message-input::placeholder { color: #a0aec0; }
+
+        .input-bottom-row { display: flex; align-items: center; justify-content: space-between; }
+
+        .input-actions { display: flex; gap: 4px; }
+        .action-btn {
+            width: 36px; height: 36px; border: none; background: transparent;
+            border-radius: 8px; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; color: #64748b; transition: all 0.2s;
+        }
+        .action-btn:hover { background: #f1f5f9; color: #667eea; }
+        .action-btn svg { width: 20px; height: 20px; fill: currentColor; }
+        /* Voice button active state */
+        .action-btn.recording { background: #fee2e2; color: #ef4444; }
+        .action-btn.recording svg { animation: pulse-mic 1s infinite; }
+        @keyframes pulse-mic { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* SUBTLE MODERN Send button */
+        .send-btn {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: transparent; border: none; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease; color: #667eea;
+        }
+        .send-btn:hover { background: rgba(102, 126, 234, 0.1); }
+        .send-btn:active { transform: scale(0.95); }
+        .send-btn svg { width: 22px; height: 22px; fill: currentColor; }
+
+        /* Emoji picker */
+        .emoji-picker {
+            position: absolute; bottom: 100%; left: 12px; width: 300px; max-height: 250px;
+            background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: 12px; display: none; z-index: 100; overflow: hidden;
+        }
+        .emoji-picker.show { display: block; }
+        .emoji-grid { 
+            display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; 
+            max-height: 200px; overflow-y: auto; padding-right: 4px;
+        }
+        .emoji-item {
+            width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border-radius: 6px; font-size: 20px; transition: background 0.2s;
+        }
+        .emoji-item:hover { background: #f1f5f9; transform: scale(1.1); }
+
+        /* Voice recording indicator - IMPROVED visibility */
+        .voice-recording {
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+            background: #ef4444; color: white; padding: 10px 20px; border-radius: 24px;
+            display: none; align-items: center; gap: 10px; font-size: 14px; font-weight: 500;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+        .voice-recording.show { display: flex; animation: slideDown 0.3s ease; }
+        @keyframes slideDown { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        .voice-dot { width: 10px; height: 10px; background: white; border-radius: 50%; animation: pulse-dot 1s infinite; }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+        .voice-waveform { display: flex; gap: 2px; align-items: center; }
+        .voice-waveform span { width: 3px; background: white; border-radius: 2px; animation: wave 0.6s infinite ease-in-out; }
+        .voice-waveform span:nth-child(1) { height: 8px; animation-delay: 0s; }
+        .voice-waveform span:nth-child(2) { height: 16px; animation-delay: 0.1s; }
+        .voice-waveform span:nth-child(3) { height: 12px; animation-delay: 0.2s; }
+        .voice-waveform span:nth-child(4) { height: 20px; animation-delay: 0.3s; }
+        .voice-waveform span:nth-child(5) { height: 12px; animation-delay: 0.4s; }
+        @keyframes wave { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.5); } }
+        .stop-voice-btn {
+            background: rgba(255,255,255,0.2); border: none; padding: 6px 12px;
+            border-radius: 6px; color: white; cursor: pointer; font-size: 12px; font-weight: 500;
+            transition: background 0.2s;
+        }
+        .stop-voice-btn:hover { background: rgba(255,255,255,0.3); }
+
+        /* Confirm modal */
+        .confirm-modal {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: none;
+            align-items: center; justify-content: center; z-index: 200;
+        }
+        .confirm-modal.show { display: flex; }
+        .confirm-content {
+            background: white; padding: 24px; border-radius: 16px; text-align: center;
+            max-width: 280px; margin: 20px;
+        }
+        .confirm-title { font-size: 16px; font-weight: 600; color: #2d3748; margin-bottom: 8px; }
+        .confirm-text { font-size: 14px; color: #64748b; margin-bottom: 20px; }
+        .confirm-buttons { display: flex; gap: 12px; justify-content: center; }
+        .confirm-btn {
+            padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 500;
+            cursor: pointer; transition: all 0.2s; border: none;
+        }
+        .confirm-btn.cancel { background: #e2e8f0; color: #4a5568; }
+        .confirm-btn.cancel:hover { background: #cbd5e1; }
+        .confirm-btn.end { background: #ef4444; color: white; }
+        .confirm-btn.end:hover { background: #dc2626; }
+    </style>
+</head>
+<body>
+    <!-- Background screenshot -->
+    <div id="demoBackground"></div>
+
+    <button class="chat-launcher" id="chatLauncher">
+        <span class="chat-badge" id="chatBadge">0</span>
+        <svg class="chat-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+        <svg class="close-icon" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    </button>
+
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-header">
+            <div class="header-avatar" id="headerAvatar">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+            </div>
+            <div class="header-info">
+                <div class="header-title" id="headerTitle">Support Chat</div>
+                <div class="header-status" id="headerStatus">We're here to help</div>
+            </div>
+            <div class="header-actions">
+                <!-- Download transcript button -->
+                <button class="header-btn" id="downloadChat" title="Download transcript" style="display:none;">
+                    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                </button>
+                <button class="header-btn" id="minimizeChat" title="Minimize">
+                    <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
+                </button>
+                <button class="header-btn" id="closeChat" title="Close">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="chat-body">
+            <form class="prechat-form" id="prechatForm" onsubmit="return false;">
+                <div class="form-title"> Welcome!</div>
+                <div class="form-subtitle">Please fill in your details to start chatting with us.</div>
+                <div class="form-group">
+                    <label for="userName">Name *</label>
+                    <input type="text" id="userName" placeholder="Enter your name" required>
+                </div>
+                <div class="form-group">
+                    <label for="userEmail">Email *</label>
+                    <input type="email" id="userEmail" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="userQuestion">How can we help? (optional)</label>
+                    <textarea id="userQuestion" placeholder="Describe your question..."></textarea>
+                </div>
+                <button type="button" class="start-btn" id="startBtn">Start Chat</button>
+            </form>
+
+            <div class="connecting-view" id="connectingView">
+                <div class="spinner"></div>
+                <div class="connecting-text">Connecting you with an agent...</div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="typing-indicator" id="typingIndicator">
+                    <div class="typing-dots"><span></span><span></span><span></span></div>
+                </div>
+            </div>
+
+            <div class="chat-input-area" id="chatInputArea">
+                <div class="emoji-picker" id="emojiPicker">
+                    <div class="emoji-grid" id="emojiGrid"></div>
+                </div>
+                <div class="voice-recording" id="voiceRecording">
+                    <div class="voice-dot"></div>
+                    <div class="voice-waveform"><span></span><span></span><span></span><span></span><span></span></div>
+                    <span>Recording...</span>
+                    <button class="stop-voice-btn" id="stopVoiceBtn">Stop</button>
+                </div>
+                <div class="chat-input-wrapper">
+                    <textarea class="message-input" id="messageInput" placeholder="Type your message..." rows="3"></textarea>
+                    <div class="input-bottom-row">
+                        <div class="input-actions">
+                            <input type="file" id="fileInput" hidden>
+                            <button type="button" class="action-btn" id="attachBtn" title="Attach file">
+                                <svg viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/></svg>
+                            </button>
+                            <button type="button" class="action-btn" id="emojiBtn" title="Emoji">
+                                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+                            </button>
+                            <button type="button" class="action-btn" id="voiceBtn" title="Voice input">
+                                <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
+                            </button>
+                        </div>
+                        <button type="button" class="send-btn" id="sendBtn" title="Send">
+                            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-ended" id="chatEnded">
+                <div class="ended-icon"></div>
+                <div class="ended-title">Chat Ended</div>
+                <div class="ended-text">Thank you for chatting with us!</div>
+                <button class="new-chat-btn" id="newChatBtn">Start New Chat</button>
+            </div>
+        </div>
+
+        <div class="confirm-modal" id="confirmModal">
+            <div class="confirm-content">
+                <div class="confirm-title">End Chat?</div>
+                <div class="confirm-text">Are you sure you want to end this conversation?</div>
+                <div class="confirm-buttons">
+                    <button class="confirm-btn cancel" id="confirmNo">Cancel</button>
+                    <button class="confirm-btn end" id="confirmYes">End Chat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // ============ LOAD ADMIN SETTINGS ============
+        function loadAdminSettings() {
+            const saved = localStorage.getItem('chatWidgetSettings');
+            console.log('Loading admin settings from localStorage:', saved ? 'Found' : 'Not found');
+            if (!saved) return null;
+            try {
+                const parsed = JSON.parse(saved);
+                console.log('Parsed admin settings:', parsed);
+                return parsed;
+            } catch (e) {
+                console.error('Error loading admin settings:', e);
+                return null;
+            }
+        }
+
+        const adminSettings = loadAdminSettings();
+
+        // Load background screenshot if configured
+        const demoBackground = document.getElementById('demoBackground');
+        
+        if (adminSettings?.backgroundImageUrl && adminSettings.backgroundImageUrl.trim()) {
+            let imageUrl = adminSettings.backgroundImageUrl.trim();
+            console.log('Loading background screenshot:', imageUrl);
+            
+            // Convert Windows path to file:/// URL format
+            if (imageUrl.match(/^[A-Za-z]:\\/)) {
+                imageUrl = 'file:///' + imageUrl.replace(/\\/g, '/');
+            }
+            
+            demoBackground.style.backgroundImage = `url('${imageUrl}')`;
+            demoBackground.classList.add('active');
+        }
+
+        // ============ WIDGET MODE CHECK ============
+        const widgetMode = adminSettings?.widgetMode || 'custom';
+        console.log('Widget mode:', widgetMode);
+
+        if (widgetMode === 'standard') {
+            // Hide custom widget elements but keep the background
+            document.querySelector('.chat-launcher')?.remove();
+            document.querySelector('.chat-container')?.remove();
+            // Keep demoBackground for the screenshot background
+            
+            // Load the standard D365 Live Chat Widget
+            if (adminSettings?.lcwCode) {
+                // Parse the lcwCode to extract the script attributes
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(adminSettings.lcwCode, 'text/html');
+                const scriptTag = doc.querySelector('script[id="Microsoft_Omnichannel_LCWidget"]');
+                
+                if (scriptTag) {
+                    const lcwScript = document.createElement('script');
+                    lcwScript.id = 'Microsoft_Omnichannel_LCWidget';
+                    lcwScript.src = scriptTag.getAttribute('src');
+                    lcwScript.setAttribute('data-app-id', scriptTag.getAttribute('data-app-id'));
+                    lcwScript.setAttribute('data-org-id', scriptTag.getAttribute('data-org-id'));
+                    lcwScript.setAttribute('data-org-url', scriptTag.getAttribute('data-org-url'));
+                    document.head.appendChild(lcwScript);
+                    console.log('✅ Standard D365 LCW widget loaded');
+                    
+                    // Set up D365 context provider to pass pre-chat form data for contact authentication
+                    window.addEventListener("lcw:ready", function handleLivechatReadyEvent() {
+                        console.log('✅ LCW Ready - Setting up context provider');
+                        
+                        Microsoft.Omnichannel.LiveChatWidget.SDK.setContextProvider(function contextProvider() {
+                            // Check if pre-chat form is disabled - use default contact info
+                            if (adminSettings?.enablePrechatForm === false) {
+                                const defaultName = adminSettings.defaultContactName || 'Anonymous User';
+                                const defaultEmail = adminSettings.defaultContactEmail || 'anonymous@example.com';
+                                console.log('🔒 Using default contact info (pre-chat disabled):', { defaultName, defaultEmail });
+                                
+                                return {
+                                    'emailaddress1': defaultEmail, // Contact email in Dynamics 365
+                                    'Name': { value: defaultName, isDisplayable: true }, // Contact name in Dynamics 365
+                                    'Authenticated': { value: 'Authenticated', isDisplayable: true } // Authentication status
+                                };
+                            }
+                            
+                            // Get form values from localStorage (when pre-chat is enabled)
+                            const storedContext = JSON.parse(localStorage.getItem('d365ChatContext') || '{}');
+                            
+                            return {
+                                'emailaddress1': storedContext.email || '', // Contact email in Dynamics 365
+                                'Name': { value: storedContext.name || '', isDisplayable: true }, // Contact name in Dynamics 365
+                                'Authenticated': { value: 'Authenticated', isDisplayable: true }, // Authentication status
+                                'InitialQuestion': { value: storedContext.question || '', isDisplayable: true }
+                            };
+                        });
+                        
+                        console.log('✅ Context provider configured for D365 contact authentication');
+                    });
+                    
+                    // Listen for pre-chat form submission to capture user data
+                    window.addEventListener("lcw:startChat", function handleStartChat() {
+                        // This event fires when user starts the chat via native LCW widget
+                        console.log('✅ LCW Start Chat event - context will be passed to D365');
+                    });
+                    
+                } else {
+                    console.error('❌ Could not parse LCW code');
+                }
+            } else {
+                console.warn('⚠️ No LCW code configured - cannot load standard widget');
+            }
+            
+            // Stop execution here for standard mode
+            throw new Error('Standard mode - stopping custom widget initialization');
+        }
+
+        // ============ MICROSOFT D365 CONFIGURATION ============
+        // D365 Configuration - use admin settings if available
+        const omnichannelConfig = {
+            orgId: adminSettings?.orgId || '6f473421-f852-f011-8ee4-00224820bd14',
+            widgetId: adminSettings?.widgetId || '4fea0c57-e7c2-4fe0-b274-327396965b3c',
+            orgUrl: adminSettings?.orgUrl || 'https://m-6f473421-f852-f011-8ee4-00224820bd14.us.omnichannelengagementhub.com'
+        };
+
+        let chatSDK = null, chatStarted = false, unreadCount = 0, isMinimized = false, userName = '', userEmail = '', chatMessages = [];
+        let processedMessageIds = new Set(); // Track processed message IDs to avoid duplicates
+
+        // DOM elements
+        const launcher = document.getElementById('chatLauncher');
+        const container = document.getElementById('chatContainer');
+        const badge = document.getElementById('chatBadge');
+        const prechatForm = document.getElementById('prechatForm');
+        const connectingView = document.getElementById('connectingView');
+        const messagesContainer = document.getElementById('chatMessages');
+        const inputArea = document.getElementById('chatInputArea');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const startBtn = document.getElementById('startBtn');
+        const closeBtn = document.getElementById('closeChat');
+        const minimizeBtn = document.getElementById('minimizeChat');
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmYes = document.getElementById('confirmYes');
+        const confirmNo = document.getElementById('confirmNo');
+        const headerTitle = document.getElementById('headerTitle');
+        const headerStatus = document.getElementById('headerStatus');
+        const headerAvatar = document.getElementById('headerAvatar');
+        const chatEndedView = document.getElementById('chatEnded');
+        const newChatBtn = document.getElementById('newChatBtn');
+        const attachBtn = document.getElementById('attachBtn');
+        const fileInput = document.getElementById('fileInput');
+        const emojiBtn = document.getElementById('emojiBtn');
+        const emojiPicker = document.getElementById('emojiPicker');
+        const emojiGrid = document.getElementById('emojiGrid');
+        const voiceBtn = document.getElementById('voiceBtn');
+        const voiceRecording = document.getElementById('voiceRecording');
+        const stopVoiceBtn = document.getElementById('stopVoiceBtn');
+        const downloadChatBtn = document.getElementById('downloadChat');
+
+        // FIXED: Actual emoji array with real emojis
+        const emojis = [
+            '😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂',
+            '🙂', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘',
+            '😗', '😚', '😋', '😛', '😜', '🤪', '😝', '🤑',
+            '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐', '😑',
+            '😶', '😏', '😒', '🙄', '😬', '🤥', '😌', '😔',
+            '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮',
+            '👍', '👎', '👌', '✌️', '🤞', '🤟', '🤘', '👋',
+            '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍'
+        ];
+
+        function getInitials(name) {
+            if (!name || typeof name !== 'string') return '?';
+            const trimmed = name.trim();
+            if (!trimmed) return '?';
+            const parts = trimmed.split(' ');
+            if (parts.length >= 2) return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+            return trimmed.substring(0, 2).toUpperCase();
+        }
+
+        function formatTime(date) {
+            return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // Event listeners
+        launcher.addEventListener('click', () => {
+            const isOpen = container.classList.contains('open');
+            container.classList.toggle('open');
+            launcher.classList.toggle('open');
+            if (!isOpen) { 
+                unreadCount = 0; 
+                badge.textContent = '0'; 
+                badge.classList.remove('show'); 
+                isMinimized = false;
+                
+                // Check if pre-chat form is disabled - if so, auto-start chat
+                if (adminSettings?.enablePrechatForm === false) {
+                    const defaultName = adminSettings.defaultContactName || 'Anonymous User';
+                    const defaultEmail = adminSettings.defaultContactEmail || 'anonymous@example.com';
+                    console.log('🚀 Pre-chat form disabled - auto-starting chat with:', { defaultName, defaultEmail });
+                    initializeChat(defaultName, defaultEmail, '');
+                }
+            }
+        });
+
+        minimizeBtn.addEventListener('click', () => {
+            container.classList.remove('open');
+            launcher.classList.remove('open');
+            isMinimized = true;
+        });
+
+        closeBtn.addEventListener('click', () => {
+            if (chatStarted) { confirmModal.classList.add('show'); }
+            else { container.classList.remove('open'); launcher.classList.remove('open'); }
+        });
+
+        confirmNo.addEventListener('click', () => confirmModal.classList.remove('show'));
+        confirmYes.addEventListener('click', async () => {
+            confirmModal.classList.remove('show');
+            if (chatSDK) { try { await chatSDK.endChat(); } catch (e) { console.log('End chat error:', e); } }
+            localStorage.removeItem('chatWidgetSession'); // Clear saved session
+            showView('ended');
+        });
+
+        sendBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
+
+        startBtn.addEventListener('click', async () => {
+            userName = document.getElementById('userName').value.trim();
+            userEmail = document.getElementById('userEmail').value.trim();
+            const question = document.getElementById('userQuestion').value.trim();
+            if (!userName || !userEmail) { alert('Please fill in all required fields'); return; }
+            startBtn.disabled = true; startBtn.textContent = 'Starting...';
+            await initializeChat(userName, userEmail, question);
+        });
+
+        attachBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFileSelect);
+
+        // Download transcript
+        downloadChatBtn.addEventListener('click', downloadTranscript);
+
+        function downloadTranscript() {
+            if (chatMessages.length === 0) { alert('No messages to download'); return; }
+            let transcript = `Chat Transcript\n`;
+            transcript += `Date: ${new Date().toLocaleDateString()}\n`;
+            transcript += `User: ${userName}\n`;
+            transcript += `Email: ${userEmail}\n`;
+            transcript += `${'='.repeat(50)}\n\n`;
+            chatMessages.forEach(msg => {
+                const time = formatTime(msg.timestamp);
+                const sender = msg.isUser ? userName : (msg.senderName || 'Agent');
+                transcript += `[${time}] ${sender}:\n${msg.content}\n\n`;
+            });
+            transcript += `${'='.repeat(50)}\n`;
+            transcript += `End of transcript`;
+            const blob = new Blob([transcript], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `chat-transcript-${new Date().toISOString().slice(0,10)}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function showView(view) {
+            prechatForm.classList.add('hidden');
+            connectingView.classList.remove('active');
+            messagesContainer.classList.remove('active');
+            inputArea.classList.remove('active');
+            chatEndedView.classList.remove('active');
+            downloadChatBtn.style.display = 'none';
+            
+            // Skip pre-chat form if disabled in settings
+            if (view === 'prechat' && adminSettings?.enablePrechatForm === false) {
+                console.log('⏩ Skipping pre-chat form - disabled in settings');
+                return; // Don't show anything, chat auto-starts on launcher click
+            }
+            
+            if (view === 'prechat') { prechatForm.classList.remove('hidden'); headerTitle.textContent = 'Support Chat'; headerStatus.textContent = "We're here to help"; }
+            else if (view === 'connecting') { connectingView.classList.add('active'); headerTitle.textContent = 'Connecting...'; headerStatus.textContent = 'Please wait'; }
+            else if (view === 'chat') { messagesContainer.classList.add('active'); inputArea.classList.add('active'); downloadChatBtn.style.display = 'flex'; }
+            else if (view === 'ended') { chatEndedView.classList.add('active'); chatStarted = false; headerTitle.textContent = 'Chat Ended'; headerStatus.textContent = 'Session closed'; downloadChatBtn.style.display = 'flex'; }
+        }
+
+        function updateHeaderWithAgent(agentName, agentImage) {
+            // Ensure agentName is a string
+            const name = (typeof agentName === 'string') ? agentName : 'Support Agent';
+            headerTitle.textContent = name || 'Support Agent';
+            headerStatus.textContent = 'Online';
+            if (agentImage) { headerAvatar.innerHTML = `<img src="${agentImage}" alt="${name}">`; }
+            else { headerAvatar.innerHTML = `<span style="color:white;font-weight:600;font-size:14px;">${getInitials(name)}</span>`; }
+        }
+
+        function createAvatarElement(isUser, senderName, senderImage) {
+            const avatar = document.createElement('div');
+            avatar.className = `message-avatar ${isUser ? 'user' : 'agent'}`;
+            if (senderImage) { avatar.innerHTML = `<img src="${senderImage}" alt="${senderName}">`; }
+            else { avatar.textContent = getInitials(senderName || (isUser ? userName : 'Agent')); }
+            return avatar;
+        }
+
+        function addImageMessage(fileInfo, isUser, senderName, senderImage) {
+            const now = new Date();
+            const wrapper = document.createElement('div');
+            wrapper.className = `message-wrapper ${isUser ? 'user' : 'agent'}`;
+            // Use admin-configured avatars if no senderImage provided
+            const avatarImage = senderImage || (isUser ? adminSettings?.customerAvatar : adminSettings?.agentAvatar);
+            const avatar = createAvatarElement(isUser, senderName, avatarImage);
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            content.innerHTML = `
+                <div class="message-sender">${isUser ? userName : (senderName || 'Agent')}</div>
+                <div class="message-image-container">
+                    <img src="${fileInfo.url}" class="message-image" alt="${fileInfo.name}" onclick="window.open('${fileInfo.url}', '_blank')">
+                    <div class="message-file-info">${fileInfo.name}</div>
+                </div>
+                <div class="message-time">${formatTime(now)}</div>
+            `;
+            wrapper.appendChild(avatar);
+            wrapper.appendChild(content);
+            typingIndicator.parentNode.insertBefore(wrapper, typingIndicator);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            chatMessages.push({ isUser, content: `[Image: ${fileInfo.name}]`, senderName: isUser ? userName : senderName, timestamp: now });
+        }
+
+        function addMessage(text, isUser = false, senderName = null, senderImage = null) {
+            const now = new Date();
+            const wrapper = document.createElement('div');
+            wrapper.className = `message-wrapper ${isUser ? 'user' : 'agent'}`;
+            // Use admin-configured avatars if no senderImage provided
+            const avatarImage = senderImage || (isUser ? adminSettings?.customerAvatar : adminSettings?.agentAvatar);
+            const avatar = createAvatarElement(isUser, senderName, avatarImage);
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            content.innerHTML = `
+                <div class="message-sender">${isUser ? userName : (senderName || 'Agent')}</div>
+                <div class="message ${isUser ? 'user' : 'agent'}">${text}</div>
+                <div class="message-time">${formatTime(now)}</div>
+            `;
+            wrapper.appendChild(avatar);
+            wrapper.appendChild(content);
+            typingIndicator.parentNode.insertBefore(wrapper, typingIndicator);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            chatMessages.push({ isUser, content: text, senderName: isUser ? userName : senderName, timestamp: now });
+            saveChatSession(); // Save after adding message
+            if (!isUser && !container.classList.contains('open')) {
+                unreadCount++; badge.textContent = unreadCount; badge.classList.add('show');
+            }
+        }
+
+        function processMessage(message) {
+            if (!message) return;
+            
+            // Get message ID - try various possible ID fields
+            const messageId = message.messageId || message.id || message.clientmessageid || message.messageid;
+            
+            // Skip if already processed
+            if (messageId && processedMessageIds.has(messageId)) {
+                console.log('Skipping already processed message:', messageId);
+                return;
+            }
+            
+            // Mark as processed
+            if (messageId) {
+                processedMessageIds.add(messageId);
+            }
+            
+            // Get message content - try various possible content fields
+            const content = message.content || message.text || message.body;
+            
+            // Check for file attachments (images, files sent by agent)
+            const fileMetadata = message.fileMetadata || message.attachments || message.attachment;
+            
+            // Log full message if no content (helps debug attachment structure)
+            if (!content && !fileMetadata) {
+                console.log('Message has no content or attachments - full object:', JSON.stringify(message, null, 2));
+                return;
+            }
+            
+            // Determine message role
+            const role = message.role || message.senderRole || message.deliveryMode;
+            
+            // Extract sender info - senderId can be an object with displayName
+            const senderId = message.senderId || message.sender;
+            let senderName = 'Agent';
+            if (typeof senderId === 'object' && senderId !== null) {
+                senderName = senderId.displayName || senderId.name || 'Agent';
+            } else if (typeof senderId === 'string') {
+                senderName = senderId;
+            }
+            // Also check direct senderDisplayName field
+            if (message.senderDisplayName) {
+                senderName = message.senderDisplayName;
+            }
+            
+            console.log('Processing message - role:', role, 'senderName:', senderName, 'content:', content, 'fileMetadata:', fileMetadata);
+            
+            const isFromUser = role === 'user' || role === 'User' || role === 1;
+            const isFromBot = role === 'bot' || role === 'Bot' || role === 2;
+            const isFromAgent = role === 'agent' || role === 'Agent' || role === 3;
+            const isSystem = role === 'system' || role === 'System';
+            
+            // Skip user messages (those are added when sent)
+            if (isFromUser) {
+                console.log('Skipping user message');
+                return;
+            }
+            
+            // Handle system messages
+            if (isSystem) {
+                addSystemMessage(content);
+                return;
+            }
+            
+            // Handle agent/bot messages
+            if (isFromBot || isFromAgent || !isFromUser) {
+                // Only update header for actual agent (not system)
+                if (isFromAgent && senderName && senderName !== '__agent__') {
+                    updateHeaderWithAgent(senderName, null);
+                }
+                
+                // Handle file/image attachments
+                if (fileMetadata) {
+                    handleAgentAttachment(fileMetadata, senderName);
+                }
+                
+                // Handle text content
+                if (content) {
+                    addMessage(content, false, senderName, null);
+                }
+            }
+        }
+        
+        function handleAgentAttachment(fileMetadata, senderName) {
+            console.log('Handling agent attachment:', fileMetadata);
+            
+            // fileMetadata can be a single object or an array
+            const attachments = Array.isArray(fileMetadata) ? fileMetadata : [fileMetadata];
+            
+            attachments.forEach(async (attachment) => {
+                const fileName = attachment.name || attachment.fileName || attachment.filePath || 'File';
+                const fileType = attachment.type || attachment.contentType || attachment.mimeType || '';
+                const fileId = attachment.id;
+                
+                console.log('Attachment details - name:', fileName, 'id:', fileId, 'type:', fileType);
+                
+                // Check if there's a direct URL first
+                let fileUrl = attachment.url || attachment.downloadUrl || attachment.filePath;
+                
+                // If no direct URL but we have an ID, use SDK to download the file
+                if (!fileUrl && fileId && chatSDK) {
+                    try {
+                        console.log('Downloading attachment via SDK...');
+                        const blob = await chatSDK.downloadFileAttachment(attachment);
+                        console.log('Downloaded blob:', blob);
+                        
+                        if (blob) {
+                            // Create a blob URL from the downloaded content
+                            fileUrl = URL.createObjectURL(blob);
+                            console.log('Created blob URL:', fileUrl);
+                        }
+                    } catch (err) {
+                        console.error('Error downloading attachment:', err);
+                    }
+                }
+                
+                if (fileUrl) {
+                    if (fileType.startsWith('image/') || /\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(fileName)) {
+                        // It's an image
+                        addImageMessage({ name: fileName, url: fileUrl }, false, senderName, null);
+                    } else {
+                        // It's a file - show as downloadable link
+                        addFileMessage({ name: fileName, url: fileUrl, type: fileType }, false, senderName, null);
+                    }
+                } else {
+                    console.log('Could not get URL for attachment:', attachment);
+                    // Show a placeholder message indicating a file was received but couldn't be loaded
+                    addMessage(`?? ${fileName} (file could not be loaded)`, false, senderName, null);
+                }
+            });
+        }
+        
+        function addFileMessage(fileInfo, isUser, senderName, senderImage) {
+            const now = new Date();
+            const wrapper = document.createElement('div');
+            wrapper.className = `message-wrapper ${isUser ? 'user' : 'agent'}`;
+            const avatar = createAvatarElement(isUser, senderName, senderImage);
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            content.innerHTML = `
+                <div class="message-sender">${isUser ? userName : (senderName || 'Agent')}</div>
+                <div class="message ${isUser ? 'user' : 'agent'}">
+                    <a href="${fileInfo.url}" target="_blank" style="color: inherit; text-decoration: underline;">
+                        ?? ${fileInfo.name}
+                    </a>
+                </div>
+                <div class="message-time">${formatTime(now)}</div>
+            `;
+            wrapper.appendChild(avatar);
+            wrapper.appendChild(content);
+            typingIndicator.parentNode.insertBefore(wrapper, typingIndicator);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            chatMessages.push({ isUser, content: `[File: ${fileInfo.name}]`, senderName: isUser ? userName : senderName, timestamp: now });
+        }
+        
+        function addSystemMessage(text) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message-wrapper';
+            wrapper.style.justifyContent = 'center';
+            wrapper.style.maxWidth = '100%';
+            
+            const msg = document.createElement('div');
+            msg.className = 'message system';
+            msg.textContent = text;
+            
+            wrapper.appendChild(msg);
+            typingIndicator.parentNode.insertBefore(wrapper, typingIndicator);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        async function pollMessages() {
+            if (!chatSDK || !chatStarted) return;
+            try {
+                const messages = await chatSDK.getMessages();
+                console.log('Polled messages:', messages);
+                if (messages && messages.length) {
+                    messages.forEach(msg => {
+                        processMessage(msg);
+                    });
+                }
+            } catch (e) { console.log('Poll error:', e); }
+        }
+
+        // ============ SESSION PERSISTENCE ============
+        let liveChatContext = null; // Store live chat context for reconnection
+        
+        async function saveChatSession() {
+            if (!chatStarted || !chatSDK) {
+                localStorage.removeItem('chatWidgetSession');
+                return;
+            }
+            
+            // Get live chat context from SDK for reconnection
+            try {
+                liveChatContext = await chatSDK.getCurrentLiveChatContext();
+                console.log('📍 Got live chat context:', liveChatContext);
+            } catch (e) {
+                console.log('⚠️ Could not get live chat context:', e);
+            }
+            
+            const session = {
+                userName,
+                userEmail,
+                chatStarted,
+                messages: chatMessages,
+                processedIds: Array.from(processedMessageIds),
+                liveChatContext: liveChatContext, // Save context for reconnection
+                timestamp: Date.now()
+            };
+            
+            localStorage.setItem('chatWidgetSession', JSON.stringify(session));
+            console.log('💾 Chat session saved with context');
+        }
+
+        async function restoreChatSession() {
+            const saved = localStorage.getItem('chatWidgetSession');
+            if (!saved) return false;
+            
+            try {
+                const session = JSON.parse(saved);
+                
+                // Check if session is recent (less than 1 hour old)
+                const oneHour = 60 * 60 * 1000;
+                if (Date.now() - session.timestamp > oneHour) {
+                    console.log('⏰ Session expired - clearing');
+                    localStorage.removeItem('chatWidgetSession');
+                    return false;
+                }
+                
+                // Check if we have live chat context to reconnect
+                if (!session.liveChatContext) {
+                    console.log('⚠️ No live chat context - cannot reconnect');
+                    localStorage.removeItem('chatWidgetSession');
+                    return false;
+                }
+                
+                // Restore session state
+                userName = session.userName || '';
+                userEmail = session.userEmail || '';
+                liveChatContext = session.liveChatContext;
+                chatMessages = session.messages || [];
+                processedMessageIds = new Set(session.processedIds || []);
+                
+                // Try to reconnect to existing chat session
+                console.log('🔄 Attempting to reconnect to existing chat...');
+                showView('connecting');
+                
+                try {
+                    const OmnichannelChatSDK = window.OmnichannelChatSDK;
+                    chatSDK = new OmnichannelChatSDK(omnichannelConfig);
+                    await chatSDK.initialize();
+                    
+                    // Set up message listener
+                    chatSDK.onNewMessage((msg) => {
+                        console.log('onNewMessage event received:', msg);
+                        if (msg) processMessage(msg);
+                    });
+                    
+                    chatSDK.onTypingEvent(() => {
+                        typingIndicator.classList.add('active');
+                        setTimeout(() => typingIndicator.classList.remove('active'), 3000);
+                    });
+                    
+                    chatSDK.onAgentEndSession(() => { 
+                        console.log('Agent ended session');
+                        localStorage.removeItem('chatWidgetSession');
+                        showView('ended'); 
+                    });
+                    
+                    // Reconnect to existing chat using saved context
+                    await chatSDK.startChat({ liveChatContext: session.liveChatContext });
+                    console.log('✅ Reconnected to existing chat session!');
+                    
+                    chatStarted = true;
+                    chatMessages = session.messages || [];
+                    
+                    // Restore UI - rebuild message display
+                    showView('chat');
+                    chatMessages.forEach(msg => {
+                        if (msg.content) {
+                            const now = msg.timestamp ? new Date(msg.timestamp) : new Date();
+                            const wrapper = document.createElement('div');
+                            wrapper.className = `message-wrapper ${msg.isUser ? 'user' : 'agent'}`;
+                            
+                            const avatarImage = msg.isUser ? adminSettings?.customerAvatar : adminSettings?.agentAvatar;
+                            const avatar = createAvatarElement(msg.isUser, msg.senderName, avatarImage);
+                            
+                            const content = document.createElement('div');
+                            content.className = 'message-content';
+                            content.innerHTML = `
+                                <div class="message-sender">${msg.isUser ? userName : (msg.senderName || 'Agent')}</div>
+                                <div class="message ${msg.isUser ? 'user' : 'agent'}">${msg.content}</div>
+                                <div class="message-time">${formatTime(now)}</div>
+                            `;
+                            wrapper.appendChild(avatar);
+                            wrapper.appendChild(content);
+                            typingIndicator.parentNode.insertBefore(wrapper, typingIndicator);
+                        }
+                    });
+                    
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    
+                    // Start polling for new messages
+                    setInterval(pollMessages, 3000);
+                    
+                    console.log('✅ Chat session fully restored with', chatMessages.length, 'messages');
+                    return true;
+                    
+                } catch (reconnectError) {
+                    console.error('❌ Failed to reconnect:', reconnectError);
+                    localStorage.removeItem('chatWidgetSession');
+                    showView('prechat');
+                    return false;
+                }
+                
+            } catch (error) {
+                console.error('❌ Error restoring session:', error);
+                localStorage.removeItem('chatWidgetSession');
+            }
+            
+            return false;
+        }
+
+        async function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file || !chatSDK || !chatStarted) return;
+            try {
+                const reader = new FileReader();
+                reader.onload = async (ev) => {
+                    if (file.type.startsWith('image/')) { addImageMessage({ name: file.name, url: ev.target.result }, true, userName, null); }
+                };
+                reader.readAsDataURL(file);
+                await chatSDK.uploadFileAttachment(file);
+            } catch (err) { console.error('File upload error:', err); alert('Failed to upload file'); }
+            fileInput.value = '';
+        }
+
+        async function initializeChat(name, email, question) {
+            try {
+                showView('connecting');
+                chatMessages = [];
+                processedMessageIds.clear(); // Clear any previously tracked messages
+                const OmnichannelChatSDK = window.OmnichannelChatSDK;
+                chatSDK = new OmnichannelChatSDK(omnichannelConfig);
+                await chatSDK.initialize();
+                console.log('SDK initialized');
+                
+                // Set up message listener BEFORE starting chat
+                chatSDK.onNewMessage((msg) => {
+                    console.log('onNewMessage event received:', msg);
+                    console.log('Message details - content:', msg?.content, 'role:', msg?.role, 'id:', msg?.messageId || msg?.id);
+                    if (msg) {
+                        processMessage(msg);
+                    }
+                });
+                
+                chatSDK.onTypingEvent(() => {
+                    console.log('Typing event received');
+                    typingIndicator.classList.add('active');
+                    setTimeout(() => typingIndicator.classList.remove('active'), 3000);
+                });
+                
+                chatSDK.onAgentEndSession(() => { 
+                    console.log('Agent ended session');
+                    localStorage.removeItem('chatWidgetSession'); // Clear session when ended
+                    showView('ended'); 
+                });
+                
+                // D365 Context - uses proper field identifiers for contact authentication
+                // 'Name' and 'emailaddress1' allow D365 to automatically populate contact records
+                const customContext = {
+                    'emailaddress1': { value: email, isDisplayable: true }, // Contact email in Dynamics 365
+                    'Name': { value: name, isDisplayable: true }, // Contact name in Dynamics 365
+                    'Authenticated': { value: 'Authenticated', isDisplayable: true }, // Authentication status
+                    'InitialQuestion': { value: question || '', isDisplayable: true }
+                };
+                
+                // Also store in localStorage for standard mode context provider
+                localStorage.setItem('d365ChatContext', JSON.stringify({ name, email, question }));
+                
+                await chatSDK.startChat({ customContext });
+                console.log('Chat started with D365 context:', customContext);
+                chatStarted = true;
+                saveChatSession(); // Save initial session state
+                showView('chat');
+                if (question) { await sendMessageText(question); }
+                setInterval(pollMessages, 3000);
+            } catch (error) {
+                console.error('Chat init error:', error);
+                alert('Failed to start chat. Please try again.');
+                showView('prechat');
+                startBtn.disabled = false; startBtn.textContent = 'Start Chat';
+            }
+        }
+
+        async function sendMessageText(text) {
+            if (!text || !chatSDK || !chatStarted) return;
+            addMessage(text, true, userName, null);
+            try { await chatSDK.sendMessage({ content: text }); } catch (e) { console.error('Send error:', e); }
+        }
+
+        async function sendMessage() {
+            const text = messageInput.value.trim();
+            if (!text) return;
+            messageInput.value = '';
+            await sendMessageText(text);
+        }
+
+        // Emoji picker - Use native OS emoji picker
+        emojiBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Focus the message input first
+            messageInput.focus();
+            
+            // Try to trigger native emoji picker using keyboard simulation
+            // Windows: Win + . (period) | Mac: Cmd + Ctrl + Space
+            try {
+                // Create and dispatch the keyboard event for emoji picker
+                const isWindows = navigator.platform.indexOf('Win') > -1;
+                const isMac = navigator.platform.indexOf('Mac') > -1;
+                
+                if (isWindows) {
+                    // For Windows, we show a helpful tooltip since we can't programmatically trigger Win+.
+                    const tooltip = document.createElement('div');
+                    tooltip.style.cssText = `
+                        position: fixed; bottom: 120px; right: 30px; background: #1e293b; color: white;
+                        padding: 12px 16px; border-radius: 8px; font-size: 13px; z-index: 10000;
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.3); animation: fadeIn 0.2s ease;
+                    `;
+                    tooltip.innerHTML = `<strong>💡 Tip:</strong> Press <kbd style="background:#374151;padding:2px 6px;border-radius:4px;margin:0 2px;">Win</kbd> + <kbd style="background:#374151;padding:2px 6px;border-radius:4px;margin:0 2px;">.</kbd> for emojis`;
+                    document.body.appendChild(tooltip);
+                    setTimeout(() => tooltip.remove(), 3000);
+                } else if (isMac) {
+                    const tooltip = document.createElement('div');
+                    tooltip.style.cssText = `
+                        position: fixed; bottom: 120px; right: 30px; background: #1e293b; color: white;
+                        padding: 12px 16px; border-radius: 8px; font-size: 13px; z-index: 10000;
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.3); animation: fadeIn 0.2s ease;
+                    `;
+                    tooltip.innerHTML = `<strong>💡 Tip:</strong> Press <kbd style="background:#374151;padding:2px 6px;border-radius:4px;margin:0 2px;">Cmd</kbd> + <kbd style="background:#374151;padding:2px 6px;border-radius:4px;margin:0 2px;">Ctrl</kbd> + <kbd style="background:#374151;padding:2px 6px;border-radius:4px;margin:0 2px;">Space</kbd> for emojis`;
+                    document.body.appendChild(tooltip);
+                    setTimeout(() => tooltip.remove(), 3000);
+                }
+            } catch (err) {
+                console.log('Emoji picker error:', err);
+            }
+        });
+
+        // Voice input with visual indicator
+        let recognition = null;
+        let isRecording = false;
+
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                isRecording = true;
+                voiceBtn.classList.add('recording');
+                voiceRecording.classList.add('show');
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                messageInput.value += transcript;
+            };
+
+            recognition.onend = () => {
+                isRecording = false;
+                voiceBtn.classList.remove('recording');
+                voiceRecording.classList.remove('show');
+            };
+
+            recognition.onerror = (event) => {
+                console.log('Speech recognition error:', event.error);
+                isRecording = false;
+                voiceBtn.classList.remove('recording');
+                voiceRecording.classList.remove('show');
+            };
+
+            voiceBtn.addEventListener('click', () => {
+                if (isRecording) {
+                    recognition.stop();
+                } else {
+                    recognition.start();
+                }
+            });
+
+            stopVoiceBtn.addEventListener('click', () => {
+                recognition.stop();
+            });
+        } else {
+            voiceBtn.style.display = 'none';
+        }
+
+        // New chat button
+        newChatBtn.addEventListener('click', () => {
+            chatSDK = null; chatStarted = false;
+            processedMessageIds.clear(); // Clear processed message IDs
+            chatMessages = []; // Clear messages array
+            localStorage.removeItem('chatWidgetSession'); // Clear saved session
+            messagesContainer.querySelectorAll('.message-wrapper').forEach(el => el.remove());
+            document.getElementById('userName').value = '';
+            document.getElementById('userEmail').value = '';
+            document.getElementById('userQuestion').value = '';
+            startBtn.disabled = false; startBtn.textContent = adminSettings?.startBtnText || 'Start Chat';
+            headerAvatar.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>';
+            showView('prechat');
+        });
+
+        // ============ APPLY ADMIN THEME SETTINGS ============
+        function applyAdminTheme() {
+            if (!adminSettings) {
+                console.log('?? No admin settings found - using default theme');
+                return;
+            }
+
+            console.log('? Applying admin theme with settings:', adminSettings);
+            const s = adminSettings;
+            
+            // Font family mapping
+            const fontMap = {
+                // System
+                'system': '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                // Sans-Serif
+                'inter': '"Inter", sans-serif',
+                'roboto': '"Roboto", sans-serif',
+                'opensans': '"Open Sans", sans-serif',
+                'lato': '"Lato", sans-serif',
+                'poppins': '"Poppins", sans-serif',
+                'montserrat': '"Montserrat", sans-serif',
+                'nunito': '"Nunito", sans-serif',
+                'sourcesans': '"Source Sans Pro", sans-serif',
+                'raleway': '"Raleway", sans-serif',
+                'ubuntu': '"Ubuntu", sans-serif',
+                'rubik': '"Rubik", sans-serif',
+                'worksans': '"Work Sans", sans-serif',
+                'firasans': '"Fira Sans", sans-serif',
+                'dmsans': '"DM Sans", sans-serif',
+                'manrope': '"Manrope", sans-serif',
+                'plusjakarta': '"Plus Jakarta Sans", sans-serif',
+                'outfit': '"Outfit", sans-serif',
+                'lexend': '"Lexend", sans-serif',
+                // Serif
+                'playfair': '"Playfair Display", serif',
+                'merriweather': '"Merriweather", serif',
+                'lora': '"Lora", serif',
+                'crimson': '"Crimson Text", serif',
+                'libre': '"Libre Baskerville", serif',
+                // Monospace
+                'jetbrains': '"JetBrains Mono", monospace',
+                'firacode': '"Fira Code", monospace',
+                'sourcecodepro': '"Source Code Pro", monospace',
+                // Display
+                'quicksand': '"Quicksand", sans-serif',
+                'comfortaa': '"Comfortaa", cursive',
+                'righteous': '"Righteous", cursive'
+            };
+            const fontFamily = fontMap[s.fontFamily] || fontMap['system'];
+            
+            // Determine gradient or solid color
+            const gradient = s.useGradient 
+                ? `linear-gradient(135deg, ${s.gradientStart || '#667eea'} 0%, ${s.gradientEnd || '#764ba2'} 100%)`
+                : s.primaryColor || '#667eea';
+            
+            const launcherBg = s.launcherColor || gradient;
+
+            // Create dynamic style element
+            const styleEl = document.createElement('style');
+            styleEl.id = 'admin-theme';
+            styleEl.textContent = `
+                /* Font */
+                .chat-container, .chat-launcher { font-family: ${fontFamily} !important; }
+                
+                /* Header & Launcher */
+                .chat-header { background: ${gradient} !important; }
+                .chat-launcher { background: ${launcherBg} !important; }
+                .chat-launcher:hover { box-shadow: 0 6px 30px ${s.gradientStart || '#667eea'}66 !important; }
+
+                /* Messages */
+                .chat-messages { background: ${s.chatBgColor || '#f8fafc'} !important; }
+                .message.user { background: ${s.useGradient ? gradient : (s.userBubbleColor || '#667eea')} !important; color: ${s.userTextColor || '#ffffff'} !important; }
+                .message.agent { background: ${s.agentBubbleColor || '#ffffff'} !important; color: ${s.agentTextColor || '#2d3748'} !important; }
+                .message.system { background: ${s.systemMsgColor || '#e2e8f0'} !important; color: ${s.systemTextColor || '#64748b'} !important; }
+                .message-avatar.agent { background: ${gradient} !important; }
+
+                /* Input Area */
+                .chat-input-area { background: ${s.inputBgColor || '#ffffff'} !important; }
+                .message-input { border-color: ${s.inputBorderColor || '#e2e8f0'} !important; }
+                .message-input:focus { border-color: ${s.gradientStart || '#667eea'} !important; box-shadow: 0 0 0 3px ${s.gradientStart || '#667eea'}1a !important; }
+                .send-btn { color: ${s.sendBtnColor || '#667eea'} !important; }
+                .send-btn:hover { background: ${s.sendBtnColor || '#667eea'}1a !important; }
+
+                /* Buttons */
+                .start-btn { background: ${gradient} !important; }
+                .start-btn:hover { box-shadow: 0 4px 15px ${s.gradientStart || '#667eea'}66 !important; }
+                .new-chat-btn { background: ${gradient} !important; }
+                
+                /* Badge */
+                .chat-badge { background: ${s.badgeColor || '#ff4757'} !important; }
+            `;
+            document.head.appendChild(styleEl);
+
+            // Apply header text
+            if (s.headerTitle) {
+                headerTitle.textContent = s.headerTitle;
+            }
+            if (s.headerSubtitle) {
+                headerStatus.textContent = s.headerSubtitle;
+            }
+
+            // Apply header logo if set
+            if (s.headerLogo) {
+                headerAvatar.innerHTML = `<img src="${s.headerLogo}" alt="Logo" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            }
+
+            // Apply pre-chat form labels
+            if (s.welcomeTitle) {
+                const formTitle = document.querySelector('.form-title');
+                if (formTitle) formTitle.textContent = s.welcomeTitle;
+            }
+            if (s.welcomeMessage) {
+                const formSubtitle = document.querySelector('.form-subtitle');
+                if (formSubtitle) formSubtitle.textContent = s.welcomeMessage;
+            }
+            if (s.nameFieldLabel) {
+                const nameLabel = document.querySelector('label[for="userName"]');
+                if (nameLabel) nameLabel.textContent = s.nameFieldLabel + ' *';
+            }
+            if (s.emailFieldLabel) {
+                const emailLabel = document.querySelector('label[for="userEmail"]');
+                if (emailLabel) emailLabel.textContent = s.emailFieldLabel + ' *';
+            }
+            if (s.questionFieldLabel) {
+                const questionLabel = document.querySelector('label[for="userQuestion"]');
+                if (questionLabel) questionLabel.textContent = s.questionFieldLabel + ' (optional)';
+            }
+            if (s.startBtnText) {
+                startBtn.textContent = s.startBtnText;
+            }
+
+            console.log('✅ Admin theme applied successfully');
+        }
+
+        // Apply theme on load
+        applyAdminTheme();
+        
+        // Restore previous chat session if available (async)
+        (async function initPage() {
+            const sessionRestored = await restoreChatSession();
+            if (!sessionRestored) {
+                showView('prechat');
+            }
+        })();
+    </script>
+</body>
+</html>
