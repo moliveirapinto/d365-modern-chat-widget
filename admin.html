@@ -1077,11 +1077,13 @@
                     </div>
                     <div class="card-body">
                         <div class="form-group">
-                            <label class="toggle-label">
-                                <input type="checkbox" id="enableStandardAuth" class="toggle-input">
-                                <span class="toggle-slider"></span>
-                                <span class="toggle-text">Enable Auto-Authentication</span>
-                            </label>
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="enableStandardAuth">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label">Enable Auto-Authentication</span>
+                            </div>
                             <p class="form-help">When enabled, the widget will automatically authenticate users using the contact information below. This links chat sessions to existing D365 contact records without requiring a pre-chat form.</p>
                         </div>
                         <div id="standardAuthFields" class="hidden">
