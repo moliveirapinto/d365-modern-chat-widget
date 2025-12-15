@@ -1,123 +1,227 @@
-# Modern Dynamics 365 Live Chat Widget
+# 🚀 Modern Dynamics 365 Live Chat Widget
 
-A beautiful, modern custom chat widget UI for Microsoft Dynamics 365 Omnichannel for Customer Service with an intuitive admin panel for managing multiple customer configurations. This implementation completely replaces the out-of-the-box (OOTB) chat widget with a sleek, contemporary design.
+> **A beautiful, modern custom chat widget UI for Microsoft Dynamics 365 Omnichannel** with an intuitive admin panel, advanced session persistence, and contact authentication. This implementation completely replaces the out-of-the-box (OOTB) chat widget with a sleek, contemporary design.
+
+[![D365 Compatible](https://img.shields.io/badge/D365-Omnichannel-0078D4?style=flat-square&logo=microsoft)](https://dynamics.microsoft.com)
+[![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue?style=flat-square)](package.json)
 
 ![Chat Widget Preview](preview.png)
 
-## ✨ Features
+---
+
+
+## 📋 Table of Contents
+
+- [✨ Key Features](#-key-features)
+- [🎯 Why Choose This Widget?](#-why-choose-this-widget)
+- [🚀 Quick Start](#-quick-start)
+- [📁 Project Structure](#-project-structure)
+- [🎨 Admin Panel Guide](#-admin-panel-guide)
+- [🔑 Advanced Features](#-advanced-features)
+- [🔧 SDK Integration](#-sdk-integration)
+- [📱 Mobile Support](#-mobile-support)
+- [🧪 Demo Mode](#-demo-mode)
+- [🛠️ Troubleshooting](#️-troubleshooting)
+- [📚 Documentation](#-documentation)
+- [🤝 Support](#-support)
+
+---
+
+## ✨ Key Features
+
+### 🎯 Core Capabilities
+
+<table>
+<tr>
+<td width="50%">
+
+#### Chat Widget
+- ✅ **Modern Design** - Clean, minimalist interface with smooth animations
+- 🎨 **Gradient Accents** - Beautiful purple/blue gradient theme (fully customizable)
+- 📱 **Responsive** - Works seamlessly on desktop and mobile devices
+- 📝 **Pre-Chat Form** - Collects user information with customizable fields
+- 💬 **Real-time Messaging** - Full integration with D365 Omnichannel Chat SDK
+- ⌨️ **Typing Indicators** - Shows when agent is typing
+- 📎 **File Attachments** - Upload and download files
+- 😊 **Emoji Support** - Native OS emoji picker with helpful tooltips
+- 🔢 **Queue Position** - Displays queue status with animated UI
+- 📄 **Chat Transcript** - Download conversation history
+- 🔔 **Toast Notifications** - User-friendly feedback messages
+- 🔴 **Notification Badge** - Unread message counter
+
+</td>
+<td width="50%">
+
+#### Admin Panel
+- 🎭 **Demo Profiles** - Save and switch between multiple customer configurations
+- 🔄 **Widget Mode Selector** - Choose between Standard (native D365 LCW) or Custom (styled widget)
+- 🔤 **Font Library** - 30 professional fonts in 4 categories (Sans-Serif, Serif, Monospace, Display)
+- 🔌 **D365 Configuration** - Easy setup with connection validation
+- 👤 **Contact Authentication** - Configure default contact info for D365
+- 👁️ **Live Theme Preview** - See changes in real-time
+- 🎨 **Color Customization** - Full control with 3 tabs (Primary, Messages, UI Elements)
+- 🏷️ **Branding** - Custom header titles, subtitles, and logos
+- 📋 **Pre-chat Form Toggle** - Enable/disable with customizable fields
+- 👥 **Avatar Management** - Upload custom agent and customer avatars
+- 💾 **Import/Export** - Share configurations or backup settings
+- 📋 **Quick Embed Code** - Copy integration code with one click
+
+</td>
+</tr>
+</table>
 
 ### 🚀 Advanced Capabilities
-- **🔄 Session Persistence with D365 Reconnection**: Automatically saves chat sessions and reconnects to the same D365 conversation on page refresh - prevents ghost chats and duplicate sessions
-- **👤 Contact Authentication**: Seamlessly authenticate customers using D365 contact records (emailaddress1, Name fields) for personalized service
-- **🎨 30 Font Options**: Choose from professionally curated fonts organized in 4 categories (Sans-Serif, Serif, Monospace, Display)
-- **🔀 Widget Mode Selector**: Switch between Standard mode (native D365 LCW) and Custom mode (fully styled widget)
-- **💬 Pre-chat Form Toggle**: Enable/disable pre-chat form with optional default contact info for quick demos
-- **😊 Native OS Emoji Picker**: Full emoji support with native OS picker integration (Win+. or Cmd+Ctrl+Space)
-- **✨ Elegant Custom Scrollbar**: Premium scrollbar styling with soft gray tones
 
-### Chat Widget
-- **Modern Design** - Clean, minimalist interface with smooth animations
-- **Gradient Accents** - Beautiful purple/blue gradient theme (fully customizable)
-- **Responsive** - Works on desktop and mobile devices
-- **Pre-Chat Form** - Collects user information before starting chat (customizable fields)
-- **Real-time Messaging** - Full integration with D365 Omnichannel Chat SDK
-- **Typing Indicators** - Shows when agent is typing
-- **File Attachments** - Upload and download files
-- **Emoji Support** - Native OS emoji picker with helpful tooltips
-- **Queue Position** - Displays queue status with animated UI
-- **Chat Transcript** - Download conversation history
-- **Toast Notifications** - User-friendly feedback messages
-- **Notification Badge** - Unread message counter
-- **Demo Mode** - Works without D365 for testing/demo purposes
-- **Theme Support** - Automatically applies admin panel customizations
+#### 🔄 Session Persistence with D365 Reconnection
+**Prevents ghost chats and duplicate sessions** by automatically saving chat sessions and reconnecting to the same D365 conversation on page refresh.
 
-### Admin Panel
-- **Demo Profiles** - Save and switch between multiple customer configurations instantly
-- **Widget Mode Selector** - Choose between Standard (native D365 LCW) or Custom (styled widget)
-- **Font Library** - 30 professional fonts organized in 4 categories (Sans-Serif, Serif, Monospace, Display)
-- **D365 Configuration** - Easy setup of Organization ID, URL, and Widget ID with connection validation
-- **Contact Authentication** - Configure default contact info (Name, Email) for D365 authentication
-- **Live Theme Preview** - See changes in real-time as you customize
-- **Color Customization** - Full control with 3 tabs (Primary, Messages, UI Elements) and gradient/solid options
-- **Branding** - Custom header titles, subtitles, and logos
-- **Pre-chat Form Toggle** - Enable/disable pre-chat form with customizable welcome messages and field labels
-- **Avatar Management** - Upload custom agent and customer avatars
-- **Import/Export** - Share configurations across team or backup settings
-- **Quick Embed Code** - Copy integration code with one click
-- **Connection Status** - Real-time validation of D365 settings
+- Saves messages, user info, D365 `liveChatContext`, and timestamps
+- Restores and reconnects to the SAME D365 conversation seamlessly
+- Automatically expires after 1 hour of inactivity
+- No duplicate sessions or lost conversations
+
+#### 👤 Contact Authentication
+**Seamlessly authenticate customers** using D365 contact records (`emailaddress1`, `Name` fields) for personalized service.
+
+- Skip pre-chat form for authenticated users
+- Pass logged-in portal user credentials automatically
+- Supports SSO and portal integration scenarios
+- Default contact info for quick demos
+
+#### 🎨 30 Font Options
+Choose from professionally curated fonts organized in **4 categories**:
+- **Sans-Serif** (9 fonts): Inter, Roboto, Open Sans, Lato, Montserrat, Poppins, Source Sans Pro, Nunito, Work Sans
+- **Serif** (6 fonts): Merriweather, Playfair Display, Lora, Crimson Text, EB Garamond, Libre Baskerville
+- **Monospace** (5 fonts): Roboto Mono, Source Code Pro, IBM Plex Mono, JetBrains Mono, Fira Code
+- **Display** (10 fonts): Raleway, Bebas Neue, Oswald, Archivo Black, Anton, Righteous, Lobster, Pacifico, Dancing Script
+
+#### 🔀 Widget Mode Selector
+Switch between **Standard mode** (native D365 LCW) and **Custom mode** (fully styled widget) instantly.
+
+#### ✨ Premium UI Features
+- **Elegant Custom Scrollbar** - Premium scrollbar styling with soft gray tones
+- **Native OS Emoji Picker** - Full emoji support (Win+. or Cmd+Ctrl+Space)
+- **Demo Mode** - Works without D365 for testing/presentations
+
+---
+
+
+## 🎯 Why Choose This Widget?
+
+| Feature | Out-of-the-Box Widget | Modern Chat Widget ✨ |
+|---------|----------------------|----------------------|
+| **Customization** | Limited styling options | Full control over colors, fonts, and branding |
+| **Session Persistence** | ❌ Lost on refresh | ✅ Reconnects to same D365 conversation |
+| **Admin Panel** | ❌ None | ✅ Comprehensive configuration interface |
+| **Font Options** | ❌ Default only | ✅ 30 professional fonts in 4 categories |
+| **Multi-Config Support** | ❌ Single config | ✅ Demo profiles for multiple customers |
+| **Contact Auth** | Basic | ✅ Advanced with default contact support |
+| **Pre-chat Toggle** | ❌ Always on | ✅ Enable/disable dynamically |
+| **Mobile Support** | Basic | ✅ Fully responsive with touch-friendly controls |
+| **Demo Mode** | ❌ None | ✅ Full demo without D365 connection |
+| **Widget Modes** | Single mode | ✅ Standard or Custom mode selector |
+
+---
 
 ## 🚀 Quick Start
 
-### 1. Clone or Download
+### Prerequisites
 
-Download the files to your project:
+- Microsoft Dynamics 365 Omnichannel for Customer Service
+- Modern web browser (Chrome, Edge, Firefox, Safari)
+- (Optional) Node.js 16+ for building from source
 
-```
-d365-modern-chat-widget/
-├── index.html              # Main chat widget
-├── admin.html              # Admin configuration panel
-├── package.json            # Dependencies
-├── webpack.config.js       # Build configuration
-├── src/
-│   ├── chat-widget.js      # Widget SDK wrapper
-│   └── sdk-entry.js        # SDK entry point
-└── README.md              # This file
-```
+### Installation
 
-### 2. Configure via Admin Panel (Recommended)
+#### Option 1: Direct Download (Recommended for Quick Start)
 
-1. **Open the Admin Panel**: Navigate to `admin.html` in your browser
+1. **Download the repository** or clone it:
+   ```bash
+   git clone https://github.com/moliveirapinto/d365-modern-chat-widget.git
+   cd d365-modern-chat-widget
+   ```
+
+2. **Open the Admin Panel**:
+   - Open `admin.html` in your browser
+   - Configure your D365 connection details
+   - Customize appearance and branding
+   - Copy the embed code
+
+3. **Deploy the Widget**:
+   - Host the files on your web server
+   - Paste the embed code into your website/portal
+   - Done! 🎉
+
+#### Option 2: Build from Source
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/moliveirapinto/d365-modern-chat-widget.git
+   cd d365-modern-chat-widget
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Build the bundle** (optional):
+   ```bash
+   npm run build
+   ```
+
+4. **Configure and deploy** using `admin.html`
+
+---
+
+### Configuration Steps
+
+#### 1️⃣ Get Your D365 Configuration Values
+
+Find these values in **Dynamics 365 Admin Center**:
+
+1. Navigate to **Customer Service admin center** or **Omnichannel admin center**
+2. Go to **Channels** → **Chat**
+3. Select your chat widget
+4. Click **Copy Widget Script**
+5. Extract the values:
+   - `data-org-url` → **Organization URL**
+   - `data-org-id` → **Organization ID**
+   - `data-app-id` → **Widget ID**
+
+#### 2️⃣ Configure via Admin Panel (Recommended)
+
+1. **Open `admin.html`** in your browser
 2. **Set D365 Connection**:
    - Enter your Organization ID
-   - Enter your Organization URL
+   - Enter your Organization URL  
    - Enter your Widget ID
+   - Watch the status indicator turn green ✅
 3. **Customize Appearance**:
-   - Choose colors and gradients
+   - Choose from 30 fonts
+   - Select colors and gradients
    - Upload company logo
    - Set header text
-4. **Personalize Pre-chat Form**:
+4. **Configure Pre-chat Form**:
+   - Toggle enable/disable
    - Edit welcome message
    - Customize field labels
-   - Set button text
-   - **Enable/disable pre-chat form** with toggle switch
-   - **Configure default contact info** for demo/authenticated scenarios
+   - Set default contact info for authenticated scenarios
 5. **Upload Avatars**:
    - Add default agent photo
    - Add default customer avatar
-6. **Save as Profile**: Create demo profiles for different customers
-7. **Export Settings**: Download configuration JSON for sharing
+6. **Save as Profile**:
+   - Create demo profiles for different customers
+7. **Export Settings**:
+   - Download configuration JSON for sharing/backup
+8. **Get Embed Code**:
+   - Click "Copy Embed Code"
+   - Paste into your website
 
-## 🔑 Session Persistence & Contact Authentication
+#### 3️⃣ Configure Manually (Alternative)
 
-### Session Persistence
-The widget automatically saves and restores chat sessions using localStorage:
-- **Saves**: Messages, user info, D365 liveChatContext, and timestamps
-- **Restores**: Reconnects to the SAME D365 conversation on page refresh
-- **Prevents**: Ghost chats and duplicate sessions
-- **Expires**: Automatically after 1 hour of inactivity
-
-**How it works**:
-1. During active chat, session data is saved to localStorage every time a message is sent/received
-2. On page refresh, the widget checks for an existing session
-3. If found and not expired, it reconnects to the same D365 conversation using the saved liveChatContext
-4. Messages and conversation history are restored seamlessly
-
-### Contact Authentication
-Authenticate customers using D365 contact records:
-- **Field Mapping**: emailaddress1 (email), Name (full name), Authenticated (true/false)
-- **Pre-chat Toggle**: Enable/disable the pre-chat form
-- **Default Contact Info**: Configure default name/email for quick demos or authenticated scenarios
-- **Use Case**: When user is already logged into your portal, pass their info to skip pre-chat form
-
-**Configuration in admin.html**:
-1. Navigate to "Pre-chat Form Settings"
-2. Toggle "Enable Pre-chat Form" (ON = show form, OFF = auto-start with defaults)
-3. Set "Default Contact Name" and "Default Contact Email"
-4. These values are passed to D365 as the authenticated contact
-
-### 3. Configure Manually (Alternative)
-
-Open `src/chat-widget.js` and update the configuration:
+Open [`src/chat-widget.js`](src/chat-widget.js) and update:
 
 ```javascript
 window.chatWidget = new ModernChatWidget({
@@ -127,263 +231,549 @@ window.chatWidget = new ModernChatWidget({
 });
 ```
 
-### 4. Get Your D365 Configuration Values
+---
 
-You can find these values in **Copilot Service Admin Center**:
 
-1. Navigate to **Customer Service admin center** or **Omnichannel admin center**
-2. Go to **Channels** → **Chat**
-3. Select your chat widget
-4. Click **Copy Widget Script**
-5. Extract the values from the script:
-   - `data-org-url` → Organization URL
-   - `data-org-id` → Organization ID
-   - `data-app-id` → Widget ID
+## 📁 Project Structure
 
-### 5. Deploy
+```
+d365-modern-chat-widget/
+├── 📄 index.html                    # Main chat widget UI
+├── 🎨 admin.html                    # Admin configuration panel
+├── 📘 D365-CHAT-SDK-GUIDE.md        # SDK implementation guide
+├── 📦 package.json                  # NPM dependencies
+├── ⚙️ webpack.config.js             # Build configuration
+├── 🗂️ src/
+│   ├── chat-widget.js               # Widget core logic (892 lines)
+│   └── sdk-entry.js                 # SDK entry point
+├── 📁 dist/                         # Built bundles (generated)
+└── 📖 README.md                     # This file
+```
 
-Host the files on your web server or embed them in your website/portal using the embed code from admin panel.
+### File Descriptions
 
-## 📁 File Structure
+#### [`index.html`](index.html)
+The main chat widget interface containing:
+- 🎨 Chat widget UI and layout with customizable styling
+- 📝 Pre-chat form with dynamic field labels
+- 💬 Message area with typing indicators and file support
+- 🎮 Input controls with emoji, file, and voice options
+- ⏳ Loading states and connection indicators
+- 🔄 **Automatically loads and applies admin settings from localStorage**
 
-### `index.html`
-The main chat widget containing:
-- Chat widget UI and layout with customizable styling
-- Pre-chat form with dynamic field labels
-- Message area with typing indicators
-- Input controls with emoji, file, and voice options
-- Loading states and connection indicators
-- **Automatically loads and applies admin settings from localStorage**
+#### [`admin.html`](admin.html)
+Comprehensive admin configuration panel featuring:
+- 🎭 **Demo Profiles** section for saving/loading configurations
+- 🔀 **Widget Mode Selector** (Standard vs Custom)
+- 🔤 **Font Library** with 30 professional fonts in 4 categories
+- 🔌 **D365 Connection** settings with real-time status indicator
+- 👤 **Contact Authentication** with default name/email
+- 🏷️ **Header & Branding** customization
+- 🎨 **Colors** tabs (Primary, Messages, UI Elements)
+- 📋 **Pre-chat Form** toggle and field customization
+- 👥 **Avatars** upload for agent and customer
+- 💾 **Import/Export** functionality and embed code generator
+- 👁️ **Live Preview** panel showing real-time changes
 
-### `admin.html`
-The comprehensive admin configuration panel with:
-- **Demo Profiles** section for saving/loading configurations
-- **Widget Mode Selector** to switch between Standard (D365 LCW) and Custom (styled widget)
-- **Font Library** with 30 professional fonts in 4 categories
-- **D365 Connection** settings with status indicator
-- **Contact Authentication** with default name/email for authenticated scenarios
-- **Header & Branding** customization
-- **Colors** tabs (Primary, Messages, UI Elements) with gradient and solid color options
-- **Pre-chat Form** toggle and field customization (titles, labels, button text)
-- **Avatars** upload area for agent and customer
-- **Import/Export** functionality and embed code generator
-- **Live Preview** panel showing real-time changes
-- Settings management with save/reset options
+#### [`src/chat-widget.js`](src/chat-widget.js)
+The widget core logic (892 lines) including:
+- 🔌 SDK initialization and management
+- 💾 **Session persistence** with D365 liveChatContext reconnection
+- 👤 **Contact authentication** provider for D365 integration
+- 📡 Event handling and message processing
+- 🎨 Message rendering with file attachment support
+- 🧪 Demo mode for testing without D365
+- ⚙️ **Settings loading and application** from admin panel
 
-### `src/chat-widget.js`
-The widget logic including:
-- SDK initialization and management
-- Session persistence with D365 liveChatContext reconnection
-- Contact authentication provider for D365 integration
-- Event handling
-- Message rendering
-- File attachment support
-- Demo mode for testing
-- **Settings loading and application from admin panel**
+#### [`D365-CHAT-SDK-GUIDE.md`](D365-CHAT-SDK-GUIDE.md)
+Comprehensive SDK implementation guide covering:
+- ⚙️ SDK setup and configuration
+- 📩 Message handling and deduplication
+- 👤 Sender information parsing
+- 📎 File attachment processing
+- 🎧 Event listener setup
+- ⚠️ Common pitfalls and solutions
 
-## 🎨 Admin Panel Guide
+---
+
+
+## 🔑 Advanced Features
+
+### 🔄 Session Persistence with D365 Reconnection
+
+**Prevents ghost chats and duplicate sessions** by maintaining conversation continuity across page refreshes.
+
+#### How It Works
+
+1. **During Active Chat**: Session data is saved to localStorage every time a message is sent/received
+2. **On Page Refresh**: Widget checks for an existing session
+3. **If Found**: Reconnects to the SAME D365 conversation using saved `liveChatContext`
+4. **Result**: Messages and conversation history are restored seamlessly
+
+#### What Gets Saved
+
+| Data | Description |
+|------|-------------|
+| 📩 **Messages** | Full conversation history |
+| 👤 **User Info** | Name, email, authenticated status |
+| 🔑 **liveChatContext** | D365 session identifier for reconnection |
+| ⏰ **Timestamps** | Session start and last activity |
+
+#### Benefits
+
+- ✅ **No Ghost Chats** - Refreshing doesn't create duplicate D365 sessions
+- ✅ **Conversation Continuity** - Users can refresh without losing context
+- ✅ **Better UX** - Seamless experience across page navigation
+- ⏰ **Auto Expiry** - Sessions automatically expire after 1 hour of inactivity
+
+---
+
+### 👤 Contact Authentication
+
+**Seamlessly authenticate customers** using D365 contact records for personalized service.
+
+#### Field Mapping
+
+| Widget Field | D365 Contact Field | Purpose |
+|-------------|-------------------|---------|
+| Email | `emailaddress1` | Primary identifier |
+| Name | `Name` | Display name |
+| Authenticated | `Authenticated` | Auth status flag |
+
+#### Configuration
+
+**Via Admin Panel** ([admin.html](admin.html)):
+
+1. Navigate to **"Pre-chat Form Settings"**
+2. **Toggle** "Enable Pre-chat Form":
+   - **ON** → Shows pre-chat form to collect info
+   - **OFF** → Auto-starts chat with default contact info
+3. Set **"Default Contact Name"** and **"Default Contact Email"**
+4. These values are passed to D365 as the authenticated contact
+
+#### Use Cases
+
+| Scenario | Configuration | Benefit |
+|----------|--------------|---------|
+| 🔓 **Anonymous Visitors** | Pre-chat ON | Collect user information |
+| 🔐 **Authenticated Portal** | Pre-chat OFF, Default contact set | Skip form, use logged-in credentials |
+| 🎬 **Quick Demos** | Pre-chat OFF, Default contact set | Fast demo without form friction |
+| 🔁 **Return Customers** | Pre-chat OFF, Saved profile | Seamless re-engagement |
+
+---
 
 ### 🎭 Widget Mode Selector
 
-**What it does**: Choose how the chat widget appears and integrates with D365.
+Choose how the chat widget appears and integrates with D365.
 
-**Modes**:
-- **Standard Mode**: Uses the native Dynamics 365 Live Chat Widget (LCW) with OOTB styling
-  - Best for: Organizations wanting Microsoft's standard UX
-  - Integration: Minimal custom styling, follows D365 design guidelines
-  
-- **Custom Mode**: Fully styled custom widget with all advanced features
-  - Best for: Organizations wanting complete branding control
-  - Features: Custom colors, fonts, pre-chat form, session persistence
+#### Standard Mode
+- Uses native **Dynamics 365 Live Chat Widget (LCW)** with OOTB styling
+- Best for organizations wanting Microsoft's standard UX
+- Minimal custom styling, follows D365 design guidelines
 
-**How to use**:
-1. In admin panel, locate "Widget Mode" section
-2. Toggle between "Standard" and "Custom"
-3. Custom mode unlocks all styling and customization options
-4. Changes apply immediately in the live preview
+#### Custom Mode ✨
+- **Fully styled custom widget** with all advanced features
+- Complete branding control
+- Includes: Custom colors, 30 fonts, pre-chat toggle, session persistence
+- Changes apply immediately in live preview
+
+**How to Switch**: In admin panel, locate "Widget Mode" section and toggle between "Standard" and "Custom"
+
+---
 
 ### 🔤 Font Customization (30 Fonts)
 
-**What it does**: Choose from a professional font library to match your brand.
+Choose from a professional font library to match your brand identity.
 
-**Categories**:
-- **Sans-Serif** (Modern & Clean): Inter, Roboto, Open Sans, Lato, Montserrat, Poppins, Source Sans Pro, Nunito, Work Sans
-- **Serif** (Traditional & Elegant): Merriweather, Playfair Display, Lora, Crimson Text, EB Garamond, Libre Baskerville
-- **Monospace** (Technical & Code): Roboto Mono, Source Code Pro, IBM Plex Mono, JetBrains Mono, Fira Code
-- **Display** (Bold & Stylish): Raleway, Bebas Neue, Oswald, Archivo Black, Anton, Righteous, Lobster, Pacifico, Dancing Script
+<table>
+<tr>
+<td width="25%">
 
-**How to use**:
-1. Navigate to "Font Settings" in admin panel
-2. Select a font from the dropdown (organized by category)
-3. Preview updates in real-time
-4. Font applies to entire widget including messages, headers, and buttons
+**Sans-Serif** (9)  
+*Modern & Clean*
+- Inter
+- Roboto
+- Open Sans
+- Lato
+- Montserrat
+- Poppins
+- Source Sans Pro
+- Nunito
+- Work Sans
 
-**Use cases**:
-- Match corporate brand guidelines
-- Improve readability for specific audiences
-- Create distinct brand personality (playful vs. professional)
-- Accessibility considerations (larger, clearer fonts)
+</td>
+<td width="25%">
 
-### 📋 Demo Profiles
+**Serif** (6)  
+*Traditional & Elegant*
+- Merriweather
+- Playfair Display
+- Lora
+- Crimson Text
+- EB Garamond
+- Libre Baskerville
 
-**What it does**: Save multiple configuration sets for different customer demonstrations.
+</td>
+<td width="25%">
 
-**How to use**:
+**Monospace** (5)  
+*Technical & Code*
+- Roboto Mono
+- Source Code Pro
+- IBM Plex Mono
+- JetBrains Mono
+- Fira Code
+
+</td>
+<td width="25%">
+
+**Display** (10)  
+*Bold & Stylish*
+- Raleway
+- Bebas Neue
+- Oswald
+- Archivo Black
+- Anton
+- Righteous
+- Lobster
+- Pacifico
+- Dancing Script
+
+</td>
+</tr>
+</table>
+
+#### Use Cases
+
+- 🏢 **Corporate Branding** - Match brand guidelines
+- 👓 **Accessibility** - Improve readability for specific audiences
+- 🎨 **Brand Personality** - Playful vs. professional
+- 📏 **Consistency** - Align with website typography
+
+---
+
+
+## 🎨 Admin Panel Guide
+
+The admin panel ([admin.html](admin.html)) provides a comprehensive interface for configuring every aspect of the chat widget.
+
+### 🎭 Demo Profiles
+
+**Save multiple configuration sets** for different customer demonstrations or environments.
+
+#### Features
+- 💾 **Save** configurations with custom names
+- 🔄 **Switch** between profiles instantly
+- 📝 **Update** existing profiles with current settings
+- 🗑️ **Delete** profiles you no longer need
+
+#### How to Use
+
 1. Configure your D365 connection, colors, and branding
-2. Enter a profile name in the input field (e.g., "Contoso Demo")
-3. Click "Save" to create the profile
-4. Switch between profiles by clicking on them in the list
-5. Use the update icon (💾) to save current settings to a profile
-6. Use the delete icon (🗑️) to remove a profile
+2. Enter a profile name (e.g., "Contoso Demo", "Production Config")
+3. Click **Save** to create the profile
+4. Click on any profile name to load its configuration
+5. Use 💾 icon to update, 🗑️ icon to delete
 
-**Use cases**:
-- Different branding for different customers
-- Pre-configured D365 environments for demos
-- Quick demo switching during presentations
-- Team member collaboration on customer configs
+#### Use Cases
+
+| Scenario | Benefit |
+|----------|---------|
+| 🎬 **Customer Demos** | Different branding per customer |
+| 🌍 **Multi-Environment** | Dev, QA, Prod configs |
+| 🎨 **A/B Testing** | Test different themes |
+| 👥 **Team Collaboration** | Share configs via export |
+
+---
 
 ### 🔌 D365 Configuration
 
-**What it does**: Stores and validates your D365 Omnichannel connection details.
+Store and validate your **Dynamics 365 Omnichannel** connection details.
 
-**Fields**:
-- **Organization ID**: GUID found in D365 admin center
-- **Organization URL**: Your D365 org domain (e.g., https://yourorg.crm.dynamics.com)
-- **Widget ID (App ID)**: Omnichannel chat widget identifier
+#### Required Fields
 
-**Connection Status Indicator**:
-- 🟢 **Green "Configuration complete"**: All required fields configured
-- 🔴 **Red "Missing..."**: Indicates which fields need to be filled
-- ⚪ **Gray "Not configured"**: Demo mode will be used, no D365 connection
+| Field | Description | Where to Find |
+|-------|-------------|---------------|
+| **Organization ID** | GUID identifier | D365 Admin → Chat Widget Script |
+| **Organization URL** | D365 org domain | `https://yourorg.crm.dynamics.com` |
+| **Widget ID (App ID)** | Chat widget identifier | D365 Admin → Chat Widget Script |
+
+#### Connection Status Indicator
+
+| Status | Meaning |
+|--------|---------|
+| 🟢 **"Configuration complete"** | All required fields configured |
+| 🔴 **"Missing..."** | Shows which fields need to be filled |
+| ⚪ **"Not configured"** | Demo mode will be used |
+
+**Tip**: The widget works in demo mode even without D365 configuration for testing!
+
+---
 
 ### 🎨 Color Customization
 
-Three tabs for comprehensive theming:
+**Three tabs** for comprehensive theming:
 
-**Primary Colors Tab**:
-- Toggle between **gradient** and **solid color** modes
-- Gradient mode: Set start and end colors (used for headers, buttons, user bubbles)
-- Solid mode: Choose a single primary color
-- Live preview updates in real-time
+#### 1️⃣ Primary Colors Tab
 
-**Message Colors Tab**:
-- **User message bubble**: Color of messages sent by customer
-- **User text**: Text color within user messages
-- **Agent message bubble**: Color of messages from agent
-- **Agent text**: Text color within agent messages
-- **System message background**: Notifications and system messages
-- **System text**: Text within system messages
+- 🎨 **Toggle** between **Gradient** and **Solid Color** modes
+- **Gradient Mode**: Set start and end colors (used for headers, buttons, user bubbles)
+- **Solid Mode**: Choose a single primary color
+- 👁️ Live preview updates in real-time
 
-**UI Elements Tab**:
-- **Chat background**: Main message area background
-- **Input background**: Message input field background
-- **Input border**: Input field border color
-- **Send button**: Color of the send message button
-- **Launcher button**: Color of the chat widget launcher button
-- **Notification badge**: Unread message counter color
+#### 2️⃣ Message Colors Tab
+
+| Color | Applied To |
+|-------|-----------|
+| **User message bubble** | Customer messages background |
+| **User text** | Text within user messages |
+| **Agent message bubble** | Agent messages background |
+| **Agent text** | Text within agent messages |
+| **System message background** | Notifications (e.g., "Agent joined") |
+| **System text** | System notification text |
+
+#### 3️⃣ UI Elements Tab
+
+| Element | Description |
+|---------|-------------|
+| **Chat background** | Main message area background |
+| **Input background** | Message input field background |
+| **Input border** | Input field border color |
+| **Send button** | Send message button color |
+| **Launcher button** | Chat widget launcher button |
+| **Notification badge** | Unread message counter |
+
+---
 
 ### 📝 Pre-chat Form Customization
 
-**What it does**: Control whether users fill out a form before starting chat, and customize all form fields.
+Control the user experience **before chat starts**.
 
-**Enable/Disable Toggle**:
-- **ON** (default): Shows pre-chat form to collect Name, Email, and initial Question
-- **OFF**: Skips pre-chat form and starts chat immediately using default contact info
+#### Enable/Disable Toggle
 
-**When to disable**:
-- Authenticated user scenarios (user already logged into your portal)
-- Quick demo/testing without form friction
-- Anonymous chat scenarios
-- When using default contact authentication
+- **ON** (default): Shows pre-chat form to collect Name, Email, and Question
+- **OFF**: Skips form and starts chat immediately with default contact info
 
-**Customizable Fields**:
-- **Welcome Title**: Main heading (e.g., "Start a conversation")
-- **Welcome Message**: Introductory text explaining the form
-- **Name Field Label**: Label for customer name input
-- **Email Field Label**: Label for email input
-- **Question Field Label**: Label for message/question textarea
-- **Start Button Text**: Label for the button that starts the chat (e.g., "Begin Chat")
+#### When to Disable
 
-**Default Contact Info** (used when pre-chat form is disabled):
+✅ Authenticated user scenarios (logged into portal)  
+✅ Quick demo/testing without form friction  
+✅ Anonymous chat scenarios  
+✅ When using default contact authentication
+
+#### Customizable Fields
+
+| Field | Description | Default |
+|-------|-------------|---------|
+| **Welcome Title** | Main heading | "Start a conversation" |
+| **Welcome Message** | Introductory text | Explains the form |
+| **Name Field Label** | Name input label | "Your Name" |
+| **Email Field Label** | Email input label | "Your Email" |
+| **Question Field Label** | Message textarea label | "How can we help?" |
+| **Start Button Text** | Submit button label | "Begin Chat" |
+
+#### Default Contact Info (Authentication)
+
+When pre-chat form is **disabled**, these values authenticate the user in D365:
+
 - **Default Contact Name**: Auto-populated name sent to D365
 - **Default Contact Email**: Auto-populated email sent to D365
-- These values authenticate the user in D365 using contact records (emailaddress1, Name fields)
+- Maps to D365 contact fields: `Name` and `emailaddress1`
 
-**Use cases**:
-- Enable form for anonymous visitors who need to identify themselves
-- Disable form for authenticated portal users (pass their logged-in details)
-- Quick demos with pre-filled contact info
-- Skip form for return customers with saved profiles
+---
 
 ### 👥 Avatar Management
 
-Upload custom images for the widget:
-- **Default Agent Avatar**: Used in message bubbles when agent photo unavailable
-- **Default Customer Avatar**: Used in message bubbles for customer/user messages
-- Recommended: Square images (100x100px minimum)
-- Maximum: 2MB file size
-- Optional: If not provided, initials will be used instead
+Upload custom images for a personalized experience.
+
+#### Avatar Types
+
+| Avatar | Usage | Fallback |
+|--------|-------|----------|
+| **Default Agent Avatar** | Message bubbles when agent photo unavailable | Agent initials |
+| **Default Customer Avatar** | User message bubbles | User initials |
+
+#### Specifications
+
+- ✅ **Format**: JPG, PNG, GIF, SVG
+- 📏 **Recommended**: Square images (100x100px minimum)
+- 📦 **Maximum**: 2MB file size
+- ⚙️ **Optional**: Initials used if not provided
+
+---
 
 ### 💾 Import/Export
 
-**Export Settings**:
-- Click **Export JSON** to download all your settings
-- Creates a `.json` file with current settings and all saved profiles
-- Useful for backup or sharing with team members
-- File includes timestamp of export
+Share configurations or backup your settings.
 
-**Import Settings**:
-- Click **Import JSON** to load previously exported configurations
-- Automatically merges profiles by name (avoids duplicates)
-- Updates existing settings
-- Select a previously exported `.json` file
+#### Export Settings
 
-**Copy Embed Code**:
-- Click **Copy Embed Code** to get HTML/JavaScript snippet
-- Code includes your D365 configuration (org URL, ID, widget ID)
-- Ready to paste directly into your website/portal
-- Automatically copied to clipboard
+1. Click **Export JSON**
+2. Downloads a `.json` file with:
+   - All current settings
+   - All saved demo profiles
+   - Timestamp of export
+3. Use for backup or sharing with team
+
+#### Import Settings
+
+1. Click **Import JSON**
+2. Select a previously exported `.json` file
+3. Automatically merges profiles by name
+4. Updates existing settings
+
+#### Copy Embed Code
+
+1. Click **Copy Embed Code**
+2. HTML/JavaScript snippet is copied to clipboard
+3. Includes your D365 configuration
+4. Ready to paste into your website/portal
+
+---
 
 ## 🔧 SDK Integration
 
-### Available SDK Methods Used
+This widget uses the **@microsoft/omnichannel-chat-sdk** for headless connectivity to Dynamics 365 Omnichannel.
 
-| Method | Description |
-|--------|-------------|
-| `initialize()` | Initializes the Chat SDK |
-| `startChat()` | Starts a new chat session |
-| `sendMessage()` | Sends a message to the agent |
-| `endChat()` | Ends the current chat |
-| `uploadFileAttachment()` | Uploads a file attachment |
-| `downloadFileAttachment()` | Downloads a file attachment |
-| `getLiveChatTranscript()` | Gets the chat transcript |
-| `sendTypingEvent()` | Sends typing indicator |
+### SDK Methods Used
+
+| Method | Description | Usage |
+|--------|-------------|-------|
+| `initialize()` | Initializes the Chat SDK | Called on widget load |
+| `startChat()` | Starts a new chat session | Pre-chat form submission or auto-start |
+| `sendMessage()` | Sends a message to the agent | User sends text message |
+| `endChat()` | Ends the current chat | User clicks end chat button |
+| `uploadFileAttachment()` | Uploads a file attachment | User attaches file |
+| `downloadFileAttachment()` | Downloads a file attachment | User clicks download |
+| `getLiveChatTranscript()` | Gets the chat transcript | Download transcript feature |
+| `sendTypingEvent()` | Sends typing indicator | User types in input field |
+| `getMessages()` | Retrieves all messages | Polling for new messages |
 
 ### Event Subscriptions
 
-| Event | Handler |
-|-------|---------|
-| `onNewMessage` | Handles incoming messages |
-| `onTypingEvent` | Shows typing indicator |
-| `onAgentEndSession` | Handles session end |
+| Event | Handler | Description |
+|-------|---------|-------------|
+| `onNewMessage` | Message display | Renders incoming messages in real-time |
+| `onTypingEvent` | Typing indicator | Shows "Agent is typing..." |
+| `onAgentEndSession` | Session cleanup | Handles agent-initiated session end |
+
+### Authentication Provider
+
+The widget implements a **custom authentication provider** for contact authentication:
+
+```javascript
+const authSettings = {
+    authClientFunction: async () => {
+        return {
+            getToken: async () => {
+                // Returns JWT token or contact info
+                return {
+                    emailaddress1: "user@example.com",
+                    Name: "John Doe",
+                    Authenticated: true
+                };
+            }
+        };
+    }
+};
+```
+
+This enables:
+- ✅ Contact record matching in D365
+- ✅ Authenticated chat sessions
+- ✅ Pre-filled contact information
+- ✅ Portal/SSO integration
+
+### Session Persistence Implementation
+
+The widget saves and restores the **D365 liveChatContext** to maintain conversation continuity:
+
+```javascript
+// During chat
+const liveChatContext = await chatSDK.getCurrentLiveChatContext();
+localStorage.setItem('chatWidgetSession', JSON.stringify({
+    liveChatContext,
+    messages,
+    userInfo,
+    timestamp
+}));
+
+// On page refresh
+const session = JSON.parse(localStorage.getItem('chatWidgetSession'));
+if (session && !isExpired(session)) {
+    await chatSDK.startChat({
+        liveChatContext: session.liveChatContext
+    });
+}
+```
+
+**Result**: Same D365 conversation is resumed, preventing ghost chats.
+
+---
 
 ## 📱 Mobile Support
 
-The widget and admin panel are fully responsive:
-- Full-screen mode on mobile devices
-- Touch-friendly controls and inputs
-- Optimized keyboard handling
-- Proper viewport configuration
-- Admin panel works on tablets and phones
+The widget and admin panel are **fully responsive** and optimized for mobile devices.
+
+### Chat Widget Mobile Features
+
+- 📱 **Full-screen mode** on mobile devices
+- 👆 **Touch-friendly controls** and inputs
+- ⌨️ **Optimized keyboard handling** (no viewport issues)
+- 📐 **Proper viewport configuration**
+- 🎨 **Adaptive UI** that scales gracefully
+- 📎 **Mobile file picker** integration
+- 😊 **Native emoji keyboard** support
+
+### Admin Panel Mobile Features
+
+- 📊 **Responsive layout** for tablets and phones
+- 🖱️ **Touch-optimized controls**
+- 📱 **Scrollable sections** for smaller screens
+- 🎨 **Collapsible panels** for better space management
+
+### Supported Devices
+
+| Device | Experience |
+|--------|-----------|
+| 💻 **Desktop** | Full features, optimal experience |
+| 📱 **Mobile** | Full-screen chat, all features supported |
+| 📱 **Tablet** | Hybrid experience, admin panel accessible |
+
+---
 
 ## 🧪 Demo Mode
 
-If you don't have D365 configured or the SDK fails to load, the widget automatically runs in demo mode:
-- Simulated agent responses
-- Working UI interactions
-- Queue position simulation
-- Perfect for testing and demos
-- No connection errors or warnings
+The widget **automatically runs in demo mode** if D365 is not configured or SDK fails to load.
+
+### Demo Mode Features
+
+- 🤖 **Simulated agent responses** (realistic delays)
+- 🎨 **Working UI interactions** (all buttons, animations)
+- 📊 **Queue position simulation**
+- 💬 **Echo bot behavior** for testing
+- ✅ **No connection errors or warnings**
+- 🎬 **Perfect for presentations and demos**
+
+### When Demo Mode Activates
+
+- ❌ D365 configuration is missing or incorrect
+- ❌ SDK fails to initialize
+- ❌ Network connectivity issues
+- ✅ Admin panel status shows "Not configured"
+
+### How to Use Demo Mode
+
+1. Open [index.html](index.html) without configuring D365
+2. Widget automatically detects missing config
+3. Chat functions with simulated responses
+4. Perfect for:
+   - 🎨 Testing UI customizations
+   - 🎬 Customer demonstrations
+   - 🧪 Development without D365 access
+   - 📚 Training and onboarding
+
+---
 
 ## �️ Troubleshooting
 
@@ -424,81 +814,236 @@ If you don't have D365 configured or the SDK fails to load, the widget automatic
 - **Mac**: Press `Cmd + Ctrl + Space` to open emoji picker
 - **Tooltip**: Hover over the emoji icon for instructions specific to your OS
 
-## 🔒 Security Notes
+---
 
-1. **Never expose credentials** in client-side code
-2. Use **authenticated chat** for sensitive data
-3. Implement **Content Security Policy** headers
-4. Consider using **data masking** for PII
-5. **localStorage** stores settings locally - doesn't transmit to external servers
-6. Export configurations only to trusted recipients
-7. Admin panel should be restricted to authorized users only
-8. **Session data** includes chat history - ensure localStorage is properly secured
-9. **Default contact info** should only be used in trusted/authenticated scenarios
+## 🔒 Security Best Practices
 
-## 📚 Documentation Links
+### Client-Side Security
 
-- [Dynamics 365 Live Chat SDK Reference](https://learn.microsoft.com/en-us/dynamics365/customer-service/develop/omnichannel-reference)
-- [Omnichannel Chat SDK (GitHub)](https://github.com/microsoft/omnichannel-chat-sdk)
-- [Customize Live Chat Widgets](https://learn.microsoft.com/en-us/dynamics365/customer-service/develop/develop-live-chat-widget)
-- [Live Chat Widget UI Components](https://github.com/microsoft/omnichannel-chat-widget)
+| Practice | Description |
+|----------|-------------|
+| 🔑 **No Credentials** | Never expose API keys or secrets in client-side code |
+| 🔐 **Authenticated Chat** | Use authenticated sessions for sensitive data |
+| 📋 **CSP Headers** | Implement Content Security Policy headers |
+| 🎭 **Data Masking** | Mask PII (personally identifiable information) |
 
-## 🎯 Use Cases
+### Data Storage Security
 
-### Customer Demonstrations
-- Save separate profiles for each customer
-### Customer Demonstrations
-- Save separate profiles for each customer
-- Switch between customer branding instantly
-- Show customization capabilities live
-- Export configs to share with clients
-- Use pre-chat toggle to skip forms during demos
+| Component | Security Notes |
+|-----------|----------------|
+| 💾 **localStorage** | Stores settings locally only, not transmitted externally |
+| 💬 **Session Data** | Includes chat history - ensure localStorage is secured |
+| 📤 **Export Configs** | Share only with trusted recipients |
+| 🎨 **Admin Panel** | Restrict access to authorized users only |
 
-### Multi-Tenant Deployments
-- One codebase, multiple customer configs
-- Manage different D365 orgs per customer
-- Team members can update individual customer settings
-- No code changes needed
-- Session persistence ensures uninterrupted customer experience
+### Authentication Security
 
-### Authenticated Portal Integration
-- Disable pre-chat form for logged-in users
-- Pass portal user credentials to D365 for contact matching
-- Seamless experience without re-entering information
-- Session persistence maintains chat across page navigation
-- Single sign-on (SSO) friendly
+⚠️ **Important**: Default contact info should only be used in:
+- ✅ Trusted/authenticated scenarios (e.g., logged-in portals)
+- ✅ SSO-protected environments
+- ✅ Internal testing/demos
 
-### A/B Testing
-- Create different themed versions
-- Switch between variants instantly
-- Save results in profile names
-- Import successful configurations
-- Test font and color combinations for readability
+❌ **Never use** for public-facing anonymous widgets with pre-filled admin credentials.
 
-### Brand Consistency
-- Centralized admin panel for all branding
-- 30 professional fonts to match brand guidelines
-- Ensures consistency across deployments
-- Easy updates to colors and messaging
-- Quick rollback to previous versions
+### HTTPS Requirement
 
-## 🤝 Support
-
-For issues specific to the Dynamics 365 Omnichannel service, contact Microsoft Support. 
-
-For help with:
-- **Session persistence** - Review the Troubleshooting section for ghost chats and reconnection issues
-- **Contact authentication** - Verify D365 contact records match the email/name configured
-- **Admin panel customization** - Review the configuration guide above
-- **Widget appearance** - Check the Font Customization and Color Customization sections
-- **D365 configuration** - Verify your org ID, URL, and widget ID values
-- **Pre-chat form toggle** - See the Pre-chat Form Customization section
-- **Import/Export issues** - Ensure the JSON file is valid and correctly formatted
-
-## 📄 License
-
-This custom widget implementation is provided as-is for educational and development purposes. Modify and use according to your needs.
+🔒 Always host the widget on **HTTPS** to ensure:
+- Encrypted communication with D365
+- localStorage security
+- Protection against MITM attacks
 
 ---
 
-Built with ❤️ for a better customer service experience
+## 📚 Documentation
+
+### Official Microsoft Documentation
+
+| Resource | Link |
+|----------|------|
+| 📘 **D365 Live Chat SDK Reference** | [Microsoft Learn](https://learn.microsoft.com/en-us/dynamics365/customer-service/develop/omnichannel-reference) |
+| 💻 **Omnichannel Chat SDK (GitHub)** | [GitHub Repo](https://github.com/microsoft/omnichannel-chat-sdk) |
+| 🎨 **Customize Live Chat Widgets** | [Microsoft Learn](https://learn.microsoft.com/en-us/dynamics365/customer-service/develop/develop-live-chat-widget) |
+| 🧩 **Live Chat Widget UI Components** | [GitHub Repo](https://github.com/microsoft/omnichannel-chat-widget) |
+
+### Project Documentation
+
+| Document | Description |
+|----------|-------------|
+| 📖 [README.md](README.md) | This file - complete project guide |
+| 📘 [D365-CHAT-SDK-GUIDE.md](D365-CHAT-SDK-GUIDE.md) | SDK implementation guide & best practices |
+
+---
+
+## 🎯 Real-World Use Cases
+
+### 🎬 Customer Demonstrations
+
+**Scenario**: Sales team demos the widget to multiple prospects
+
+| Feature | Benefit |
+|---------|----------|
+| 🎭 Demo Profiles | Save separate profile for each customer |
+| 🔄 Instant Switching | Switch branding during live demos |
+| 📤 Export Configs | Share configs with clients |
+| 🚫 Pre-chat Toggle | Skip forms for faster demos |
+
+**Result**: Professional, customized demos that win deals.
+
+---
+
+### 🏢 Multi-Tenant Deployments
+
+**Scenario**: SaaS platform with multiple customer organizations
+
+| Feature | Benefit |
+|---------|----------|
+| 📁 One Codebase | Single widget for all customers |
+| 🔌 Per-Customer D365 | Different D365 org per tenant |
+| 👥 Team Management | Team members update individual configs |
+| 🔄 Session Persistence | Uninterrupted experience across refreshes |
+
+**Result**: Scalable, maintainable multi-tenant solution.
+
+---
+
+### 🔐 Authenticated Portal Integration
+
+**Scenario**: Customer portal with logged-in users
+
+| Feature | Benefit |
+|---------|----------|
+| 👤 Contact Auth | Match portal user to D365 contact |
+| 🚫 Skip Pre-chat | No duplicate info entry |
+| 🔄 Session Continuity | Chat persists across page navigation |
+| 🔑 SSO Support | Integrates with existing authentication |
+
+**Result**: Seamless, personalized customer experience.
+
+---
+
+### 🧪 A/B Testing
+
+**Scenario**: Optimize widget for conversion and engagement
+
+| Feature | Benefit |
+|---------|----------|
+| 🎨 Multiple Themes | Test different color schemes |
+| 🔤 Font Testing | Compare readability and brand fit |
+| 💾 Save Variants | Keep successful configurations |
+| 📊 Quick Switching | A/B test in real-time |
+
+**Result**: Data-driven design decisions.
+
+---
+
+### 🎨 Brand Consistency
+
+**Scenario**: Enterprise with strict brand guidelines
+
+| Feature | Benefit |
+|---------|----------|
+| 🎨 Centralized Admin | Single source of truth for branding |
+| 🔤 30 Fonts | Match corporate font guidelines |
+| 🎨 Color Control | Exact brand colors (gradients/solid) |
+| 💾 Export/Backup | Version control for branding |
+
+**Result**: Consistent brand experience across all touchpoints.
+
+---
+
+## 🤝 Support & Community
+
+### Getting Help
+
+| Issue Type | Resource |
+|------------|----------|
+| 🔧 **Widget Issues** | Review [Troubleshooting](#️-troubleshooting) section |
+| 📘 **SDK Questions** | Read [D365-CHAT-SDK-GUIDE.md](D365-CHAT-SDK-GUIDE.md) |
+| 🔌 **D365 Service** | Contact [Microsoft Support](https://support.microsoft.com/) |
+| 🎨 **Customization** | Review [Admin Panel Guide](#-admin-panel-guide) |
+| 💾 **Session Persistence** | See [Advanced Features](#-advanced-features) |
+| 👤 **Contact Auth** | Check [Contact Authentication](#-contact-authentication) |
+
+### Quick Reference
+
+| Topic | Section |
+|-------|----------|
+| 🚀 Getting Started | [Quick Start](#-quick-start) |
+| 🎨 Appearance | [Admin Panel Guide](#-admin-panel-guide) |
+| 🔑 Advanced Features | [Session Persistence](#-session-persistence-with-d365-reconnection) |
+| 📁 File Structure | [Project Structure](#-project-structure) |
+| 🔧 SDK Integration | [SDK Integration](#-sdk-integration) |
+| 🛠️ Troubleshooting | [Troubleshooting](#️-troubleshooting) |
+
+---
+
+## 📊 Project Stats
+
+| Metric | Value |
+|--------|-------|
+| 📄 **Main Widget** | index.html (full-featured UI) |
+| 🎨 **Admin Panel** | admin.html (comprehensive config) |
+| 💻 **Core Logic** | src/chat-widget.js (892 lines) |
+| 🔤 **Font Options** | 30 professional fonts |
+| 🎨 **Color Options** | Unlimited (gradients + solid) |
+| 🔌 **D365 SDK** | @microsoft/omnichannel-chat-sdk v1.11+ |
+| 📱 **Mobile Support** | Fully responsive |
+| 🧪 **Demo Mode** | Built-in, no D365 required |
+
+---
+
+## 🗺️ Roadmap
+
+### Planned Features
+
+- [ ] 🌍 **Multi-language support** with dynamic translations
+- [ ] 🎤 **Voice message recording** (in addition to text)
+- [ ] 📊 **Analytics dashboard** (track engagement metrics)
+- [ ] 🎨 **Theme marketplace** (pre-built color schemes)
+- [ ] 🔔 **Browser notifications** (desktop notifications for new messages)
+- [ ] 💬 **Canned responses** (quick reply templates)
+- [ ] 📷 **Screenshot/screen sharing** integration
+- [ ] 🤖 **Bot builder integration** (Visual bot flow designer)
+
+---
+
+## 📄 License
+
+**MIT License** - Free to use, modify, and distribute.
+
+This custom widget implementation is provided **as-is** for educational and commercial purposes. Modify and use according to your needs.
+
+### Attribution
+
+While not required, attribution is appreciated:
+
+```
+Based on Modern D365 Live Chat Widget
+https://github.com/moliveirapinto/d365-modern-chat-widget
+```
+
+---
+
+## ⭐ Show Your Support
+
+If this widget helped you, consider:
+
+- ⭐ **Starring** this repository
+- 🍴 **Forking** to customize for your needs
+- 🐛 **Reporting issues** you encounter
+- 💡 **Suggesting features** you'd like to see
+- 📤 **Sharing** with others who might benefit
+
+---
+
+<div align="center">
+
+**Built with ❤️ for a better customer service experience**
+
+🚀 **[Get Started](#-quick-start)** | 📖 **[Read Docs](#-documentation)** | 🎨 **[View Demo](index.html)**
+
+---
+
+*Powered by Microsoft Dynamics 365 Omnichannel for Customer Service*
+
+</div>
