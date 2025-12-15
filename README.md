@@ -45,10 +45,13 @@
 - ⌨️ **Typing Indicators** - Shows when agent is typing
 - 📎 **File Attachments** - Upload and download files
 - 😊 **Emoji Support** - Native OS emoji picker with helpful tooltips
+- � **Voice/Video Calling** - Agent-initiated calls with accept/decline UI
+- 🎥 **Video Conferencing** - Full WebRTC support with call controls
 - 🔢 **Queue Position** - Displays queue status with animated UI
 - 📄 **Chat Transcript** - Download conversation history
 - 🔔 **Toast Notifications** - User-friendly feedback messages
 - 🔴 **Notification Badge** - Unread message counter
+- 🎴 **Adaptive Cards** - Full support for Copilot Studio interactive cards
 
 </td>
 <td width="50%">
@@ -871,6 +874,9 @@ The widget **automatically runs in demo mode** if D365 is not configured or SDK 
 |----------|-------------|
 | 📖 [README.md](README.md) | This file - complete project guide |
 | 📘 [D365-CHAT-SDK-GUIDE.md](D365-CHAT-SDK-GUIDE.md) | SDK implementation guide & best practices |
+| 🎴 [ADAPTIVE-CARDS-GUIDE.md](ADAPTIVE-CARDS-GUIDE.md) | Copilot Studio Adaptive Cards integration |
+| 📞 [VOICE-VIDEO-GUIDE.md](VOICE-VIDEO-GUIDE.md) | Voice/Video calling feature documentation |
+| 🎯 [AGENT-CALLING-IMPLEMENTATION.md](AGENT-CALLING-IMPLEMENTATION.md) | Agent-initiated calling implementation details |
 
 ---
 

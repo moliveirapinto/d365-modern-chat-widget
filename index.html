@@ -8,6 +8,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600&family=Crimson+Text:wght@400;600&family=DM+Sans:wght@400;500;600&family=Fira+Code:wght@400;500&family=Fira+Sans:wght@400;500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Lato:wght@400;700&family=Lexend:wght@400;500;600&family=Libre+Baskerville:wght@400;700&family=Lora:wght@400;500;600&family=Manrope:wght@400;500;600&family=Merriweather:wght@400;700&family=Montserrat:wght@400;500;600&family=Nunito:wght@400;600;700&family=Open+Sans:wght@400;600&family=Outfit:wght@400;500;600&family=Playfair+Display:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600&family=Poppins:wght@400;500;600&family=Quicksand:wght@400;500;600&family=Raleway:wght@400;500;600&family=Righteous&family=Roboto:wght@400;500&family=Rubik:wght@400;500;600&family=Source+Code+Pro:wght@400;500&family=Source+Sans+Pro:wght@400;600&family=Ubuntu:wght@400;500;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Adaptive Cards Library -->
+    <script src="https://unpkg.com/adaptivecards@3.0.2/dist/adaptivecards.min.js"></script>
+    
     <script src="dist/chat-sdk-bundle.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -115,6 +119,254 @@
         }
         .header-btn:hover { background: rgba(255,255,255,0.3); }
         .header-btn svg { width: 18px; height: 18px; fill: white; }
+        .header-btn.active { background: #48bb78; }
+        .header-btn.active:hover { background: #38a169; }
+        .header-btn.disabled { opacity: 0.4; pointer-events: none; }
+
+        /* Incoming Call Notification */
+        .incoming-call-notification {
+            position: absolute;
+            top: 60px;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            z-index: 1000;
+            animation: slideDown 0.3s ease-out;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .incoming-call-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .incoming-call-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .incoming-call-icon svg {
+            width: 28px;
+            height: 28px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .incoming-call-info {
+            flex: 1;
+        }
+        
+        .incoming-call-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
+        }
+        
+        .incoming-call-subtitle {
+            font-size: 13px;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .incoming-call-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .accept-call-btn,
+        .decline-call-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .accept-call-btn {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .accept-call-btn:hover {
+            background: #38a169;
+            transform: scale(1.05);
+        }
+        
+        .accept-call-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+        }
+        
+        .decline-call-btn {
+            background: #f56565;
+            color: white;
+        }
+        
+        .decline-call-btn:hover {
+            background: #e53e3e;
+            transform: scale(1.05);
+        }
+        
+        .decline-call-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+        }
+        
+        /* Voice/Video Call Container */
+        .call-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #1a202c;
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+        }
+        .call-container.active { display: flex; }
+        
+        .call-header {
+            padding: 16px 20px;
+            background: rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .call-info {
+            color: white;
+        }
+        .call-status {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .call-duration {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+        
+        .call-video-area {
+            flex: 1;
+            position: relative;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .remote-video,
+        .local-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .local-video {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 120px;
+            height: 160px;
+            border-radius: 12px;
+            border: 2px solid white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        
+        .call-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            font-weight: 600;
+        }
+        
+        .call-controls {
+            padding: 24px 20px;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+        
+        .call-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            background: rgba(255,255,255,0.2);
+        }
+        .call-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+        .call-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+        .call-btn.muted {
+            background: rgba(239, 68, 68, 0.8);
+        }
+        .call-btn.end-call {
+            background: #ef4444;
+            width: 64px;
+            height: 64px;
+        }
+        .call-btn.end-call:hover {
+            background: #dc2626;
+        }
+        
+        .call-connecting {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            color: white;
+        }
+        .call-connecting .spinner {
+            border-color: rgba(255,255,255,0.2);
+            border-top-color: white;
+        }
 
         .chat-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
         .prechat-form {
@@ -333,6 +585,84 @@
         .confirm-btn.cancel:hover { background: #cbd5e1; }
         .confirm-btn.end { background: #ef4444; color: white; }
         .confirm-btn.end:hover { background: #dc2626; }
+        
+        /* Adaptive Card Styles */
+        .ac-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 4px 0;
+            font-family: inherit;
+        }
+        .ac-container .ac-textBlock {
+            margin-bottom: 12px;
+            color: #2d3748;
+            line-height: 1.5;
+        }
+        .ac-container .ac-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .ac-container .ac-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .ac-container .ac-input.ac-multichoiceInput {
+            padding: 8px 12px;
+        }
+        .ac-container label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #4a5568;
+            margin-bottom: 6px;
+        }
+        .ac-container .ac-pushButton {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            margin-top: 8px;
+        }
+        .ac-container .ac-pushButton:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .ac-container .ac-pushButton:active {
+            transform: translateY(0);
+        }
+        .ac-container .ac-actionSet {
+            margin-top: 12px;
+        }
+        .ac-container select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            font-family: inherit;
+            background: white;
+            cursor: pointer;
+        }
+        .ac-container select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -359,6 +689,14 @@
                 <button class="header-btn" id="downloadChat" title="Download transcript" style="display:none;">
                     <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
                 </button>
+                <!-- Voice call button -->
+                <button class="header-btn" id="voiceCallBtn" title="Voice call" style="display:none;">
+                    <svg viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg>
+                </button>
+                <!-- Video call button -->
+                <button class="header-btn" id="videoCallBtn" title="Video call" style="display:none;">
+                    <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+                </button>
                 <button class="header-btn" id="minimizeChat" title="Minimize">
                     <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
                 </button>
@@ -369,6 +707,59 @@
         </div>
 
         <div class="chat-body">
+            <!-- Incoming Call Notification -->
+            <div class="incoming-call-notification" id="incomingCallNotification" style="display:none;">
+                <div class="incoming-call-content">
+                    <div class="incoming-call-icon">
+                        <svg viewBox="0 0 24 24" fill="#48bb78"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg>
+                    </div>
+                    <div class="incoming-call-info">
+                        <div class="incoming-call-title" id="incomingCallTitle">Incoming Call</div>
+                        <div class="incoming-call-subtitle" id="incomingCallSubtitle">Agent is calling...</div>
+                    </div>
+                    <div class="incoming-call-actions">
+                        <button class="accept-call-btn" id="acceptCallBtn" title="Accept call">
+                            <svg viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg>
+                            Accept
+                        </button>
+                        <button class="decline-call-btn" id="declineCallBtn" title="Decline call">
+                            <svg viewBox="0 0 24 24"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>
+                            Decline
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Voice/Video Call Container -->
+            <div class="call-container" id="callContainer">
+                <div class="call-header">
+                    <div class="call-info">
+                        <div class="call-status" id="callStatus">Connecting...</div>
+                        <div class="call-duration" id="callDuration">00:00</div>
+                    </div>
+                </div>
+                <div class="call-video-area" id="callVideoArea">
+                    <div class="call-connecting" id="callConnecting">
+                        <div class="spinner"></div>
+                        <div>Connecting to agent...</div>
+                    </div>
+                    <div class="call-avatar" id="callAvatar" style="display:none;">A</div>
+                    <video id="remoteVideo" class="remote-video" autoplay playsinline style="display:none;"></video>
+                    <video id="localVideo" class="local-video" autoplay playsinline muted style="display:none;"></video>
+                </div>
+                <div class="call-controls">
+                    <button class="call-btn" id="muteMicBtn" title="Mute microphone">
+                        <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                    </button>
+                    <button class="call-btn" id="toggleCameraBtn" title="Turn off camera" style="display:none;">
+                        <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+                    </button>
+                    <button class="call-btn end-call" id="endCallBtn" title="End call">
+                        <svg viewBox="0 0 24 24"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>
+                    </button>
+                </div>
+            </div>
+            
             <form class="prechat-form" id="prechatForm" onsubmit="return false;">
                 <div class="form-title"> Welcome!</div>
                 <div class="form-subtitle">Please fill in your details to start chatting with us.</div>
@@ -563,6 +954,45 @@
 
         let chatSDK = null, chatStarted = false, unreadCount = 0, isMinimized = false, userName = '', userEmail = '', chatMessages = [];
         let processedMessageIds = new Set(); // Track processed message IDs to avoid duplicates
+        
+        // Initialize Adaptive Cards
+        let adaptiveCardRenderer = null;
+        if (typeof AdaptiveCards !== 'undefined') {
+            adaptiveCardRenderer = new AdaptiveCards.AdaptiveCard();
+            adaptiveCardRenderer.hostConfig = new AdaptiveCards.HostConfig({
+                fontFamily: "inherit",
+                spacing: {
+                    small: 8,
+                    default: 12,
+                    medium: 16,
+                    large: 20,
+                    extraLarge: 24,
+                    padding: 16
+                },
+                separator: {
+                    lineThickness: 1,
+                    lineColor: "#e2e8f0"
+                },
+                fontSizes: {
+                    small: 12,
+                    default: 14,
+                    medium: 16,
+                    large: 18,
+                    extraLarge: 20
+                },
+                containerStyles: {
+                    default: {
+                        backgroundColor: "#f8f9fa",
+                        foregroundColors: {
+                            default: {
+                                default: "#2d3748",
+                                subtle: "#64748b"
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
         // DOM elements
         const launcher = document.getElementById('chatLauncher');
@@ -595,6 +1025,39 @@
         const voiceRecording = document.getElementById('voiceRecording');
         const stopVoiceBtn = document.getElementById('stopVoiceBtn');
         const downloadChatBtn = document.getElementById('downloadChat');
+        
+        // Voice/Video Call elements
+        const voiceCallBtn = document.getElementById('voiceCallBtn');
+        const videoCallBtn = document.getElementById('videoCallBtn');
+        const callContainer = document.getElementById('callContainer');
+        const callStatus = document.getElementById('callStatus');
+        const callDuration = document.getElementById('callDuration');
+        const callConnecting = document.getElementById('callConnecting');
+        const callAvatar = document.getElementById('callAvatar');
+        const remoteVideo = document.getElementById('remoteVideo');
+        const localVideo = document.getElementById('localVideo');
+        const muteMicBtn = document.getElementById('muteMicBtn');
+        const toggleCameraBtn = document.getElementById('toggleCameraBtn');
+        const endCallBtn = document.getElementById('endCallBtn');
+        
+        // Incoming call elements
+        const incomingCallNotification = document.getElementById('incomingCallNotification');
+        const incomingCallTitle = document.getElementById('incomingCallTitle');
+        const incomingCallSubtitle = document.getElementById('incomingCallSubtitle');
+        const acceptCallBtn = document.getElementById('acceptCallBtn');
+        const declineCallBtn = document.getElementById('declineCallBtn');
+        const endCallBtn = document.getElementById('endCallBtn');
+        
+        // Call state
+        let isInCall = false;
+        let isVideoCall = false;
+        let isMicMuted = false;
+        let isCameraOff = false;
+        let callStartTime = null;
+        let callDurationInterval = null;
+        let localStream = null;
+        let remoteStream = null;
+        let pendingCallData = null; // Store incoming call data
 
         // FIXED: Actual emoji array with real emojis
         const emojis = [
@@ -675,6 +1138,15 @@
 
         attachBtn.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', handleFileSelect);
+        
+        // Voice/Video call button listeners
+        voiceCallBtn.addEventListener('click', startVoiceCall);
+        videoCallBtn.addEventListener('click', startVideoCall);
+        muteMicBtn.addEventListener('click', toggleMic);
+        toggleCameraBtn.addEventListener('click', toggleCamera);
+        endCallBtn.addEventListener('click', endCall);
+        acceptCallBtn.addEventListener('click', acceptIncomingCall);
+        declineCallBtn.addEventListener('click', declineIncomingCall);
 
         // Download transcript
         downloadChatBtn.addEventListener('click', downloadTranscript);
@@ -739,6 +1211,145 @@
             if (senderImage) { avatar.innerHTML = `<img src="${senderImage}" alt="${senderName}">`; }
             else { avatar.textContent = getInitials(senderName || (isUser ? userName : 'Agent')); }
             return avatar;
+        }
+        
+        // Adaptive Card Support Functions
+        function isAdaptiveCardContent(content) {
+            if (!content || typeof content !== 'string') return false;
+            try {
+                const parsed = JSON.parse(content);
+                // Check if it's an Adaptive Card directly or has attachments with Adaptive Cards
+                if (parsed.type === 'AdaptiveCard') return true;
+                if (parsed.attachments && Array.isArray(parsed.attachments)) {
+                    return parsed.attachments.some(att => 
+                        att.contentType === 'application/vnd.microsoft.card.adaptive' ||
+                        (att.content && att.content.type === 'AdaptiveCard')
+                    );
+                }
+                return false;
+            } catch (e) {
+                return false;
+            }
+        }
+        
+        function addAdaptiveCardMessage(content, isUser, senderName, senderImage) {
+            const now = new Date();
+            const wrapper = document.createElement('div');
+            wrapper.className = `message-wrapper ${isUser ? 'user' : 'agent'}`;
+            
+            const avatarImage = senderImage || (isUser ? adminSettings?.customerAvatar : adminSettings?.agentAvatar);
+            const avatar = createAvatarElement(isUser, senderName, avatarImage);
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            const senderDiv = document.createElement('div');
+            senderDiv.className = 'message-sender';
+            senderDiv.textContent = isUser ? userName : (senderName || 'Agent');
+            
+            const cardContainer = document.createElement('div');
+            cardContainer.className = 'message adaptive-card-message';
+            
+            try {
+                const parsed = JSON.parse(content);
+                let cardPayload = null;
+                
+                // Extract the Adaptive Card payload
+                if (parsed.type === 'AdaptiveCard') {
+                    cardPayload = parsed;
+                } else if (parsed.attachments && Array.isArray(parsed.attachments)) {
+                    const cardAttachment = parsed.attachments.find(att => 
+                        att.contentType === 'application/vnd.microsoft.card.adaptive' && att.content
+                    );
+                    if (cardAttachment) {
+                        cardPayload = cardAttachment.content;
+                    }
+                }
+                
+                if (cardPayload && adaptiveCardRenderer) {
+                    adaptiveCardRenderer.parse(cardPayload);
+                    
+                    // Set up action handlers
+                    adaptiveCardRenderer.onExecuteAction = async (action) => {
+                        console.log('Adaptive Card action executed:', action);
+                        
+                        if (action instanceof AdaptiveCards.SubmitAction) {
+                            const data = action.data;
+                            console.log('Submit action data:', data);
+                            
+                            // Send the form data as a message to the chat
+                            if (data) {
+                                const formattedData = Object.entries(data)
+                                    .filter(([key, value]) => key !== 'actionSubmitId' && value)
+                                    .map(([key, value]) => `${key}: ${value}`)
+                                    .join('\n');
+                                
+                                if (formattedData) {
+                                    // Send the data via SDK
+                                    if (chatSDK && chatStarted) {
+                                        try {
+                                            await chatSDK.sendMessage({
+                                                content: formattedData,
+                                                contentType: 'text',
+                                                metadata: {
+                                                    adaptiveCardData: data
+                                                }
+                                            });
+                                            
+                                            // Show in UI
+                                            addMessage(formattedData, true, userName, null);
+                                        } catch (error) {
+                                            console.error('Error sending adaptive card data:', error);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    };
+                    
+                    const renderedCard = adaptiveCardRenderer.render();
+                    if (renderedCard) {
+                        cardContainer.appendChild(renderedCard);
+                    } else {
+                        cardContainer.innerHTML = '<p style="color: #e74c3c;">⚠️ Could not render card</p>';
+                    }
+                } else {
+                    cardContainer.innerHTML = '<p style="color: #e74c3c;">⚠️ Invalid Adaptive Card format</p>';
+                }
+            } catch (error) {
+                console.error('Error rendering Adaptive Card:', error);
+                cardContainer.innerHTML = '<p style="color: #e74c3c;">⚠️ Error displaying card</p>';
+            }
+            
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'message-time';
+            timeDiv.textContent = formatTime(now);
+            
+            contentDiv.appendChild(senderDiv);
+            contentDiv.appendChild(cardContainer);
+            contentDiv.appendChild(timeDiv);
+            
+            wrapper.appendChild(avatar);
+            wrapper.appendChild(contentDiv);
+            
+            typingIndicator.parentNode.insertBefore(wrapper, typingIndicator);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Save to chat history (store original JSON)
+            chatMessages.push({ 
+                isUser, 
+                content: content, 
+                isAdaptiveCard: true,
+                senderName: isUser ? userName : senderName, 
+                timestamp: now 
+            });
+            saveChatSession();
+            
+            if (!isUser && !container.classList.contains('open')) {
+                unreadCount++; 
+                badge.textContent = unreadCount; 
+                badge.classList.add('show');
+            }
         }
 
         function addImageMessage(fileInfo, isUser, senderName, senderImage) {
@@ -866,9 +1477,14 @@
                     handleAgentAttachment(fileMetadata, senderName);
                 }
                 
-                // Handle text content
+                // Handle text content - check if it's an Adaptive Card first
                 if (content) {
-                    addMessage(content, false, senderName, null);
+                    if (isAdaptiveCardContent(content)) {
+                        console.log('📋 Detected Adaptive Card in message content');
+                        addAdaptiveCardMessage(content, false, senderName, null);
+                    } else {
+                        addMessage(content, false, senderName, null);
+                    }
                 }
             }
         }
@@ -1059,6 +1675,9 @@
                         showView('ended'); 
                     });
                     
+                    // Listen for incoming voice/video call requests from agent
+                    setupIncomingCallListener(chatSDK);
+                    
                     // Reconnect to existing chat using saved context
                     await chatSDK.startChat({ liveChatContext: session.liveChatContext });
                     console.log('✅ Reconnected to existing chat session!');
@@ -1066,27 +1685,92 @@
                     chatStarted = true;
                     chatMessages = session.messages || [];
                     
+                    // Show voice/video call buttons
+                    voiceCallBtn.style.display = 'flex';
+                    videoCallBtn.style.display = 'flex';
+                    
                     // Restore UI - rebuild message display
                     showView('chat');
                     chatMessages.forEach(msg => {
                         if (msg.content) {
-                            const now = msg.timestamp ? new Date(msg.timestamp) : new Date();
-                            const wrapper = document.createElement('div');
-                            wrapper.className = `message-wrapper ${msg.isUser ? 'user' : 'agent'}`;
-                            
-                            const avatarImage = msg.isUser ? adminSettings?.customerAvatar : adminSettings?.agentAvatar;
-                            const avatar = createAvatarElement(msg.isUser, msg.senderName, avatarImage);
-                            
-                            const content = document.createElement('div');
-                            content.className = 'message-content';
-                            content.innerHTML = `
-                                <div class="message-sender">${msg.isUser ? userName : (msg.senderName || 'Agent')}</div>
-                                <div class="message ${msg.isUser ? 'user' : 'agent'}">${msg.content}</div>
-                                <div class="message-time">${formatTime(now)}</div>
-                            `;
-                            wrapper.appendChild(avatar);
-                            wrapper.appendChild(content);
-                            typingIndicator.parentNode.insertBefore(wrapper, typingIndicator);
+                            // Check if this is an Adaptive Card message
+                            if (msg.isAdaptiveCard) {
+                                // Re-render the Adaptive Card
+                                const now = msg.timestamp ? new Date(msg.timestamp) : new Date();
+                                const wrapper = document.createElement('div');
+                                wrapper.className = `message-wrapper ${msg.isUser ? 'user' : 'agent'}`;
+                                
+                                const avatarImage = msg.isUser ? adminSettings?.customerAvatar : adminSettings?.agentAvatar;
+                                const avatar = createAvatarElement(msg.isUser, msg.senderName, avatarImage);
+                                
+                                const contentDiv = document.createElement('div');
+                                contentDiv.className = 'message-content';
+                                
+                                const senderDiv = document.createElement('div');
+                                senderDiv.className = 'message-sender';
+                                senderDiv.textContent = msg.isUser ? userName : (msg.senderName || 'Agent');
+                                
+                                const cardContainer = document.createElement('div');
+                                cardContainer.className = 'message adaptive-card-message';
+                                
+                                try {
+                                    const parsed = JSON.parse(msg.content);
+                                    let cardPayload = null;
+                                    
+                                    if (parsed.type === 'AdaptiveCard') {
+                                        cardPayload = parsed;
+                                    } else if (parsed.attachments && Array.isArray(parsed.attachments)) {
+                                        const cardAttachment = parsed.attachments.find(att => 
+                                            att.contentType === 'application/vnd.microsoft.card.adaptive' && att.content
+                                        );
+                                        if (cardAttachment) {
+                                            cardPayload = cardAttachment.content;
+                                        }
+                                    }
+                                    
+                                    if (cardPayload && adaptiveCardRenderer) {
+                                        adaptiveCardRenderer.parse(cardPayload);
+                                        const renderedCard = adaptiveCardRenderer.render();
+                                        if (renderedCard) {
+                                            cardContainer.appendChild(renderedCard);
+                                        }
+                                    }
+                                } catch (error) {
+                                    console.error('Error re-rendering Adaptive Card:', error);
+                                    cardContainer.innerHTML = '<p style="color: #e74c3c;">⚠️ Card could not be restored</p>';
+                                }
+                                
+                                const timeDiv = document.createElement('div');
+                                timeDiv.className = 'message-time';
+                                timeDiv.textContent = formatTime(now);
+                                
+                                contentDiv.appendChild(senderDiv);
+                                contentDiv.appendChild(cardContainer);
+                                contentDiv.appendChild(timeDiv);
+                                
+                                wrapper.appendChild(avatar);
+                                wrapper.appendChild(contentDiv);
+                                typingIndicator.parentNode.insertBefore(wrapper, typingIndicator);
+                            } else {
+                                // Regular text message
+                                const now = msg.timestamp ? new Date(msg.timestamp) : new Date();
+                                const wrapper = document.createElement('div');
+                                wrapper.className = `message-wrapper ${msg.isUser ? 'user' : 'agent'}`;
+                                
+                                const avatarImage = msg.isUser ? adminSettings?.customerAvatar : adminSettings?.agentAvatar;
+                                const avatar = createAvatarElement(msg.isUser, msg.senderName, avatarImage);
+                                
+                                const content = document.createElement('div');
+                                content.className = 'message-content';
+                                content.innerHTML = `
+                                    <div class="message-sender">${msg.isUser ? userName : (msg.senderName || 'Agent')}</div>
+                                    <div class="message ${msg.isUser ? 'user' : 'agent'}">${msg.content}</div>
+                                    <div class="message-time">${formatTime(now)}</div>
+                                `;
+                                wrapper.appendChild(avatar);
+                                wrapper.appendChild(content);
+                                typingIndicator.parentNode.insertBefore(wrapper, typingIndicator);
+                            }
                         }
                     });
                     
@@ -1158,6 +1842,9 @@
                     showView('ended'); 
                 });
                 
+                // Listen for incoming voice/video call requests from agent
+                setupIncomingCallListener(chatSDK);
+                
                 // D365 Context - uses proper field identifiers for contact authentication
                 // 'Name' and 'emailaddress1' allow D365 to automatically populate contact records
                 const customContext = {
@@ -1173,6 +1860,11 @@
                 await chatSDK.startChat({ customContext });
                 console.log('Chat started with D365 context:', customContext);
                 chatStarted = true;
+                
+                // Show voice/video call buttons once chat is connected
+                voiceCallBtn.style.display = 'flex';
+                videoCallBtn.style.display = 'flex';
+                
                 saveChatSession(); // Save initial session state
                 showView('chat');
                 if (question) { await sendMessageText(question); }
@@ -1189,6 +1881,540 @@
             if (!text || !chatSDK || !chatStarted) return;
             addMessage(text, true, userName, null);
             try { await chatSDK.sendMessage({ content: text }); } catch (e) { console.error('Send error:', e); }
+        }
+        
+        // ============ INCOMING CALL HANDLING (Agent-Initiated) ============
+        
+        function setupIncomingCallListener(sdk) {
+            console.log('📞 Setting up incoming call listener...');
+            
+            // Method 1: Try direct calling SDK event
+            if (sdk.getVoiceVideoCalling) {
+                sdk.getVoiceVideoCalling().then(voiceVideoCall => {
+                    if (voiceVideoCall && voiceVideoCall.onCallAdded) {
+                        voiceVideoCall.onCallAdded((callData) => {
+                            console.log('📞 Incoming call detected:', callData);
+                            showIncomingCallNotification(callData);
+                        });
+                    }
+                }).catch(err => console.log('VoiceVideoCalling not available:', err));
+            }
+            
+            // Method 2: Listen for control messages (secondary channel events)
+            if (sdk.onControlMessage) {
+                sdk.onControlMessage((message) => {
+                    console.log('📞 Control message received:', message);
+                    if (message && message.type === 'VoiceVideoCall') {
+                        showIncomingCallNotification(message.data);
+                    }
+                });
+            }
+            
+            // Method 3: Listen for system messages that might indicate call
+            if (sdk.onNewMessage) {
+                const originalHandler = sdk.onNewMessage;
+                sdk.onNewMessage((msg) => {
+                    // Check if message is a call invitation
+                    if (msg && msg.tags && (msg.tags.includes('voicecall') || msg.tags.includes('videocall'))) {
+                        const isVideo = msg.tags.includes('videocall');
+                        showIncomingCallNotification({ 
+                            isVideo, 
+                            agentName: msg.sender || 'Agent',
+                            messageData: msg
+                        });
+                    }
+                    
+                    // Call original handler
+                    if (originalHandler) originalHandler(msg);
+                });
+            }
+            
+            console.log('✅ Incoming call listeners configured');
+        }
+        
+        function showIncomingCallNotification(callData) {
+            console.log('📞 Showing incoming call notification:', callData);
+            
+            pendingCallData = callData;
+            isVideoCall = callData?.isVideo || callData?.video || false;
+            
+            const callType = isVideoCall ? 'Video Call' : 'Voice Call';
+            const agentName = callData?.agentName || callData?.from || 'Agent';
+            
+            incomingCallTitle.textContent = `Incoming ${callType}`;
+            incomingCallSubtitle.textContent = `${agentName} is calling you...`;
+            
+            incomingCallNotification.style.display = 'block';
+            
+            // Play notification sound if available
+            playNotificationSound();
+        }
+        
+        async function acceptIncomingCall() {
+            console.log('✅ Accepting incoming call...');
+            incomingCallNotification.style.display = 'none';
+            
+            if (!pendingCallData) {
+                console.error('No pending call data');
+                return;
+            }
+            
+            try {
+                // Show call UI
+                callContainer.classList.add('active');
+                callConnecting.style.display = 'flex';
+                callAvatar.style.display = 'none';
+                remoteVideo.style.display = 'none';
+                localVideo.style.display = 'none';
+                toggleCameraBtn.style.display = isVideoCall ? 'flex' : 'none';
+                callStatus.textContent = 'Connecting...';
+                
+                // Request media permissions
+                const mediaConstraints = {
+                    audio: true,
+                    video: isVideoCall ? { width: { ideal: 1280 }, height: { ideal: 720 } } : false
+                };
+                
+                localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+                console.log('✅ Media permissions granted');
+                
+                if (isVideoCall && localStream) {
+                    localVideo.srcObject = localStream;
+                    localVideo.style.display = 'block';
+                }
+                
+                // Try to accept call through SDK
+                if (chatSDK && chatSDK.getVoiceVideoCalling) {
+                    const voiceVideoCall = await chatSDK.getVoiceVideoCalling();
+                    if (voiceVideoCall && voiceVideoCall.acceptCall) {
+                        await voiceVideoCall.acceptCall(pendingCallData);
+                        window.activeVoiceVideoCall = voiceVideoCall;
+                        
+                        // Setup event listeners
+                        if (voiceVideoCall.onCallConnected) {
+                            voiceVideoCall.onCallConnected(() => {
+                                console.log('📞 Call connected');
+                                callStatus.textContent = 'Connected';
+                                callConnecting.style.display = 'none';
+                                
+                                if (isVideoCall) {
+                                    remoteVideo.style.display = 'block';
+                                } else {
+                                    callAvatar.style.display = 'flex';
+                                    callAvatar.textContent = getInitials(pendingCallData?.agentName || 'Agent');
+                                }
+                            });
+                        }
+                        
+                        if (voiceVideoCall.onCallDisconnected) {
+                            voiceVideoCall.onCallDisconnected(() => {
+                                console.log('📞 Call disconnected by remote');
+                                endCall();
+                            });
+                        }
+                        
+                        if (voiceVideoCall.onRemoteVideoStreamAdded) {
+                            voiceVideoCall.onRemoteVideoStreamAdded((stream) => {
+                                console.log('📹 Remote stream added');
+                                remoteStream = stream;
+                                remoteVideo.srcObject = stream;
+                            });
+                        }
+                    }
+                }
+                
+                // Update state
+                isInCall = true;
+                callConnecting.style.display = 'none';
+                callStatus.textContent = isVideoCall ? 'Video Call' : 'Voice Call';
+                
+                if (!isVideoCall) {
+                    callAvatar.style.display = 'flex';
+                    callAvatar.textContent = getInitials(pendingCallData?.agentName || 'Agent');
+                } else {
+                    remoteVideo.style.display = 'block';
+                }
+                
+                if (isVideoCall) {
+                    videoCallBtn.classList.add('active');
+                } else {
+                    voiceCallBtn.classList.add('active');
+                }
+                
+                startCallDuration();
+                
+                console.log('✅ Call accepted and connected');
+                
+            } catch (error) {
+                console.error('❌ Failed to accept call:', error);
+                alert('Could not connect to call: ' + error.message);
+                callContainer.classList.remove('active');
+                if (localStream) {
+                    localStream.getTracks().forEach(track => track.stop());
+                    localStream = null;
+                }
+            }
+        }
+        
+        function declineIncomingCall() {
+            console.log('❌ Declining incoming call');
+            incomingCallNotification.style.display = 'none';
+            
+            // Notify SDK about decline if possible
+            if (chatSDK && chatSDK.getVoiceVideoCalling) {
+                chatSDK.getVoiceVideoCalling().then(voiceVideoCall => {
+                    if (voiceVideoCall && voiceVideoCall.rejectCall && pendingCallData) {
+                        voiceVideoCall.rejectCall(pendingCallData);
+                    }
+                }).catch(err => console.log('Could not reject call:', err));
+            }
+            
+            pendingCallData = null;
+        }
+        
+        function playNotificationSound() {
+            // Create a simple beep sound
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                gainNode.gain.value = 0.3;
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.2);
+            } catch (e) {
+                console.log('Could not play notification sound:', e);
+            }
+        }
+        
+        // ============ OUTGOING CALL FUNCTIONS (Customer-Initiated) ============
+        // Note: These may not work if SDK doesn't support client-initiated calling
+        
+        // Voice/Video Call Functions
+        async function startVoiceCall() {
+            if (!chatSDK || !chatStarted || isInCall) return;
+            
+            try {
+                console.log('🎤 Starting voice call...');
+                console.log('Available SDK methods:', Object.keys(chatSDK));
+                
+                // Check if calling is available through SDK
+                // Note: D365 voice/video calling may require specific Omnichannel configuration
+                // and might not be available through the headless chat SDK
+                const hasCallingSupport = typeof chatSDK.getVoiceVideoCalling === 'function' ||
+                                         typeof chatSDK.requestVoiceCall === 'function' ||
+                                         typeof chatSDK.initiateCall === 'function';
+                
+                if (!hasCallingSupport) {
+                    throw new Error('Voice/Video calling is not available through the chat SDK.\n\n' +
+                        'This feature requires:\n' +
+                        '1. Voice/Video channel enabled in D365 Omnichannel Admin Center\n' +
+                        '2. Proper licensing (Digital Messaging + Voice add-on)\n' +
+                        '3. Native D365 widget or supported calling SDK\n\n' +
+                        'The headless chat SDK may not support direct client-initiated calling.\n' +
+                        'Consider using the native D365 widget or contact Microsoft support.');
+                }
+                
+                isVideoCall = false;
+                callContainer.classList.add('active');
+                callConnecting.style.display = 'flex';
+                callAvatar.style.display = 'none';
+                remoteVideo.style.display = 'none';
+                localVideo.style.display = 'none';
+                toggleCameraBtn.style.display = 'none';
+                callStatus.textContent = 'Connecting...';
+                
+                // Try to get the voice/video calling object from SDK
+                let voiceVideoCall = null;
+                if (chatSDK.getVoiceVideoCalling) {
+                    voiceVideoCall = await chatSDK.getVoiceVideoCalling();
+                }
+                console.log('Voice/Video calling object:', voiceVideoCall);
+                
+                // Request microphone access
+                localStream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: true, 
+                    video: false 
+                });
+                
+                // Start voice calling using SDK
+                if (voiceVideoCall && voiceVideoCall.startCall) {
+                    await voiceVideoCall.startCall({ 
+                        video: false, 
+                        audio: true 
+                    });
+                } else {
+                    throw new Error('Calling API not available. Please check Omnichannel configuration.');
+                }
+                
+                console.log('✅ Voice call started');
+                isInCall = true;
+                callConnecting.style.display = 'none';
+                callAvatar.style.display = 'flex';
+                callAvatar.textContent = getInitials(headerTitle.textContent);
+                callStatus.textContent = 'Voice Call';
+                
+                voiceCallBtn.classList.add('active');
+                startCallDuration();
+                
+                // Setup call event listeners
+                if (voiceVideoCall.onCallConnected) {
+                    voiceVideoCall.onCallConnected(() => {
+                        console.log('📞 Call connected');
+                        callStatus.textContent = 'Connected';
+                    });
+                }
+                
+                if (voiceVideoCall.onCallDisconnected) {
+                    voiceVideoCall.onCallDisconnected(() => {
+                        console.log('📞 Call disconnected');
+                        endCall();
+                    });
+                }
+                
+                if (voiceVideoCall.onRemoteVideoStreamAdded) {
+                    voiceVideoCall.onRemoteVideoStreamAdded((stream) => {
+                        console.log('📹 Remote stream added');
+                        remoteStream = stream;
+                        remoteVideo.srcObject = stream;
+                    });
+                }
+                
+                // Store the calling object for later use
+                window.activeVoiceVideoCall = voiceVideoCall;
+                
+            } catch (error) {
+                console.error('❌ Voice call failed:', error);
+                alert('Could not start voice call: ' + error.message);
+                callContainer.classList.remove('active');
+                if (localStream) {
+                    localStream.getTracks().forEach(track => track.stop());
+                    localStream = null;
+                }
+            }
+        }
+        
+        async function startVideoCall() {
+            if (!chatSDK || !chatStarted || isInCall) return;
+            
+            try {
+                console.log('📹 Starting video call...');
+                console.log('Available SDK methods:', Object.keys(chatSDK));
+                
+                // Check if calling is available through SDK
+                const hasCallingSupport = typeof chatSDK.getVoiceVideoCalling === 'function' ||
+                                         typeof chatSDK.requestVideoCall === 'function' ||
+                                         typeof chatSDK.initiateCall === 'function';
+                
+                if (!hasCallingSupport) {
+                    throw new Error('Voice/Video calling is not available through the chat SDK.\n\n' +
+                        'This feature requires:\n' +
+                        '1. Voice/Video channel enabled in D365 Omnichannel Admin Center\n' +
+                        '2. Proper licensing (Digital Messaging + Voice add-on)\n' +
+                        '3. Native D365 widget or supported calling SDK\n\n' +
+                        'The headless chat SDK may not support direct client-initiated calling.\n' +
+                        'Consider using the native D365 widget or contact Microsoft support.');
+                }
+                
+                isVideoCall = true;
+                callContainer.classList.add('active');
+                callConnecting.style.display = 'flex';
+                callAvatar.style.display = 'none';
+                remoteVideo.style.display = 'none';
+                localVideo.style.display = 'none';
+                toggleCameraBtn.style.display = 'flex';
+                callStatus.textContent = 'Connecting...';
+                
+                // Try to get the voice/video calling object from SDK
+                let voiceVideoCall = null;
+                if (chatSDK.getVoiceVideoCalling) {
+                    voiceVideoCall = await chatSDK.getVoiceVideoCalling();
+                }
+                console.log('Voice/Video calling object:', voiceVideoCall);
+                
+                // Request camera and microphone access
+                localStream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: true, 
+                    video: { 
+                        width: { ideal: 1280 }, 
+                        height: { ideal: 720 } 
+                    } 
+                });
+                
+                localVideo.srcObject = localStream;
+                localVideo.style.display = 'block';
+                
+                // Start video calling using SDK
+                if (voiceVideoCall && voiceVideoCall.startCall) {
+                    await voiceVideoCall.startCall({ 
+                        video: true, 
+                        audio: true 
+                    });
+                } else {
+                    throw new Error('Calling API not available. Please check Omnichannel configuration.');
+                }
+                
+                console.log('✅ Video call started');
+                isInCall = true;
+                callConnecting.style.display = 'none';
+                remoteVideo.style.display = 'block';
+                callStatus.textContent = 'Video Call';
+                
+                videoCallBtn.classList.add('active');
+                startCallDuration();
+                
+                // Setup call event listeners
+                if (voiceVideoCall.onCallConnected) {
+                    voiceVideoCall.onCallConnected(() => {
+                        console.log('📞 Call connected');
+                        callStatus.textContent = 'Connected';
+                    });
+                }
+                
+                if (voiceVideoCall.onCallDisconnected) {
+                    voiceVideoCall.onCallDisconnected(() => {
+                        console.log('📞 Call disconnected');
+                        endCall();
+                    });
+                }
+                
+                if (voiceVideoCall.onRemoteVideoStreamAdded) {
+                    voiceVideoCall.onRemoteVideoStreamAdded((stream) => {
+                        console.log('📹 Remote stream added');
+                        remoteStream = stream;
+                        remoteVideo.srcObject = stream;
+                    });
+                }
+                
+                // Store the calling object for later use
+                window.activeVoiceVideoCall = voiceVideoCall;
+                
+            } catch (error) {
+                console.error('❌ Video call failed:', error);
+                alert('Could not start video call: ' + error.message);
+                callContainer.classList.remove('active');
+                if (localStream) {
+                    localStream.getTracks().forEach(track => track.stop());
+                    localStream = null;
+                }
+            }
+        }
+        
+        function startCallDuration() {
+            callStartTime = Date.now();
+            callDurationInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                callDuration.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }, 1000);
+        }
+        
+        function toggleMic() {
+            if (!localStream) return;
+            
+            const audioTrack = localStream.getAudioTracks()[0];
+            if (audioTrack) {
+                audioTrack.enabled = !audioTrack.enabled;
+                isMicMuted = !audioTrack.enabled;
+                muteMicBtn.classList.toggle('muted', isMicMuted);
+                muteMicBtn.title = isMicMuted ? 'Unmute microphone' : 'Mute microphone';
+                
+                // Update mic icon
+                if (isMicMuted) {
+                    muteMicBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z"/></svg>';
+                } else {
+                    muteMicBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>';
+                }
+                
+                console.log(isMicMuted ? '🔇 Microphone muted' : '🎤 Microphone unmuted');
+            }
+        }
+        
+        function toggleCamera() {
+            if (!localStream || !isVideoCall) return;
+            
+            const videoTrack = localStream.getVideoTracks()[0];
+            if (videoTrack) {
+                videoTrack.enabled = !videoTrack.enabled;
+                isCameraOff = !videoTrack.enabled;
+                toggleCameraBtn.classList.toggle('muted', isCameraOff);
+                toggleCameraBtn.title = isCameraOff ? 'Turn on camera' : 'Turn off camera';
+                
+                // Update camera icon
+                if (isCameraOff) {
+                    toggleCameraBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M21 6.5l-4 4V7c0-.55-.45-1-1-1H9.82L21 17.18V6.5zM3.27 2L2 3.27 4.73 6H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.21 0 .39-.08.54-.18L19.73 21 21 19.73 3.27 2z"/></svg>';
+                } else {
+                    toggleCameraBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>';
+                }
+                
+                localVideo.style.display = isCameraOff ? 'none' : 'block';
+                console.log(isCameraOff ? '📷 Camera off' : '📹 Camera on');
+            }
+        }
+        
+        async function endCall() {
+            console.log('🔴 Ending call...');
+            
+            // Stop local media streams
+            if (localStream) {
+                localStream.getTracks().forEach(track => {
+                    track.stop();
+                    console.log('Stopped track:', track.kind);
+                });
+                localStream = null;
+            }
+            
+            // Clear remote stream
+            if (remoteVideo.srcObject) {
+                remoteVideo.srcObject = null;
+            }
+            if (localVideo.srcObject) {
+                localVideo.srcObject = null;
+            }
+            
+            // Stop call via SDK
+            if (window.activeVoiceVideoCall && isInCall) {
+                try {
+                    if (typeof window.activeVoiceVideoCall.stopCall === 'function') {
+                        await window.activeVoiceVideoCall.stopCall();
+                    }
+                } catch (error) {
+                    console.error('Error stopping call via SDK:', error);
+                }
+            }
+            
+            // Clear stored calling object
+            window.activeVoiceVideoCall = null;
+            
+            // Reset UI
+            callContainer.classList.remove('active');
+            voiceCallBtn.classList.remove('active');
+            videoCallBtn.classList.remove('active');
+            muteMicBtn.classList.remove('muted');
+            toggleCameraBtn.classList.remove('muted');
+            
+            // Clear call duration timer
+            if (callDurationInterval) {
+                clearInterval(callDurationInterval);
+                callDurationInterval = null;
+            }
+            
+            // Reset state
+            isInCall = false;
+            isVideoCall = false;
+            isMicMuted = false;
+            isCameraOff = false;
+            callStartTime = null;
+            callDuration.textContent = '00:00';
+            
+            console.log('✅ Call ended');
         }
 
         async function sendMessage() {
