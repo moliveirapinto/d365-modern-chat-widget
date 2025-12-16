@@ -130,7 +130,7 @@
             left: 0;
             right: 0;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
+            padding: 12px 16px;
             z-index: 1000;
             animation: slideDown 0.3s ease-out;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
@@ -149,24 +149,35 @@
         
         .incoming-call-content {
             display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .incoming-call-header {
+            display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
         
         .incoming-call-icon {
-            width: 50px;
-            height: 50px;
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            min-height: 44px;
             background: rgba(255,255,255,0.2);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             animation: pulse 1.5s infinite;
+            box-shadow: 0 0 15px rgba(72, 187, 120, 0.4);
         }
         
         .incoming-call-icon svg {
-            width: 28px;
-            height: 28px;
+            width: 22px;
+            height: 22px;
+            fill: white;
+            flex-shrink: 0;
         }
         
         @keyframes pulse {
@@ -179,10 +190,10 @@
         }
         
         .incoming-call-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             color: white;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
         
         .incoming-call-subtitle {
@@ -192,21 +203,39 @@
         
         .incoming-call-actions {
             display: flex;
-            gap: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
         }
         
         .accept-call-btn,
+        .accept-video-btn,
         .decline-call-btn {
-            padding: 12px 20px;
+            padding: 10px 16px;
             border: none;
-            border-radius: 25px;
-            font-size: 14px;
+            border-radius: 20px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             transition: all 0.2s;
+            justify-content: center;
+        }
+        
+        .accept-video-btn {
+            background: #4299e1;
+            color: white;
+        }
+        
+        .accept-video-btn:hover {
+            background: #3182ce;
+            transform: scale(1.05);
+        }
+        
+        .accept-video-btn svg {
+            fill: white;
         }
         
         .accept-call-btn {
@@ -220,8 +249,6 @@
         }
         
         .accept-call-btn svg {
-            width: 18px;
-            height: 18px;
             fill: white;
         }
         
@@ -689,14 +716,7 @@
                 <button class="header-btn" id="downloadChat" title="Download transcript" style="display:none;">
                     <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
                 </button>
-                <!-- Voice call button -->
-                <button class="header-btn" id="voiceCallBtn" title="Voice call" style="display:none;">
-                    <svg viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg>
-                </button>
-                <!-- Video call button -->
-                <button class="header-btn" id="videoCallBtn" title="Video call" style="display:none;">
-                    <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
-                </button>
+                <!-- Voice/Video call buttons removed - only agents can initiate calls -->
                 <button class="header-btn" id="minimizeChat" title="Minimize">
                     <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
                 </button>
@@ -710,20 +730,26 @@
             <!-- Incoming Call Notification -->
             <div class="incoming-call-notification" id="incomingCallNotification" style="display:none;">
                 <div class="incoming-call-content">
-                    <div class="incoming-call-icon">
-                        <svg viewBox="0 0 24 24" fill="#48bb78"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg>
-                    </div>
-                    <div class="incoming-call-info">
-                        <div class="incoming-call-title" id="incomingCallTitle">Incoming Call</div>
-                        <div class="incoming-call-subtitle" id="incomingCallSubtitle">Agent is calling...</div>
+                    <div class="incoming-call-header">
+                        <div class="incoming-call-icon">
+                            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="white" d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg>
+                        </div>
+                        <div class="incoming-call-info">
+                            <div class="incoming-call-title" id="incomingCallTitle">Incoming Call</div>
+                            <div class="incoming-call-subtitle" id="incomingCallSubtitle">Agent is calling...</div>
+                        </div>
                     </div>
                     <div class="incoming-call-actions">
-                        <button class="accept-call-btn" id="acceptCallBtn" title="Accept call">
-                            <svg viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg>
-                            Accept
+                        <button class="accept-video-btn" id="acceptVideoBtn" title="Accept with video">
+                            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="white" d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+                            Video
+                        </button>
+                        <button class="accept-call-btn" id="acceptCallBtn" title="Accept voice only">
+                            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="white" d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg>
+                            Voice
                         </button>
                         <button class="decline-call-btn" id="declineCallBtn" title="Decline call">
-                            <svg viewBox="0 0 24 24"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>
+                            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="white" d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>
                             Decline
                         </button>
                     </div>
@@ -1026,9 +1052,7 @@
         const stopVoiceBtn = document.getElementById('stopVoiceBtn');
         const downloadChatBtn = document.getElementById('downloadChat');
         
-        // Voice/Video Call elements
-        const voiceCallBtn = document.getElementById('voiceCallBtn');
-        const videoCallBtn = document.getElementById('videoCallBtn');
+        // Voice/Video Call elements (agent-initiated only - customer cannot start calls)
         const callContainer = document.getElementById('callContainer');
         const callStatus = document.getElementById('callStatus');
         const callDuration = document.getElementById('callDuration');
@@ -1046,7 +1070,6 @@
         const incomingCallSubtitle = document.getElementById('incomingCallSubtitle');
         const acceptCallBtn = document.getElementById('acceptCallBtn');
         const declineCallBtn = document.getElementById('declineCallBtn');
-        const endCallBtn = document.getElementById('endCallBtn');
         
         // Call state
         let isInCall = false;
@@ -1058,6 +1081,7 @@
         let localStream = null;
         let remoteStream = null;
         let pendingCallData = null; // Store incoming call data
+        let currentAgentName = 'Agent'; // Track the current agent name for calls
 
         // FIXED: Actual emoji array with real emojis
         const emojis = [
@@ -1119,6 +1143,23 @@
         confirmNo.addEventListener('click', () => confirmModal.classList.remove('show'));
         confirmYes.addEventListener('click', async () => {
             confirmModal.classList.remove('show');
+            
+            // End any active call first
+            if (isInCall) {
+                await endCall();
+            }
+            
+            // Close VoiceVideoCallingSDK
+            if (VoiceVideoCallingSDK && VoiceVideoCallingSDK.close) {
+                try {
+                    VoiceVideoCallingSDK.close();
+                    console.log('✅ VoiceVideoCallingSDK closed');
+                } catch (e) {
+                    console.log('VoiceVideoCallingSDK close error:', e);
+                }
+            }
+            VoiceVideoCallingSDK = null;
+            
             if (chatSDK) { try { await chatSDK.endChat(); } catch (e) { console.log('End chat error:', e); } }
             localStorage.removeItem('chatWidgetSession'); // Clear saved session
             showView('ended');
@@ -1139,13 +1180,15 @@
         attachBtn.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', handleFileSelect);
         
-        // Voice/Video call button listeners
-        voiceCallBtn.addEventListener('click', startVoiceCall);
-        videoCallBtn.addEventListener('click', startVideoCall);
+        // In-call controls (for agent-initiated calls)
         muteMicBtn.addEventListener('click', toggleMic);
         toggleCameraBtn.addEventListener('click', toggleCamera);
         endCallBtn.addEventListener('click', endCall);
-        acceptCallBtn.addEventListener('click', acceptIncomingCall);
+        
+        // Accept call buttons - customer chooses how to answer
+        const acceptVideoBtn = document.getElementById('acceptVideoBtn');
+        acceptCallBtn.addEventListener('click', () => acceptIncomingCall(false)); // Voice only
+        acceptVideoBtn.addEventListener('click', () => acceptIncomingCall(true));  // With video
         declineCallBtn.addEventListener('click', declineIncomingCall);
 
         // Download transcript
@@ -1201,6 +1244,10 @@
             const name = (typeof agentName === 'string') ? agentName : 'Support Agent';
             headerTitle.textContent = name || 'Support Agent';
             headerStatus.textContent = 'Online';
+            
+            // Update the global currentAgentName for use in calls
+            currentAgentName = name || 'Agent';
+            
             if (agentImage) { headerAvatar.innerHTML = `<img src="${agentImage}" alt="${name}">`; }
             else { headerAvatar.innerHTML = `<span style="color:white;font-weight:600;font-size:14px;">${getInitials(name)}</span>`; }
         }
@@ -1416,6 +1463,27 @@
             // Mark as processed
             if (messageId) {
                 processedMessageIds.add(messageId);
+            }
+            
+            // 🎯 CHECK FOR INCOMING VOICE/VIDEO CALL
+            // Check if message contains call invitation tags or metadata
+            const tags = message.tags || [];
+            const metadata = message.metadata || message.properties || {};
+            const messageType = message.messageType || message.type || metadata.messageType;
+            
+            if (tags.includes('voicecall') || tags.includes('videocall') || 
+                messageType === 'VoiceVideoCall' || messageType === 'voicecall' || messageType === 'videocall' ||
+                metadata.isVoiceCall || metadata.isVideoCall) {
+                console.log('📞 INCOMING CALL DETECTED in message:', message);
+                const isVideo = tags.includes('videocall') || messageType === 'videocall' || metadata.isVideoCall;
+                const senderName = message.senderDisplayName || message.sender?.displayName || 'Agent';
+                showIncomingCallNotification({ 
+                    isVideo, 
+                    agentName: senderName,
+                    messageData: message,
+                    callId: messageId
+                });
+                return; // Don't process as regular message
             }
             
             // Get message content - try various possible content fields
@@ -1660,7 +1728,8 @@
                     
                     // Set up message listener
                     chatSDK.onNewMessage((msg) => {
-                        console.log('onNewMessage event received:', msg);
+                        console.log('📨 onNewMessage event received:', msg);
+                        console.log('📨 Message details - tags:', msg?.tags, 'type:', msg?.type || msg?.messageType, 'metadata:', msg?.metadata);
                         if (msg) processMessage(msg);
                     });
                     
@@ -1675,19 +1744,18 @@
                         showView('ended'); 
                     });
                     
-                    // Listen for incoming voice/video call requests from agent
-                    setupIncomingCallListener(chatSDK);
+                    // VoiceVideoCallingSDK will be initialized after chat reconnects
+                    // Incoming call listener is set up in initializeVoiceVideoCallingSDK
                     
                     // Reconnect to existing chat using saved context
                     await chatSDK.startChat({ liveChatContext: session.liveChatContext });
                     console.log('✅ Reconnected to existing chat session!');
                     
+                    // Initialize VoiceVideoCallingSDK for incoming calls (after startChat)
+                    await initializeVoiceVideoCallingSDK(chatSDK);
+                    
                     chatStarted = true;
                     chatMessages = session.messages || [];
-                    
-                    // Show voice/video call buttons
-                    voiceCallBtn.style.display = 'flex';
-                    videoCallBtn.style.display = 'flex';
                     
                     // Restore UI - rebuild message display
                     showView('chat');
@@ -1823,8 +1891,8 @@
                 
                 // Set up message listener BEFORE starting chat
                 chatSDK.onNewMessage((msg) => {
-                    console.log('onNewMessage event received:', msg);
-                    console.log('Message details - content:', msg?.content, 'role:', msg?.role, 'id:', msg?.messageId || msg?.id);
+                    console.log('📨 onNewMessage event received:', msg);
+                    console.log('📨 Message details - tags:', msg?.tags, 'type:', msg?.type || msg?.messageType, 'metadata:', msg?.metadata, 'role:', msg?.role, 'id:', msg?.messageId || msg?.id);
                     if (msg) {
                         processMessage(msg);
                     }
@@ -1842,8 +1910,8 @@
                     showView('ended'); 
                 });
                 
-                // Listen for incoming voice/video call requests from agent
-                setupIncomingCallListener(chatSDK);
+                // Pre-load the VoiceVideoCallingSDK (but don't initialize yet - needs chat token from startChat)
+                await preloadVoiceVideoCallingSDK(chatSDK);
                 
                 // D365 Context - uses proper field identifiers for contact authentication
                 // 'Name' and 'emailaddress1' allow D365 to automatically populate contact records
@@ -1861,9 +1929,10 @@
                 console.log('Chat started with D365 context:', customContext);
                 chatStarted = true;
                 
-                // Show voice/video call buttons once chat is connected
-                voiceCallBtn.style.display = 'flex';
-                videoCallBtn.style.display = 'flex';
+                // NOW initialize VoiceVideoCallingSDK (AFTER startChat - chat token is now valid)
+                await initializeVoiceVideoCallingSDK(chatSDK);
+                
+                // Voice/video call buttons removed - only agents can initiate calls
                 
                 saveChatSession(); // Save initial session state
                 showView('chat');
@@ -1885,82 +1954,579 @@
         
         // ============ INCOMING CALL HANDLING (Agent-Initiated) ============
         
-        function setupIncomingCallListener(sdk) {
-            console.log('📞 Setting up incoming call listener...');
+        // Global VoiceVideoCallingSDK instance
+        let VoiceVideoCallingSDK = null;
+        
+        // Step 1: Pre-load the SDK before startChat (but don't initialize)
+        async function preloadVoiceVideoCallingSDK(sdk) {
+            console.log('📞 Pre-loading VoiceVideoCallingSDK...');
             
-            // Method 1: Try direct calling SDK event
-            if (sdk.getVoiceVideoCalling) {
-                sdk.getVoiceVideoCalling().then(voiceVideoCall => {
-                    if (voiceVideoCall && voiceVideoCall.onCallAdded) {
-                        voiceVideoCall.onCallAdded((callData) => {
-                            console.log('📞 Incoming call detected:', callData);
-                            showIncomingCallNotification(callData);
-                        });
-                    }
-                }).catch(err => console.log('VoiceVideoCalling not available:', err));
+            try {
+                if (!sdk.getVoiceVideoCalling) {
+                    console.log('⚠️ getVoiceVideoCalling not available on SDK');
+                    return;
+                }
+                
+                VoiceVideoCallingSDK = await sdk.getVoiceVideoCalling();
+                console.log('📞 VoiceVideoCallingSDK pre-loaded:', VoiceVideoCallingSDK ? 'Yes' : 'No');
+                
+            } catch (err) {
+                console.log('⚠️ VoiceVideoCalling pre-load error:', err);
+                
+                if (err.message === 'UnsupportedPlatform') {
+                    console.log('⚠️ Voice/Video calling not supported on this platform');
+                } else if (err.message === 'FeatureDisabled') {
+                    console.log('⚠️ Voice/Video calling is disabled in admin settings');
+                }
             }
-            
-            // Method 2: Listen for control messages (secondary channel events)
-            if (sdk.onControlMessage) {
-                sdk.onControlMessage((message) => {
-                    console.log('📞 Control message received:', message);
-                    if (message && message.type === 'VoiceVideoCall') {
-                        showIncomingCallNotification(message.data);
-                    }
-                });
-            }
-            
-            // Method 3: Listen for system messages that might indicate call
-            if (sdk.onNewMessage) {
-                const originalHandler = sdk.onNewMessage;
-                sdk.onNewMessage((msg) => {
-                    // Check if message is a call invitation
-                    if (msg && msg.tags && (msg.tags.includes('voicecall') || msg.tags.includes('videocall'))) {
-                        const isVideo = msg.tags.includes('videocall');
-                        showIncomingCallNotification({ 
-                            isVideo, 
-                            agentName: msg.sender || 'Agent',
-                            messageData: msg
-                        });
-                    }
-                    
-                    // Call original handler
-                    if (originalHandler) originalHandler(msg);
-                });
-            }
-            
-            console.log('✅ Incoming call listeners configured');
         }
         
-        function showIncomingCallNotification(callData) {
-            console.log('📞 Showing incoming call notification:', callData);
+        // Step 2: Initialize the SDK AFTER startChat (chat token is now valid)
+        async function initializeVoiceVideoCallingSDK(sdk) {
+            console.log('📞 Initializing VoiceVideoCallingSDK...');
             
-            pendingCallData = callData;
-            isVideoCall = callData?.isVideo || callData?.video || false;
-            
-            const callType = isVideoCall ? 'Video Call' : 'Voice Call';
-            const agentName = callData?.agentName || callData?.from || 'Agent';
-            
-            incomingCallTitle.textContent = `Incoming ${callType}`;
-            incomingCallSubtitle.textContent = `${agentName} is calling you...`;
-            
-            incomingCallNotification.style.display = 'block';
-            
-            // Play notification sound if available
-            playNotificationSound();
-        }
-        
-        async function acceptIncomingCall() {
-            console.log('✅ Accepting incoming call...');
-            incomingCallNotification.style.display = 'none';
-            
-            if (!pendingCallData) {
-                console.error('No pending call data');
+            if (!VoiceVideoCallingSDK) {
+                console.log('⚠️ VoiceVideoCallingSDK was not pre-loaded');
                 return;
             }
             
             try {
-                // Show call UI
+                // Get chat token - THIS IS ONLY VALID AFTER startChat()
+                const chatToken = await sdk.getChatToken();
+                console.log('📞 Chat token obtained:', chatToken ? 'Yes' : 'No');
+                
+                if (!chatToken) {
+                    console.error('❌ Failed to get chat token for VoiceVideoCalling');
+                    return;
+                }
+                
+                // Initialize VoiceVideoCallingSDK with required parameters
+                // This registers the customer endpoint with ACS (Azure Communication Services)
+                await VoiceVideoCallingSDK.initialize({
+                    chatToken: chatToken,
+                    selfVideoHTMLElementId: 'localVideo',      // HTML element for local video
+                    remoteVideoHTMLElementId: 'remoteVideo',   // HTML element for remote video
+                    OCClient: sdk.OCClient
+                });
+                console.log('✅ VoiceVideoCallingSDK initialized successfully');
+                
+                // IMPORTANT: Also set element IDs on proxyInstance directly
+                if (VoiceVideoCallingSDK.proxyInstance) {
+                    VoiceVideoCallingSDK.proxyInstance._selfVideoHTMLElementId = 'localVideo';
+                    VoiceVideoCallingSDK.proxyInstance._remoteVideoHTMLElementId = 'remoteVideo';
+                    console.log('📹 Video element IDs configured on proxyInstance');
+                }
+                
+                // Log available SDK methods to help debug video detection
+                console.log('📞 Available SDK methods:', Object.keys(VoiceVideoCallingSDK).filter(k => typeof VoiceVideoCallingSDK[k] === 'function'));
+                
+                // Set up incoming call listener - THIS IS THE KEY PART
+                // This registers the callback that fires when agent initiates a call
+                VoiceVideoCallingSDK.onCallAdded((callInfo) => {
+                    console.log('📞 ========================================');
+                    console.log('📞 INCOMING CALL DETECTED via onCallAdded!');
+                    console.log('📞 ========================================');
+                    
+                    try {
+                        // DEEP INSPECTION: Log everything about callInfo
+                        console.log('📞 callInfo raw:', callInfo);
+                        console.log('📞 callInfo type:', typeof callInfo);
+                        
+                        if (callInfo) {
+                            // All own properties
+                            console.log('📞 callInfo keys:', Object.keys(callInfo));
+                            
+                            // Full JSON dump
+                            try {
+                                console.log('📞 callInfo JSON:', JSON.stringify(callInfo, null, 2));
+                            } catch (e) {
+                                console.log('📞 callInfo not JSON-serializable');
+                            }
+                            
+                            // Check all properties including nested
+                            for (const key of Object.keys(callInfo)) {
+                                const val = callInfo[key];
+                                console.log(`📞 callInfo.${key}:`, val, '(type:', typeof val + ')');
+                                // If it's an object, dive deeper
+                                if (val && typeof val === 'object') {
+                                    try {
+                                        console.log(`📞   ${key} nested keys:`, Object.keys(val));
+                                        for (const subKey of Object.keys(val)) {
+                                            console.log(`📞   ${key}.${subKey}:`, val[subKey]);
+                                        }
+                                    } catch (e) {}
+                                }
+                            }
+                            
+                            // Check prototype methods
+                            const proto = Object.getPrototypeOf(callInfo);
+                            if (proto && proto !== Object.prototype) {
+                                console.log('📞 callInfo prototype methods:', Object.getOwnPropertyNames(proto));
+                            }
+                        }
+                        
+                        // DEEP INSPECTION: Check VoiceVideoCallingSDK for any call-related state
+                        console.log('📞 VoiceVideoCallingSDK methods:', Object.keys(VoiceVideoCallingSDK));
+                        
+                        // Try to access any call state
+                        const sdkMethods = ['getCurrentCall', 'getCall', 'getCallInfo', 'getIncomingCall',
+                                           'getCallState', 'getCallType', 'getMediaType', 'getVideoState',
+                                           'isVideoEnabled', 'hasVideoCapability', 'getCallFeatures'];
+                        for (const method of sdkMethods) {
+                            if (typeof VoiceVideoCallingSDK[method] === 'function') {
+                                try {
+                                    const result = VoiceVideoCallingSDK[method]();
+                                    console.log(`📞 SDK.${method}():`, result);
+                                    if (result && typeof result === 'object') {
+                                        console.log(`📞   ${method} keys:`, Object.keys(result));
+                                    }
+                                } catch (e) {
+                                    console.log(`📞 SDK.${method}() error:`, e.message);
+                                }
+                            }
+                        }
+                        
+                        // Determine if video call - check multiple indicators
+                        let hasVideo = false;
+                        
+                        // Check the callInfo parameter passed to onCallAdded
+                        if (callInfo) {
+                            hasVideo = callInfo.isVideoCall || callInfo.hasVideo || 
+                                       callInfo.videoEnabled || callInfo.isVideo ||
+                                       callInfo.callType === 'video' || callInfo.type === 'video' ||
+                                       callInfo.mediaType === 'video' || callInfo.withVideo ||
+                                       (callInfo.callClientName && callInfo.callClientName.toLowerCase().includes('video')) ||
+                                       false;
+                                       
+                            // Check nested objects for video indicators
+                            if (!hasVideo && callInfo.options) {
+                                hasVideo = callInfo.options.videoEnabled || callInfo.options.isVideo || 
+                                           callInfo.options.withVideo || false;
+                            }
+                            if (!hasVideo && callInfo.callOptions) {
+                                hasVideo = callInfo.callOptions.videoEnabled || callInfo.callOptions.isVideo ||
+                                           callInfo.callOptions.withVideo || false;
+                            }
+                            if (!hasVideo && callInfo.mediaOptions) {
+                                hasVideo = callInfo.mediaOptions.video || callInfo.mediaOptions.videoEnabled || false;
+                            }
+                        }
+                        
+                        // Try to get call info from SDK methods
+                        if (!hasVideo && VoiceVideoCallingSDK.isRemoteVideoEnabled) {
+                            try {
+                                hasVideo = VoiceVideoCallingSDK.isRemoteVideoEnabled();
+                                console.log('📞 isRemoteVideoEnabled():', hasVideo);
+                            } catch (e) { console.log('📞 isRemoteVideoEnabled error:', e); }
+                        }
+                        
+                        // Check SDK state for video capability
+                        if (!hasVideo && VoiceVideoCallingSDK.isVideoCall) {
+                            try {
+                                hasVideo = VoiceVideoCallingSDK.isVideoCall();
+                                console.log('📞 isVideoCall():', hasVideo);
+                            } catch (e) { console.log('📞 isVideoCall error:', e); }
+                        }
+                        
+                        // Check if local video is being requested
+                        if (!hasVideo && VoiceVideoCallingSDK.isLocalVideoEnabled) {
+                            try {
+                                hasVideo = VoiceVideoCallingSDK.isLocalVideoEnabled();
+                                console.log('📞 isLocalVideoEnabled():', hasVideo);
+                            } catch (e) { console.log('📞 isLocalVideoEnabled error:', e); }
+                        }
+                        
+                        console.log('📞 ========================================');
+                        console.log('📞 Final video call detection:', hasVideo);
+                        console.log('📞 ========================================');
+                        
+                        showIncomingCallNotification({ 
+                            isVideo: hasVideo, 
+                            agentName: currentAgentName || 'Agent',
+                            sdk: VoiceVideoCallingSDK
+                        });
+                    } catch (err) {
+                        console.error('❌ Error in onCallAdded handler:', err);
+                    }
+                });
+                
+                // Set up call disconnected listener - handles both connected calls ending 
+                // AND when agent cancels before customer answers
+                VoiceVideoCallingSDK.onCallDisconnected(() => {
+                    console.log('📞 Call disconnected by remote party');
+                    
+                    // Hide incoming call notification if it's still showing
+                    const notification = document.getElementById('incomingCallNotification');
+                    if (notification && notification.style.display !== 'none') {
+                        console.log('📞 Hiding incoming call notification (agent cancelled)');
+                        notification.style.display = 'none';
+                        pendingCallData = null;
+                    }
+                    
+                    // End the call if we're in a call
+                    if (isInCall) {
+                        endCall();
+                    }
+                });
+                
+                // Set up call removed listener (if available) - fires when call is cancelled
+                if (VoiceVideoCallingSDK.onCallRemoved) {
+                    VoiceVideoCallingSDK.onCallRemoved(() => {
+                        console.log('📞 Call removed (agent cancelled the call)');
+                        
+                        // Hide incoming call notification
+                        const notification = document.getElementById('incomingCallNotification');
+                        if (notification) {
+                            notification.style.display = 'none';
+                        }
+                        pendingCallData = null;
+                        
+                        if (isInCall) {
+                            endCall();
+                        }
+                    });
+                }
+                
+                // Set up call ended listener (if available)
+                if (VoiceVideoCallingSDK.onCallEnded) {
+                    VoiceVideoCallingSDK.onCallEnded(() => {
+                        console.log('📞 Call ended event received');
+                        
+                        // Hide incoming call notification if showing
+                        const notification = document.getElementById('incomingCallNotification');
+                        if (notification) {
+                            notification.style.display = 'none';
+                        }
+                        pendingCallData = null;
+                        
+                        if (isInCall) {
+                            endCall();
+                        }
+                    });
+                }
+                
+                // Set up call connected listener to start video after connection
+                if (VoiceVideoCallingSDK.onCallConnected) {
+                    VoiceVideoCallingSDK.onCallConnected(async () => {
+                        console.log('📞 Call connected event received');
+                        callStatus.textContent = 'Connected';
+                        
+                        // If this is a video call, ensure video is started
+                        if (isVideoCall && VoiceVideoCallingSDK.startVideo) {
+                            console.log('📹 Auto-starting video after call connected...');
+                            try {
+                                await VoiceVideoCallingSDK.startVideo();
+                                console.log('✅ Video started after connection');
+                            } catch (err) {
+                                console.warn('⚠️ Could not auto-start video:', err);
+                            }
+                        }
+                    });
+                }
+                
+                // Set up remote video stream listeners
+                if (VoiceVideoCallingSDK.onRemoteVideoStreamAdded) {
+                    VoiceVideoCallingSDK.onRemoteVideoStreamAdded(async (streamInfo) => {
+                        console.log('📹 Remote video stream added - showing remote video');
+                        console.log('📹 Stream info:', streamInfo);
+                        console.log('📹 Stream info type:', typeof streamInfo);
+                        if (streamInfo) {
+                            console.log('📹 Stream info keys:', Object.keys(streamInfo));
+                        }
+                        
+                        remoteVideo.style.display = 'block';
+                        callAvatar.style.display = 'none';
+                        
+                        // IMPORTANT: Ensure element IDs are set on proxyInstance
+                        if (VoiceVideoCallingSDK.proxyInstance) {
+                            VoiceVideoCallingSDK.proxyInstance._selfVideoHTMLElementId = 'localVideo';
+                            VoiceVideoCallingSDK.proxyInstance._remoteVideoHTMLElementId = 'remoteVideo';
+                            console.log('📹 Element IDs confirmed on proxyInstance');
+                        }
+                        
+                        // Try to get the actual call object and render remote video
+                        if (VoiceVideoCallingSDK.proxyInstance?._callClients) {
+                            for (const [clientName, client] of VoiceVideoCallingSDK.proxyInstance._callClients) {
+                                if (client._calls) {
+                                    for (const [callId, call] of client._calls) {
+                                        console.log('📹 Found call in onRemoteVideoStreamAdded:', callId);
+                                        
+                                        // Try to access remote participants
+                                        if (call.remoteParticipants) {
+                                            console.log('📹 Remote participants:', call.remoteParticipants.length);
+                                            
+                                            for (const participant of call.remoteParticipants) {
+                                                console.log('📹 Checking participant:', participant);
+                                                
+                                                if (participant.videoStreams) {
+                                                    for (const stream of participant.videoStreams) {
+                                                        console.log('📹 Found video stream:', stream);
+                                                        console.log('📹 Stream.isAvailable:', stream.isAvailable);
+                                                        
+                                                        if (stream.isAvailable) {
+                                                            // Try getMediaStream
+                                                            if (typeof stream.getMediaStream === 'function') {
+                                                                try {
+                                                                    const ms = await stream.getMediaStream();
+                                                                    if (ms instanceof MediaStream) {
+                                                                        console.log('✅ Got MediaStream in onRemoteVideoStreamAdded!');
+                                                                        remoteVideo.srcObject = ms;
+                                                                        remoteVideo.play().catch(e => {});
+                                                                    }
+                                                                } catch (e) {
+                                                                    console.log('📹 getMediaStream error:', e);
+                                                                }
+                                                            }
+                                                        }
+                                                        
+                                                        // Set up listener for when stream becomes available
+                                                        if (stream.on) {
+                                                            stream.on('isAvailableChanged', async () => {
+                                                                console.log('📹 Stream availability changed:', stream.isAvailable);
+                                                                if (stream.isAvailable && typeof stream.getMediaStream === 'function') {
+                                                                    try {
+                                                                        const ms = await stream.getMediaStream();
+                                                                        if (ms instanceof MediaStream) {
+                                                                            console.log('✅ Got MediaStream after availability change!');
+                                                                            remoteVideo.srcObject = ms;
+                                                                            remoteVideo.play().catch(e => {});
+                                                                        }
+                                                                    } catch (e) {
+                                                                        console.log('📹 getMediaStream error:', e);
+                                                                    }
+                                                                }
+                                                            });
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Call renderVideoStreams as backup
+                        if (VoiceVideoCallingSDK.renderVideoStreams) {
+                            try {
+                                console.log('📹 Calling renderVideoStreams...');
+                                await VoiceVideoCallingSDK.renderVideoStreams();
+                                console.log('✅ renderVideoStreams completed');
+                            } catch (err) {
+                                console.warn('⚠️ renderVideoStreams error:', err);
+                            }
+                        }
+                        
+                        // Also update the call status to indicate video is active
+                        if (isInCall) {
+                            callStatus.textContent = 'Video Call - Connected';
+                            isVideoCall = true;
+                        }
+                    });
+                }
+                
+                if (VoiceVideoCallingSDK.onRemoteVideoStreamRemoved) {
+                    VoiceVideoCallingSDK.onRemoteVideoStreamRemoved(() => {
+                        console.log('📹 Remote video stream removed');
+                        remoteVideo.style.display = 'none';
+                        if (isInCall) {
+                            callAvatar.style.display = 'flex';
+                        }
+                    });
+                }
+                
+                // Set up local video stream listeners
+                if (VoiceVideoCallingSDK.onLocalVideoStreamAdded) {
+                    VoiceVideoCallingSDK.onLocalVideoStreamAdded(async (streamInfo) => {
+                        console.log('📹 Local video stream added');
+                        console.log('📹 Local stream info:', streamInfo);
+                        if (streamInfo) {
+                            console.log('📹 Local stream info keys:', Object.keys(streamInfo));
+                        }
+                        
+                        localVideo.style.display = 'block';
+                        
+                        // Try createView for local video
+                        if (VoiceVideoCallingSDK.createView) {
+                            try {
+                                console.log('📹 Attempting SDK createView for local video...');
+                                const view = await VoiceVideoCallingSDK.createView(streamInfo, { 
+                                    scalingMode: 'Fit',
+                                    isMirrored: true 
+                                });
+                                if (view && view.target) {
+                                    localVideo.parentElement.appendChild(view.target);
+                                    console.log('✅ Local video rendered via createView');
+                                }
+                            } catch (err) {
+                                console.warn('⚠️ Local createView failed:', err);
+                            }
+                        }
+                        
+                        // Try renderLocalVideo if available
+                        if (VoiceVideoCallingSDK.renderLocalVideo) {
+                            try {
+                                console.log('📹 Attempting SDK renderLocalVideo...');
+                                await VoiceVideoCallingSDK.renderLocalVideo(localVideo);
+                                console.log('✅ Local video rendered via renderLocalVideo');
+                            } catch (err) {
+                                console.warn('⚠️ renderLocalVideo failed:', err);
+                            }
+                        }
+                        
+                        // Try various methods to get MediaStream
+                        const localMethods = ['getLocalVideoStream', 'getLocalStream', 'getLocalMediaStream'];
+                        for (const method of localMethods) {
+                            if (typeof VoiceVideoCallingSDK[method] === 'function') {
+                                try {
+                                    const ms = await VoiceVideoCallingSDK[method]();
+                                    if (ms instanceof MediaStream) {
+                                        localVideo.srcObject = ms;
+                                        console.log(`✅ Local stream via ${method}`);
+                                        break;
+                                    }
+                                } catch (err) {
+                                    console.log(`📹 ${method} error:`, err.message);
+                                }
+                            }
+                        }
+                        
+                        // Check streamInfo for MediaStream
+                        if (streamInfo) {
+                            if (streamInfo instanceof MediaStream) {
+                                localVideo.srcObject = streamInfo;
+                                console.log('✅ Local streamInfo was MediaStream');
+                            } else if (typeof streamInfo.getMediaStream === 'function') {
+                                try {
+                                    localVideo.srcObject = await streamInfo.getMediaStream();
+                                    console.log('✅ Local stream via streamInfo.getMediaStream()');
+                                } catch (e) {}
+                            } else if (streamInfo.stream instanceof MediaStream) {
+                                localVideo.srcObject = streamInfo.stream;
+                                console.log('✅ Local stream via streamInfo.stream');
+                            }
+                        }
+                    });
+                }
+                
+                if (VoiceVideoCallingSDK.onLocalVideoStreamRemoved) {
+                    VoiceVideoCallingSDK.onLocalVideoStreamRemoved(() => {
+                        console.log('📹 Local video stream removed');
+                        localVideo.style.display = 'none';
+                        localVideo.srcObject = null;
+                    });
+                }
+                
+                console.log('✅ All VoiceVideoCallingSDK event listeners configured');
+                
+            } catch (err) {
+                console.error('❌ VoiceVideoCallingSDK initialization error:', err);
+            }
+        }
+        
+        function showIncomingCallNotification(callData) {
+            console.log('📞 showIncomingCallNotification called with:', callData);
+            
+            try {
+                // Get DOM elements (in case they weren't captured at init time)
+                const notificationEl = document.getElementById('incomingCallNotification');
+                const titleEl = document.getElementById('incomingCallTitle');
+                const subtitleEl = document.getElementById('incomingCallSubtitle');
+                const containerEl = document.getElementById('chatContainer');
+                
+                console.log('📞 DOM elements found - notification:', !!notificationEl, 'title:', !!titleEl, 'subtitle:', !!subtitleEl, 'container:', !!containerEl);
+                
+                if (!notificationEl) {
+                    console.error('❌ incomingCallNotification element not found!');
+                    return;
+                }
+                
+                // Make sure the chat container is open
+                if (containerEl && !containerEl.classList.contains('open')) {
+                    console.log('📞 Opening chat container for incoming call...');
+                    containerEl.classList.add('open');
+                }
+                
+                pendingCallData = callData;
+                
+                // Note: D365 SDK doesn't reliably tell us if it's video or voice
+                // So we show a generic "Incoming Call" and let user choose how to answer
+                const agentName = callData?.agentName || callData?.from || 'Agent';
+                
+                console.log('📞 Setting notification for incoming call from:', agentName);
+                
+                if (titleEl) titleEl.textContent = 'Incoming Call';
+                if (subtitleEl) subtitleEl.textContent = `${agentName} is calling you...`;
+                
+                // Use a combined phone/video icon
+                const iconEl = notificationEl.querySelector('.incoming-call-icon');
+                if (iconEl) {
+                    // Phone icon - user will choose video or voice when accepting
+                    iconEl.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22"><path fill="white" d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg>';
+                }
+                
+                // Make sure the notification is visible with high z-index
+                notificationEl.style.display = 'block';
+                notificationEl.style.visibility = 'visible';
+                notificationEl.style.opacity = '1';
+                notificationEl.style.zIndex = '10000';
+                notificationEl.style.position = 'absolute';
+                notificationEl.style.top = '60px';
+                notificationEl.style.left = '0';
+                notificationEl.style.right = '0';
+                
+                console.log('📞 Notification display set to:', notificationEl.style.display);
+                console.log('📞 Notification offsetHeight:', notificationEl.offsetHeight);
+                console.log('✅ Notification banner should now be visible');
+                
+                // Play notification sound if available
+                playNotificationSound();
+                
+            } catch (err) {
+                console.error('❌ Error showing incoming call notification:', err);
+            }
+        }
+        
+        async function acceptIncomingCall(withVideo = false) {
+            console.log('✅ Accepting incoming call...');
+            console.log('📞 VoiceVideoCallingSDK available:', !!VoiceVideoCallingSDK);
+            console.log('📞 pendingCallData:', pendingCallData);
+            console.log('📞 User chose to accept with video:', withVideo);
+            
+            // Set isVideoCall based on user's choice
+            isVideoCall = withVideo;
+            
+            incomingCallNotification.style.display = 'none';
+            
+            try {
+                // Request permissions based on user's choice
+                if (withVideo) {
+                    console.log('📹 Requesting camera and microphone permissions...');
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ 
+                            video: true, 
+                            audio: true 
+                        });
+                        console.log('✅ Camera and microphone permissions granted');
+                        // Stop the test stream - the SDK will create its own
+                        stream.getTracks().forEach(track => track.stop());
+                    } catch (permErr) {
+                        console.warn('⚠️ Could not get media permissions:', permErr);
+                        // Continue anyway - SDK might handle this
+                    }
+                } else {
+                    // Voice only - just request microphone
+                    console.log('🎤 Requesting microphone permission...');
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        console.log('✅ Microphone permission granted');
+                        stream.getTracks().forEach(track => track.stop());
+                    } catch (permErr) {
+                        console.warn('⚠️ Could not get microphone permission:', permErr);
+                    }
+                }
+                
+                // Show call UI with connecting state
                 callContainer.classList.add('active');
                 callConnecting.style.display = 'flex';
                 callAvatar.style.display = 'none';
@@ -1969,104 +2535,611 @@
                 toggleCameraBtn.style.display = isVideoCall ? 'flex' : 'none';
                 callStatus.textContent = 'Connecting...';
                 
-                // Request media permissions
-                const mediaConstraints = {
-                    audio: true,
-                    video: isVideoCall ? { width: { ideal: 1280 }, height: { ideal: 720 } } : false
-                };
-                
-                localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-                console.log('✅ Media permissions granted');
-                
-                if (isVideoCall && localStream) {
-                    localVideo.srcObject = localStream;
-                    localVideo.style.display = 'block';
+                // Use the global VoiceVideoCallingSDK that was initialized in initializeVoiceVideoCallingSDK
+                if (!VoiceVideoCallingSDK) {
+                    throw new Error('VoiceVideoCallingSDK not initialized');
                 }
                 
-                // Try to accept call through SDK
-                if (chatSDK && chatSDK.getVoiceVideoCalling) {
-                    const voiceVideoCall = await chatSDK.getVoiceVideoCalling();
-                    if (voiceVideoCall && voiceVideoCall.acceptCall) {
-                        await voiceVideoCall.acceptCall(pendingCallData);
-                        window.activeVoiceVideoCall = voiceVideoCall;
+                // Accept the call using the SDK's acceptCall method
+                // The SDK handles media permissions internally
+                const acceptCallConfig = {
+                    withVideo: isVideoCall // Accept with video if it's a video call
+                };
+                
+                console.log('📞 Calling VoiceVideoCallingSDK.acceptCall with config:', acceptCallConfig);
+                await VoiceVideoCallingSDK.acceptCall(acceptCallConfig);
+                console.log('✅ VoiceVideoCallingSDK.acceptCall completed successfully');
+                
+                // DEEP INSPECTION: Log all available SDK methods after call is accepted
+                console.log('📹 ========== POST-ACCEPT SDK INSPECTION ==========');
+                console.log('📹 SDK keys:', Object.keys(VoiceVideoCallingSDK));
+                
+                // Check for video rendering methods
+                const videoMethods = [
+                    'createView', 'disposeView', 'renderView',
+                    'renderRemoteVideo', 'renderLocalVideo', 'renderVideoStreams',
+                    'getRemoteVideoStream', 'getLocalVideoStream',
+                    'getRemoteParticipants', 'getRemoteParticipant',
+                    'getCall', 'getCurrentCall', 'getCallInfo',
+                    'startLocalVideoStream', 'stopLocalVideoStream',
+                    'startRemoteVideoStream', 'stopRemoteVideoStream',
+                    'createLocalVideoStream', 'createRemoteVideoStream',
+                    'getVideoDevices', 'getCameras', 'getSelectedCamera',
+                    'attachVideo', 'detachVideo', 'bindVideo'
+                ];
+                
+                for (const method of videoMethods) {
+                    if (typeof VoiceVideoCallingSDK[method] === 'function') {
+                        console.log(`📹 SDK.${method} = function ✅`);
+                    }
+                }
+                
+                // Check if proxy has additional methods
+                if (VoiceVideoCallingSDK.proxy) {
+                    console.log('📹 SDK.proxy exists, checking its methods...');
+                    console.log('📹 SDK.proxy keys:', Object.keys(VoiceVideoCallingSDK.proxy));
+                }
+                
+                if (VoiceVideoCallingSDK.proxyInstance) {
+                    console.log('📹 SDK.proxyInstance exists, checking...');
+                    console.log('📹 SDK.proxyInstance type:', typeof VoiceVideoCallingSDK.proxyInstance);
+                    if (typeof VoiceVideoCallingSDK.proxyInstance === 'object') {
+                        console.log('📹 SDK.proxyInstance keys:', Object.keys(VoiceVideoCallingSDK.proxyInstance));
                         
-                        // Setup event listeners
-                        if (voiceVideoCall.onCallConnected) {
-                            voiceVideoCall.onCallConnected(() => {
-                                console.log('📞 Call connected');
-                                callStatus.textContent = 'Connected';
-                                callConnecting.style.display = 'none';
-                                
-                                if (isVideoCall) {
-                                    remoteVideo.style.display = 'block';
-                                } else {
-                                    callAvatar.style.display = 'flex';
-                                    callAvatar.textContent = getInitials(pendingCallData?.agentName || 'Agent');
-                                }
-                            });
+                        // KEY DISCOVERY: Check the video element IDs the SDK expects
+                        const pi = VoiceVideoCallingSDK.proxyInstance;
+                        console.log('📹 _selfVideoHTMLElementId:', pi._selfVideoHTMLElementId);
+                        console.log('📹 _remoteVideoHTMLElementId:', pi._remoteVideoHTMLElementId);
+                        
+                        // Set our element IDs so the SDK knows where to render!
+                        console.log('📹 Setting our video element IDs on proxyInstance...');
+                        pi._selfVideoHTMLElementId = 'localVideo';
+                        pi._remoteVideoHTMLElementId = 'remoteVideo';
+                        console.log('📹 Element IDs set: localVideo, remoteVideo');
+                        
+                        // Check _voiceVideoCallingStream for actual stream
+                        if (pi._voiceVideoCallingStream) {
+                            console.log('📹 _voiceVideoCallingStream exists!');
+                            console.log('📹 _voiceVideoCallingStream:', pi._voiceVideoCallingStream);
+                            console.log('📹 _voiceVideoCallingStream type:', typeof pi._voiceVideoCallingStream);
+                            if (typeof pi._voiceVideoCallingStream === 'object') {
+                                console.log('📹 _voiceVideoCallingStream keys:', Object.keys(pi._voiceVideoCallingStream));
+                            }
                         }
                         
-                        if (voiceVideoCall.onCallDisconnected) {
-                            voiceVideoCall.onCallDisconnected(() => {
-                                console.log('📞 Call disconnected by remote');
-                                endCall();
-                            });
-                        }
-                        
-                        if (voiceVideoCall.onRemoteVideoStreamAdded) {
-                            voiceVideoCall.onRemoteVideoStreamAdded((stream) => {
-                                console.log('📹 Remote stream added');
-                                remoteStream = stream;
-                                remoteVideo.srcObject = stream;
-                            });
+                        // Check _callClients for active call
+                        if (pi._callClients) {
+                            console.log('📹 _callClients:', pi._callClients);
+                            if (pi._callClients instanceof Map) {
+                                console.log('📹 _callClients is a Map with', pi._callClients.size, 'entries');
+                                pi._callClients.forEach((value, key) => {
+                                    console.log(`📹 _callClients[${key}]:`, value);
+                                    if (value && typeof value === 'object') {
+                                        console.log(`📹 _callClients[${key}] keys:`, Object.keys(value));
+                                    }
+                                });
+                            }
                         }
                     }
                 }
+                
+                // Try to get call agent or call object
+                if (VoiceVideoCallingSDK.callAgent) {
+                    console.log('📹 SDK.callAgent exists');
+                    console.log('📹 SDK.callAgent keys:', Object.keys(VoiceVideoCallingSDK.callAgent));
+                }
+                
+                if (VoiceVideoCallingSDK.call) {
+                    console.log('📹 SDK.call exists');
+                    console.log('📹 SDK.call keys:', Object.keys(VoiceVideoCallingSDK.call));
+                }
+                
+                console.log('📹 ========== END POST-ACCEPT INSPECTION ==========');
+                
+                // Store reference for later use
+                window.activeVoiceVideoCall = VoiceVideoCallingSDK;
                 
                 // Update state
                 isInCall = true;
                 callConnecting.style.display = 'none';
                 callStatus.textContent = isVideoCall ? 'Video Call' : 'Voice Call';
                 
+                // Show appropriate UI based on call type
                 if (!isVideoCall) {
                     callAvatar.style.display = 'flex';
-                    callAvatar.textContent = getInitials(pendingCallData?.agentName || 'Agent');
-                } else {
-                    remoteVideo.style.display = 'block';
+                    callAvatar.textContent = getInitials(pendingCallData?.agentName || currentAgentName || 'Agent');
                 }
                 
+                // For video calls, we need to explicitly start local video after accepting
                 if (isVideoCall) {
-                    videoCallBtn.classList.add('active');
-                } else {
-                    voiceCallBtn.classList.add('active');
+                    console.log('📹 Starting local video for video call...');
+                    
+                    // Try to start local video - the SDK should render to the configured element
+                    if (VoiceVideoCallingSDK.startVideo) {
+                        try {
+                            await VoiceVideoCallingSDK.startVideo();
+                            console.log('✅ Local video started');
+                            localVideo.style.display = 'block';
+                        } catch (videoErr) {
+                            console.warn('⚠️ Could not start local video:', videoErr);
+                            // Continue with the call even if local video fails
+                        }
+                    } else if (VoiceVideoCallingSDK.toggleLocalVideo) {
+                        // Fallback: use toggleLocalVideo if startVideo doesn't exist
+                        try {
+                            // Check if video is off and turn it on
+                            const isVideoOn = VoiceVideoCallingSDK.isLocalVideoEnabled ? 
+                                              VoiceVideoCallingSDK.isLocalVideoEnabled() : false;
+                            if (!isVideoOn) {
+                                await VoiceVideoCallingSDK.toggleLocalVideo();
+                                console.log('✅ Local video toggled on');
+                            }
+                            localVideo.style.display = 'block';
+                        } catch (videoErr) {
+                            console.warn('⚠️ Could not toggle local video:', videoErr);
+                        }
+                    }
+                    
+                    // The remote video should be handled by onRemoteVideoStreamAdded event
+                    // But let's check if remote video is already available
+                    if (VoiceVideoCallingSDK.isRemoteVideoEnabled) {
+                        const remoteVideoEnabled = VoiceVideoCallingSDK.isRemoteVideoEnabled();
+                        console.log('📹 Remote video enabled:', remoteVideoEnabled);
+                        if (remoteVideoEnabled) {
+                            remoteVideo.style.display = 'block';
+                            callAvatar.style.display = 'none';
+                        }
+                    }
+                    
+                    // Try to render video streams if the SDK has this method
+                    // This is sometimes needed to attach streams to HTML elements
+                    if (VoiceVideoCallingSDK.renderVideoStreams) {
+                        try {
+                            await VoiceVideoCallingSDK.renderVideoStreams();
+                            console.log('✅ Video streams rendered');
+                        } catch (renderErr) {
+                            console.warn('⚠️ Could not render video streams:', renderErr);
+                        }
+                    }
+                    
+                    // Also try createView for local and remote video if available
+                    if (VoiceVideoCallingSDK.createLocalVideoStream) {
+                        try {
+                            const localStream = await VoiceVideoCallingSDK.createLocalVideoStream();
+                            if (localStream && localStream.getMediaStream) {
+                                localVideo.srcObject = localStream.getMediaStream();
+                                console.log('✅ Local video stream attached directly');
+                            }
+                        } catch (streamErr) {
+                            console.warn('⚠️ Could not create local video stream:', streamErr);
+                        }
+                    }
                 }
                 
                 startCallDuration();
                 
                 console.log('✅ Call accepted and connected');
                 
+                // DEEP INSPECTION: Find the actual video streams after call connects
+                console.log('📹 ========== DEEP STREAM INSPECTION ==========');
+                
+                // Helper function to render remote video streams from ACS call object
+                async function renderRemoteVideoFromCall(call) {
+                    console.log('📹 Attempting to render remote video from call object...');
+                    console.log('📹 Call:', call);
+                    console.log('📹 Call keys:', Object.keys(call));
+                    
+                    // Check for remoteParticipants
+                    let participants = null;
+                    if (call.remoteParticipants) {
+                        participants = call.remoteParticipants;
+                    } else if (call._remoteParticipants) {
+                        participants = call._remoteParticipants;
+                    } else if (typeof call.getRemoteParticipants === 'function') {
+                        participants = call.getRemoteParticipants();
+                    }
+                    
+                    if (participants) {
+                        console.log('📹 Remote participants found:', participants);
+                        console.log('📹 Participants type:', typeof participants);
+                        
+                        // Handle both array and Map
+                        const participantList = participants instanceof Map 
+                            ? Array.from(participants.values()) 
+                            : (Array.isArray(participants) ? participants : [participants]);
+                        
+                        console.log('📹 Participant count:', participantList.length);
+                        
+                        for (const participant of participantList) {
+                            console.log('📹 Processing participant:', participant);
+                            if (participant && typeof participant === 'object') {
+                                console.log('📹 Participant keys:', Object.keys(participant));
+                            }
+                            
+                            // Get video streams
+                            let videoStreams = null;
+                            if (participant.videoStreams) {
+                                videoStreams = participant.videoStreams;
+                            } else if (participant._videoStreams) {
+                                videoStreams = participant._videoStreams;
+                            } else if (typeof participant.getVideoStreams === 'function') {
+                                videoStreams = participant.getVideoStreams();
+                            }
+                            
+                            if (videoStreams) {
+                                console.log('📹 Video streams found:', videoStreams);
+                                const streamList = Array.isArray(videoStreams) ? videoStreams : [videoStreams];
+                                
+                                for (const stream of streamList) {
+                                    console.log('📹 Processing video stream:', stream);
+                                    if (stream && typeof stream === 'object') {
+                                        console.log('📹 Stream keys:', Object.keys(stream));
+                                        console.log('📹 Stream isAvailable:', stream.isAvailable);
+                                        console.log('📹 Stream mediaStreamType:', stream.mediaStreamType);
+                                    }
+                                    
+                                    // Try to get MediaStream directly
+                                    if (stream instanceof MediaStream) {
+                                        console.log('📹 Stream IS a MediaStream!');
+                                        remoteVideo.srcObject = stream;
+                                        remoteVideo.play().catch(e => console.log('Play error:', e));
+                                        return true;
+                                    }
+                                    
+                                    // Try getMediaStream() method
+                                    if (typeof stream.getMediaStream === 'function') {
+                                        try {
+                                            const ms = await stream.getMediaStream();
+                                            if (ms instanceof MediaStream) {
+                                                console.log('📹 Got MediaStream via getMediaStream()!');
+                                                remoteVideo.srcObject = ms;
+                                                remoteVideo.play().catch(e => console.log('Play error:', e));
+                                                return true;
+                                            }
+                                        } catch (e) {
+                                            console.log('📹 getMediaStream error:', e);
+                                        }
+                                    }
+                                    
+                                    // Try createView() - ACS pattern for rendering
+                                    if (call.createView || (stream && typeof stream.createView === 'function')) {
+                                        try {
+                                            console.log('📹 Trying createView for remote stream...');
+                                            const createViewFn = stream.createView || call.createView;
+                                            const view = await createViewFn(stream, { scalingMode: 'Fit' });
+                                            if (view && view.target) {
+                                                console.log('📹 createView succeeded, appending to DOM');
+                                                // Clear existing content and append
+                                                const container = remoteVideo.parentElement;
+                                                view.target.style.width = '100%';
+                                                view.target.style.height = '100%';
+                                                view.target.style.objectFit = 'cover';
+                                                container.appendChild(view.target);
+                                                remoteVideo.style.display = 'none';
+                                                return true;
+                                            }
+                                        } catch (e) {
+                                            console.log('📹 createView error:', e);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return false;
+                }
+                
+                if (VoiceVideoCallingSDK.proxyInstance) {
+                    const pi = VoiceVideoCallingSDK.proxyInstance;
+                    
+                    // CRITICAL: Access the _calls Map inside _callClients
+                    if (pi._callClients && pi._callClients instanceof Map) {
+                        console.log('📹 _callClients Map found, size:', pi._callClients.size);
+                        
+                        for (const [clientName, client] of pi._callClients) {
+                            console.log(`📹 Processing callClient: ${clientName}`);
+                            console.log(`📹 Client keys:`, Object.keys(client));
+                            
+                            // Access the _calls Map inside the client
+                            if (client._calls && client._calls instanceof Map) {
+                                console.log(`📹 Found _calls Map, size:`, client._calls.size);
+                                
+                                for (const [callId, call] of client._calls) {
+                                    console.log(`📹 Found call: ${callId}`);
+                                    console.log(`📹 Call object:`, call);
+                                    
+                                    if (call && typeof call === 'object') {
+                                        console.log(`📹 Call keys:`, Object.keys(call));
+                                        
+                                        // Store reference for later use
+                                        window.activeACSCall = call;
+                                        
+                                        // Try to render remote video
+                                        const rendered = await renderRemoteVideoFromCall(call);
+                                        if (rendered) {
+                                            console.log('✅ Remote video rendered from call object!');
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            // Also check _callAgent - this has the REAL ACS call object
+                            if (client._callAgent) {
+                                console.log('📹 Found _callAgent:', client._callAgent);
+                                console.log('📹 _callAgent keys:', Object.keys(client._callAgent));
+                                
+                                // Check for _calls on callAgent
+                                if (client._callAgent._calls) {
+                                    console.log('📹 _callAgent._calls:', client._callAgent._calls);
+                                }
+                                
+                                // Check for calls property - THIS is the real ACS call!
+                                if (client._callAgent.calls && client._callAgent.calls.length > 0) {
+                                    console.log('📹 _callAgent.calls:', client._callAgent.calls);
+                                    for (const call of client._callAgent.calls) {
+                                        console.log('📹 REAL ACS call found!');
+                                        console.log('📹 ACS call keys:', Object.keys(call));
+                                        
+                                        // Store the REAL ACS call (with 59+ keys) for camera control
+                                        window.activeACSCall = call;
+                                        console.log('📹 Stored real ACS call in window.activeACSCall');
+                                        
+                                        await renderRemoteVideoFromCall(call);
+                                        
+                                        // AUTO-START LOCAL CAMERA for video calls
+                                        if (isVideoCall && client._deviceManager) {
+                                            console.log('📹 Auto-starting local camera for video call...');
+                                            try {
+                                                let cameras = [];
+                                                if (typeof client._deviceManager.getCameras === 'function') {
+                                                    cameras = await client._deviceManager.getCameras();
+                                                } else if (client._deviceManager.cameras) {
+                                                    cameras = client._deviceManager.cameras;
+                                                }
+                                                
+                                                if (cameras && cameras.length > 0) {
+                                                    console.log('📹 Available cameras:', cameras.length);
+                                                    
+                                                    // Get local video via getUserMedia for preview
+                                                    try {
+                                                        const stream = await navigator.mediaDevices.getUserMedia({
+                                                            video: true,
+                                                            audio: false
+                                                        });
+                                                        localVideo.srcObject = stream;
+                                                        localVideo.style.display = 'block';
+                                                        localStream = stream;
+                                                        isCameraOff = false;
+                                                        console.log('✅ Local camera started for customer preview');
+                                                        
+                                                        // Update UI
+                                                        toggleCameraBtn.classList.remove('muted');
+                                                        toggleCameraBtn.title = 'Turn off camera';
+                                                        toggleCameraBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>';
+                                                    } catch (mediaErr) {
+                                                        console.log('📹 Could not get camera:', mediaErr.message);
+                                                    }
+                                                }
+                                            } catch (camErr) {
+                                                console.log('📹 Camera auto-start error:', camErr);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            // Check _deviceManager for streams
+                            if (client._deviceManager) {
+                                console.log('📹 Found _deviceManager:', client._deviceManager);
+                                console.log('📹 _deviceManager keys:', Object.keys(client._deviceManager));
+                            }
+                        }
+                    }
+                    
+                    // Inspect _voiceVideoCallingStream
+                    if (pi._voiceVideoCallingStream) {
+                        console.log('📹 _voiceVideoCallingStream found:', pi._voiceVideoCallingStream);
+                    }
+                }
+                
+                console.log('📹 ========== END DEEP INSPECTION ==========');
+                
+                // Set up a delayed inspection to catch streams that appear later
+                setTimeout(async () => {
+                    console.log('📹 ========== DELAYED INSPECTION (3s) ==========');
+                    
+                    // Re-check the call object for remote participants
+                    if (window.activeACSCall) {
+                        console.log('📹 [3s] Re-checking activeACSCall...');
+                        const call = window.activeACSCall;
+                        console.log('📹 [3s] Call state:', call.state);
+                        console.log('📹 [3s] Call keys:', Object.keys(call));
+                        
+                        // Check for remoteParticipants (ACS standard property)
+                        if (call.remoteParticipants && call.remoteParticipants.length > 0) {
+                            console.log('📹 [3s] Remote participants:', call.remoteParticipants.length);
+                            for (const participant of call.remoteParticipants) {
+                                console.log('📹 [3s] Participant:', participant);
+                                console.log('📹 [3s] Participant keys:', Object.keys(participant));
+                                
+                                // Check videoStreams
+                                if (participant.videoStreams && participant.videoStreams.length > 0) {
+                                    console.log('📹 [3s] Participant videoStreams:', participant.videoStreams);
+                                    
+                                    for (const stream of participant.videoStreams) {
+                                        console.log('📹 [3s] Stream:', stream);
+                                        console.log('📹 [3s] Stream.isAvailable:', stream.isAvailable);
+                                        console.log('📹 [3s] Stream keys:', Object.keys(stream));
+                                        
+                                        // If stream is available, try to render it
+                                        if (stream.isAvailable) {
+                                            // Check for createView method on the call
+                                            if (typeof call.createRemoteVideoView === 'function') {
+                                                try {
+                                                    console.log('📹 [3s] Calling createRemoteVideoView...');
+                                                    const view = await call.createRemoteVideoView(stream);
+                                                    if (view && view.target) {
+                                                        const container = remoteVideo.parentElement;
+                                                        view.target.style.width = '100%';
+                                                        view.target.style.height = '100%';
+                                                        container.appendChild(view.target);
+                                                        remoteVideo.style.display = 'none';
+                                                        console.log('✅ [3s] Remote video rendered via createRemoteVideoView');
+                                                    }
+                                                } catch (e) {
+                                                    console.log('📹 [3s] createRemoteVideoView error:', e);
+                                                }
+                                            }
+                                            
+                                            // Try getMediaStream
+                                            if (typeof stream.getMediaStream === 'function') {
+                                                try {
+                                                    const ms = await stream.getMediaStream();
+                                                    if (ms instanceof MediaStream) {
+                                                        console.log('📹 [3s] Got MediaStream!', ms);
+                                                        remoteVideo.srcObject = ms;
+                                                        remoteVideo.play().catch(e => console.log('Play error:', e));
+                                                    }
+                                                } catch (e) {
+                                                    console.log('📹 [3s] getMediaStream error:', e);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Set up event listener for when video streams are added
+                        if (call.on && typeof call.on === 'function') {
+                            console.log('📹 [3s] Setting up call.on event listeners...');
+                            
+                            call.on('remoteParticipantsUpdated', (e) => {
+                                console.log('📹 remoteParticipantsUpdated event:', e);
+                                if (e.added) {
+                                    for (const participant of e.added) {
+                                        console.log('📹 New participant added:', participant);
+                                        setupParticipantVideoListener(participant);
+                                    }
+                                }
+                            });
+                        }
+                        
+                        // Check existing participants and set up listeners
+                        if (call.remoteParticipants) {
+                            for (const participant of call.remoteParticipants) {
+                                setupParticipantVideoListener(participant);
+                            }
+                        }
+                    }
+                    
+                    // Check if remoteVideo has srcObject now
+                    console.log('📹 [3s] remoteVideo.srcObject:', remoteVideo.srcObject);
+                    console.log('📹 [3s] localVideo.srcObject:', localVideo.srcObject);
+                    
+                    // Look for any video elements that might have been created by SDK
+                    const allVideos = document.querySelectorAll('video');
+                    console.log('📹 [3s] All video elements:', allVideos.length);
+                    allVideos.forEach((v, i) => {
+                        console.log(`📹 [3s] Video ${i}: id=${v.id}, srcObject=`, v.srcObject);
+                        if (v.srcObject && v !== remoteVideo && v !== localVideo) {
+                            console.log('📹 [3s] Found video with stream! Copying to remoteVideo...');
+                            remoteVideo.srcObject = v.srcObject;
+                        }
+                    });
+                    
+                    console.log('📹 ========== END DELAYED INSPECTION ==========');
+                }, 3000);
+                
+                // Helper function to listen for video streams on a participant
+                function setupParticipantVideoListener(participant) {
+                    console.log('📹 Setting up video listener for participant:', participant.identifier);
+                    
+                    if (participant.on && typeof participant.on === 'function') {
+                        participant.on('videoStreamsUpdated', async (e) => {
+                            console.log('📹 videoStreamsUpdated event:', e);
+                            if (e.added) {
+                                for (const stream of e.added) {
+                                    console.log('📹 New video stream added:', stream);
+                                    await handleRemoteVideoStream(stream);
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Check existing streams
+                    if (participant.videoStreams) {
+                        for (const stream of participant.videoStreams) {
+                            if (stream.isAvailable) {
+                                handleRemoteVideoStream(stream);
+                            }
+                            
+                            // Listen for availability changes
+                            if (stream.on) {
+                                stream.on('isAvailableChanged', async () => {
+                                    console.log('📹 Stream isAvailableChanged:', stream.isAvailable);
+                                    if (stream.isAvailable) {
+                                        await handleRemoteVideoStream(stream);
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+                
+                // Helper function to handle a remote video stream
+                async function handleRemoteVideoStream(stream) {
+                    console.log('📹 Handling remote video stream:', stream);
+                    console.log('📹 Stream keys:', Object.keys(stream));
+                    console.log('📹 Stream.isAvailable:', stream.isAvailable);
+                    
+                    // Try getMediaStream
+                    if (typeof stream.getMediaStream === 'function') {
+                        try {
+                            const ms = await stream.getMediaStream();
+                            if (ms instanceof MediaStream) {
+                                console.log('✅ Got MediaStream from remote stream!');
+                                remoteVideo.srcObject = ms;
+                                remoteVideo.style.display = 'block';
+                                callAvatar.style.display = 'none';
+                                remoteVideo.play().catch(e => console.log('Play error:', e));
+                                return;
+                            }
+                        } catch (e) {
+                            console.log('📹 getMediaStream error:', e);
+                        }
+                    }
+                    
+                    // Check if stream itself is MediaStream
+                    if (stream instanceof MediaStream) {
+                        console.log('✅ Stream IS MediaStream!');
+                        remoteVideo.srcObject = stream;
+                        remoteVideo.style.display = 'block';
+                        callAvatar.style.display = 'none';
+                        remoteVideo.play().catch(e => console.log('Play error:', e));
+                    }
+                }
+                
             } catch (error) {
                 console.error('❌ Failed to accept call:', error);
                 alert('Could not connect to call: ' + error.message);
                 callContainer.classList.remove('active');
-                if (localStream) {
-                    localStream.getTracks().forEach(track => track.stop());
-                    localStream = null;
-                }
+                endCall();
             }
         }
         
-        function declineIncomingCall() {
+        async function declineIncomingCall() {
             console.log('❌ Declining incoming call');
             incomingCallNotification.style.display = 'none';
             
-            // Notify SDK about decline if possible
-            if (chatSDK && chatSDK.getVoiceVideoCalling) {
-                chatSDK.getVoiceVideoCalling().then(voiceVideoCall => {
-                    if (voiceVideoCall && voiceVideoCall.rejectCall && pendingCallData) {
-                        voiceVideoCall.rejectCall(pendingCallData);
-                    }
-                }).catch(err => console.log('Could not reject call:', err));
+            // Use the global VoiceVideoCallingSDK to reject the call
+            if (VoiceVideoCallingSDK && VoiceVideoCallingSDK.rejectCall) {
+                try {
+                    await VoiceVideoCallingSDK.rejectCall();
+                    console.log('✅ Call rejected successfully');
+                } catch (err) {
+                    console.log('⚠️ Could not reject call:', err);
+                }
             }
             
             pendingCallData = null;
@@ -2160,7 +3233,7 @@
                 callAvatar.textContent = getInitials(headerTitle.textContent);
                 callStatus.textContent = 'Voice Call';
                 
-                voiceCallBtn.classList.add('active');
+                // Voice call is now active
                 startCallDuration();
                 
                 // Setup call event listeners
@@ -2266,7 +3339,7 @@
                 remoteVideo.style.display = 'block';
                 callStatus.textContent = 'Video Call';
                 
-                videoCallBtn.classList.add('active');
+                // Video call is now active
                 startCallDuration();
                 
                 // Setup call event listeners
@@ -2316,34 +3389,194 @@
             }, 1000);
         }
         
-        function toggleMic() {
-            if (!localStream) return;
+        async function toggleMic() {
+            if (!isInCall) return;
             
-            const audioTrack = localStream.getAudioTracks()[0];
-            if (audioTrack) {
-                audioTrack.enabled = !audioTrack.enabled;
-                isMicMuted = !audioTrack.enabled;
-                muteMicBtn.classList.toggle('muted', isMicMuted);
-                muteMicBtn.title = isMicMuted ? 'Unmute microphone' : 'Mute microphone';
-                
-                // Update mic icon
-                if (isMicMuted) {
-                    muteMicBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z"/></svg>';
-                } else {
-                    muteMicBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>';
+            try {
+                // Use the VoiceVideoCallingSDK to toggle mute
+                if (VoiceVideoCallingSDK && VoiceVideoCallingSDK.toggleMute) {
+                    await VoiceVideoCallingSDK.toggleMute();
+                    
+                    // Check the mute state from SDK
+                    isMicMuted = VoiceVideoCallingSDK.isMicrophoneMuted ? 
+                                 VoiceVideoCallingSDK.isMicrophoneMuted() : !isMicMuted;
+                    
+                    muteMicBtn.classList.toggle('muted', isMicMuted);
+                    muteMicBtn.title = isMicMuted ? 'Unmute microphone' : 'Mute microphone';
+                    
+                    // Update mic icon
+                    if (isMicMuted) {
+                        muteMicBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z"/></svg>';
+                    } else {
+                        muteMicBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>';
+                    }
+                    
+                    console.log(isMicMuted ? '🔇 Microphone muted' : '🎤 Microphone unmuted');
                 }
-                
-                console.log(isMicMuted ? '🔇 Microphone muted' : '🎤 Microphone unmuted');
+            } catch (error) {
+                console.error('Failed to toggle mute:', error);
             }
         }
         
-        function toggleCamera() {
-            if (!localStream || !isVideoCall) return;
+        async function toggleCamera() {
+            if (!isInCall || !isVideoCall) return;
             
-            const videoTrack = localStream.getVideoTracks()[0];
-            if (videoTrack) {
-                videoTrack.enabled = !videoTrack.enabled;
-                isCameraOff = !videoTrack.enabled;
+            try {
+                console.log('📹 toggleCamera called, isCameraOff:', isCameraOff);
+                
+                // Try using the ACS call object directly
+                if (window.activeACSCall) {
+                    const call = window.activeACSCall;
+                    console.log('📹 Using activeACSCall for camera toggle');
+                    
+                    // Get device manager from the SDK
+                    let deviceManager = null;
+                    if (VoiceVideoCallingSDK?.proxyInstance?._callClients) {
+                        for (const [name, client] of VoiceVideoCallingSDK.proxyInstance._callClients) {
+                            if (client._deviceManager) {
+                                deviceManager = client._deviceManager;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (isCameraOff) {
+                        // Turn camera ON
+                        console.log('📹 Turning camera ON...');
+                        
+                        if (deviceManager) {
+                            console.log('📹 Got deviceManager');
+                            
+                            // Get available cameras
+                            let cameras = [];
+                            if (typeof deviceManager.getCameras === 'function') {
+                                cameras = await deviceManager.getCameras();
+                            } else if (deviceManager.cameras) {
+                                cameras = deviceManager.cameras;
+                            }
+                            console.log('📹 Available cameras:', cameras);
+                            
+                            if (cameras && cameras.length > 0) {
+                                const camera = cameras[0];
+                                console.log('📹 Using camera:', camera.name || camera.id);
+                                
+                                // Create LocalVideoStream
+                                // Check if there's a LocalVideoStream class available
+                                let localVideoStream = null;
+                                
+                                // Try different ways to create local video stream
+                                if (call.startVideo) {
+                                    // ACS way: create stream and start video
+                                    try {
+                                        // First check if call has localVideoStreams we can use
+                                        if (call.localVideoStreams && call.localVideoStreams.length > 0) {
+                                            console.log('📹 Restarting existing local video stream');
+                                            await call.startVideo(call.localVideoStreams[0]);
+                                        } else {
+                                            // Create new stream - need LocalVideoStream class
+                                            // Try to find it from ACS bundle
+                                            const LocalVideoStream = window.ACS?.LocalVideoStream || 
+                                                                    window.LocalVideoStream;
+                                            
+                                            if (LocalVideoStream) {
+                                                localVideoStream = new LocalVideoStream(camera);
+                                                console.log('📹 Created LocalVideoStream');
+                                                await call.startVideo(localVideoStream);
+                                            } else {
+                                                console.log('📹 LocalVideoStream class not found, trying SDK method');
+                                            }
+                                        }
+                                        console.log('✅ Camera started via call.startVideo');
+                                        isCameraOff = false;
+                                    } catch (e) {
+                                        console.log('📹 call.startVideo error:', e);
+                                    }
+                                }
+                                
+                                // Also try to get media stream directly for preview
+                                try {
+                                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                                        video: { deviceId: camera.id ? { exact: camera.id } : undefined },
+                                        audio: false 
+                                    });
+                                    localVideo.srcObject = stream;
+                                    localVideo.style.display = 'block';
+                                    localStream = stream;
+                                    console.log('✅ Local video preview started');
+                                    isCameraOff = false;
+                                } catch (e) {
+                                    console.log('📹 getUserMedia error:', e);
+                                }
+                            }
+                        }
+                        
+                        // Fallback: try SDK method
+                        if (isCameraOff && VoiceVideoCallingSDK?.toggleLocalVideo) {
+                            try {
+                                const result = await VoiceVideoCallingSDK.toggleLocalVideo();
+                                console.log('📹 SDK toggleLocalVideo result:', result);
+                                if (result !== undefined) {
+                                    isCameraOff = false;
+                                }
+                            } catch (e) {
+                                console.log('📹 SDK toggleLocalVideo error:', e);
+                            }
+                        }
+                        
+                        // Another fallback: try startLocalVideo
+                        if (isCameraOff && VoiceVideoCallingSDK?.startLocalVideo) {
+                            try {
+                                await VoiceVideoCallingSDK.startLocalVideo();
+                                console.log('✅ Local video started via SDK.startLocalVideo');
+                                isCameraOff = false;
+                            } catch (e) {
+                                console.log('📹 SDK startLocalVideo error:', e);
+                            }
+                        }
+                    } else {
+                        // Turn camera OFF
+                        console.log('📹 Turning camera OFF...');
+                        
+                        // Stop via call object
+                        if (call.stopVideo && call.localVideoStreams && call.localVideoStreams.length > 0) {
+                            try {
+                                await call.stopVideo(call.localVideoStreams[0]);
+                                console.log('✅ Camera stopped via call.stopVideo');
+                            } catch (e) {
+                                console.log('📹 call.stopVideo error:', e);
+                            }
+                        }
+                        
+                        // Stop local stream
+                        if (localStream) {
+                            localStream.getVideoTracks().forEach(track => track.stop());
+                        }
+                        if (localVideo.srcObject) {
+                            localVideo.srcObject.getVideoTracks().forEach(track => track.stop());
+                            localVideo.srcObject = null;
+                        }
+                        
+                        // Try SDK method
+                        if (VoiceVideoCallingSDK?.toggleLocalVideo) {
+                            try {
+                                await VoiceVideoCallingSDK.toggleLocalVideo();
+                            } catch (e) {
+                                console.log('📹 SDK toggleLocalVideo error:', e);
+                            }
+                        }
+                        
+                        isCameraOff = true;
+                        localVideo.style.display = 'none';
+                    }
+                } else {
+                    // Fallback to original SDK method
+                    if (VoiceVideoCallingSDK && VoiceVideoCallingSDK.toggleLocalVideo) {
+                        await VoiceVideoCallingSDK.toggleLocalVideo();
+                        isCameraOff = !isCameraOff;
+                    }
+                }
+                
+                // Update UI
                 toggleCameraBtn.classList.toggle('muted', isCameraOff);
                 toggleCameraBtn.title = isCameraOff ? 'Turn on camera' : 'Turn off camera';
                 
@@ -2356,13 +3589,28 @@
                 
                 localVideo.style.display = isCameraOff ? 'none' : 'block';
                 console.log(isCameraOff ? '📷 Camera off' : '📹 Camera on');
+                
+            } catch (error) {
+                console.error('Failed to toggle camera:', error);
             }
         }
         
         async function endCall() {
             console.log('🔴 Ending call...');
             
-            // Stop local media streams
+            // Stop call via VoiceVideoCallingSDK
+            if (VoiceVideoCallingSDK && isInCall) {
+                try {
+                    if (typeof VoiceVideoCallingSDK.stopCall === 'function') {
+                        await VoiceVideoCallingSDK.stopCall();
+                        console.log('✅ Call stopped via VoiceVideoCallingSDK');
+                    }
+                } catch (error) {
+                    console.error('Error stopping call via SDK:', error);
+                }
+            }
+            
+            // Stop local media streams (fallback cleanup)
             if (localStream) {
                 localStream.getTracks().forEach(track => {
                     track.stop();
@@ -2379,24 +3627,11 @@
                 localVideo.srcObject = null;
             }
             
-            // Stop call via SDK
-            if (window.activeVoiceVideoCall && isInCall) {
-                try {
-                    if (typeof window.activeVoiceVideoCall.stopCall === 'function') {
-                        await window.activeVoiceVideoCall.stopCall();
-                    }
-                } catch (error) {
-                    console.error('Error stopping call via SDK:', error);
-                }
-            }
-            
-            // Clear stored calling object
+            // Clear stored calling object reference
             window.activeVoiceVideoCall = null;
             
             // Reset UI
             callContainer.classList.remove('active');
-            voiceCallBtn.classList.remove('active');
-            videoCallBtn.classList.remove('active');
             muteMicBtn.classList.remove('muted');
             toggleCameraBtn.classList.remove('muted');
             
