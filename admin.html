@@ -614,6 +614,14 @@
         .btn-secondary:hover {
             background: var(--admin-border);
         }
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        .btn-success:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
         .btn svg { width: 18px; height: 18px; fill: currentColor; }
 
         .action-buttons {
@@ -652,6 +660,30 @@
 
         /* Image upload inputs (hidden) */
         .hidden-input { display: none; }
+
+        /* Path input group for Edge-friendly image selection */
+        .path-input-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .path-input-group .form-input {
+            flex: 1;
+            padding: 6px 10px;
+        }
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            background: var(--admin-primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-small:hover {
+            background: var(--admin-primary-hover);
+        }
 
         /* Tabs */
         .tabs {
@@ -1139,14 +1171,17 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Company Logo / Header Icon</label>
-                        <div class="image-upload-area" id="logoUploadArea" onclick="handleUploadAreaClick(event, 'logoInput')">
+                        <div class="image-upload-area" id="logoUploadArea">
                             <div class="upload-icon">
                                 <svg viewBox="0 0 24 24"><path d="M19 7v2.99s-1.99.01-2 0V7h-3s.01-1.99 0-2h3V2h2v3h3v2h-3zm-3 4V8h-3V5H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8h-3zM5 19l3-4 2 3 3-4 4 5H5z"/></svg>
                             </div>
-                            <div class="upload-text">Click to upload logo</div>
-                            <div class="upload-hint">PNG, JPG up to 2MB (recommended: 100x100px)</div>
+                            <div class="upload-text">Enter image path below</div>
+                            <div class="upload-hint">Place images in the img/ folder</div>
                         </div>
-                        <input type="file" id="logoInput" class="hidden-input" accept="image/*">
+                        <div class="path-input-group" style="margin-top: 8px;">
+                            <input type="text" class="form-input" id="logoPathInput" placeholder="Enter path: img/logo.png" style="font-size: 12px;">
+                            <button type="button" class="btn-small" onclick="applyImagePath('headerLogo', 'logoPathInput', 'logoUploadArea', false)">Apply</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1450,25 +1485,31 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                         <div class="form-group">
                             <label class="form-label">Default Agent Avatar</label>
-                            <div class="image-upload-area" id="agentAvatarArea" onclick="handleUploadAreaClick(event, 'agentAvatarInput')">
+                            <div class="image-upload-area" id="agentAvatarArea">
                                 <div class="upload-icon">
                                     <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                                 </div>
-                                <div class="upload-text">Agent photo</div>
-                                <div class="upload-hint">Square image recommended</div>
+                                <div class="upload-text">Enter image path below</div>
+                                <div class="upload-hint">Place images in the img/ folder</div>
                             </div>
-                            <input type="file" id="agentAvatarInput" class="hidden-input" accept="image/*">
+                            <div class="path-input-group" style="margin-top: 8px;">
+                                <input type="text" class="form-input" id="agentAvatarPathInput" placeholder="Enter path: img/agent.png" style="font-size: 12px;">
+                                <button type="button" class="btn-small" onclick="applyImagePath('agentAvatar', 'agentAvatarPathInput', 'agentAvatarArea', true)">Apply</button>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Default Customer Avatar</label>
-                            <div class="image-upload-area" id="customerAvatarArea" onclick="handleUploadAreaClick(event, 'customerAvatarInput')">
+                            <div class="image-upload-area" id="customerAvatarArea">
                                 <div class="upload-icon">
                                     <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                                 </div>
-                                <div class="upload-text">Customer photo</div>
-                                <div class="upload-hint">Square image recommended</div>
+                                <div class="upload-text">Enter image path below</div>
+                                <div class="upload-hint">Place images in the img/ folder</div>
                             </div>
-                            <input type="file" id="customerAvatarInput" class="hidden-input" accept="image/*">
+                            <div class="path-input-group" style="margin-top: 8px;">
+                                <input type="text" class="form-input" id="customerAvatarPathInput" placeholder="Enter path: img/customer.png" style="font-size: 12px;">
+                                <button type="button" class="btn-small" onclick="applyImagePath('customerAvatar', 'customerAvatarPathInput', 'customerAvatarArea', true)">Apply</button>
+                            </div>
                         </div>
                     </div>
                     <p class="form-hint" style="margin-top: 12px;">These avatars will be used as defaults. Agent's actual photo from D365 will override if available.</p>
@@ -1522,7 +1563,7 @@
                         <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
                         Reset to Default
                     </button>
-                    <a href="index.html" class="btn btn-secondary" id="goToWidgetBtn" style="text-decoration:none;">
+                    <a href="index.html" target="_blank" class="btn btn-success" id="goToWidgetBtn" style="text-decoration:none;">
                         <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
                         Go to Widget
                     </a>
@@ -1643,92 +1684,15 @@
         const MAX_IMAGE_DATA_LENGTH = 120 * 1024; // ~120KB limit for stored image data URLs
 
         function isSafeImageData(value) {
-            return typeof value === 'string'
-                && value.startsWith('data:image')
-                && value.length > 0
-                && value.length <= MAX_IMAGE_DATA_LENGTH;
-        }
-
-        function readFileAsDataUrl(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    if (typeof reader.result === 'string') {
-                        resolve(reader.result);
-                    } else {
-                        reject(new Error('Unsupported image format.'));
-                    }
-                };
-                reader.onerror = () => reject(new Error('Failed to read image file.'));
-                reader.readAsDataURL(file);
-            });
-        }
-
-        async function processImageFile(file, maxDimension, maxDataLength = MAX_IMAGE_DATA_LENGTH) {
-            const originalDataUrl = await readFileAsDataUrl(file);
-
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.onload = () => {
-                    try {
-                        const width = img.naturalWidth || img.width;
-                        const height = img.naturalHeight || img.height;
-                        if (!width || !height) {
-                            reject(new Error('Image has invalid dimensions.'));
-                            return;
-                        }
-
-                        if (width <= maxDimension && height <= maxDimension && originalDataUrl.length <= maxDataLength) {
-                            resolve(originalDataUrl);
-                            return;
-                        }
-
-                        const canvas = document.createElement('canvas');
-                        let targetWidth = width;
-                        let targetHeight = height;
-
-                        const scale = Math.min(1, maxDimension / targetWidth, maxDimension / targetHeight);
-                        targetWidth = Math.max(1, Math.round(targetWidth * scale));
-                        targetHeight = Math.max(1, Math.round(targetHeight * scale));
-
-                        canvas.width = targetWidth;
-                        canvas.height = targetHeight;
-                        const ctx = canvas.getContext('2d');
-                        if (!ctx) {
-                            reject(new Error('Unable to create drawing context.'));
-                            return;
-                        }
-
-                        ctx.clearRect(0, 0, targetWidth, targetHeight);
-                        ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
-
-                        const supportsTransparency = file.type === 'image/png' || file.type === 'image/gif';
-                        let mimeType = supportsTransparency ? 'image/png' : 'image/jpeg';
-                        let quality = 0.85;
-                        let processed = canvas.toDataURL(mimeType, mimeType === 'image/jpeg' ? quality : undefined);
-
-                        if (processed.length > maxDataLength) {
-                            mimeType = 'image/jpeg';
-                            quality = 0.85;
-                            processed = canvas.toDataURL(mimeType, quality);
-                            while (processed.length > maxDataLength && quality > 0.5) {
-                                quality -= 0.1;
-                                processed = canvas.toDataURL(mimeType, quality);
-                            }
-                        }
-
-                        if (processed.length > maxDataLength) {
-                            reject(new Error('Image is still too large even after compression. Please choose a smaller image.'));
-                        } else {
-                            resolve(processed);
-                        }
-                    } catch (err) {
-                        reject(err);
-                    }
-                };
-                img.onerror = () => reject(new Error('Unable to load the selected image file.'));
-                img.src = originalDataUrl;
-            });
+            if (typeof value !== 'string' || value.length === 0) return false;
+            
+            // Accept file paths (like img/logo.png)
+            if (value.startsWith('img/') && /\.(png|jpg|jpeg|gif|webp|svg)$/i.test(value)) {
+                return true;
+            }
+            
+            // Accept data URLs (legacy support)
+            return value.startsWith('data:image') && value.length <= MAX_IMAGE_DATA_LENGTH;
         }
 
         // Initialize
@@ -2251,10 +2215,7 @@
                 updateConnectionStatus();
             });
 
-            // File uploads
-            document.getElementById('logoInput').addEventListener('change', (e) => handleImageUpload(e, 'headerLogo', 'logoUploadArea', false));
-            document.getElementById('agentAvatarInput').addEventListener('change', (e) => handleImageUpload(e, 'agentAvatar', 'agentAvatarArea', true));
-            document.getElementById('customerAvatarInput').addEventListener('change', (e) => handleImageUpload(e, 'customerAvatar', 'customerAvatarArea', true));
+            // File uploads removed - using path input instead for Edge compatibility
         }
 
         // ============ CONNECTION STATUS ============
@@ -2415,79 +2376,28 @@
             }
         }
 
-        function handleUploadAreaClick(event, inputId) {
-            // Only trigger file input if there's no image uploaded yet
-            const area = event.currentTarget;
-            if (!area.classList.contains('has-image')) {
-                document.getElementById(inputId).click();
-            }
-        }
-
-        async function handleImageUpload(event, settingKey, areaId, isAvatar) {
-            const input = event.target;
-            const file = input.files?.[0];
-            if (!file) return;
-
-            if (!file.type.startsWith('image/')) {
-                alert('Please choose a valid image file (PNG, JPG, GIF, or WEBP).');
-                input.value = '';
-                return;
-            }
-
-            const HARD_SIZE_LIMIT = 2 * 1024 * 1024; // 2MB hard limit before processing
-            if (file.size > HARD_SIZE_LIMIT) {
-                alert('Image too large. Please use an image under 2MB.');
-                input.value = '';
-                return;
-            }
-
-            const area = document.getElementById(areaId);
-            if (area) {
-                area.classList.add('processing');
-            }
-
-            try {
-                const maxDimension = isAvatar ? 180 : 360;
-                const processedDataUrl = await processImageFile(file, maxDimension);
-
-                settings[settingKey] = processedDataUrl;
-                showUploadedImage(areaId, processedDataUrl, isAvatar);
-                updatePreview();
-            } catch (err) {
-                console.error('Image processing error:', err);
-                alert(err.message || 'Unable to process image. Please try a smaller file.');
-            } finally {
-                if (area) {
-                    area.classList.remove('processing');
-                }
-                input.value = '';
-            }
-        }
-
         function showUploadedImage(areaId, src, isAvatar) {
             const area = document.getElementById(areaId);
             if (!area) return;
             
             area.classList.add('has-image');
             
-            let inputId = areaId === 'logoUploadArea' ? 'logoInput' 
-                        : areaId === 'agentAvatarArea' ? 'agentAvatarInput' 
-                        : 'customerAvatarInput';
+            // Show path info below the image
+            const pathInfo = `<div class="path-info" style="font-size:10px;color:#666;margin-top:4px;">${src}</div>`;
             
             area.innerHTML = `
                 <div class="uploaded-image-preview ${isAvatar ? 'avatar' : ''}">
-                    <img src="${src}" alt="Uploaded">
+                    <img src="${src}" alt="Uploaded" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="image-error" style="display:none;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#999;">
+                        <svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:currentColor;"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                        <span style="font-size:10px;margin-top:4px;">Image not found</span>
+                    </div>
                     <div class="image-overlay">
-                        <button type="button" class="change-image-btn">Change</button>
                         <button type="button" class="remove-image-btn">Remove</button>
                     </div>
                 </div>
+                ${pathInfo}
             `;
-            
-            area.querySelector('.change-image-btn')?.addEventListener('click', (e) => {
-                e.stopPropagation();
-                document.getElementById(inputId).click();
-            });
             
             area.querySelector('.remove-image-btn')?.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -2500,31 +2410,77 @@
             const area = document.getElementById(areaId);
             area.classList.remove('has-image');
             
-            let settingKey, inputId, iconSvg, text;
+            let settingKey, iconSvg, text;
             if (areaId === 'logoUploadArea') {
                 settingKey = 'headerLogo';
-                inputId = 'logoInput';
                 iconSvg = '<svg viewBox="0 0 24 24"><path d="M19 7v2.99s-1.99.01-2 0V7h-3s.01-1.99 0-2h3V2h2v3h3v2h-3zm-3 4V8h-3V5H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8h-3zM5 19l3-4 2 3 3-4 4 5H5z"/></svg>';
-                text = 'Click to upload logo';
+                text = 'Enter image path below';
             } else if (areaId === 'agentAvatarArea') {
                 settingKey = 'agentAvatar';
-                inputId = 'agentAvatarInput';
                 iconSvg = '<svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
-                text = 'Agent photo';
+                text = 'Enter image path below';
             } else {
                 settingKey = 'customerAvatar';
-                inputId = 'customerAvatarInput';
                 iconSvg = '<svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
-                text = 'Customer photo';
+                text = 'Enter image path below';
             }
 
             settings[settingKey] = null;
             area.innerHTML = `
                 <div class="upload-icon">${iconSvg}</div>
                 <div class="upload-text">${text}</div>
-                <div class="upload-hint">Square image recommended</div>
+                <div class="upload-hint">Place images in the img/ folder</div>
             `;
             updatePreview();
+            
+            // Save the change
+            if (!isInitializing && activeProfileId) {
+                const profile = profiles.find(p => p.id === activeProfileId);
+                if (profile) {
+                    profile.settings = { ...settings };
+                    profile.updatedAt = new Date().toISOString();
+                    saveProfiles();
+                }
+            }
+            localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+        }
+
+        // Apply image from path input (Edge-friendly alternative to file upload)
+        function applyImagePath(settingKey, inputId, areaId, isAvatar) {
+            const input = document.getElementById(inputId);
+            const path = input.value.trim();
+            
+            if (!path) {
+                alert('Please enter an image path (e.g., img/logo.png)');
+                return;
+            }
+            
+            // Validate the path format
+            if (!path.match(/\.(png|jpg|jpeg|gif|webp|svg)$/i)) {
+                alert('Please enter a valid image path ending with .png, .jpg, .gif, .webp, or .svg');
+                return;
+            }
+            
+            // Store the path
+            settings[settingKey] = path;
+            
+            // Show preview
+            showUploadedImage(areaId, path, isAvatar);
+            updatePreview();
+            
+            // Clear the input
+            input.value = '';
+            
+            // Save settings
+            if (!isInitializing && activeProfileId) {
+                const profile = profiles.find(p => p.id === activeProfileId);
+                if (profile) {
+                    profile.settings = { ...settings };
+                    profile.updatedAt = new Date().toISOString();
+                    saveProfiles();
+                }
+            }
+            localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
         }
 
         // ============ PRE-CHAT FORM TOGGLE ============

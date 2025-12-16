@@ -31,9 +31,10 @@
             width: 100%;
             height: 100%;
             z-index: 1;
-            background-size: cover;
-            background-position: center;
+            background-size: 100% auto;
+            background-position: top center;
             background-repeat: no-repeat;
+            background-color: #f5f5f5;
             display: none;
         }
         #demoBackground.active {
@@ -105,6 +106,8 @@
         .header-avatar {
             width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.2);
             display: flex; align-items: center; justify-content: center; overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.5);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15), 0 0 0 2px rgba(255,255,255,0.1);
         }
         .header-avatar svg { width: 26px; height: 26px; fill: white; }
         .header-avatar img { width: 100%; height: 100%; object-fit: cover; }
@@ -122,6 +125,17 @@
         .header-btn.active { background: #48bb78; }
         .header-btn.active:hover { background: #38a169; }
         .header-btn.disabled { opacity: 0.4; pointer-events: none; }
+        .header-btn.sound-off svg { opacity: 0.5; }
+        .header-btn.sound-off::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background: white;
+            transform: rotate(45deg);
+            border-radius: 1px;
+        }
+        .header-btn { position: relative; }
 
         /* Incoming Call Notification */
         .incoming-call-notification {
@@ -340,6 +354,8 @@
             color: white;
             font-size: 48px;
             font-weight: 600;
+            border: 3px solid rgba(255,255,255,0.4);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 4px rgba(255,255,255,0.1);
         }
         
         .call-controls {
@@ -462,10 +478,33 @@
             width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center;
             justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; overflow: hidden;
             margin-top: 18px; /* Align with message bubble center */
+            border: 2px solid transparent;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .message-avatar.agent { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-        .message-avatar.user { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; }
-        .message-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .message-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+        }
+        .message-avatar.agent { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+        .message-avatar.bot { 
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%); 
+            color: white; 
+            border-color: rgba(0, 180, 216, 0.3);
+        }
+        .message-avatar.user { 
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); 
+            color: white; 
+            border-color: rgba(17, 153, 142, 0.3);
+        }
+        .message-avatar img { 
+            width: 100%; height: 100%; object-fit: cover; 
+            border-radius: 50%;
+        }
 
         .message-content { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
         .message-sender { font-size: 12px; font-weight: 600; color: #64748b; padding: 0 4px; }
@@ -705,13 +744,18 @@
     <div class="chat-container" id="chatContainer">
         <div class="chat-header">
             <div class="header-avatar" id="headerAvatar">
-                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                <!-- Generic company/building icon - no bot logo here -->
+                <svg viewBox="0 0 24 24" fill="white"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>
             </div>
             <div class="header-info">
                 <div class="header-title" id="headerTitle">Support Chat</div>
                 <div class="header-status" id="headerStatus">We're here to help</div>
             </div>
             <div class="header-actions">
+                <!-- Sound toggle button -->
+                <button class="header-btn" id="toggleSound" title="Sound notifications on">
+                    <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                </button>
                 <!-- Download transcript button -->
                 <button class="header-btn" id="downloadChat" title="Download transcript" style="display:none;">
                     <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
@@ -1082,6 +1126,47 @@
         let remoteStream = null;
         let pendingCallData = null; // Store incoming call data
         let currentAgentName = 'Agent'; // Track the current agent name for calls
+        
+        // Sound notification state
+        let soundEnabled = localStorage.getItem('chatSoundEnabled') !== 'false'; // Default to enabled
+        const toggleSoundBtn = document.getElementById('toggleSound');
+        
+        // Initialize sound button state
+        if (!soundEnabled) {
+            toggleSoundBtn.classList.add('sound-off');
+            toggleSoundBtn.title = 'Sound notifications off';
+        }
+        
+        // Toggle sound notifications
+        toggleSoundBtn.addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            localStorage.setItem('chatSoundEnabled', soundEnabled);
+            if (soundEnabled) {
+                toggleSoundBtn.classList.remove('sound-off');
+                toggleSoundBtn.title = 'Sound notifications on';
+            } else {
+                toggleSoundBtn.classList.add('sound-off');
+                toggleSoundBtn.title = 'Sound notifications off';
+            }
+        });
+        
+        // Create a subtle, modern notification sound using Web Audio API
+        const notificationAudio = new Audio('notification/new-notification-3-398649.mp3');
+        notificationAudio.volume = 0.5; // 50% volume - adjust as needed
+        
+        function playNotificationSound() {
+            if (!soundEnabled) return;
+            
+            try {
+                // Reset to beginning if already playing
+                notificationAudio.currentTime = 0;
+                notificationAudio.play().catch(e => {
+                    console.log('Could not play notification sound:', e);
+                });
+            } catch (e) {
+                console.log('Could not play notification sound:', e);
+            }
+        }
 
         // FIXED: Actual emoji array with real emojis
         const emojis = [
@@ -1233,30 +1318,55 @@
                 return; // Don't show anything, chat auto-starts on launcher click
             }
             
-            if (view === 'prechat') { prechatForm.classList.remove('hidden'); headerTitle.textContent = 'Support Chat'; headerStatus.textContent = "We're here to help"; }
-            else if (view === 'connecting') { connectingView.classList.add('active'); headerTitle.textContent = 'Connecting...'; headerStatus.textContent = 'Please wait'; }
+            // Header always stays as company branding - only toggle views
+            if (view === 'prechat') { prechatForm.classList.remove('hidden'); }
+            else if (view === 'connecting') { connectingView.classList.add('active'); }
             else if (view === 'chat') { messagesContainer.classList.add('active'); inputArea.classList.add('active'); downloadChatBtn.style.display = 'flex'; }
-            else if (view === 'ended') { chatEndedView.classList.add('active'); chatStarted = false; headerTitle.textContent = 'Chat Ended'; headerStatus.textContent = 'Session closed'; downloadChatBtn.style.display = 'flex'; }
+            else if (view === 'ended') { chatEndedView.classList.add('active'); chatStarted = false; downloadChatBtn.style.display = 'flex'; }
         }
 
         function updateHeaderWithAgent(agentName, agentImage) {
-            // Ensure agentName is a string
+            // Keep header static with company branding - don't update with agent info
+            // Only update the internal agent name for calls
             const name = (typeof agentName === 'string') ? agentName : 'Support Agent';
-            headerTitle.textContent = name || 'Support Agent';
-            headerStatus.textContent = 'Online';
-            
-            // Update the global currentAgentName for use in calls
             currentAgentName = name || 'Agent';
-            
-            if (agentImage) { headerAvatar.innerHTML = `<img src="${agentImage}" alt="${name}">`; }
-            else { headerAvatar.innerHTML = `<span style="color:white;font-weight:600;font-size:14px;">${getInitials(name)}</span>`; }
+            // Header stays as company branding (CPS Support / We're here to help)
         }
 
-        function createAvatarElement(isUser, senderName, senderImage) {
+        // Default bot avatar path
+        const BOT_AVATAR_PATH = 'img/cps_logo.png';
+        
+        function isBotSender(senderName) {
+            if (!senderName) return false;
+            const name = senderName.toLowerCase();
+            return name.includes('bot') || name.includes('copilot') || name.includes('virtual') || 
+                   name.includes('assistant') || name.includes('ai') || name === 'cps';
+        }
+        
+        function createAvatarElement(isUser, senderName, senderImage, isBot = false) {
             const avatar = document.createElement('div');
-            avatar.className = `message-avatar ${isUser ? 'user' : 'agent'}`;
-            if (senderImage) { avatar.innerHTML = `<img src="${senderImage}" alt="${senderName}">`; }
-            else { avatar.textContent = getInitials(senderName || (isUser ? userName : 'Agent')); }
+            
+            // Determine if this is a bot based on sender name or explicit flag
+            const isBotMessage = isBot || isBotSender(senderName);
+            
+            // Set appropriate class
+            if (isUser) {
+                avatar.className = 'message-avatar user';
+            } else if (isBotMessage) {
+                avatar.className = 'message-avatar bot';
+            } else {
+                avatar.className = 'message-avatar agent';
+            }
+            
+            // Set avatar image or initials
+            if (senderImage) { 
+                avatar.innerHTML = `<img src="${senderImage}" alt="${senderName || 'Avatar'}">`; 
+            } else if (isBotMessage) {
+                // Use bot avatar for bot messages
+                avatar.innerHTML = `<img src="${BOT_AVATAR_PATH}" alt="Bot" onerror="this.parentElement.textContent='🤖'">`;
+            } else { 
+                avatar.textContent = getInitials(senderName || (isUser ? userName : 'Agent')); 
+            }
             return avatar;
         }
         
@@ -1397,6 +1507,10 @@
                 badge.textContent = unreadCount; 
                 badge.classList.add('show');
             }
+            // Play notification sound for incoming Adaptive Card messages
+            if (!isUser) {
+                playNotificationSound();
+            }
         }
 
         function addImageMessage(fileInfo, isUser, senderName, senderImage) {
@@ -1421,6 +1535,10 @@
             typingIndicator.parentNode.insertBefore(wrapper, typingIndicator);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
             chatMessages.push({ isUser, content: `[Image: ${fileInfo.name}]`, senderName: isUser ? userName : senderName, timestamp: now });
+            // Play notification sound for incoming image messages
+            if (!isUser) {
+                playNotificationSound();
+            }
         }
 
         function addMessage(text, isUser = false, senderName = null, senderImage = null) {
@@ -1445,6 +1563,10 @@
             saveChatSession(); // Save after adding message
             if (!isUser && !container.classList.contains('open')) {
                 unreadCount++; badge.textContent = unreadCount; badge.classList.add('show');
+            }
+            // Play notification sound for incoming messages
+            if (!isUser) {
+                playNotificationSound();
             }
         }
 
@@ -1627,6 +1749,10 @@
             typingIndicator.parentNode.insertBefore(wrapper, typingIndicator);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
             chatMessages.push({ isUser, content: `[File: ${fileInfo.name}]`, senderName: isUser ? userName : senderName, timestamp: now });
+            // Play notification sound for incoming file messages
+            if (!isUser) {
+                playNotificationSound();
+            }
         }
         
         function addSystemMessage(text) {
@@ -1881,6 +2007,10 @@
 
         async function initializeChat(name, email, question) {
             try {
+                // Set global userName and userEmail (important when pre-chat form is disabled)
+                userName = name;
+                userEmail = email;
+                
                 showView('connecting');
                 chatMessages = [];
                 processedMessageIds.clear(); // Clear any previously tracked messages
@@ -2015,6 +2145,34 @@
                     VoiceVideoCallingSDK.proxyInstance._selfVideoHTMLElementId = 'localVideo';
                     VoiceVideoCallingSDK.proxyInstance._remoteVideoHTMLElementId = 'remoteVideo';
                     console.log('📹 Video element IDs configured on proxyInstance');
+                }
+                
+                // Try to find and expose LocalVideoStream class from ACS SDK
+                console.log('📹 Searching for LocalVideoStream class...');
+                
+                // Method 1: Check if CallingBundle exposed it
+                if (window.LocalVideoStream) {
+                    console.log('📹 Found window.LocalVideoStream');
+                }
+                
+                // Method 2: Search global object for ACS exports
+                for (const key in window) {
+                    try {
+                        if (key.includes('LocalVideoStream') && typeof window[key] === 'function') {
+                            console.log('📹 Found LocalVideoStream at window.' + key);
+                            window.LocalVideoStream = window[key];
+                            break;
+                        }
+                        // Also check for ACS namespace
+                        if (key === 'ACS' || key.includes('AzureCommunication')) {
+                            const obj = window[key];
+                            if (obj && obj.LocalVideoStream) {
+                                console.log('📹 Found LocalVideoStream in', key);
+                                window.LocalVideoStream = obj.LocalVideoStream;
+                                break;
+                            }
+                        }
+                    } catch (e) {}
                 }
                 
                 // Log available SDK methods to help debug video detection
@@ -2499,32 +2657,9 @@
             incomingCallNotification.style.display = 'none';
             
             try {
-                // Request permissions based on user's choice
-                if (withVideo) {
-                    console.log('📹 Requesting camera and microphone permissions...');
-                    try {
-                        const stream = await navigator.mediaDevices.getUserMedia({ 
-                            video: true, 
-                            audio: true 
-                        });
-                        console.log('✅ Camera and microphone permissions granted');
-                        // Stop the test stream - the SDK will create its own
-                        stream.getTracks().forEach(track => track.stop());
-                    } catch (permErr) {
-                        console.warn('⚠️ Could not get media permissions:', permErr);
-                        // Continue anyway - SDK might handle this
-                    }
-                } else {
-                    // Voice only - just request microphone
-                    console.log('🎤 Requesting microphone permission...');
-                    try {
-                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                        console.log('✅ Microphone permission granted');
-                        stream.getTracks().forEach(track => track.stop());
-                    } catch (permErr) {
-                        console.warn('⚠️ Could not get microphone permission:', permErr);
-                    }
-                }
+                // DON'T request camera/mic permissions here - let the SDK handle it
+                // Pre-grabbing the camera causes "Device in use" conflicts with the SDK
+                console.log('📹 Letting SDK handle media permissions...');
                 
                 // Show call UI with connecting state
                 callContainer.classList.add('active');
@@ -2654,29 +2789,63 @@
                 if (isVideoCall) {
                     console.log('📹 Starting local video for video call...');
                     
-                    // Try to start local video - the SDK should render to the configured element
+                    // Log all available methods on VoiceVideoCallingSDK for debugging
+                    const allMethods = [];
+                    for (const key in VoiceVideoCallingSDK) {
+                        if (typeof VoiceVideoCallingSDK[key] === 'function') {
+                            allMethods.push(key);
+                        }
+                    }
+                    console.log('📹 All VoiceVideoCallingSDK methods:', allMethods);
+                    
+                    // Try to start local video via SDK
                     if (VoiceVideoCallingSDK.startVideo) {
                         try {
                             await VoiceVideoCallingSDK.startVideo();
-                            console.log('✅ Local video started');
+                            console.log('✅ Local video started via SDK.startVideo');
                             localVideo.style.display = 'block';
                         } catch (videoErr) {
-                            console.warn('⚠️ Could not start local video:', videoErr);
-                            // Continue with the call even if local video fails
+                            console.warn('⚠️ SDK.startVideo error:', videoErr);
                         }
-                    } else if (VoiceVideoCallingSDK.toggleLocalVideo) {
-                        // Fallback: use toggleLocalVideo if startVideo doesn't exist
+                    }
+                    
+                    // Try startLocalVideo
+                    if (!localVideo.srcObject && VoiceVideoCallingSDK.startLocalVideo) {
                         try {
-                            // Check if video is off and turn it on
+                            await VoiceVideoCallingSDK.startLocalVideo();
+                            console.log('✅ Local video started via SDK.startLocalVideo');
+                            localVideo.style.display = 'block';
+                        } catch (videoErr) {
+                            console.warn('⚠️ SDK.startLocalVideo error:', videoErr);
+                        }
+                    }
+                    
+                    // Try toggleLocalVideo
+                    if (!localVideo.srcObject && VoiceVideoCallingSDK.toggleLocalVideo) {
+                        try {
                             const isVideoOn = VoiceVideoCallingSDK.isLocalVideoEnabled ? 
                                               VoiceVideoCallingSDK.isLocalVideoEnabled() : false;
                             if (!isVideoOn) {
                                 await VoiceVideoCallingSDK.toggleLocalVideo();
-                                console.log('✅ Local video toggled on');
+                                console.log('✅ Local video toggled on via SDK.toggleLocalVideo');
                             }
                             localVideo.style.display = 'block';
                         } catch (videoErr) {
-                            console.warn('⚠️ Could not toggle local video:', videoErr);
+                            console.warn('⚠️ SDK.toggleLocalVideo error:', videoErr);
+                        }
+                    }
+                    
+                    // Check _voiceVideoCallingStream for methods
+                    if (VoiceVideoCallingSDK.proxyInstance?._voiceVideoCallingStream) {
+                        const stream = VoiceVideoCallingSDK.proxyInstance._voiceVideoCallingStream;
+                        console.log('📹 _voiceVideoCallingStream:', stream);
+                        console.log('📹 _voiceVideoCallingStream methods:', Object.keys(stream));
+                        
+                        // Check if it has startVideo or related methods
+                        if (stream._voiceVideoCalling) {
+                            const vvc = stream._voiceVideoCalling;
+                            console.log('📹 _voiceVideoCalling:', vvc);
+                            console.log('📹 _voiceVideoCalling keys:', Object.keys(vvc));
                         }
                     }
                     
@@ -2886,38 +3055,162 @@
                                         
                                         await renderRemoteVideoFromCall(call);
                                         
-                                        // AUTO-START LOCAL CAMERA for video calls
-                                        if (isVideoCall && client._deviceManager) {
-                                            console.log('📹 Auto-starting local camera for video call...');
+                                        // AUTO-START LOCAL CAMERA for video calls using ACS SDK
+                                        if (isVideoCall) {
+                                            console.log('📹 Auto-starting local camera via ACS SDK...');
                                             try {
-                                                let cameras = [];
-                                                if (typeof client._deviceManager.getCameras === 'function') {
-                                                    cameras = await client._deviceManager.getCameras();
-                                                } else if (client._deviceManager.cameras) {
-                                                    cameras = client._deviceManager.cameras;
-                                                }
+                                                // Check if localVideoStream already exists on the call
+                                                const existingStream = call.localVideoStream || (call._localVideoStreams && call._localVideoStreams[0]);
+                                                console.log('📹 Existing localVideoStream:', existingStream);
                                                 
-                                                if (cameras && cameras.length > 0) {
-                                                    console.log('📹 Available cameras:', cameras.length);
-                                                    
-                                                    // Get local video via getUserMedia for preview
+                                                if (existingStream && typeof existingStream.getMediaStream === 'function') {
+                                                    // Get MediaStream directly from ACS LocalVideoStream
+                                                    console.log('📹 Getting MediaStream from existing localVideoStream...');
                                                     try {
-                                                        const stream = await navigator.mediaDevices.getUserMedia({
-                                                            video: true,
-                                                            audio: false
-                                                        });
-                                                        localVideo.srcObject = stream;
-                                                        localVideo.style.display = 'block';
-                                                        localStream = stream;
-                                                        isCameraOff = false;
-                                                        console.log('✅ Local camera started for customer preview');
+                                                        const mediaStream = await existingStream.getMediaStream();
+                                                        if (mediaStream) {
+                                                            localVideo.srcObject = mediaStream;
+                                                            localVideo.style.display = 'block';
+                                                            localStream = mediaStream;
+                                                            isCameraOff = false;
+                                                            console.log('✅ Local camera preview from ACS stream');
+                                                            toggleCameraBtn.classList.remove('muted');
+                                                            toggleCameraBtn.title = 'Turn off camera';
+                                                            toggleCameraBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>';
+                                                        }
+                                                    } catch (streamErr) {
+                                                        console.log('📹 getMediaStream error:', streamErr);
+                                                    }
+                                                } else if (client._deviceManager) {
+                                                    // No existing stream - start video through ACS call
+                                                    console.log('📹 No existing stream, starting via call.startVideo...');
+                                                    try {
+                                                        let cameras = [];
+                                                        if (typeof client._deviceManager.getCameras === 'function') {
+                                                            cameras = await client._deviceManager.getCameras();
+                                                        } else if (client._deviceManager._videoDevices) {
+                                                            cameras = client._deviceManager._videoDevices;
+                                                        }
                                                         
-                                                        // Update UI
-                                                        toggleCameraBtn.classList.remove('muted');
-                                                        toggleCameraBtn.title = 'Turn off camera';
-                                                        toggleCameraBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>';
-                                                    } catch (mediaErr) {
-                                                        console.log('📹 Could not get camera:', mediaErr.message);
+                                                        if (cameras && cameras.length > 0) {
+                                                            console.log('📹 Available cameras:', cameras.length, cameras[0]);
+                                                            
+                                                            // Try to find LocalVideoStream class
+                                                            let LocalVideoStreamClass = window.ACS?.LocalVideoStream || 
+                                                                                        window.LocalVideoStream ||
+                                                                                        window.currentLocalVideoStream?.constructor;
+                                                            
+                                                            // Try to find from existing streams on call
+                                                            if (!LocalVideoStreamClass && call._localVideoStreams && call._localVideoStreams.length > 0) {
+                                                                LocalVideoStreamClass = call._localVideoStreams[0].constructor;
+                                                            }
+                                                            
+                                                            // Search window object for LocalVideoStream
+                                                            if (!LocalVideoStreamClass) {
+                                                                for (const key in window) {
+                                                                    try {
+                                                                        if (key.includes('LocalVideoStream') && typeof window[key] === 'function') {
+                                                                            LocalVideoStreamClass = window[key];
+                                                                            console.log('📹 Found LocalVideoStream at window.' + key);
+                                                                            break;
+                                                                        }
+                                                                    } catch (e) {}
+                                                                }
+                                                            }
+                                                            
+                                                            if (LocalVideoStreamClass) {
+                                                                console.log('📹 Creating LocalVideoStream with class:', LocalVideoStreamClass.name || 'anonymous');
+                                                                const newLvs = new LocalVideoStreamClass(cameras[0]);
+                                                                window.currentLocalVideoStream = newLvs;
+                                                                await call.startVideo(newLvs);
+                                                                
+                                                                // Get preview from the new stream
+                                                                if (typeof newLvs.getMediaStream === 'function') {
+                                                                    const mediaStream = await newLvs.getMediaStream();
+                                                                    if (mediaStream) {
+                                                                        localVideo.srcObject = mediaStream;
+                                                                        localVideo.style.display = 'block';
+                                                                        localStream = mediaStream;
+                                                                        isCameraOff = false;
+                                                                        console.log('✅ Local camera started via LocalVideoStream');
+                                                                        toggleCameraBtn.classList.remove('muted');
+                                                                        toggleCameraBtn.title = 'Turn off camera';
+                                                                        toggleCameraBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>';
+                                                                    }
+                                                                }
+                                                            } else {
+                                                                // Try to find LocalVideoStream through VoiceVideoCallingSDK
+                                                                console.log('📹 LocalVideoStream not found, trying VoiceVideoCallingSDK methods...');
+                                                                let foundStream = false;
+                                                                
+                                                                const pi = VoiceVideoCallingSDK?.proxyInstance;
+                                                                if (pi && pi._voiceVideoCallingStream) {
+                                                                    const vvs = pi._voiceVideoCallingStream;
+                                                                    console.log('📹 Checking _voiceVideoCallingStream:', Object.keys(vvs));
+                                                                    
+                                                                    // Check if vvs has LocalVideoStream
+                                                                    if (vvs.LocalVideoStream) {
+                                                                        LocalVideoStreamClass = vvs.LocalVideoStream;
+                                                                        console.log('📹 Found LocalVideoStream on vvs!');
+                                                                        const newLvs = new LocalVideoStreamClass(cameras[0]);
+                                                                        window.currentLocalVideoStream = newLvs;
+                                                                        await call.startVideo(newLvs);
+                                                                        foundStream = true;
+                                                                    }
+                                                                    
+                                                                    // Try startLocalVideo method
+                                                                    if (!foundStream && typeof vvs.startLocalVideo === 'function') {
+                                                                        try {
+                                                                            console.log('📹 Calling vvs.startLocalVideo()...');
+                                                                            await vvs.startLocalVideo();
+                                                                            foundStream = true;
+                                                                            console.log('✅ Started via vvs.startLocalVideo()');
+                                                                        } catch (e) {
+                                                                            console.log('📹 vvs.startLocalVideo error:', e);
+                                                                        }
+                                                                    }
+                                                                }
+                                                                
+                                                                // Look for SDK-created local video element
+                                                                if (foundStream || call._isLocalVideoStarted) {
+                                                                    await new Promise(r => setTimeout(r, 500));
+                                                                    const allVideos = document.querySelectorAll('video');
+                                                                    for (const v of allVideos) {
+                                                                        if (v !== remoteVideo && v !== localVideo && v.srcObject) {
+                                                                            console.log('📹 Found SDK video with stream, copying...');
+                                                                            localVideo.srcObject = v.srcObject;
+                                                                            localVideo.style.display = 'block';
+                                                                            localStream = v.srcObject;
+                                                                            isCameraOff = false;
+                                                                            foundStream = true;
+                                                                            console.log('✅ Local preview from SDK element');
+                                                                            toggleCameraBtn.classList.remove('muted');
+                                                                            break;
+                                                                        }
+                                                                    }
+                                                                }
+                                                                
+                                                                // Fallback: use getUserMedia for preview
+                                                                if (!foundStream) {
+                                                                    console.log('📹 No SDK stream, trying getUserMedia for preview...');
+                                                                    try {
+                                                                        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                                                                        localVideo.srcObject = stream;
+                                                                        localVideo.style.display = 'block';
+                                                                        localStream = stream;
+                                                                        isCameraOff = false;
+                                                                        console.log('✅ Local camera preview via getUserMedia');
+                                                                        toggleCameraBtn.classList.remove('muted');
+                                                                        toggleCameraBtn.title = 'Turn off camera';
+                                                                        toggleCameraBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>';
+                                                                    } catch (gmErr) {
+                                                                        console.log('📹 getUserMedia failed:', gmErr.message);
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    } catch (startErr) {
+                                                        console.log('📹 startVideo error:', startErr);
                                                     }
                                                 }
                                             } catch (camErr) {
@@ -3037,15 +3330,188 @@
                     console.log('📹 [3s] remoteVideo.srcObject:', remoteVideo.srcObject);
                     console.log('📹 [3s] localVideo.srcObject:', localVideo.srcObject);
                     
+                    // Use window.activeACSCall which we stored earlier
+                    const acsCall = window.activeACSCall;
+                    
+                    // If local video is still missing, try to get it from ACS
+                    if (!localVideo.srcObject && isVideoCall && acsCall) {
+                        console.log('📹 [3s] Local video missing, trying to get from ACS...');
+                        const lvs = acsCall.localVideoStream || (acsCall._localVideoStreams && acsCall._localVideoStreams[0]);
+                        console.log('📹 [3s] acsCall.localVideoStream:', lvs);
+                        console.log('📹 [3s] acsCall._isLocalVideoStarted:', acsCall._isLocalVideoStarted);
+                        
+                        if (lvs && typeof lvs.getMediaStream === 'function') {
+                            try {
+                                const mediaStream = await lvs.getMediaStream();
+                                if (mediaStream) {
+                                    console.log('📹 [3s] Got local MediaStream from ACS!');
+                                    localVideo.srcObject = mediaStream;
+                                    localVideo.style.display = 'block';
+                                    window.localStream = mediaStream;
+                                    isCameraOff = false;
+                                    toggleCameraBtn.classList.remove('muted');
+                                }
+                            } catch (e) {
+                                console.log('📹 [3s] getMediaStream error for local:', e);
+                            }
+                        } else if (!acsCall._isLocalVideoStarted) {
+                            // Try to start local video if not started - need LocalVideoStream class
+                            console.log('📹 [3s] Local video not started, trying to find LocalVideoStream class...');
+                            
+                            // Try to extract LocalVideoStream from ACS SDK
+                            let LocalVideoStreamClass = window.LocalVideoStream;
+                            
+                            // Method 1: Check if it's on the call object's constructor
+                            if (!LocalVideoStreamClass && acsCall._localVideoStreams && acsCall._localVideoStreams.length > 0) {
+                                LocalVideoStreamClass = acsCall._localVideoStreams[0].constructor;
+                                console.log('📹 [3s] Found LocalVideoStream from existing stream constructor');
+                            }
+                            
+                            // Method 2: Check CallingBundle exports
+                            if (!LocalVideoStreamClass && window.ACS) {
+                                LocalVideoStreamClass = window.ACS.LocalVideoStream;
+                            }
+                            
+                            // Method 3: Search window for LocalVideoStream
+                            if (!LocalVideoStreamClass) {
+                                for (const key in window) {
+                                    if (key.includes('LocalVideoStream') && typeof window[key] === 'function') {
+                                        LocalVideoStreamClass = window[key];
+                                        console.log('📹 [3s] Found LocalVideoStream at window.' + key);
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            // Get device manager and try to start video
+                            try {
+                                const pi = VoiceVideoCallingSDK.proxyInstance;
+                                if (pi && pi._callClients) {
+                                    for (const [name, client] of pi._callClients.entries()) {
+                                        if (client._deviceManager) {
+                                            let cameras = [];
+                                            if (typeof client._deviceManager.getCameras === 'function') {
+                                                cameras = await client._deviceManager.getCameras();
+                                            } else if (client._deviceManager._videoDevices) {
+                                                cameras = client._deviceManager._videoDevices;
+                                            }
+                                            
+                                            if (cameras && cameras.length > 0) {
+                                                console.log('📹 [3s] Starting video with camera:', cameras[0]);
+                                                
+                                                if (LocalVideoStreamClass) {
+                                                    console.log('📹 [3s] Creating LocalVideoStream with class:', LocalVideoStreamClass.name);
+                                                    const newLvs = new LocalVideoStreamClass(cameras[0]);
+                                                    window.currentLocalVideoStream = newLvs;
+                                                    await acsCall.startVideo(newLvs);
+                                                    
+                                                    // Get preview
+                                                    const mediaStream = await newLvs.getMediaStream();
+                                                    if (mediaStream) {
+                                                        console.log('📹 [3s] Got local stream via LocalVideoStream!');
+                                                        localVideo.srcObject = mediaStream;
+                                                        localVideo.style.display = 'block';
+                                                        window.localStream = mediaStream;
+                                                        isCameraOff = false;
+                                                        toggleCameraBtn.classList.remove('muted');
+                                                    }
+                                                } else {
+                                                    // Last resort: getUserMedia for preview only
+                                                    console.log('📹 [3s] No LocalVideoStream class, trying to find SDK-created local video...');
+                                                    
+                                                    // First, look for SDK-created video elements for local preview
+                                                    const allVideos = document.querySelectorAll('video');
+                                                    let foundLocalVideo = false;
+                                                    for (const v of allVideos) {
+                                                        if (v !== remoteVideo && v !== localVideo && v.srcObject) {
+                                                            // Check if this might be a local video (not the remote one we're showing)
+                                                            const tracks = v.srcObject.getVideoTracks();
+                                                            if (tracks.length > 0) {
+                                                                console.log('📹 [3s] Found SDK video element with stream:', v.id, tracks[0].label);
+                                                                // If the track label suggests it's a camera, use it for local
+                                                                if (tracks[0].label.toLowerCase().includes('camera') || 
+                                                                    !tracks[0].label.toLowerCase().includes('screen')) {
+                                                                    localVideo.srcObject = v.srcObject;
+                                                                    localVideo.style.display = 'block';
+                                                                    window.localStream = v.srcObject;
+                                                                    isCameraOff = false;
+                                                                    toggleCameraBtn.classList.remove('muted');
+                                                                    foundLocalVideo = true;
+                                                                    console.log('✅ [3s] Got local preview from SDK element!');
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    
+                                                    // If still no local preview, try getUserMedia
+                                                    if (!foundLocalVideo) {
+                                                        try {
+                                                            console.log('📹 [3s] Trying getUserMedia for preview...');
+                                                            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                                                            localVideo.srcObject = stream;
+                                                            localVideo.style.display = 'block';
+                                                            window.localStream = stream;
+                                                            isCameraOff = false;
+                                                            toggleCameraBtn.classList.remove('muted');
+                                                            console.log('📹 [3s] Got local preview via getUserMedia');
+                                                        } catch (gmErr) {
+                                                            console.log('📹 [3s] getUserMedia failed:', gmErr.message);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+                            } catch (e) {
+                                console.log('📹 [3s] startVideo error:', e);
+                            }
+                        }
+                    }
+                    
                     // Look for any video elements that might have been created by SDK
                     const allVideos = document.querySelectorAll('video');
                     console.log('📹 [3s] All video elements:', allVideos.length);
                     allVideos.forEach((v, i) => {
                         console.log(`📹 [3s] Video ${i}: id=${v.id}, srcObject=`, v.srcObject);
                         if (v.srcObject && v !== remoteVideo && v !== localVideo) {
-                            console.log('📹 [3s] Found video with stream! Copying to remoteVideo...');
-                            remoteVideo.srcObject = v.srcObject;
+                            // Log video track info to understand what kind of stream this is
+                            const tracks = v.srcObject.getVideoTracks ? v.srcObject.getVideoTracks() : [];
+                            console.log(`📹 [3s] Video ${i} tracks:`, tracks.length, tracks.map(t => t.label));
+                            
+                            // Check if this is a remote video (already has different source)
+                            if (!remoteVideo.srcObject) {
+                                console.log('📹 [3s] Copying to remoteVideo...');
+                                remoteVideo.srcObject = v.srcObject;
+                            } else if (!localVideo.srcObject) {
+                                // If local video is still empty, this might be the local preview
+                                console.log('📹 [3s] Copying to localVideo...');
+                                localVideo.srcObject = v.srcObject;
+                                localVideo.style.display = 'block';
+                                window.localStream = v.srcObject;
+                                isCameraOff = false;
+                                toggleCameraBtn.classList.remove('muted');
+                            }
                         }
+                    });
+                    
+                    // Also check for hidden video elements inside divs created by SDK
+                    const sdkContainers = document.querySelectorAll('[id*="video"], [class*="video"], [id*="stream"], [class*="stream"]');
+                    console.log('📹 [3s] SDK-like containers found:', sdkContainers.length);
+                    sdkContainers.forEach((container, i) => {
+                        const videos = container.querySelectorAll('video');
+                        videos.forEach((v, j) => {
+                            if (v.srcObject && v !== remoteVideo && v !== localVideo && !localVideo.srcObject) {
+                                console.log(`📹 [3s] Found video in container ${i}:`, v.srcObject);
+                                localVideo.srcObject = v.srcObject;
+                                localVideo.style.display = 'block';
+                                window.localStream = v.srcObject;
+                                isCameraOff = false;
+                                toggleCameraBtn.classList.remove('muted');
+                            }
+                        });
                     });
                     
                     console.log('📹 ========== END DELAYED INSPECTION ==========');
@@ -3143,27 +3609,6 @@
             }
             
             pendingCallData = null;
-        }
-        
-        function playNotificationSound() {
-            // Create a simple beep sound
-            try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                oscillator.frequency.value = 800;
-                oscillator.type = 'sine';
-                gainNode.gain.value = 0.3;
-                
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.2);
-            } catch (e) {
-                console.log('Could not play notification sound:', e);
-            }
         }
         
         // ============ OUTGOING CALL FUNCTIONS (Customer-Initiated) ============
@@ -3443,6 +3888,10 @@
                     if (isCameraOff) {
                         // Turn camera ON
                         console.log('📹 Turning camera ON...');
+                        console.log('📹 call.localVideoStream:', call.localVideoStream);
+                        console.log('📹 call.localVideoStreams:', call.localVideoStreams);
+                        console.log('📹 call._localVideoStreams:', call._localVideoStreams);
+                        console.log('📹 call._isLocalVideoStarted:', call._isLocalVideoStarted);
                         
                         if (deviceManager) {
                             console.log('📹 Got deviceManager');
@@ -3453,6 +3902,8 @@
                                 cameras = await deviceManager.getCameras();
                             } else if (deviceManager.cameras) {
                                 cameras = deviceManager.cameras;
+                            } else if (deviceManager._videoDevices) {
+                                cameras = deviceManager._videoDevices;
                             }
                             console.log('📹 Available cameras:', cameras);
                             
@@ -3464,48 +3915,381 @@
                                 // Check if there's a LocalVideoStream class available
                                 let localVideoStream = null;
                                 
+                                // Check if there's already a localVideoStream on the call (singular)
+                                if (call.localVideoStream) {
+                                    console.log('📹 Found call.localVideoStream (singular):', call.localVideoStream);
+                                    localVideoStream = call.localVideoStream;
+                                    if (typeof localVideoStream.getMediaStream === 'function') {
+                                        try {
+                                            const ms = await localVideoStream.getMediaStream();
+                                            if (ms instanceof MediaStream) {
+                                                console.log('✅ Got MediaStream from localVideoStream!');
+                                                localVideo.srcObject = ms;
+                                                localVideo.style.display = 'block';
+                                                localStream = ms;
+                                                isCameraOff = false;
+                                            }
+                                        } catch (e) {
+                                            console.log('📹 localVideoStream.getMediaStream error:', e);
+                                        }
+                                    }
+                                }
+                                
                                 // Try different ways to create local video stream
-                                if (call.startVideo) {
+                                if (isCameraOff && call.startVideo) {
                                     // ACS way: create stream and start video
                                     try {
                                         // First check if call has localVideoStreams we can use
                                         if (call.localVideoStreams && call.localVideoStreams.length > 0) {
                                             console.log('📹 Restarting existing local video stream');
-                                            await call.startVideo(call.localVideoStreams[0]);
+                                            localVideoStream = call.localVideoStreams[0];
+                                            await call.startVideo(localVideoStream);
+                                        } else if (call._localVideoStreams && call._localVideoStreams.length > 0) {
+                                            console.log('📹 Using _localVideoStreams');
+                                            localVideoStream = call._localVideoStreams[0];
+                                            await call.startVideo(localVideoStream);
                                         } else {
                                             // Create new stream - need LocalVideoStream class
-                                            // Try to find it from ACS bundle
-                                            const LocalVideoStream = window.ACS?.LocalVideoStream || 
-                                                                    window.LocalVideoStream;
+                                            // Try multiple ways to find LocalVideoStream
+                                            let LocalVideoStreamClass = window.ACS?.LocalVideoStream || 
+                                                                        window.LocalVideoStream ||
+                                                                        window.currentLocalVideoStream?.constructor;
                                             
-                                            if (LocalVideoStream) {
-                                                localVideoStream = new LocalVideoStream(camera);
-                                                console.log('📹 Created LocalVideoStream');
+                                            // Try to find from existing call streams
+                                            if (!LocalVideoStreamClass && call._localVideoStreams && call._localVideoStreams.length > 0) {
+                                                LocalVideoStreamClass = call._localVideoStreams[0].constructor;
+                                                console.log('📹 Got LocalVideoStream class from existing stream');
+                                            }
+                                            
+                                            // Try searching window object
+                                            if (!LocalVideoStreamClass) {
+                                                for (const key in window) {
+                                                    try {
+                                                        if (key.includes('LocalVideoStream') && typeof window[key] === 'function') {
+                                                            LocalVideoStreamClass = window[key];
+                                                            console.log('📹 Found LocalVideoStream at window.' + key);
+                                                            break;
+                                                        }
+                                                    } catch (e) {}
+                                                }
+                                            }
+                                            
+                                            if (LocalVideoStreamClass) {
+                                                localVideoStream = new LocalVideoStreamClass(camera);
+                                                window.currentLocalVideoStream = localVideoStream;
+                                                console.log('📹 Created LocalVideoStream:', localVideoStream);
                                                 await call.startVideo(localVideoStream);
+                                                
+                                                // Try to get preview from the new stream
+                                                if (typeof localVideoStream.getMediaStream === 'function') {
+                                                    try {
+                                                        const ms = await localVideoStream.getMediaStream();
+                                                        if (ms instanceof MediaStream) {
+                                                            console.log('✅ Got MediaStream from new LocalVideoStream!');
+                                                            localVideo.srcObject = ms;
+                                                            localVideo.style.display = 'block';
+                                                            localStream = ms;
+                                                            isCameraOff = false;
+                                                        }
+                                                    } catch (e) {
+                                                        console.log('📹 getMediaStream from new LVS error:', e);
+                                                    }
+                                                }
                                             } else {
-                                                console.log('📹 LocalVideoStream class not found, trying SDK method');
+                                                console.log('📹 LocalVideoStream class not found via standard methods');
+                                                
+                                                // Try using D365 VoiceVideoCallingSDK methods directly
+                                                console.log('📹 Trying VoiceVideoCallingSDK.startLocalVideo...');
+                                                let startedViaSDK = false;
+                                                
+                                                if (VoiceVideoCallingSDK) {
+                                                    // Try various SDK methods
+                                                    const sdkMethods = Object.getOwnPropertyNames(Object.getPrototypeOf(VoiceVideoCallingSDK) || {});
+                                                    console.log('📹 VoiceVideoCallingSDK prototype methods:', sdkMethods);
+                                                    
+                                                    // Check proxyInstance for video methods
+                                                    const pi = VoiceVideoCallingSDK.proxyInstance;
+                                                    if (pi) {
+                                                        console.log('📹 proxyInstance keys:', Object.keys(pi));
+                                                        
+                                                        // Check _voiceVideoCallingStream for LocalVideoStream
+                                                        if (pi._voiceVideoCallingStream) {
+                                                            const vvs = pi._voiceVideoCallingStream;
+                                                            console.log('📹 _voiceVideoCallingStream:', vvs);
+                                                            console.log('📹 _voiceVideoCallingStream keys:', Object.keys(vvs));
+                                                            
+                                                            // Check if it has LocalVideoStream
+                                                            if (vvs.LocalVideoStream) {
+                                                                LocalVideoStreamClass = vvs.LocalVideoStream;
+                                                                console.log('📹 Found LocalVideoStream on _voiceVideoCallingStream!');
+                                                            }
+                                                            
+                                                            // Try startLocalVideo method
+                                                            if (typeof vvs.startLocalVideo === 'function') {
+                                                                try {
+                                                                    console.log('📹 Calling vvs.startLocalVideo()...');
+                                                                    await vvs.startLocalVideo();
+                                                                    startedViaSDK = true;
+                                                                    console.log('✅ Started via _voiceVideoCallingStream.startLocalVideo()');
+                                                                } catch (e) {
+                                                                    console.log('📹 vvs.startLocalVideo error:', e);
+                                                                }
+                                                            }
+                                                        }
+                                                        
+                                                        // Check _callClients for ACS exports
+                                                        if (pi._callClients) {
+                                                            for (const [name, client] of pi._callClients) {
+                                                                // Check if client has ACS modules
+                                                                console.log('📹 Client keys:', Object.keys(client));
+                                                                
+                                                                // Try to find LocalVideoStream in client's module context
+                                                                if (client.LocalVideoStream) {
+                                                                    LocalVideoStreamClass = client.LocalVideoStream;
+                                                                    console.log('📹 Found LocalVideoStream on client!');
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    
+                                                    // Try direct SDK methods
+                                                    if (typeof VoiceVideoCallingSDK.startLocalVideo === 'function') {
+                                                        try {
+                                                            console.log('📹 Calling VoiceVideoCallingSDK.startLocalVideo()...');
+                                                            await VoiceVideoCallingSDK.startLocalVideo();
+                                                            startedViaSDK = true;
+                                                            console.log('✅ Started via VoiceVideoCallingSDK.startLocalVideo()');
+                                                        } catch (e) {
+                                                            console.log('📹 VoiceVideoCallingSDK.startLocalVideo error:', e);
+                                                        }
+                                                    }
+                                                }
+                                                
+                                                // If we found LocalVideoStreamClass, try to use it
+                                                if (LocalVideoStreamClass && !startedViaSDK) {
+                                                    try {
+                                                        localVideoStream = new LocalVideoStreamClass(camera);
+                                                        window.currentLocalVideoStream = localVideoStream;
+                                                        await call.startVideo(localVideoStream);
+                                                        startedViaSDK = true;
+                                                        console.log('✅ Started via discovered LocalVideoStream class');
+                                                    } catch (e) {
+                                                        console.log('📹 LocalVideoStream creation failed:', e);
+                                                    }
+                                                }
+                                                
+                                                // Check if video actually started
+                                                if (startedViaSDK || call._isLocalVideoStarted || 
+                                                    (call._localVideoStreams && call._localVideoStreams.length > 0)) {
+                                                    console.log('📹 Local video started, looking for preview stream...');
+                                                    
+                                                    // Wait briefly for stream to be ready
+                                                    await new Promise(r => setTimeout(r, 500));
+                                                    
+                                                    // Check for local video stream
+                                                    const lvs = call.localVideoStream || 
+                                                                (call._localVideoStreams && call._localVideoStreams[0]) ||
+                                                                (call.localVideoStreams && call.localVideoStreams[0]);
+                                                    
+                                                    if (lvs && typeof lvs.getMediaStream === 'function') {
+                                                        try {
+                                                            const ms = await lvs.getMediaStream();
+                                                            if (ms instanceof MediaStream) {
+                                                                localVideo.srcObject = ms;
+                                                                localVideo.style.display = 'block';
+                                                                localStream = ms;
+                                                                isCameraOff = false;
+                                                                console.log('✅ Got local preview from SDK stream!');
+                                                            }
+                                                        } catch (e) {
+                                                            console.log('📹 getMediaStream after start error:', e);
+                                                        }
+                                                    }
+                                                    
+                                                    // Look for SDK-created video elements
+                                                    if (!localVideo.srcObject) {
+                                                        console.log('📹 Searching for SDK-created local video elements...');
+                                                        const allVideos = document.querySelectorAll('video');
+                                                        for (const v of allVideos) {
+                                                            if (v !== remoteVideo && v !== localVideo && v.srcObject) {
+                                                                console.log('📹 Found SDK video element with srcObject');
+                                                                // Clone the stream for local preview
+                                                                localVideo.srcObject = v.srcObject;
+                                                                localVideo.style.display = 'block';
+                                                                isCameraOff = false;
+                                                                console.log('✅ Copied local stream from SDK element!');
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                
+                                                // Ultimate fallback: getUserMedia for preview only
+                                                if (!localVideo.srcObject) {
+                                                    console.log('📹 No SDK stream found, trying getUserMedia for preview...');
+                                                    try {
+                                                        const stream = await navigator.mediaDevices.getUserMedia({ 
+                                                            video: { deviceId: camera.id ? { exact: camera.id } : undefined },
+                                                            audio: false 
+                                                        });
+                                                        localVideo.srcObject = stream;
+                                                        localVideo.style.display = 'block';
+                                                        localStream = stream;
+                                                        isCameraOff = false;
+                                                        console.log('✅ Got local preview via getUserMedia');
+                                                    } catch (gmErr) {
+                                                        console.log('📹 getUserMedia with device failed:', gmErr.message);
+                                                        // Try without device constraint
+                                                        try {
+                                                            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                                                            localVideo.srcObject = stream;
+                                                            localVideo.style.display = 'block';
+                                                            localStream = stream;
+                                                            isCameraOff = false;
+                                                            console.log('✅ Got local preview via getUserMedia (any camera)');
+                                                        } catch (e) {
+                                                            console.log('📹 getUserMedia completely failed:', e.message);
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                         console.log('✅ Camera started via call.startVideo');
                                         isCameraOff = false;
+                                        
+                                        // NOW get the local preview from the localVideoStream
+                                        // After startVideo, localVideoStreams should be populated
+                                        if (call.localVideoStreams && call.localVideoStreams.length > 0) {
+                                            localVideoStream = call.localVideoStreams[0];
+                                            console.log('📹 LocalVideoStream from call:', localVideoStream);
+                                            console.log('📹 LocalVideoStream keys:', Object.keys(localVideoStream));
+                                            
+                                            // Try to get MediaStream for preview
+                                            if (typeof localVideoStream.getMediaStream === 'function') {
+                                                try {
+                                                    const ms = await localVideoStream.getMediaStream();
+                                                    if (ms instanceof MediaStream) {
+                                                        console.log('✅ Got local MediaStream for preview!');
+                                                        localVideo.srcObject = ms;
+                                                        localVideo.style.display = 'block';
+                                                        localStream = ms;
+                                                    }
+                                                } catch (msErr) {
+                                                    console.log('📹 getMediaStream error:', msErr);
+                                                }
+                                            }
+                                            
+                                            // Alternative: check source property
+                                            if (!localVideo.srcObject && localVideoStream.source) {
+                                                console.log('📹 LocalVideoStream.source:', localVideoStream.source);
+                                                if (localVideoStream.source instanceof MediaStream) {
+                                                    localVideo.srcObject = localVideoStream.source;
+                                                    localVideo.style.display = 'block';
+                                                }
+                                            }
+                                        }
                                     } catch (e) {
                                         console.log('📹 call.startVideo error:', e);
                                     }
                                 }
                                 
-                                // Also try to get media stream directly for preview
-                                try {
-                                    const stream = await navigator.mediaDevices.getUserMedia({ 
-                                        video: { deviceId: camera.id ? { exact: camera.id } : undefined },
-                                        audio: false 
-                                    });
-                                    localVideo.srcObject = stream;
-                                    localVideo.style.display = 'block';
-                                    localStream = stream;
-                                    console.log('✅ Local video preview started');
-                                    isCameraOff = false;
-                                } catch (e) {
-                                    console.log('📹 getUserMedia error:', e);
+                                // Fallback: try to get media stream directly for preview
+                                if (!localVideo.srcObject) {
+                                    console.log('📹 Still no local preview, trying additional methods...');
+                                    
+                                    // Method 1: Check call.localVideoStream again (singular)
+                                    const lvs = call.localVideoStream || (call._localVideoStreams && call._localVideoStreams[0]) || 
+                                               (call.localVideoStreams && call.localVideoStreams[0]);
+                                    if (lvs) {
+                                        console.log('📹 Found LocalVideoStream:', lvs);
+                                        console.log('📹 LocalVideoStream keys:', Object.keys(lvs));
+                                        
+                                        // Try getMediaStream
+                                        if (typeof lvs.getMediaStream === 'function') {
+                                            try {
+                                                const ms = await lvs.getMediaStream();
+                                                console.log('📹 getMediaStream result:', ms);
+                                                if (ms instanceof MediaStream) {
+                                                    localVideo.srcObject = ms;
+                                                    localVideo.style.display = 'block';
+                                                    localStream = ms;
+                                                    isCameraOff = false;
+                                                    console.log('✅ Got preview via getMediaStream!');
+                                                }
+                                            } catch (e) {
+                                                console.log('📹 getMediaStream failed:', e.message);
+                                            }
+                                        }
+                                        
+                                        // Try getMediaStreamForRenderer
+                                        if (!localVideo.srcObject && typeof lvs.getMediaStreamForRenderer === 'function') {
+                                            try {
+                                                const ms = await lvs.getMediaStreamForRenderer();
+                                                console.log('📹 getMediaStreamForRenderer result:', ms);
+                                                if (ms instanceof MediaStream) {
+                                                    localVideo.srcObject = ms;
+                                                    localVideo.style.display = 'block';
+                                                    localStream = ms;
+                                                    isCameraOff = false;
+                                                    console.log('✅ Got preview via getMediaStreamForRenderer!');
+                                                }
+                                            } catch (e) {
+                                                console.log('📹 getMediaStreamForRenderer failed:', e.message);
+                                            }
+                                        }
+                                        
+                                        // Check for source or mediaStream property
+                                        if (!localVideo.srcObject) {
+                                            const directStream = lvs.source || lvs.mediaStream || lvs._mediaStream;
+                                            console.log('📹 Direct stream property:', directStream);
+                                            if (directStream instanceof MediaStream) {
+                                                localVideo.srcObject = directStream;
+                                                localVideo.style.display = 'block';
+                                                localStream = directStream;
+                                                isCameraOff = false;
+                                                console.log('✅ Got preview via direct property!');
+                                            }
+                                        }
+                                    }
+                                    
+                                    // Method 2: Create a VideoStreamRenderer (ACS pattern)
+                                    if (!localVideo.srcObject && lvs) {
+                                        console.log('📹 Trying VideoStreamRenderer approach...');
+                                        try {
+                                            const VideoStreamRenderer = window.VideoStreamRenderer || window.ACS?.VideoStreamRenderer;
+                                            if (VideoStreamRenderer) {
+                                                const renderer = new VideoStreamRenderer(lvs);
+                                                const view = await renderer.createView({ scalingMode: 'Crop' });
+                                                if (view.target && view.target.srcObject) {
+                                                    localVideo.srcObject = view.target.srcObject;
+                                                    localVideo.style.display = 'block';
+                                                    console.log('✅ Got preview via VideoStreamRenderer!');
+                                                }
+                                            }
+                                        } catch (e) {
+                                            console.log('📹 VideoStreamRenderer failed:', e.message);
+                                        }
+                                    }
+                                    
+                                    // Method 3: Search for SDK-created video elements
+                                    if (!localVideo.srcObject) {
+                                        console.log('📹 Searching for SDK-created local video elements...');
+                                        const allVideos = document.querySelectorAll('video');
+                                        for (const v of allVideos) {
+                                            if (v.srcObject && v.srcObject instanceof MediaStream && v !== remoteVideo && v !== localVideo) {
+                                                const videoTracks = v.srcObject.getVideoTracks();
+                                                // Skip if it's the same as remote video
+                                                if (v.srcObject !== remoteVideo.srcObject && videoTracks.length > 0) {
+                                                    console.log('📹 Found SDK video element with stream');
+                                                    localVideo.srcObject = v.srcObject;
+                                                    localVideo.style.display = 'block';
+                                                    isCameraOff = false;
+                                                    console.log('✅ Using SDK video element stream!');
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
