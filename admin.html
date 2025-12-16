@@ -30,6 +30,7 @@
             color: var(--admin-text);
             line-height: 1.6;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         /* Custom Scrollbar */
@@ -68,6 +69,8 @@
             display: grid;
             grid-template-columns: 1fr 400px;
             gap: 32px;
+            overflow-x: hidden;
+            width: 100%;
         }
 
         @media (max-width: 1200px) {
@@ -81,6 +84,8 @@
             display: flex;
             flex-direction: column;
             gap: 32px;
+            max-width: 100%;
+            overflow-x: hidden;
         }
 
         .settings-card {
@@ -88,6 +93,7 @@
             border-radius: 12px;
             box-shadow: var(--admin-shadow);
             overflow: hidden;
+            max-width: 100%;
         }
 
         .card-header {
@@ -106,7 +112,7 @@
         .card-header h2 { font-size: 16px; font-weight: 600; }
         .card-header p { font-size: 13px; color: var(--admin-text-light); margin-top: 2px; }
 
-        .card-body { padding: 24px; }
+        .card-body { padding: 24px; overflow-x: auto; max-width: 100%; }
 
         /* Form Elements */
         .form-group {
@@ -236,6 +242,8 @@
             border-radius: 8px;
             font-size: 14px;
             transition: border-color 0.2s, box-shadow 0.2s;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         .form-input:focus {
             outline: none;
@@ -247,6 +255,9 @@
             resize: vertical;
             min-height: 80px;
             font-family: inherit;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         /* LCW Textarea */
@@ -255,6 +266,10 @@
             font-size: 12px;
             line-height: 1.5;
             min-height: 100px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-all;
         }
         .extracted-values {
             margin-top: 16px;
