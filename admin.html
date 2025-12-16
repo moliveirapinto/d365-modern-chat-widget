@@ -220,7 +220,10 @@
             transition: opacity 0.3s ease, max-height 0.3s ease;
         }
         #customWidgetSettings.hidden {
-            display: none;
+            display: none !important;
+        }
+        #standardWidgetSettings.hidden {
+            display: none !important;
         }
         .preview-panel.hidden {
             display: none;
@@ -1070,7 +1073,7 @@
                 </div>
                 <div class="card-body">
                     <div class="widget-mode-selector">
-                        <label class="mode-option">
+                        <label class="mode-option" onclick="console.log('Standard clicked'); document.getElementById('modeStandard').checked = true; toggleWidgetMode('standard');">
                             <input type="radio" name="widgetMode" value="standard" id="modeStandard">
                             <div class="mode-card">
                                 <div class="mode-icon">
@@ -1080,7 +1083,7 @@
                                 <div class="mode-desc">Use the default D365 Live Chat Widget appearance and behavior</div>
                             </div>
                         </label>
-                        <label class="mode-option">
+                        <label class="mode-option" onclick="console.log('Custom clicked'); document.getElementById('modeCustom').checked = true; toggleWidgetMode('custom');">
                             <input type="radio" name="widgetMode" value="custom" id="modeCustom" checked>
                             <div class="mode-card">
                                 <div class="mode-icon">
@@ -1415,32 +1418,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="form-group">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="enablePrechatForm" checked>
-                                <span class="toggle-slider"></span>
-                            </label>
-                            <span class="toggle-label">Enable Pre-chat Form</span>
-                        </div>
-                        <p class="form-hint">When disabled, your customer will be automagically authenticated with the info below, so you don't have to type it during your demo. Make sure your contact details in D365 matches!</p>
-                    </div>
-
-                    <!-- Default Contact Info (shown when pre-chat form is disabled) -->
-                    <div id="defaultContactInfo" style="display: none;">
-                        <div class="form-group">
-                            <label class="form-label">Default Contact Name</label>
-                            <input type="text" class="form-input" id="defaultContactName" placeholder="e.g., Anonymous User">
-                            <p class="form-hint">This name will be passed to Dynamics 365 for contact authentication</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Default Contact Email</label>
-                            <input type="email" class="form-input" id="defaultContactEmail" placeholder="e.g., anonymous@example.com">
-                            <p class="form-hint">This email will be used for D365 contact identification</p>
-                        </div>
-                    </div>
-
-                    <!-- Pre-chat Form Fields (shown when pre-chat form is enabled) -->
+                    <!-- Pre-chat Form Fields -->
                     <div id="prechatFormFields">
                         <div class="form-group">
                             <label class="form-label">Welcome Title</label>
@@ -1991,13 +1969,6 @@
             document.getElementById('fontFamily').value = settings.fontFamily || 'system';
             updateFontPreview(settings.fontFamily || 'system');
             
-            // Pre-chat form settings
-            const enablePrechatForm = settings.enablePrechatForm !== false; // Default true
-            document.getElementById('enablePrechatForm').checked = enablePrechatForm;
-            document.getElementById('defaultContactName').value = settings.defaultContactName || '';
-            document.getElementById('defaultContactEmail').value = settings.defaultContactEmail || '';
-            togglePrechatFormFields(enablePrechatForm);
-            
             // Pre-chat form fields
             document.getElementById('welcomeTitle').value = settings.welcomeTitle || defaultSettings.welcomeTitle;
             document.getElementById('welcomeMessage').value = settings.welcomeMessage || defaultSettings.welcomeMessage;
@@ -2148,8 +2119,7 @@
 
             // Text inputs - real-time preview AND auto-save to active profile
             ['backgroundImageUrl', 'headerTitle', 'headerSubtitle', 'welcomeTitle', 'welcomeMessage', 
-             'nameFieldLabel', 'emailFieldLabel', 'questionFieldLabel', 'startBtnText', 
-             'defaultContactName', 'defaultContactEmail'].forEach(id => {
+             'nameFieldLabel', 'emailFieldLabel', 'questionFieldLabel', 'startBtnText'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
                     el.addEventListener('input', () => {
@@ -2168,24 +2138,6 @@
                             localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
                         }
                     });
-                }
-            });
-
-            // Pre-chat form toggle
-            document.getElementById('enablePrechatForm').addEventListener('change', (e) => {
-                togglePrechatFormFields(e.target.checked);
-                updateSettingsFromForm();
-                // Auto-save
-                if (!isInitializing && activeProfileId) {
-                    const profile = profiles.find(p => p.id === activeProfileId);
-                    if (profile) {
-                        profile.settings = { ...settings };
-                        profile.updatedAt = new Date().toISOString();
-                        saveProfiles();
-                    }
-                }
-                if (!isInitializing) {
-                    localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
                 }
             });
 
@@ -2306,9 +2258,13 @@
         }
 
         function toggleWidgetMode(mode) {
+            console.log('toggleWidgetMode called with:', mode);
             const customSettings = document.getElementById('customWidgetSettings');
             const standardSettings = document.getElementById('standardWidgetSettings');
             const previewPanel = document.querySelector('.preview-panel');
+            
+            console.log('customSettings:', customSettings);
+            console.log('standardSettings:', standardSettings);
             
             if (mode === 'standard') {
                 customSettings.classList.add('hidden');
@@ -2319,6 +2275,9 @@
                 standardSettings.classList.add('hidden');
                 if (previewPanel) previewPanel.classList.remove('hidden');
             }
+            
+            console.log('After toggle - customSettings.classList:', customSettings.classList.toString());
+            console.log('After toggle - standardSettings.classList:', standardSettings.classList.toString());
             
             settings.widgetMode = mode;
             console.log('Widget mode changed to:', mode);
@@ -2483,12 +2442,6 @@
             localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
         }
 
-        // ============ PRE-CHAT FORM TOGGLE ============
-        function togglePrechatFormFields(enabled) {
-            document.getElementById('prechatFormFields').style.display = enabled ? 'block' : 'none';
-            document.getElementById('defaultContactInfo').style.display = enabled ? 'none' : 'block';
-        }
-
         function toggleStandardAuthFields(enabled) {
             const fieldsContainer = document.getElementById('standardAuthFields');
             if (fieldsContainer) {
@@ -2549,9 +2502,6 @@
             settings.badgeColor = document.getElementById('badgeColor').value;
 
             // Pre-chat Form
-            settings.enablePrechatForm = document.getElementById('enablePrechatForm').checked;
-            settings.defaultContactName = document.getElementById('defaultContactName').value;
-            settings.defaultContactEmail = document.getElementById('defaultContactEmail').value;
             settings.welcomeTitle = document.getElementById('welcomeTitle').value;
             settings.welcomeMessage = document.getElementById('welcomeMessage').value;
             settings.nameFieldLabel = document.getElementById('nameFieldLabel').value;
