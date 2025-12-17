@@ -2067,7 +2067,7 @@
                         <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
                         Reset to Default
                     </button>
-                    <a href="https://moliveirapinto.github.io/d365-modern-chat-widget/" target="_blank" class="btn btn-success" id="goToWidgetBtn" style="text-decoration:none;">
+                    <a href="index.html" target="_blank" class="btn btn-success" id="goToWidgetBtn" style="text-decoration:none;">
                         <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
                         Go to Widget
                     </a>
@@ -3497,7 +3497,33 @@
             // Add timestamp
             settingsToSave.lastSaved = new Date().toISOString();
             
+            console.log('💾 SAVING SETTINGS TO localStorage:', {
+                orgId: settingsToSave.orgId,
+                widgetId: settingsToSave.widgetId,
+                orgUrl: settingsToSave.orgUrl,
+                backgroundImageUrl: settingsToSave.backgroundImageUrl,
+                botAvatar: settingsToSave.botAvatar ? settingsToSave.botAvatar.substring(0, 100) + '...' : null,
+                launcherIcon: settingsToSave.launcherIcon,
+                headerTitle: settingsToSave.headerTitle,
+                totalSize: JSON.stringify(settingsToSave).length + ' bytes'
+            });
+            
             localStorage.setItem('chatWidgetSettings', JSON.stringify(settingsToSave));
+            
+            // Verify the save worked
+            const verification = localStorage.getItem('chatWidgetSettings');
+            if (verification) {
+                const parsed = JSON.parse(verification);
+                console.log('✅ VERIFIED in localStorage after save:', {
+                    orgId: parsed.orgId,
+                    widgetId: parsed.widgetId,
+                    backgroundImageUrl: parsed.backgroundImageUrl,
+                    botAvatar: parsed.botAvatar ? 'SET' : 'NULL'
+                });
+            } else {
+                console.error('❌ VERIFICATION FAILED - localStorage is empty!');
+            }
+            
             showToast('Settings saved successfully!');
             updateLastSavedInfo(settingsToSave.lastSaved);
         }

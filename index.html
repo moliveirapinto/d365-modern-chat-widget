@@ -1129,19 +1129,35 @@
         // ============ LOAD ADMIN SETTINGS ============
         function loadAdminSettings() {
             const saved = localStorage.getItem('chatWidgetSettings');
-            console.log('Loading admin settings from localStorage:', saved ? 'Found' : 'Not found');
-            if (!saved) return null;
+            console.log('📂 LOADING SETTINGS FROM localStorage...');
+            console.log('Raw localStorage data:', saved ? saved.substring(0, 200) + '... (' + saved.length + ' bytes total)' : 'NULL/EMPTY');
+            
+            if (!saved) {
+                console.warn('⚠️ No settings found in localStorage - will use defaults');
+                return null;
+            }
+            
             try {
                 const parsed = JSON.parse(saved);
-                console.log('Parsed admin settings:', parsed);
+                console.log('✅ Successfully parsed admin settings:', {
+                    orgId: parsed.orgId,
+                    widgetId: parsed.widgetId,
+                    orgUrl: parsed.orgUrl,
+                    backgroundImageUrl: parsed.backgroundImageUrl,
+                    botAvatar: parsed.botAvatar ? 'SET (' + parsed.botAvatar.substring(0, 50) + '...)' : 'NULL',
+                    launcherIcon: parsed.launcherIcon,
+                    headerTitle: parsed.headerTitle,
+                    lastSaved: parsed.lastSaved
+                });
                 return parsed;
             } catch (e) {
-                console.error('Error loading admin settings:', e);
+                console.error('❌ Error parsing admin settings:', e);
                 return null;
             }
         }
 
         const adminSettings = loadAdminSettings();
+        console.log('🎨 Admin settings loaded, using for configuration:', adminSettings ? 'YES' : 'NO (using defaults)');
 
         // Load background screenshot if configured
         const demoBackground = document.getElementById('demoBackground');
