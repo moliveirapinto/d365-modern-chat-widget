@@ -829,6 +829,39 @@
         .hero-card-button:active {
             transform: translateY(0);
         }
+        /* Suggested Actions (PVA-style quick reply buttons) */
+        .suggested-actions-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+            padding-top: 8px;
+        }
+        .suggested-action-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 18px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .suggested-action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.4);
+        }
+        .suggested-action-btn:active {
+            transform: translateY(0);
+        }
+        .suggested-action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
         /* Single hero card (no carousel) */
         .hero-card-single {
             max-width: 280px;
@@ -1585,6 +1618,125 @@
             }
         }
         
+        // PVA Suggested Actions Support Functions
+        function isSuggestedActionsContent(content) {
+            if (!content || typeof content !== 'string') return false;
+            try {
+                const parsed = JSON.parse(content);
+                // Check for PVA-style message with suggestedActions
+                if (parsed.text && parsed.suggestedActions && parsed.suggestedActions.actions) {
+                    return parsed.suggestedActions.actions.length > 0;
+                }
+                return false;
+            } catch (e) {
+                return false;
+            }
+        }
+        
+        function addSuggestedActionsMessage(content, isUser, senderName, senderImage) {
+            const now = new Date();
+            const wrapper = document.createElement('div');
+            wrapper.className = `message-wrapper ${isUser ? 'user' : 'agent'}`;
+            
+            // For bot messages, don't use agent avatar - let createAvatarElement use bot avatar
+            const isBotMessage = !isUser && isBotSender(senderName);
+            const avatarImage = senderImage || (isUser ? adminSettings?.customerAvatar : (isBotMessage ? null : adminSettings?.agentAvatar));
+            const avatar = createAvatarElement(isUser, senderName, avatarImage);
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            const senderDiv = document.createElement('div');
+            senderDiv.className = 'message-sender';
+            senderDiv.textContent = isUser ? userName : (senderName || 'Agent');
+            
+            try {
+                const parsed = JSON.parse(content);
+                const messageText = parsed.text || '';
+                const actions = parsed.suggestedActions?.actions || [];
+                
+                console.log('💬 Rendering suggested actions message:', messageText, 'with', actions.length, 'buttons');
+                
+                // Create message bubble with text
+                const messageBubble = document.createElement('div');
+                messageBubble.className = `message ${isUser ? 'user' : 'agent'}`;
+                messageBubble.textContent = messageText;
+                
+                // Create suggested actions container
+                if (actions.length > 0) {
+                    const actionsContainer = document.createElement('div');
+                    actionsContainer.className = 'suggested-actions-container';
+                    
+                    actions.forEach(action => {
+                        const button = document.createElement('button');
+                        button.className = 'suggested-action-btn';
+                        button.textContent = action.title || action.text || 'Select';
+                        
+                        button.onclick = async () => {
+                            const value = action.value || action.text || action.title;
+                            console.log('💬 Suggested action clicked:', action.type, value);
+                            
+                            // Disable all buttons in this container after click
+                            actionsContainer.querySelectorAll('.suggested-action-btn').forEach(btn => {
+                                btn.disabled = true;
+                            });
+                            
+                            if (action.type === 'openUrl' && action.value) {
+                                window.open(action.value, '_blank');
+                            } else if (chatSDK && chatStarted) {
+                                // Send as message (imBack, postBack, messageBack)
+                                try {
+                                    await chatSDK.sendMessage({ content: value });
+                                    addMessage(value, true);
+                                } catch (err) {
+                                    console.error('Error sending suggested action response:', err);
+                                    // Re-enable buttons on error
+                                    actionsContainer.querySelectorAll('.suggested-action-btn').forEach(btn => {
+                                        btn.disabled = false;
+                                    });
+                                }
+                            }
+                        };
+                        
+                        actionsContainer.appendChild(button);
+                    });
+                    
+                    messageBubble.appendChild(actionsContainer);
+                }
+                
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                timeDiv.textContent = formatTime(now);
+                
+                contentDiv.appendChild(senderDiv);
+                contentDiv.appendChild(messageBubble);
+                contentDiv.appendChild(timeDiv);
+                
+            } catch (e) {
+                console.error('Error rendering suggested actions:', e);
+                // Fallback to plain text
+                contentDiv.innerHTML = `
+                    <div class="message-sender">${isUser ? userName : (senderName || 'Agent')}</div>
+                    <div class="message ${isUser ? 'user' : 'agent'}">${content}</div>
+                    <div class="message-time">${formatTime(now)}</div>
+                `;
+            }
+            
+            wrapper.appendChild(avatar);
+            wrapper.appendChild(contentDiv);
+            typingIndicator.parentNode.insertBefore(wrapper, typingIndicator);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            chatMessages.push({ isUser, content, senderName: isUser ? userName : senderName, timestamp: now });
+            saveChatSession();
+            
+            if (!isUser && !container.classList.contains('open')) {
+                unreadCount++; badge.textContent = unreadCount; badge.classList.add('show');
+            }
+            if (!isUser) {
+                playNotificationSound();
+            }
+        }
+        
         // Hero Card Support Functions
         function isHeroCardContent(content) {
             if (!content || typeof content !== 'string') return false;
@@ -2101,7 +2253,10 @@
                 
                 // Handle text content - check for card types first
                 if (content) {
-                    if (isHeroCardContent(content)) {
+                    if (isSuggestedActionsContent(content)) {
+                        console.log('💬 Detected PVA Suggested Actions in message content');
+                        addSuggestedActionsMessage(content, false, senderName, null);
+                    } else if (isHeroCardContent(content)) {
                         console.log('🎴 Detected Hero Card in message content');
                         addHeroCardMessage(content, false, senderName, null);
                     } else if (isAdaptiveCardContent(content)) {
