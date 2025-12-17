@@ -2555,6 +2555,7 @@
         function populateForm() {
             // D365 Connection - LCW Code
             const lcwTextarea = document.getElementById('lcwCode');
+            console.log('📝 populateForm - lcwCode in settings:', settings.lcwCode ? `${settings.lcwCode.length} chars` : 'empty');
             if (settings.lcwCode) {
                 lcwTextarea.value = settings.lcwCode;
                 // Parse and display extracted values
@@ -2869,10 +2870,20 @@
                 settings.lcwCode = code;
                 parseLCWCode(code);
                 updateConnectionStatus();
+                // Auto-save to active profile if one is selected
+                if (!isInitializing && activeProfileId) {
+                    const profile = profiles.find(p => p.id === activeProfileId);
+                    if (profile) {
+                        profile.settings = { ...settings };
+                        profile.updatedAt = new Date().toISOString();
+                        saveProfiles();
+                        console.log('💾 Auto-saved LCW script to profile:', activeProfileId);
+                    }
+                }
                 // Auto-save to localStorage so index.html picks up the changes
                 if (!isInitializing) {
                     localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
-                    console.log('💾 Auto-saved LCW settings to localStorage');
+                    console.log('💾 Auto-saved LCW settings to localStorage, lcwCode length:', code.length);
                 }
             });
 
@@ -3501,6 +3512,7 @@
                 orgId: settingsToSave.orgId,
                 widgetId: settingsToSave.widgetId,
                 orgUrl: settingsToSave.orgUrl,
+                lcwCode: settingsToSave.lcwCode ? `${settingsToSave.lcwCode.length} chars` : 'empty',
                 backgroundImageUrl: settingsToSave.backgroundImageUrl,
                 botAvatar: settingsToSave.botAvatar ? settingsToSave.botAvatar.substring(0, 100) + '...' : null,
                 launcherIcon: settingsToSave.launcherIcon,
@@ -3517,6 +3529,7 @@
                 console.log('✅ VERIFIED in localStorage after save:', {
                     orgId: parsed.orgId,
                     widgetId: parsed.widgetId,
+                    lcwCode: parsed.lcwCode ? `${parsed.lcwCode.length} chars` : 'empty',
                     backgroundImageUrl: parsed.backgroundImageUrl,
                     botAvatar: parsed.botAvatar ? 'SET' : 'NULL'
                 });
@@ -3853,47 +3866,24 @@
             const googleFontLink = googleFontLinks[config.fontFamily] || '';
             
             // Generate a fully self-contained embed code with ALL features from index.html
-            // ALL values are pre-computed - no runtime template literals needed
-            // This ensures compatibility with Power Pages and other restrictive environments
-            
-            // Pre-compute gradient/solid backgrounds
-            const launcherBg = config.useGradient 
-                ? 'linear-gradient(135deg, ' + config.gradientStart + ' 0%, ' + config.gradientEnd + ' 100%)'
-                : config.launcherColor;
-            const headerBg = config.useGradient
-                ? 'linear-gradient(135deg, ' + config.gradientStart + ' 0%, ' + config.gradientEnd + ' 100%)'
-                : config.primaryColor;
-            const buttonBg = config.useGradient
-                ? 'linear-gradient(135deg, ' + config.gradientStart + ' 0%, ' + config.gradientEnd + ' 100%)'
-                : config.primaryColor;
-            const agentAvatarBg = 'linear-gradient(135deg, ' + config.gradientStart + ' 0%, ' + config.gradientEnd + ' 100%)';
-            
-            // Pre-compute header avatar HTML
-            const headerAvatarHtml = config.headerLogo 
-                ? '<img src="' + config.headerLogo + '" alt="Logo">'
-                : '<svg viewBox="0 0 24 24"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>';
-            
-            const embedCode = \`<!-- D365 Modern Chat Widget - Full Featured Self-Contained Embed -->
+            const embedCode = `<!-- D365 Modern Chat Widget - Full Featured Self-Contained Embed -->
 <!-- Generated: ${new Date().toLocaleDateString()} -->
 <!-- Simply copy this entire block and paste it into your HTML page -->
 <!-- Features: Emoji picker, File attachments, Voice recording, Sound toggle, Minimize, Close -->
-${googleFontLink ? \`\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="stylesheet">\` : ''}
+${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="stylesheet">` : ''}
 
 <script>
 (function() {
   'use strict';
   
-  // Widget Configuration - all values pre-computed
+  // Widget Configuration
   var config = ${configJson};
   
-  // Pre-computed values for Power Pages compatibility
+  // Launcher icon SVG path for selected icon: ${config.launcherIcon}
   var launcherIconPath = '${selectedIconPath}';
+  
+  // Font family
   var fontFamily = '${selectedFontFamily}';
-  var launcherBg = '${launcherBg}';
-  var headerBg = '${headerBg}';
-  var buttonBg = '${buttonBg}';
-  var agentAvatarBg = '${agentAvatarBg}';
-  var headerAvatarHtml = '${headerAvatarHtml.replace(/'/g, "\\'")}';
   
   // Emojis for picker
   var emojis = [
@@ -3909,347 +3899,347 @@ ${googleFontLink ? \`\n<!-- Google Font -->\n<link href="${googleFontLink}" rel=
   
   // Main initialization function - called when DOM is ready
   function initD365Widget() {
-    // Inject CSS Styles - all values are pre-computed, no template literals
+    // Inject CSS Styles - Full featured version matching index.html
     var style = document.createElement('style');
-    style.textContent = '\\
-    @keyframes d365pulse {\\
-      0% { box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 0 rgba(102,126,234,0.4); }\\
-      50% { box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 12px rgba(102,126,234,0); }\\
-      100% { box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 0 rgba(102,126,234,0); }\\
-    }\\
-    .d365-chat-launcher {\\
-      position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px;\\
-      border-radius: 50%; border: none; cursor: pointer; z-index: 999999;\\
-      display: flex; align-items: center; justify-content: center;\\
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);\\
-      transition: transform 0.3s ease, box-shadow 0.3s ease;\\
-      background: ' + launcherBg + ';\\
-      animation: d365pulse 2.5s ease-in-out infinite;\\
-    }\\
-    .d365-chat-launcher:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(0,0,0,0.4); animation: none; }\\
-    .d365-chat-launcher.open { animation: none; }\\
-    .d365-chat-launcher svg { width: 28px; height: 28px; fill: white; }\\
-    .d365-chat-launcher .chat-icon { display: block; }\\
-    .d365-chat-launcher .close-icon { display: none; }\\
-    .d365-chat-launcher.open .chat-icon { display: none; }\\
-    .d365-chat-launcher.open .close-icon { display: block; }\\
-    .d365-chat-badge {\\
-      position: absolute; top: -4px; right: -4px; background: ' + config.badgeColor + ';\\
-      color: white; font-size: 11px; font-weight: 700; min-width: 20px; height: 20px;\\
-      border-radius: 10px; display: flex; align-items: center; justify-content: center;\\
-      opacity: 0; transform: scale(0); transition: all 0.2s ease;\\
-    }\\
-    .d365-chat-badge.show { opacity: 1; transform: scale(1); }\\
-    .d365-chat-container {\\
-      position: fixed; bottom: 100px; right: 24px; width: 400px; height: 700px;\\
-      max-height: calc(100vh - 120px); background: white; border-radius: 16px;\\
-      box-shadow: 0 10px 50px rgba(0,0,0,0.2); display: flex; flex-direction: column;\\
-      overflow: hidden; opacity: 0; transform: translateY(20px) scale(0.95);\\
-      transition: all 0.3s ease; pointer-events: none; z-index: 999998;\\
-      font-family: ' + fontFamily + ';\\
-    }\\
-    .d365-chat-container.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }\\
-    .d365-chat-header {\\
-      padding: 16px 20px; display: flex; align-items: center; gap: 12px;\\
-      background: ' + headerBg + ';\\
-    }\\
-    .d365-header-avatar {\\
-      width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.2);\\
-      display: flex; align-items: center; justify-content: center; overflow: hidden;\\
-      border: 2px solid rgba(255,255,255,0.5);\\
-    }\\
-    .d365-header-avatar svg { width: 26px; height: 26px; fill: white; }\\
-    .d365-header-avatar img { width: 100%; height: 100%; object-fit: cover; }\\
-    .d365-header-info { flex: 1; }\\
-    .d365-header-title { color: white; font-weight: 600; font-size: 16px; }\\
-    .d365-header-status { color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 2px; }\\
-    .d365-header-actions { display: flex; gap: 8px; }\\
-    .d365-header-btn {\\
-      background: rgba(255,255,255,0.2); border: none; width: 32px; height: 32px;\\
-      border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;\\
-      transition: background 0.2s; position: relative;\\
-    }\\
-    .d365-header-btn:hover { background: rgba(255,255,255,0.3); }\\
-    .d365-header-btn svg { width: 18px; height: 18px; fill: white; }\\
-    .d365-header-btn.sound-off svg { opacity: 0.5; }\\
-    .d365-header-btn.sound-off::after {\\
-      content: \\\\'\\\\'; position: absolute; width: 2px; height: 20px;\\
-      background: white; transform: rotate(45deg); border-radius: 1px;\\
-    }\\
-    .d365-chat-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }\\
-    .d365-prechat-form {\\
-      padding: 24px; display: flex; flex-direction: column; gap: 16px; flex: 1; justify-content: center;\\
-    }\\
-    .d365-prechat-form.hidden { display: none; }\\
-    .d365-form-title { font-size: 20px; font-weight: 600; color: #2d3748; text-align: center; }\\
-    .d365-form-subtitle { font-size: 14px; color: #718096; text-align: center; margin-bottom: 16px; }\\
-    .d365-form-group { display: flex; flex-direction: column; gap: 6px; }\\
-    .d365-form-group label { font-size: 13px; font-weight: 500; color: #4a5568; }\\
-    .d365-form-group input, .d365-form-group textarea {\\
-      padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;\\
-      font-family: inherit;\\
-    }\\
-    .d365-form-group input:focus, .d365-form-group textarea:focus {\\
-      outline: none; border-color: ' + config.primaryColor + '; box-shadow: 0 0 0 3px ' + config.primaryColor + '22;\\
-    }\\
-    .d365-form-group textarea { resize: none; min-height: 80px; }\\
-    .d365-start-btn {\\
-      color: white; border: none; padding: 14px; border-radius: 8px; font-size: 15px;\\
-      font-weight: 600; cursor: pointer; margin-top: 8px;\\
-      background: ' + buttonBg + ';\\
-    }\\
-    .d365-start-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }\\
-    .d365-start-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }\\
-    .d365-connecting-view, .d365-chat-ended {\\
-      display: none; flex-direction: column; align-items: center; justify-content: center;\\
-      flex: 1; gap: 16px; padding: 24px; text-align: center;\\
-    }\\
-    .d365-connecting-view.active, .d365-chat-ended.active { display: flex; }\\
-    .d365-spinner {\\
-      width: 48px; height: 48px; border: 3px solid #e2e8f0; border-top-color: ' + config.primaryColor + ';\\
-      border-radius: 50%; animation: d365spin 1s linear infinite;\\
-    }\\
-    @keyframes d365spin { to { transform: rotate(360deg); } }\\
-    .d365-chat-messages {\\
-      display: none; flex-direction: column; flex: 1; overflow-y: auto;\\
-      padding: 16px; gap: 12px; background: ' + config.chatBgColor + '; scroll-behavior: smooth;\\
-    }\\
-    .d365-chat-messages.active { display: flex; }\\
-    .d365-message-wrapper { display: flex; gap: 10px; max-width: 85%; animation: d365fadeIn 0.3s ease; align-items: flex-start; }\\
-    .d365-message-wrapper.user { flex-direction: row-reverse; align-self: flex-end; }\\
-    .d365-message-wrapper.agent { align-self: flex-start; }\\
-    @keyframes d365fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }\\
-    .d365-message-avatar {\\
-      width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center;\\
-      justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; overflow: hidden;\\
-      margin-top: 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.12);\\
-      border: 2px solid transparent; transition: transform 0.2s ease;\\
-    }\\
-    .d365-message-avatar:hover { transform: scale(1.05); }\\
-    .d365-message-avatar.agent { background: ' + agentAvatarBg + '; color: white; border-color: rgba(102,126,234,0.3); }\\
-    .d365-message-avatar.bot { background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%); color: white; border-color: rgba(0,180,216,0.3); }\\
-    .d365-message-avatar.user { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border-color: rgba(17,153,142,0.3); }\\
-    .d365-message-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }\\
-    .d365-message-content { display: flex; flex-direction: column; gap: 4px; min-width: 0; }\\
-    .d365-message-sender { font-size: 12px; font-weight: 600; color: #64748b; padding: 0 4px; }\\
-    .d365-message-wrapper.user .d365-message-sender { text-align: right; }\\
-    .d365-message {\\
-      padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.5;\\
-      word-wrap: break-word; white-space: pre-wrap;\\
-    }\\
-    .d365-message.agent { background: ' + config.agentBubbleColor + '; color: ' + config.agentTextColor + '; border-bottom-left-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }\\
-    .d365-message.user { background: ' + config.userBubbleColor + '; color: ' + config.userTextColor + '; border-bottom-right-radius: 4px; }\\
-    .d365-message.system { align-self: center; background: ' + config.systemMsgColor + '; color: ' + config.systemTextColor + '; font-size: 12px; padding: 6px 12px; border-radius: 12px; max-width: none; }\\
-    .d365-message-time { font-size: 10px; color: #94a3b8; padding: 0 4px; }\\
-    .d365-message-wrapper.user .d365-message-time { text-align: right; }\\
-    .d365-message-image { max-width: 200px; max-height: 200px; border-radius: 12px; cursor: pointer; transition: transform 0.2s; object-fit: contain; }\\
-    .d365-message-image:hover { transform: scale(1.02); }\\
-    .d365-typing-indicator { display: none; padding: 8px 0; align-items: center; gap: 8px; }\\
-    .d365-typing-indicator.active { display: flex; }\\
-    .d365-typing-dots { display: flex; gap: 4px; padding: 12px 16px; background: white; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-left: 46px; }\\
-    .d365-typing-dots span { width: 8px; height: 8px; background: #a0aec0; border-radius: 50%; animation: d365bounce 1.4s infinite ease-in-out; }\\
-    .d365-typing-dots span:nth-child(1) { animation-delay: -0.32s; }\\
-    .d365-typing-dots span:nth-child(2) { animation-delay: -0.16s; }\\
-    @keyframes d365bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }\\
-    .d365-chat-input-area {\\
-      display: none; background: ' + config.inputBgColor + ';\\
-      border-top: 1px solid ' + config.inputBorderColor + '; position: relative;\\
-    }\\
-    .d365-chat-input-area.active { display: block; }\\
-    .d365-chat-input-wrapper {\\
-      padding: 12px 16px;\\
-    }\\
-    .d365-message-input {\\
-      width: 100%; padding: 10px 14px; background: #f1f5f9; border: none;\\
-      border-radius: 12px; font-size: 14px; font-family: inherit; outline: none;\\
-      resize: none; min-height: 44px; max-height: 120px;\\
-    }\\
-    .d365-message-input:focus { background: #e2e8f0; }\\
-    .d365-message-input::placeholder { color: #64748b; }\\
-    .d365-input-bottom-row {\\
-      display: flex; justify-content: space-between; align-items: center; margin-top: 8px;\\
-    }\\
-    .d365-input-actions {\\
-      display: flex; gap: 8px;\\
-    }\\
-    .d365-action-btn {\\
-      width: 36px; height: 36px; border-radius: 50%; background: #f1f5f9;\\
-      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;\\
-      transition: all 0.2s ease;\\
-    }\\
-    .d365-action-btn:hover { background: #e2e8f0; }\\
-    .d365-action-btn svg { width: 20px; height: 20px; fill: #64748b; }\\
-    .d365-send-btn {\\
-      width: 36px; height: 36px; border-radius: 50%; background: ' + config.sendBtnColor + ';\\
-      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;\\
-      transition: all 0.2s ease; flex-shrink: 0;\\
-    }\\
-    .d365-send-btn:hover { opacity: 0.9; transform: scale(1.05); }\\
-    .d365-send-btn:active { transform: scale(0.95); }\\
-    .d365-send-btn svg { width: 18px; height: 18px; fill: white; }\\
-    .d365-emoji-picker {\\
-      position: absolute; bottom: 100%; left: 12px; width: 300px; max-height: 250px;\\
-      background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);\\
-      padding: 12px; display: none; z-index: 100; overflow: hidden;\\
-    }\\
-    .d365-emoji-picker.show { display: block; }\\
-    .d365-emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; max-height: 200px; overflow-y: auto; padding-right: 4px; }\\
-    .d365-emoji-item {\\
-      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;\\
-      cursor: pointer; border-radius: 6px; font-size: 20px; transition: background 0.2s; border: none; background: transparent;\\
-    }\\
-    .d365-emoji-item:hover { background: #f1f5f9; transform: scale(1.1); }\\
-    .d365-voice-recording {\\
-      position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);\\
-      background: #ef4444; color: white; padding: 10px 20px; border-radius: 24px;\\
-      display: none; align-items: center; gap: 10px; font-size: 14px; font-weight: 500;\\
-      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);\\
-    }\\
-    .d365-voice-recording.show { display: flex; animation: d365slideUp 0.3s ease; }\\
-    @keyframes d365slideUp { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }\\
-    .d365-voice-dot { width: 10px; height: 10px; background: white; border-radius: 50%; animation: d365pulseDot 1s infinite; }\\
-    @keyframes d365pulseDot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }\\
-    .d365-voice-waveform { display: flex; gap: 2px; align-items: center; }\\
-    .d365-voice-waveform span { width: 3px; background: white; border-radius: 2px; animation: d365wave 0.6s infinite ease-in-out; }\\
-    .d365-voice-waveform span:nth-child(1) { height: 8px; animation-delay: 0s; }\\
-    .d365-voice-waveform span:nth-child(2) { height: 16px; animation-delay: 0.1s; }\\
-    .d365-voice-waveform span:nth-child(3) { height: 12px; animation-delay: 0.2s; }\\
-    .d365-voice-waveform span:nth-child(4) { height: 20px; animation-delay: 0.3s; }\\
-    .d365-voice-waveform span:nth-child(5) { height: 12px; animation-delay: 0.4s; }\\
-    @keyframes d365wave { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.5); } }\\
-    .d365-stop-voice-btn {\\
-      background: rgba(255,255,255,0.2); border: none; padding: 6px 12px;\\
-      border-radius: 6px; color: white; cursor: pointer; font-size: 12px; font-weight: 500;\\
-    }\\
-    .d365-stop-voice-btn:hover { background: rgba(255,255,255,0.3); }\\
-    .d365-confirm-modal {\\
-      position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: none;\\
-      align-items: center; justify-content: center; z-index: 200;\\
-    }\\
-    .d365-confirm-modal.show { display: flex; }\\
-    .d365-confirm-content { background: white; padding: 24px; border-radius: 16px; text-align: center; max-width: 280px; margin: 20px; }\\
-    .d365-confirm-title { font-size: 16px; font-weight: 600; color: #2d3748; margin-bottom: 8px; }\\
-    .d365-confirm-text { font-size: 14px; color: #64748b; margin-bottom: 20px; }\\
-    .d365-confirm-buttons { display: flex; gap: 12px; justify-content: center; }\\
-    .d365-confirm-btn { padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; }\\
-    .d365-confirm-btn.cancel { background: #e2e8f0; color: #4a5568; }\\
-    .d365-confirm-btn.cancel:hover { background: #cbd5e1; }\\
-    .d365-confirm-btn.end { background: #ef4444; color: white; }\\
-    .d365-confirm-btn.end:hover { background: #dc2626; }\\
-    .d365-new-chat-btn {\\
-      color: white; border: none; padding: 12px 24px; border-radius: 8px;\\
-      font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px;\\
-      background: ' + buttonBg + ';\\
-    }\\
-  ';
+    style.textContent = \`
+    @keyframes d365pulse {
+      0% { box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 0 rgba(102,126,234,0.4); }
+      50% { box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 12px rgba(102,126,234,0); }
+      100% { box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 0 rgba(102,126,234,0); }
+    }
+    .d365-chat-launcher {
+      position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px;
+      border-radius: 50%; border: none; cursor: pointer; z-index: 999999;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      background: \${config.useGradient ? 'linear-gradient(135deg, ' + config.gradientStart + ' 0%, ' + config.gradientEnd + ' 100%)' : config.launcherColor};
+      animation: d365pulse 2.5s ease-in-out infinite;
+    }
+    .d365-chat-launcher:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(0,0,0,0.4); animation: none; }
+    .d365-chat-launcher.open { animation: none; }
+    .d365-chat-launcher svg { width: 28px; height: 28px; fill: white; }
+    .d365-chat-launcher .chat-icon { display: block; }
+    .d365-chat-launcher .close-icon { display: none; }
+    .d365-chat-launcher.open .chat-icon { display: none; }
+    .d365-chat-launcher.open .close-icon { display: block; }
+    .d365-chat-badge {
+      position: absolute; top: -4px; right: -4px; background: \${config.badgeColor};
+      color: white; font-size: 11px; font-weight: 700; min-width: 20px; height: 20px;
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      opacity: 0; transform: scale(0); transition: all 0.2s ease;
+    }
+    .d365-chat-badge.show { opacity: 1; transform: scale(1); }
+    .d365-chat-container {
+      position: fixed; bottom: 100px; right: 24px; width: 400px; height: 700px;
+      max-height: calc(100vh - 120px); background: white; border-radius: 16px;
+      box-shadow: 0 10px 50px rgba(0,0,0,0.2); display: flex; flex-direction: column;
+      overflow: hidden; opacity: 0; transform: translateY(20px) scale(0.95);
+      transition: all 0.3s ease; pointer-events: none; z-index: 999998;
+      font-family: \${fontFamily};
+    }
+    .d365-chat-container.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
+    .d365-chat-header {
+      padding: 16px 20px; display: flex; align-items: center; gap: 12px;
+      background: \${config.useGradient ? 'linear-gradient(135deg, ' + config.gradientStart + ' 0%, ' + config.gradientEnd + ' 100%)' : config.primaryColor};
+    }
+    .d365-header-avatar {
+      width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.5);
+    }
+    .d365-header-avatar svg { width: 26px; height: 26px; fill: white; }
+    .d365-header-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .d365-header-info { flex: 1; }
+    .d365-header-title { color: white; font-weight: 600; font-size: 16px; }
+    .d365-header-status { color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 2px; }
+    .d365-header-actions { display: flex; gap: 8px; }
+    .d365-header-btn {
+      background: rgba(255,255,255,0.2); border: none; width: 32px; height: 32px;
+      border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s; position: relative;
+    }
+    .d365-header-btn:hover { background: rgba(255,255,255,0.3); }
+    .d365-header-btn svg { width: 18px; height: 18px; fill: white; }
+    .d365-header-btn.sound-off svg { opacity: 0.5; }
+    .d365-header-btn.sound-off::after {
+      content: ''; position: absolute; width: 2px; height: 20px;
+      background: white; transform: rotate(45deg); border-radius: 1px;
+    }
+    .d365-chat-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+    .d365-prechat-form {
+      padding: 24px; display: flex; flex-direction: column; gap: 16px; flex: 1; justify-content: center;
+    }
+    .d365-prechat-form.hidden { display: none; }
+    .d365-form-title { font-size: 20px; font-weight: 600; color: #2d3748; text-align: center; }
+    .d365-form-subtitle { font-size: 14px; color: #718096; text-align: center; margin-bottom: 16px; }
+    .d365-form-group { display: flex; flex-direction: column; gap: 6px; }
+    .d365-form-group label { font-size: 13px; font-weight: 500; color: #4a5568; }
+    .d365-form-group input, .d365-form-group textarea {
+      padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;
+      font-family: inherit;
+    }
+    .d365-form-group input:focus, .d365-form-group textarea:focus {
+      outline: none; border-color: \${config.primaryColor}; box-shadow: 0 0 0 3px \${config.primaryColor}22;
+    }
+    .d365-form-group textarea { resize: none; min-height: 80px; }
+    .d365-start-btn {
+      color: white; border: none; padding: 14px; border-radius: 8px; font-size: 15px;
+      font-weight: 600; cursor: pointer; margin-top: 8px;
+      background: \${config.useGradient ? 'linear-gradient(135deg, ' + config.gradientStart + ' 0%, ' + config.gradientEnd + ' 100%)' : config.primaryColor};
+    }
+    .d365-start-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    .d365-start-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .d365-connecting-view, .d365-chat-ended {
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      flex: 1; gap: 16px; padding: 24px; text-align: center;
+    }
+    .d365-connecting-view.active, .d365-chat-ended.active { display: flex; }
+    .d365-spinner {
+      width: 48px; height: 48px; border: 3px solid #e2e8f0; border-top-color: \${config.primaryColor};
+      border-radius: 50%; animation: d365spin 1s linear infinite;
+    }
+    @keyframes d365spin { to { transform: rotate(360deg); } }
+    .d365-chat-messages {
+      display: none; flex-direction: column; flex: 1; overflow-y: auto;
+      padding: 16px; gap: 12px; background: \${config.chatBgColor}; scroll-behavior: smooth;
+    }
+    .d365-chat-messages.active { display: flex; }
+    .d365-message-wrapper { display: flex; gap: 10px; max-width: 85%; animation: d365fadeIn 0.3s ease; align-items: flex-start; }
+    .d365-message-wrapper.user { flex-direction: row-reverse; align-self: flex-end; }
+    .d365-message-wrapper.agent { align-self: flex-start; }
+    @keyframes d365fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .d365-message-avatar {
+      width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; overflow: hidden;
+      margin-top: 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      border: 2px solid transparent; transition: transform 0.2s ease;
+    }
+    .d365-message-avatar:hover { transform: scale(1.05); }
+    .d365-message-avatar.agent { background: linear-gradient(135deg, \${config.gradientStart} 0%, \${config.gradientEnd} 100%); color: white; border-color: rgba(102,126,234,0.3); }
+    .d365-message-avatar.bot { background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%); color: white; border-color: rgba(0,180,216,0.3); }
+    .d365-message-avatar.user { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border-color: rgba(17,153,142,0.3); }
+    .d365-message-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .d365-message-content { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .d365-message-sender { font-size: 12px; font-weight: 600; color: #64748b; padding: 0 4px; }
+    .d365-message-wrapper.user .d365-message-sender { text-align: right; }
+    .d365-message {
+      padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.5;
+      word-wrap: break-word; white-space: pre-wrap;
+    }
+    .d365-message.agent { background: \${config.agentBubbleColor}; color: \${config.agentTextColor}; border-bottom-left-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .d365-message.user { background: \${config.userBubbleColor}; color: \${config.userTextColor}; border-bottom-right-radius: 4px; }
+    .d365-message.system { align-self: center; background: \${config.systemMsgColor}; color: \${config.systemTextColor}; font-size: 12px; padding: 6px 12px; border-radius: 12px; max-width: none; }
+    .d365-message-time { font-size: 10px; color: #94a3b8; padding: 0 4px; }
+    .d365-message-wrapper.user .d365-message-time { text-align: right; }
+    .d365-message-image { max-width: 200px; max-height: 200px; border-radius: 12px; cursor: pointer; transition: transform 0.2s; object-fit: contain; }
+    .d365-message-image:hover { transform: scale(1.02); }
+    .d365-typing-indicator { display: none; padding: 8px 0; align-items: center; gap: 8px; }
+    .d365-typing-indicator.active { display: flex; }
+    .d365-typing-dots { display: flex; gap: 4px; padding: 12px 16px; background: white; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-left: 46px; }
+    .d365-typing-dots span { width: 8px; height: 8px; background: #a0aec0; border-radius: 50%; animation: d365bounce 1.4s infinite ease-in-out; }
+    .d365-typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .d365-typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes d365bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+    .d365-chat-input-area {
+      display: none; background: \${config.inputBgColor};
+      border-top: 1px solid \${config.inputBorderColor}; position: relative;
+    }
+    .d365-chat-input-area.active { display: block; }
+    .d365-chat-input-wrapper {
+      padding: 12px 16px;
+    }
+    .d365-message-input {
+      width: 100%; padding: 10px 14px; background: #f1f5f9; border: none;
+      border-radius: 12px; font-size: 14px; font-family: inherit; outline: none;
+      resize: none; min-height: 44px; max-height: 120px;
+    }
+    .d365-message-input:focus { background: #e2e8f0; }
+    .d365-message-input::placeholder { color: #64748b; }
+    .d365-input-bottom-row {
+      display: flex; justify-content: space-between; align-items: center; margin-top: 8px;
+    }
+    .d365-input-actions {
+      display: flex; gap: 8px;
+    }
+    .d365-action-btn {
+      width: 36px; height: 36px; border-radius: 50%; background: #f1f5f9;
+      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .d365-action-btn:hover { background: #e2e8f0; }
+    .d365-action-btn svg { width: 20px; height: 20px; fill: #64748b; }
+    .d365-send-btn {
+      width: 36px; height: 36px; border-radius: 50%; background: \${config.sendBtnColor};
+      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s ease; flex-shrink: 0;
+    }
+    .d365-send-btn:hover { opacity: 0.9; transform: scale(1.05); }
+    .d365-send-btn:active { transform: scale(0.95); }
+    .d365-send-btn svg { width: 18px; height: 18px; fill: white; }
+    .d365-emoji-picker {
+      position: absolute; bottom: 100%; left: 12px; width: 300px; max-height: 250px;
+      background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      padding: 12px; display: none; z-index: 100; overflow: hidden;
+    }
+    .d365-emoji-picker.show { display: block; }
+    .d365-emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; max-height: 200px; overflow-y: auto; padding-right: 4px; }
+    .d365-emoji-item {
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border-radius: 6px; font-size: 20px; transition: background 0.2s; border: none; background: transparent;
+    }
+    .d365-emoji-item:hover { background: #f1f5f9; transform: scale(1.1); }
+    .d365-voice-recording {
+      position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+      background: #ef4444; color: white; padding: 10px 20px; border-radius: 24px;
+      display: none; align-items: center; gap: 10px; font-size: 14px; font-weight: 500;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    }
+    .d365-voice-recording.show { display: flex; animation: d365slideUp 0.3s ease; }
+    @keyframes d365slideUp { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+    .d365-voice-dot { width: 10px; height: 10px; background: white; border-radius: 50%; animation: d365pulseDot 1s infinite; }
+    @keyframes d365pulseDot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+    .d365-voice-waveform { display: flex; gap: 2px; align-items: center; }
+    .d365-voice-waveform span { width: 3px; background: white; border-radius: 2px; animation: d365wave 0.6s infinite ease-in-out; }
+    .d365-voice-waveform span:nth-child(1) { height: 8px; animation-delay: 0s; }
+    .d365-voice-waveform span:nth-child(2) { height: 16px; animation-delay: 0.1s; }
+    .d365-voice-waveform span:nth-child(3) { height: 12px; animation-delay: 0.2s; }
+    .d365-voice-waveform span:nth-child(4) { height: 20px; animation-delay: 0.3s; }
+    .d365-voice-waveform span:nth-child(5) { height: 12px; animation-delay: 0.4s; }
+    @keyframes d365wave { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.5); } }
+    .d365-stop-voice-btn {
+      background: rgba(255,255,255,0.2); border: none; padding: 6px 12px;
+      border-radius: 6px; color: white; cursor: pointer; font-size: 12px; font-weight: 500;
+    }
+    .d365-stop-voice-btn:hover { background: rgba(255,255,255,0.3); }
+    .d365-confirm-modal {
+      position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: none;
+      align-items: center; justify-content: center; z-index: 200;
+    }
+    .d365-confirm-modal.show { display: flex; }
+    .d365-confirm-content { background: white; padding: 24px; border-radius: 16px; text-align: center; max-width: 280px; margin: 20px; }
+    .d365-confirm-title { font-size: 16px; font-weight: 600; color: #2d3748; margin-bottom: 8px; }
+    .d365-confirm-text { font-size: 14px; color: #64748b; margin-bottom: 20px; }
+    .d365-confirm-buttons { display: flex; gap: 12px; justify-content: center; }
+    .d365-confirm-btn { padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; }
+    .d365-confirm-btn.cancel { background: #e2e8f0; color: #4a5568; }
+    .d365-confirm-btn.cancel:hover { background: #cbd5e1; }
+    .d365-confirm-btn.end { background: #ef4444; color: white; }
+    .d365-confirm-btn.end:hover { background: #dc2626; }
+    .d365-new-chat-btn {
+      color: white; border: none; padding: 12px 24px; border-radius: 8px;
+      font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px;
+      background: \${config.useGradient ? 'linear-gradient(135deg, ' + config.gradientStart + ' 0%, ' + config.gradientEnd + ' 100%)' : config.primaryColor};
+    }
+  \`;
   document.head.appendChild(style);
   
   // Inject HTML - Full featured version with all buttons
-  var widgetHTML = '\\
-    <button class="d365-chat-launcher" id="d365ChatLauncher">\\
-      <span class="d365-chat-badge" id="d365ChatBadge">0</span>\\
-      <svg class="chat-icon" viewBox="0 0 24 24"><path d="' + launcherIconPath + '"/></svg>\\
-      <svg class="close-icon" viewBox="0 0 24 24"><path d="m4.21 4.387.083-.094a1 1 0 0 1 1.32-.083l.094.083L12 10.585l6.293-6.292a1 1 0 1 1 1.414 1.414L13.415 12l6.292 6.293a1 1 0 0 1 .083 1.32l-.083.094a1 1 0 0 1-1.32.083l-.094-.083L12 13.415l-6.293 6.292a1 1 0 0 1-1.414-1.414L10.585 12 4.293 5.707a1 1 0 0 1-.083-1.32l.083-.094-.083.094Z"/></svg>\\
-    </button>\\
-    <div class="d365-chat-container" id="d365ChatContainer">\\
-      <div class="d365-chat-header">\\
-        <div class="d365-header-avatar">' + headerAvatarHtml + '</div>\\
-        <div class="d365-header-info">\\
-          <div class="d365-header-title">' + config.headerTitle + '</div>\\
-          <div class="d365-header-status">' + config.headerSubtitle + '</div>\\
-        </div>\\
-        <div class="d365-header-actions">\\
-          <button class="d365-header-btn" id="d365ToggleSound" title="Sound notifications on">\\
-            <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>\\
-          </button>\\
-          <button class="d365-header-btn" id="d365DownloadChat" title="Download transcript" style="display:none;">\\
-            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>\\
-          </button>\\
-          <button class="d365-header-btn" id="d365MinimizeChat" title="Minimize">\\
-            <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>\\
-          </button>\\
-          <button class="d365-header-btn" id="d365CloseChat" title="Close">\\
-            <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>\\
-          </button>\\
-        </div>\\
-      </div>\\
-      <div class="d365-chat-body">\\
-        <form class="d365-prechat-form" id="d365PrechatForm" onsubmit="return false;">\\
-          <div class="d365-form-title">' + config.welcomeTitle + '</div>\\
-          <div class="d365-form-subtitle">' + config.welcomeMessage + '</div>\\
-          <div class="d365-form-group">\\
-            <label>' + config.nameFieldLabel + '</label>\\
-            <input type="text" id="d365UserName" placeholder="Enter your name" required>\\
-          </div>\\
-          <div class="d365-form-group">\\
-            <label>' + config.emailFieldLabel + '</label>\\
-            <input type="email" id="d365UserEmail" placeholder="Enter your email" required>\\
-          </div>\\
-          <div class="d365-form-group">\\
-            <label>' + config.questionFieldLabel + '</label>\\
-            <textarea id="d365UserQuestion" placeholder="' + config.questionFieldPlaceholder + '"></textarea>\\
-          </div>\\
-          <button type="button" class="d365-start-btn" id="d365StartBtn">' + config.startBtnText + '</button>\\
-        </form>\\
-        <div class="d365-connecting-view" id="d365ConnectingView">\\
-          <div class="d365-spinner"></div>\\
-          <div style="color: #4a5568; font-size: 14px;">Connecting you with an agent...</div>\\
-        </div>\\
-        <div class="d365-chat-messages" id="d365ChatMessages">\\
-          <div class="d365-typing-indicator" id="d365TypingIndicator">\\
-            <div class="d365-typing-dots"><span></span><span></span><span></span></div>\\
-          </div>\\
-        </div>\\
-        <div class="d365-chat-input-area" id="d365ChatInputArea">\\
-          <div class="d365-emoji-picker" id="d365EmojiPicker">\\
-            <div class="d365-emoji-grid" id="d365EmojiGrid"></div>\\
-          </div>\\
-          <div class="d365-voice-recording" id="d365VoiceRecording">\\
-            <div class="d365-voice-dot"></div>\\
-            <div class="d365-voice-waveform"><span></span><span></span><span></span><span></span><span></span></div>\\
-            <span>Recording...</span>\\
-            <button class="d365-stop-voice-btn" id="d365StopVoiceBtn">Stop</button>\\
-          </div>\\
-          <div class="d365-chat-input-wrapper">\\
-            <textarea class="d365-message-input" id="d365MessageInput" placeholder="Type your message..." rows="3"></textarea>\\
-            <div class="d365-input-bottom-row">\\
-              <div class="d365-input-actions">\\
-                <input type="file" id="d365FileInput" style="display:none;">\\
-                <button type="button" class="d365-action-btn" id="d365AttachBtn" title="Attach file">\\
-                  <svg viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/></svg>\\
-                </button>\\
-                <button type="button" class="d365-action-btn" id="d365EmojiBtn" title="Emoji">\\
-                  <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>\\
-                </button>\\
-                <button type="button" class="d365-action-btn" id="d365VoiceBtn" title="Voice input">\\
-                  <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>\\
-                </button>\\
-              </div>\\
-              <button type="button" class="d365-send-btn" id="d365SendBtn" title="Send">\\
-                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>\\
-              </button>\\
-            </div>\\
-          </div>\\
-        </div>\\
-        <div class="d365-chat-ended" id="d365ChatEnded">\\
-          <div style="font-size: 48px;">👋</div>\\
-          <div style="font-size: 18px; font-weight: 600; color: #2d3748;">Chat Ended</div>\\
-          <div style="font-size: 14px; color: #718096;">Thank you for chatting with us!</div>\\
-          <button class="d365-new-chat-btn" id="d365NewChatBtn">Start New Chat</button>\\
-        </div>\\
-      </div>\\
-      <div class="d365-confirm-modal" id="d365ConfirmModal">\\
-        <div class="d365-confirm-content">\\
-          <div class="d365-confirm-title">End Chat?</div>\\
-          <div class="d365-confirm-text">Are you sure you want to end this conversation?</div>\\
-          <div class="d365-confirm-buttons">\\
-            <button class="d365-confirm-btn cancel" id="d365ConfirmNo">Cancel</button>\\
-            <button class="d365-confirm-btn end" id="d365ConfirmYes">End Chat</button>\\
-          </div>\\
-        </div>\\
-      </div>\\
-    </div>\\
-  ';
+  var widgetHTML = \`
+    <button class="d365-chat-launcher" id="d365ChatLauncher">
+      <span class="d365-chat-badge" id="d365ChatBadge">0</span>
+      <svg class="chat-icon" viewBox="0 0 24 24"><path d="\${launcherIconPath}"/></svg>
+      <svg class="close-icon" viewBox="0 0 24 24"><path d="m4.21 4.387.083-.094a1 1 0 0 1 1.32-.083l.094.083L12 10.585l6.293-6.292a1 1 0 1 1 1.414 1.414L13.415 12l6.292 6.293a1 1 0 0 1 .083 1.32l-.083.094a1 1 0 0 1-1.32.083l-.094-.083L12 13.415l-6.293 6.292a1 1 0 0 1-1.414-1.414L10.585 12 4.293 5.707a1 1 0 0 1-.083-1.32l.083-.094-.083.094Z"/></svg>
+    </button>
+    <div class="d365-chat-container" id="d365ChatContainer">
+      <div class="d365-chat-header">
+        <div class="d365-header-avatar">\${config.headerLogo ? '<img src="' + config.headerLogo + '" alt="Logo">' : '<svg viewBox="0 0 24 24"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>'}</div>
+        <div class="d365-header-info">
+          <div class="d365-header-title">\${config.headerTitle}</div>
+          <div class="d365-header-status">\${config.headerSubtitle}</div>
+        </div>
+        <div class="d365-header-actions">
+          <button class="d365-header-btn" id="d365ToggleSound" title="Sound notifications on">
+            <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+          </button>
+          <button class="d365-header-btn" id="d365DownloadChat" title="Download transcript" style="display:none;">
+            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          </button>
+          <button class="d365-header-btn" id="d365MinimizeChat" title="Minimize">
+            <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
+          </button>
+          <button class="d365-header-btn" id="d365CloseChat" title="Close">
+            <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="d365-chat-body">
+        <form class="d365-prechat-form" id="d365PrechatForm" onsubmit="return false;">
+          <div class="d365-form-title">\${config.welcomeTitle}</div>
+          <div class="d365-form-subtitle">\${config.welcomeMessage}</div>
+          <div class="d365-form-group">
+            <label>\${config.nameFieldLabel}</label>
+            <input type="text" id="d365UserName" placeholder="Enter your name" required>
+          </div>
+          <div class="d365-form-group">
+            <label>\${config.emailFieldLabel}</label>
+            <input type="email" id="d365UserEmail" placeholder="Enter your email" required>
+          </div>
+          <div class="d365-form-group">
+            <label>\${config.questionFieldLabel}</label>
+            <textarea id="d365UserQuestion" placeholder="\${config.questionFieldPlaceholder}"></textarea>
+          </div>
+          <button type="button" class="d365-start-btn" id="d365StartBtn">\${config.startBtnText}</button>
+        </form>
+        <div class="d365-connecting-view" id="d365ConnectingView">
+          <div class="d365-spinner"></div>
+          <div style="color: #4a5568; font-size: 14px;">Connecting you with an agent...</div>
+        </div>
+        <div class="d365-chat-messages" id="d365ChatMessages">
+          <div class="d365-typing-indicator" id="d365TypingIndicator">
+            <div class="d365-typing-dots"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+        <div class="d365-chat-input-area" id="d365ChatInputArea">
+          <div class="d365-emoji-picker" id="d365EmojiPicker">
+            <div class="d365-emoji-grid" id="d365EmojiGrid"></div>
+          </div>
+          <div class="d365-voice-recording" id="d365VoiceRecording">
+            <div class="d365-voice-dot"></div>
+            <div class="d365-voice-waveform"><span></span><span></span><span></span><span></span><span></span></div>
+            <span>Recording...</span>
+            <button class="d365-stop-voice-btn" id="d365StopVoiceBtn">Stop</button>
+          </div>
+          <div class="d365-chat-input-wrapper">
+            <textarea class="d365-message-input" id="d365MessageInput" placeholder="Type your message..." rows="3"></textarea>
+            <div class="d365-input-bottom-row">
+              <div class="d365-input-actions">
+                <input type="file" id="d365FileInput" style="display:none;">
+                <button type="button" class="d365-action-btn" id="d365AttachBtn" title="Attach file">
+                  <svg viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/></svg>
+                </button>
+                <button type="button" class="d365-action-btn" id="d365EmojiBtn" title="Emoji">
+                  <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+                </button>
+                <button type="button" class="d365-action-btn" id="d365VoiceBtn" title="Voice input">
+                  <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
+                </button>
+              </div>
+              <button type="button" class="d365-send-btn" id="d365SendBtn" title="Send">
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="d365-chat-ended" id="d365ChatEnded">
+          <div style="font-size: 48px;">👋</div>
+          <div style="font-size: 18px; font-weight: 600; color: #2d3748;">Chat Ended</div>
+          <div style="font-size: 14px; color: #718096;">Thank you for chatting with us!</div>
+          <button class="d365-new-chat-btn" id="d365NewChatBtn">Start New Chat</button>
+        </div>
+      </div>
+      <div class="d365-confirm-modal" id="d365ConfirmModal">
+        <div class="d365-confirm-content">
+          <div class="d365-confirm-title">End Chat?</div>
+          <div class="d365-confirm-text">Are you sure you want to end this conversation?</div>
+          <div class="d365-confirm-buttons">
+            <button class="d365-confirm-btn cancel" id="d365ConfirmNo">Cancel</button>
+            <button class="d365-confirm-btn end" id="d365ConfirmYes">End Chat</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  \`;
   
   var container = document.createElement('div');
   container.innerHTML = widgetHTML;
