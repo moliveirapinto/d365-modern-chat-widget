@@ -3771,6 +3771,7 @@
                 orgId: settings.orgId,
                 orgUrl: settings.orgUrl,
                 widgetId: settings.widgetId,
+                lcwScript: settings.lcwCode || '', // Include the actual LCW script from admin
                 widgetMode: 'custom',
                 headerTitle: settings.headerTitle || 'Support Chat',
                 headerSubtitle: settings.headerSubtitle || "We're here to help",
@@ -4231,44 +4232,84 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
   container.innerHTML = widgetHTML;
   document.body.appendChild(container);
   
-  // Load the Microsoft Omnichannel Chat SDK from multiple sources
-  // Note: For best results, host the chat-sdk-bundle.js on your own server or CDN
-  var sdkSources = [
-    // jsDelivr CDN serving from your GitHub repo (if dist/ is committed)
-    'https://cdn.jsdelivr.net/gh/moliveirapinto/d365-modern-chat-widget@main/dist/chat-sdk-bundle.js',
-    // jsDelivr CDN for npm package
-    'https://cdn.jsdelivr.net/npm/@microsoft/omnichannel-chat-sdk@1/dist/Microsoft.OmnichannelChatSDK.min.js',
-    // unpkg CDN fallback
-    'https://unpkg.com/@microsoft/omnichannel-chat-sdk@1/dist/Microsoft.OmnichannelChatSDK.min.js'
-  ];
-  var currentSdkIndex = 0;
-  
-  function loadNextSdk() {
-    if (currentSdkIndex >= sdkSources.length) {
-      console.error('All SDK sources failed to load');
-      initWidgetFallback();
-      return;
+  // Load the D365 Omnichannel SDK
+  // Priority: Use custom LCW script from admin config, otherwise fall back to CDN SDK
+  if (config.lcwScript && config.lcwScript.trim()) {
+    // User has provided their own D365 LCW script - inject it directly
+    console.log('Using custom D365 LCW script from configuration');
+    var tempDiv = document.createElement('div');
+    tempDiv.innerHTML = config.lcwScript;
+    var lcwScriptEl = tempDiv.querySelector('script');
+    if (lcwScriptEl) {
+      var newScript = document.createElement('script');
+      // Copy all attributes from the LCW script
+      Array.from(lcwScriptEl.attributes).forEach(function(attr) {
+        newScript.setAttribute(attr.name, attr.value);
+      });
+      // Copy inline script content if any
+      if (lcwScriptEl.textContent) {
+        newScript.textContent = lcwScriptEl.textContent;
+      }
+      newScript.onload = function() {
+        console.log('D365 LCW script loaded successfully');
+        // Wait a bit for LCW to initialize, then init our widget
+        setTimeout(initWidget, 500);
+      };
+      newScript.onerror = function() {
+        console.error('Failed to load D365 LCW script, falling back to SDK');
+        loadSdkFallback();
+      };
+      document.head.appendChild(newScript);
+    } else {
+      console.warn('Could not parse LCW script, falling back to SDK');
+      loadSdkFallback();
     }
-    
-    var ocScript = document.createElement('script');
-    ocScript.src = sdkSources[currentSdkIndex];
-    console.log('Trying SDK source:', sdkSources[currentSdkIndex]);
-    
-    ocScript.onload = function() {
-      console.log('SDK loaded successfully from:', sdkSources[currentSdkIndex]);
-      initWidget();
-    };
-    
-    ocScript.onerror = function() {
-      console.warn('SDK failed to load from:', sdkSources[currentSdkIndex]);
-      currentSdkIndex++;
-      loadNextSdk();
-    };
-    
-    document.head.appendChild(ocScript);
+  } else {
+    // No custom script provided, use SDK fallback
+    console.log('No custom LCW script, using SDK fallback');
+    loadSdkFallback();
   }
   
-  loadNextSdk();
+  function loadSdkFallback() {
+    // Load the Microsoft Omnichannel Chat SDK from multiple sources
+    // Note: For best results, provide your own D365 LCW script in admin config
+    var sdkSources = [
+      // jsDelivr CDN serving from your GitHub repo (if dist/ is committed)
+      'https://cdn.jsdelivr.net/gh/moliveirapinto/d365-modern-chat-widget@main/dist/chat-sdk-bundle.js',
+      // jsDelivr CDN for npm package
+      'https://cdn.jsdelivr.net/npm/@microsoft/omnichannel-chat-sdk@1/dist/Microsoft.OmnichannelChatSDK.min.js',
+      // unpkg CDN fallback
+      'https://unpkg.com/@microsoft/omnichannel-chat-sdk@1/dist/Microsoft.OmnichannelChatSDK.min.js'
+    ];
+    var currentSdkIndex = 0;
+    
+    function loadNextSdk() {
+      if (currentSdkIndex >= sdkSources.length) {
+        console.error('All SDK sources failed to load');
+        initWidgetFallback();
+        return;
+      }
+      
+      var ocScript = document.createElement('script');
+      ocScript.src = sdkSources[currentSdkIndex];
+      console.log('Trying SDK source:', sdkSources[currentSdkIndex]);
+      
+      ocScript.onload = function() {
+        console.log('SDK loaded successfully from:', sdkSources[currentSdkIndex]);
+        initWidget();
+      };
+      
+      ocScript.onerror = function() {
+        console.warn('SDK failed to load from:', sdkSources[currentSdkIndex]);
+        currentSdkIndex++;
+        loadNextSdk();
+      };
+      
+      document.head.appendChild(ocScript);
+    }
+    
+    loadNextSdk();
+  }
   
   function initWidget() {
     var chatSDK = null, chatStarted = false, userName = '', userEmail = '';
