@@ -1,0 +1,363 @@
+<html>
+<head>
+	<title>Microsoft Chat</title>
+
+
+	<!-- WELCOME LOADING MESSAGE SCRIPT HERE -->
+<script>
+function lcw() {
+return {   
+    styleProps: {
+        generalStyles:{
+            width: "400px",
+            height: "600px"
+        },
+        customStyles: `
+            /* Force Close button text color */
+            .oc-lcw-webchat-container button[aria-label="Close"] {
+                color: #000000 !important;   /* <-- change text color */
+                background-color: #FFD700 !important; /* optional, change button background */
+            }
+
+            /* Some themes use this class instead */
+            .oc-lcw-button-close {
+                color: #000000 !important;
+            }
+        `
+    },
+
+    loadingPaneProps: {
+        controlProps: {
+            titleText: "Welcome to Motion!",
+            subtitleText: "Please wait while I connect you...",
+            hideSpinnerText: true,
+            spinnerSize: 3,
+            hideSpinner: false
+        },
+        styleProps: {
+            titleStyleProps: {
+                fontFamily: "Impact",
+                fontSize: "25px"
+            },
+            subtitleStyleProps: {
+                fontSize: "15px"
+            }
+        }
+    },
+
+    chatButtonProps: {
+        controlProps: {
+            hideChatSubtitle: true
+        }
+    }
+}}
+</script>
+
+
+
+
+
+
+	<!-- YOUR LIVE CHAT SCRIPT HERE -->
+<script id="Microsoft_Omnichannel_LCWidget" src="https://oc-cdn-ocprod.azureedge.net/livechatwidget/scripts/LiveChatBootstrapper.js" onerror="(function(el){el.parentNode.removeChild(el);var s=document.createElement('script');s.src='https://ocprodocprodnamgs.blob.core.windows.net/livechatwidget/scripts/LiveChatBootstrapper.js';s.setAttribute('id', 'Microsoft_Omnichannel_LCWidget');s.setAttribute('data-app-id', 'de416403-f2b1-41fe-9eaf-8f87018c1b4d');s.setAttribute('data-lcw-version', 'prod');s.setAttribute('data-org-id', 'e0aec93b-f5c0-f011-95c5-6045bd03cf38');s.setAttribute('data-org-url', 'https://m-e0aec93b-f5c0-f011-95c5-6045bd03cf38.us.omnichannelengagementhub.com');document.body.appendChild(s);})(this);" data-app-id="de416403-f2b1-41fe-9eaf-8f87018c1b4d" data-lcw-version="prod" data-org-id="e0aec93b-f5c0-f011-95c5-6045bd03cf38" data-org-url="https://m-e0aec93b-f5c0-f011-95c5-6045bd03cf38.us.omnichannelengagementhub.com" async></script>
+
+<script>
+		window.addEventListener("lcw:ready", function handleLivechatReadyEvent() {
+			console.log('🔍 [NATIVE] lcw:ready event fired');
+			
+			// COMPREHENSIVE LOGGING: Intercept VoiceVideoCallingSDK
+			if (window.Microsoft && window.Microsoft.Omnichannel) {
+				console.log('🔍 [NATIVE] Microsoft.Omnichannel exists');
+				console.log('🔍 [NATIVE] Microsoft.Omnichannel keys:', Object.keys(window.Microsoft.Omnichannel));
+				
+				// Log the SDK object structure
+				if (window.Microsoft.Omnichannel.LiveChatWidget) {
+					console.log('🔍 [NATIVE] LiveChatWidget keys:', Object.keys(window.Microsoft.Omnichannel.LiveChatWidget));
+					if (window.Microsoft.Omnichannel.LiveChatWidget.SDK) {
+						console.log('🔍 [NATIVE] SDK keys:', Object.keys(window.Microsoft.Omnichannel.LiveChatWidget.SDK));
+					}
+				}
+			}
+			
+			// Monitor for video elements being created
+			const observer = new MutationObserver((mutations) => {
+				mutations.forEach((mutation) => {
+					mutation.addedNodes.forEach((node) => {
+						if (node.tagName === 'VIDEO') {
+							console.log('🎥 [NATIVE] VIDEO element added!');
+							console.log('🎥 [NATIVE] Video ID:', node.id);
+							console.log('🎥 [NATIVE] Video classes:', node.className);
+							console.log('🎥 [NATIVE] Video srcObject:', node.srcObject);
+							console.log('🎥 [NATIVE] Video parent:', node.parentElement);
+							
+							// Monitor when srcObject changes
+							const originalDescriptor = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, 'srcObject');
+							Object.defineProperty(node, 'srcObject', {
+								set: function(stream) {
+									console.log('🎥 [NATIVE] srcObject SET on video:', node.id);
+									console.log('🎥 [NATIVE] Stream:', stream);
+									if (stream instanceof MediaStream) {
+										console.log('🎥 [NATIVE] Stream tracks:', stream.getTracks());
+										stream.getTracks().forEach(track => {
+											console.log('🎥 [NATIVE] Track:', track.kind, track.label, track.readyState);
+										});
+									}
+									return originalDescriptor.set.call(this, stream);
+								},
+								get: function() {
+									return originalDescriptor.get.call(this);
+								}
+							});
+						}
+						// Also check for iframes or other containers
+						if (node.nodeType === 1) {
+							const videos = node.querySelectorAll ? node.querySelectorAll('video') : [];
+							videos.forEach(v => {
+								console.log('🎥 [NATIVE] Nested VIDEO found:', v.id, v.className);
+							});
+						}
+					});
+				});
+			});
+			observer.observe(document.body, { childList: true, subtree: true });
+			
+			// Intercept createElement to catch video elements
+			const originalCreateElement = document.createElement.bind(document);
+			document.createElement = function(tagName, options) {
+				const el = originalCreateElement(tagName, options);
+				if (tagName.toLowerCase() === 'video') {
+					console.log('🎥 [NATIVE] document.createElement("video") called');
+					console.log('🎥 [NATIVE] Stack:', new Error().stack);
+				}
+				return el;
+			};
+
+			Microsoft.Omnichannel.LiveChatWidget.SDK.setContextProvider(function contextProvider() {
+				return {
+					'SelfService': {
+						'value':
+							'[ {"msdyn_displaytitle":"Page visited", "msdyn_starttime":"yyyy-mm-ddThh:mm:ssZ","msdyn_type":192350000}, \
+					   {"msdyn_displaytitle":"Phrase searched", "msdyn_starttime":"yyyy-mm-ddThh:mm:ssZ","msdyn_type":192350001}, \
+					   {"msdyn_displaytitle":"Knowledge article viewed", "msdyn_starttime":"yyyy-mm-ddThh:mm:ssZ","msdyn_type":192350002}, \
+					   {"msdyn_displaytitle":"Custom action performed", "msdyn_starttime":"yyyy-mm-ddThh:mm:ssZ","msdyn_type":192350003} \
+					 ]'
+					}, // Additional context can be added as shown below
+                    'emailaddress1': 'lisa.garcia@gmail.com', // contact email in Dynamics
+					'Name': { 'value': 'John Garcia', isDisplayable: true }, // contact name in Dynamics
+					//'Account Number': { 'value': '118842', isDisplayable: true },
+                    //'msdyn_CustomerId': { 'value': 'a7bf9a01-b056-e711-abaa-00155d701c02', 'isDisplayable': true },
+					//'msdyn_CustomerName': { 'value': 'Brad Garza', 'isDisplayable': true },
+					'Location': 'Reno, NV', // string value
+					'Authenticated': 'Authenticated', // string value
+					'languageCode': 'en-US',
+				};
+			});
+		});
+		
+		// ============================================================
+		// ADAPTIVE CARD LOGGING - Capture how native widget handles AC
+		// ============================================================
+		
+		// Listen for ALL lcw events to capture adaptive card handling
+		const lcwEvents = [
+			'lcw:ready', 'lcw:error', 'lcw:startChat', 'lcw:closeChat',
+			'lcw:onMinimize', 'lcw:onMaximize', 'lcw:onMessageReceived',
+			'lcw:onMessageSent', 'lcw:onAgentEndSession', 'lcw:threadUpdate',
+			'lcw:chatRetrieved', 'lcw:chatQueued', 'lcw:onAgentJoined'
+		];
+		
+		lcwEvents.forEach(eventName => {
+			window.addEventListener(eventName, function(e) {
+				console.log(`📨 [NATIVE EVENT] ${eventName}:`, e.detail || e);
+			});
+		});
+		
+		// Specifically capture message events for Adaptive Card analysis
+		window.addEventListener("lcw:onMessageReceived", function(e) {
+			console.log('📩 [NATIVE] MESSAGE RECEIVED:', e.detail);
+			if (e.detail) {
+				console.log('📩 [NATIVE] Message content:', JSON.stringify(e.detail, null, 2));
+				// Check if it's an Adaptive Card
+				if (e.detail.text && e.detail.text.includes('AdaptiveCard')) {
+					console.log('🃏 [NATIVE] ADAPTIVE CARD DETECTED IN RECEIVED MESSAGE');
+				}
+				if (e.detail.attachments) {
+					console.log('🃏 [NATIVE] Message has attachments:', e.detail.attachments);
+				}
+			}
+		});
+		
+		window.addEventListener("lcw:onMessageSent", function(e) {
+			console.log('📤 [NATIVE] MESSAGE SENT:', e.detail);
+			if (e.detail) {
+				console.log('📤 [NATIVE] Sent message content:', JSON.stringify(e.detail, null, 2));
+				// This is KEY - see what format the native widget uses when sending AC responses
+				console.log('📤 [NATIVE] Sent message type:', typeof e.detail);
+				console.log('📤 [NATIVE] Sent message keys:', Object.keys(e.detail));
+			}
+		});
+		
+		// Intercept postMessage to see internal communication
+		const originalPostMessage = window.postMessage.bind(window);
+		window.postMessage = function(message, targetOrigin, transfer) {
+			if (message && (typeof message === 'object' || typeof message === 'string')) {
+				const msgStr = typeof message === 'string' ? message : JSON.stringify(message);
+				if (msgStr.includes('adaptive') || msgStr.includes('Adaptive') || 
+				    msgStr.includes('Submit') || msgStr.includes('actionSubmitId')) {
+					console.log('📬 [NATIVE] postMessage (AC related):', message);
+				}
+			}
+			return originalPostMessage(message, targetOrigin, transfer);
+		};
+		
+		// Intercept fetch to see API calls
+		const originalFetch = window.fetch;
+		window.fetch = function(...args) {
+			const url = args[0];
+			const options = args[1] || {};
+			
+			// Log all POST requests (message sending)
+			if (options.method === 'POST' || (typeof url === 'object' && url.method === 'POST')) {
+				console.log('🌐 [NATIVE] FETCH POST:', url);
+				if (options.body) {
+					try {
+						const bodyStr = typeof options.body === 'string' ? options.body : JSON.stringify(options.body);
+						if (bodyStr.includes('message') || bodyStr.includes('content') || bodyStr.includes('Submit')) {
+							console.log('🌐 [NATIVE] FETCH POST BODY:', options.body);
+						}
+					} catch(e) {}
+				}
+			}
+			
+			return originalFetch.apply(this, args).then(response => {
+				// Clone response to read body without consuming it
+				const cloned = response.clone();
+				cloned.text().then(text => {
+					if (text.includes('AdaptiveCard') || text.includes('attachments')) {
+						console.log('🌐 [NATIVE] FETCH RESPONSE (AC):', text.substring(0, 500));
+					}
+				}).catch(() => {});
+				return response;
+			});
+		};
+		
+		// Intercept XMLHttpRequest to see API calls
+		const originalXHROpen = XMLHttpRequest.prototype.open;
+		const originalXHRSend = XMLHttpRequest.prototype.send;
+		
+		XMLHttpRequest.prototype.open = function(method, url, ...rest) {
+			this._method = method;
+			this._url = url;
+			return originalXHROpen.apply(this, [method, url, ...rest]);
+		};
+		
+		XMLHttpRequest.prototype.send = function(body) {
+			if (this._method === 'POST' && body) {
+				const bodyStr = typeof body === 'string' ? body : JSON.stringify(body);
+				if (bodyStr && (bodyStr.includes('message') || bodyStr.includes('Submit') || bodyStr.includes('content'))) {
+					console.log('🌐 [NATIVE] XHR POST to:', this._url);
+					console.log('🌐 [NATIVE] XHR POST BODY:', body);
+				}
+			}
+			
+			this.addEventListener('load', function() {
+				try {
+					if (this.responseText && (this.responseText.includes('AdaptiveCard') || this.responseText.includes('attachments'))) {
+						console.log('🌐 [NATIVE] XHR RESPONSE (AC):', this.responseText.substring(0, 500));
+					}
+				} catch(e) {}
+			});
+			
+			return originalXHRSend.apply(this, [body]);
+		};
+		
+		// Also listen for voice/video specific events
+		window.addEventListener("lcw:onCallAdded", function(e) {
+			console.log('📞 [NATIVE] lcw:onCallAdded event!', e);
+			console.log('📞 [NATIVE] Event detail:', e.detail);
+		});
+		
+		window.addEventListener("lcw:onCallAccepted", function(e) {
+			console.log('📞 [NATIVE] lcw:onCallAccepted event!', e);
+		});
+		
+		window.addEventListener("lcw:onRemoteVideoStreamAdded", function(e) {
+			console.log('📹 [NATIVE] lcw:onRemoteVideoStreamAdded!', e);
+			console.log('📹 [NATIVE] Event detail:', e.detail);
+		});
+		
+		window.addEventListener("lcw:onLocalVideoStreamAdded", function(e) {
+			console.log('📹 [NATIVE] lcw:onLocalVideoStreamAdded!', e);
+		});
+		
+		// Global error handler to catch any issues
+		window.addEventListener('error', function(e) {
+			if (e.message && (e.message.includes('video') || e.message.includes('Video') || e.message.includes('stream') || e.message.includes('media'))) {
+				console.error('🔴 [NATIVE] Video-related error:', e.message);
+			}
+		});
+		
+		// Log when page loads all iframes
+		window.addEventListener('load', function() {
+			console.log('🔍 [NATIVE] Page loaded');
+			setTimeout(() => {
+				const allVideos = document.querySelectorAll('video');
+				console.log('🎥 [NATIVE] Total video elements on page:', allVideos.length);
+				allVideos.forEach((v, i) => {
+					console.log(`🎥 [NATIVE] Video ${i}:`, v.id, v.className, 'srcObject:', v.srcObject);
+				});
+				
+				// Check for iframes (native widget might use iframe)
+				const iframes = document.querySelectorAll('iframe');
+				console.log('🔍 [NATIVE] Total iframes:', iframes.length);
+				iframes.forEach((iframe, i) => {
+					console.log(`🔍 [NATIVE] Iframe ${i}:`, iframe.id, iframe.src);
+				});
+			}, 2000);
+			
+			// Continuously monitor for video elements every 2 seconds
+			setInterval(() => {
+				const videos = document.querySelectorAll('video');
+				if (videos.length > 0) {
+					console.log('🎥 [NATIVE] VIDEO ELEMENTS DETECTED:', videos.length);
+					videos.forEach((v, i) => {
+						console.log(`🎥 [NATIVE] Video ${i}: id=${v.id}, class=${v.className}`);
+						console.log(`🎥 [NATIVE] Video ${i} srcObject:`, v.srcObject);
+						console.log(`🎥 [NATIVE] Video ${i} src:`, v.src);
+						console.log(`🎥 [NATIVE] Video ${i} parent:`, v.parentElement?.className);
+						if (v.srcObject instanceof MediaStream) {
+							console.log(`🎥 [NATIVE] Video ${i} tracks:`, v.srcObject.getTracks());
+						}
+					});
+				}
+			}, 2000);
+		});
+		
+		console.log('🔬 [NATIVE] Adaptive Card logging initialized - ready to capture AC submissions!');
+	</script>
+
+	
+	<style>
+		html, body {
+			margin: 0;
+			padding: 0;
+			width: 100%;
+			height: auto;
+			overflow-x: hidden; /* Prevents unwanted horizontal scrolling */
+			text-align: center; /* Centers the image */
+		}
+	
+		/* Ensures the image is fully visible and scrollable */
+		.full-image {
+			display: block;
+			width: 100%; /* Adjusts to screen width */
+			height: auto; /* Maintains aspect ratio */
+		}
+	</style>
+	</head>
+	<body>
+	<!-- Add the image as part of the content -->
+	<img src="website.jpeg" alt="Full Image" class="full-image">
+	
+	</body>
+	</html>
