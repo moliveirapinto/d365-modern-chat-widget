@@ -2,7 +2,7 @@
 node_modules/
 
 # Build outputs
-dist/
+# dist/  # Commented out - we need dist/ for the embed code to work from CDN
 build/
 
 # IDE
