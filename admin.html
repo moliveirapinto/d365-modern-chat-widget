@@ -3852,25 +3852,25 @@
             };
             const googleFontLink = googleFontLinks[config.fontFamily] || '';
             
-            // Generate a fully self-contained embed code with ALL features from index.html
-            const embedCode = `<!-- D365 Modern Chat Widget - Full Featured Self-Contained Embed -->
-<!-- Generated: ${new Date().toLocaleDateString()} -->
+            // Build the embed code using string replacement to avoid template literal conflicts
+            let embedCodeTemplate = String.raw`<!-- D365 Modern Chat Widget - Full Featured Self-Contained Embed -->
+<!-- Generated: __GENERATION_DATE__ -->
 <!-- Simply copy this entire block and paste it into your HTML page -->
 <!-- Features: Emoji picker, File attachments, Voice recording, Sound toggle, Minimize, Close -->
-${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="stylesheet">` : ''}
+__GOOGLE_FONT_LINK__
 
 <script>
 (function() {
   'use strict';
   
   // Widget Configuration
-  var config = ${configJson};
+  var config = __CONFIG_JSON__;
   
   // Launcher icon SVG path
-  var launcherIconPath = '${selectedIconPath}';
+  var launcherIconPath = '__ICON_PATH__';
   
   // Font family
-  var fontFamily = '${selectedFontFamily}';
+  var fontFamily = '__FONT_FAMILY__';
   
   // Emojis for picker
   var emojis = [
@@ -4764,6 +4764,14 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
   }
 })();
 <\/script>`;
+
+            // Replace placeholders with actual values
+            const embedCode = embedCodeTemplate
+                .replace('__GENERATION_DATE__', new Date().toLocaleDateString())
+                .replace('__GOOGLE_FONT_LINK__', googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="stylesheet">` : '')
+                .replace('__CONFIG_JSON__', configJson)
+                .replace('__ICON_PATH__', selectedIconPath)
+                .replace('__FONT_FAMILY__', selectedFontFamily);
             
             document.getElementById('embedCodeOutput').value = embedCode;
             showToast('Self-contained embed code generated! Copy and paste into any HTML page.');
