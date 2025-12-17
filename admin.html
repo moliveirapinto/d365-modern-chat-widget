@@ -2504,7 +2504,7 @@
         // ============ SETTINGS MANAGEMENT ============
         // Helper to sanitize image data that's too large
         function sanitizeImageSettings(settingsObj) {
-            ['headerLogo', 'agentAvatar', 'customerAvatar'].forEach(key => {
+            ['headerLogo', 'agentAvatar', 'customerAvatar', 'botAvatar'].forEach(key => {
                 if (!isSafeImageData(settingsObj[key])) {
                     if (settingsObj[key]) {
                         console.warn(`⚠️ Clearing invalid or oversized ${key}`);
@@ -2655,13 +2655,26 @@
             [
                 { key: 'headerLogo', areaId: 'logoUploadArea', isAvatar: false },
                 { key: 'agentAvatar', areaId: 'agentAvatarArea', isAvatar: true },
-                { key: 'customerAvatar', areaId: 'customerAvatarArea', isAvatar: true }
+                { key: 'customerAvatar', areaId: 'customerAvatarArea', isAvatar: true },
+                { key: 'botAvatar', areaId: 'botAvatarArea', isAvatar: true }
             ].forEach(({ key, areaId, isAvatar }) => {
                 const area = document.getElementById(areaId);
                 if (!area) return;
 
                 if (isSafeImageData(settings[key])) {
                     showUploadedImage(areaId, settings[key], isAvatar);
+                    // Also update thumbnail selection for avatar galleries
+                    if (isAvatar) {
+                        const parentArea = area.parentElement;
+                        const thumbnails = parentArea.querySelectorAll('.avatar-thumb');
+                        thumbnails.forEach(thumb => {
+                            if (thumb.src === settings[key] || settings[key].includes(thumb.src.split('/').pop())) {
+                                thumb.classList.add('selected');
+                            } else {
+                                thumb.classList.remove('selected');
+                            }
+                        });
+                    }
                 } else if (area.classList.contains('has-image')) {
                     removeImage({ stopPropagation: () => {} }, areaId);
                 }
@@ -3474,7 +3487,7 @@
             
             // Create a clean copy without blob URLs (they can't be saved)
             const settingsToSave = { ...settings };
-            ['headerLogo', 'agentAvatar', 'customerAvatar'].forEach(key => {
+            ['headerLogo', 'agentAvatar', 'customerAvatar', 'botAvatar'].forEach(key => {
                 if (!isSafeImageData(settingsToSave[key])) {
                     settingsToSave[key] = null; // Only persist sanitized image data URLs
                 }
@@ -3557,7 +3570,7 @@
                 });
 
                 // Reset image areas
-                ['logoUploadArea', 'agentAvatarArea', 'customerAvatarArea'].forEach(areaId => {
+                ['logoUploadArea', 'agentAvatarArea', 'customerAvatarArea', 'botAvatarArea'].forEach(areaId => {
                     const area = document.getElementById(areaId);
                     if (area.classList.contains('has-image')) {
                         // Simulate remove
