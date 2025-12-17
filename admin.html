@@ -2856,6 +2856,11 @@
                 settings.lcwCode = code;
                 parseLCWCode(code);
                 updateConnectionStatus();
+                // Auto-save to localStorage so index.html picks up the changes
+                if (!isInitializing) {
+                    localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+                    console.log('💾 Auto-saved LCW settings to localStorage');
+                }
             });
 
             // File uploads removed - using path input instead for Edge compatibility
