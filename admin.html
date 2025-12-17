@@ -4495,13 +4495,17 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
           var fileName = file.name;
           var fileType = file.type || 'application/octet-stream';
           var base64 = evt.target.result;
-          addMessage('📎 ' + fileName, true);
           if (chatSDK && chatStarted) {
             chatSDK.uploadFileAttachment({ name: fileName, type: fileType, data: base64 }).then(function() {
               console.log('File uploaded:', fileName);
+              addMessage('📎 ' + fileName, true);
             }).catch(function(err) {
               console.error('File upload error:', err);
-              alert('Failed to upload file. Please try again.');
+              if (err.message === 'FeatureDisabled') {
+                alert('File attachments are disabled. Please enable file attachments in your D365 Omnichannel widget configuration.');
+              } else {
+                alert('Failed to upload file: ' + (err.message || 'Unknown error'));
+              }
             });
           }
           fileInput.value = '';
