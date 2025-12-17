@@ -5,6 +5,7 @@
 <!-- Simply copy this entire block and paste it into your HTML page -->
 <!-- Works in <head> or <body> -->
 
+
 <script>
 (function() {
   'use strict';
@@ -34,11 +35,11 @@
   "inputBorderColor": "#e2e8f0",
   "sendBtnColor": "#667eea",
   "launcherColor": "#667eea",
-  "launcherIcon": "chat_sparkle",
+  "launcherIcon": "chat_multiple_heart",
   "badgeColor": "#ff4757",
-  "agentAvatar": "img/headshots/headshot_female1.png",
-  "customerAvatar": "img/headshots/headshot_female1.png",
-  "botAvatar": "img/bot/bot8.png",
+  "agentAvatar": "https://raw.githubusercontent.com/moliveirapinto/d365-modern-chat-widget/main/img/headshots/headshot_female1.png",
+  "customerAvatar": "https://raw.githubusercontent.com/moliveirapinto/d365-modern-chat-widget/main/img/headshots/headshot_female2.png",
+  "botAvatar": "https://raw.githubusercontent.com/moliveirapinto/d365-modern-chat-widget/main/img/bot/bot4.png",
   "enablePrechatForm": false,
   "welcomeTitle": "Start a conversation",
   "welcomeMessage": "We're here to help! Please fill out the form below to start chatting with our team.",
@@ -52,11 +53,22 @@
   "customAuthEmail": ""
 };
   
+  // Launcher icon SVG path for selected icon: chat_multiple_heart
+  var launcherIconPath = 'M6.3412 8.3412C7.1326 7.5498 8.41849 7.55366 9.21333 8.3485L9.49671 8.63188L9.77626 8.35179C10.5691 7.55898 11.8556 7.56284 12.6518 8.3591C13.4468 9.15408 13.4493 10.4364 12.6597 11.2303L9.73275 14.1556C9.6107 14.2777 9.41283 14.2777 9.29079 14.1556L6.3485 11.2133C5.55366 10.4185 5.5498 9.1326 6.3412 8.3412ZM2.06158 10.5C2.06158 6.35786 5.41944 3 9.56158 3C13.7037 3 17.0616 6.35786 17.0616 10.5C17.0616 14.6421 13.7037 18 9.56158 18C8.46241 18 7.41678 17.7631 6.47447 17.337C5.44699 17.5819 4.29396 17.8587 3.54374 18.039C2.6294 18.2588 1.80697 17.428 2.03999 16.5147C2.22638 15.7842 2.5102 14.6714 2.76423 13.6734C2.31325 12.7088 2.06158 11.6329 2.06158 10.5ZM9.56158 4.5C6.24787 4.5 3.56158 7.18629 3.56158 10.5C3.56158 11.4914 3.80145 12.4246 4.22568 13.2468L4.35619 13.4998L4.28601 13.7757C4.05784 14.6724 3.79467 15.7047 3.59592 16.4838C4.39489 16.2919 5.46095 16.0363 6.38368 15.8167L6.6482 15.7537L6.89161 15.8749C7.69487 16.2748 8.60084 16.5 9.56158 16.5C12.8753 16.5 15.5616 13.8137 15.5616 10.5C15.5616 7.18629 12.8753 4.5 9.56158 4.5ZM9.46191 18.9995C10.8001 20.241 12.5922 21.0001 14.5616 21.0001C15.6611 21.0001 16.707 20.763 17.6495 20.3367C18.6933 20.581 19.8358 20.8248 20.563 20.9768C21.4554 21.1633 22.2348 20.3623 22.0304 19.4773C21.8679 18.774 21.6117 17.6821 21.3586 16.6741C21.8098 15.7094 22.0616 14.6332 22.0616 13.5001C22.0616 10.2171 19.9523 7.42684 17.015 6.41052C17.3653 7.04756 17.6363 7.73435 17.8146 8.45761C19.4676 9.52617 20.5616 11.3853 20.5616 13.5001C20.5616 14.4915 20.3217 15.4247 19.8975 16.2469L19.767 16.4999L19.8372 16.7757C20.065 17.6711 20.3037 18.6757 20.4787 19.4262C19.7046 19.2625 18.6611 19.0361 17.7395 18.8167L17.475 18.7537L17.2316 18.8749C16.4283 19.2748 15.5223 19.5001 14.5616 19.5001C13.5021 19.5001 12.5067 19.2254 11.6427 18.7434C10.9768 18.911 10.2796 19.0001 9.56163 19.0001C9.52835 19.0001 9.49511 18.9999 9.46191 18.9995Z';
+  
+  // Font family
+  var fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+  
   // Main initialization function - called when DOM is ready
   function initD365Widget() {
     // Inject CSS Styles
     var style = document.createElement('style');
     style.textContent = `
+    @keyframes d365pulse {
+      0% { box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 0 rgba(102,126,234,0.4); }
+      50% { box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 12px rgba(102,126,234,0); }
+      100% { box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 0 rgba(102,126,234,0); }
+    }
     .d365-chat-launcher {
       position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px;
       border-radius: 50%; border: none; cursor: pointer; z-index: 999999;
@@ -64,8 +76,10 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       background: ${config.useGradient ? 'linear-gradient(135deg, ' + config.gradientStart + ' 0%, ' + config.gradientEnd + ' 100%)' : config.launcherColor};
+      animation: d365pulse 2.5s ease-in-out infinite;
     }
-    .d365-chat-launcher:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(0,0,0,0.4); }
+    .d365-chat-launcher:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(0,0,0,0.4); animation: none; }
+    .d365-chat-launcher.open { animation: none; }
     .d365-chat-launcher svg { width: 28px; height: 28px; fill: white; }
     .d365-chat-launcher .chat-icon { display: block; }
     .d365-chat-launcher .close-icon { display: none; }
@@ -84,6 +98,7 @@
       box-shadow: 0 10px 50px rgba(0,0,0,0.2); display: flex; flex-direction: column;
       overflow: hidden; opacity: 0; transform: translateY(20px) scale(0.95);
       transition: all 0.3s ease; pointer-events: none; z-index: 999998;
+      font-family: ${fontFamily};
     }
     .d365-chat-container.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
     .d365-chat-header {
@@ -205,7 +220,7 @@
   var widgetHTML = `
     <button class="d365-chat-launcher" id="d365ChatLauncher">
       <span class="d365-chat-badge" id="d365ChatBadge">0</span>
-      <svg class="chat-icon" viewBox="0 0 24 24"><path d="M9.56158 3C5.41944 3 2.06158 6.35786 2.06158 10.5C2.06158 11.6329 2.31325 12.7088 2.76423 13.6734C2.5102 14.6714 2.22638 15.7842 2.03999 16.5147C1.80697 17.428 2.6294 18.2588 3.54374 18.039C4.29396 17.8587 5.44699 17.5819 6.47447 17.337C7.41678 17.7631 8.46241 18 9.56158 18C13.7037 18 17.0616 14.6421 17.0616 10.5C17.0616 6.35786 13.7037 3 9.56158 3ZM3.56158 10.5C3.56158 7.18629 6.24787 4.5 9.56158 4.5C12.8753 4.5 15.5616 7.18629 15.5616 10.5C15.5616 13.8137 12.8753 16.5 9.56158 16.5C8.60084 16.5 7.69487 16.2748 6.89161 15.8749L6.6482 15.7537L6.38368 15.8167C5.46095 16.0363 4.39489 16.2919 3.59592 16.4838C3.79467 15.7047 4.05784 14.6724 4.28601 13.7757L4.35619 13.4998L4.22568 13.2468C3.80145 12.4246 3.56158 11.4914 3.56158 10.5ZM14.5616 21.0001C12.5922 21.0001 10.8001 20.241 9.46191 18.9995C9.49511 18.9999 9.52835 19.0001 9.56163 19.0001C10.2796 19.0001 10.9768 18.911 11.6427 18.7434C12.5067 19.2254 13.5021 19.5001 14.5616 19.5001C15.5223 19.5001 16.4283 19.2748 17.2316 18.8749L17.475 18.7537L17.7395 18.8167C18.6611 19.0361 19.7046 19.2625 20.4787 19.4262C20.3037 18.6757 20.065 17.6711 19.8372 16.7757L19.767 16.4999L19.8975 16.2469C20.3217 15.4247 20.5616 14.4915 20.5616 13.5001C20.5616 11.3853 19.4676 9.52617 17.8146 8.45761C17.6363 7.73435 17.3653 7.04756 17.015 6.41052C19.9523 7.42684 22.0616 10.2171 22.0616 13.5001C22.0616 14.6332 21.8098 15.7094 21.3586 16.6741C21.6117 17.6821 21.8679 18.774 22.0304 19.4773C22.2348 20.3623 21.4554 21.1633 20.563 20.9768C19.8358 20.8248 18.6933 20.581 17.6495 20.3367C16.707 20.763 15.6611 21.0001 14.5616 21.0001Z"/></svg>
+      <svg class="chat-icon" viewBox="0 0 24 24"><path d="${launcherIconPath}"/></svg>
       <svg class="close-icon" viewBox="0 0 24 24"><path d="m4.21 4.387.083-.094a1 1 0 0 1 1.32-.083l.094.083L12 10.585l6.293-6.292a1 1 0 1 1 1.414 1.414L13.415 12l6.292 6.293a1 1 0 0 1 .083 1.32l-.083.094a1 1 0 0 1-1.32.083l-.094-.083L12 13.415l-6.293 6.292a1 1 0 0 1-1.414-1.414L10.585 12 4.293 5.707a1 1 0 0 1-.083-1.32l.083-.094-.083.094Z"/></svg>
     </button>
     <div class="d365-chat-container" id="d365ChatContainer">
