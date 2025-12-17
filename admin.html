@@ -1149,6 +1149,105 @@
             fill: white;
         }
 
+        /* Embed Code Section */
+        .embed-code-container {
+            position: relative;
+        }
+        .embed-code-textarea {
+            width: 100%;
+            height: 200px;
+            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            padding: 16px;
+            border: 1px solid var(--admin-border);
+            border-radius: 8px;
+            background: #1e293b;
+            color: #e2e8f0;
+            resize: vertical;
+            overflow: auto;
+        }
+        .embed-code-textarea:focus {
+            outline: none;
+            border-color: var(--admin-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        .embed-code-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .embed-code-actions .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .embed-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        .embed-info-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .embed-info-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+        .embed-info-text h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--admin-text);
+            margin-bottom: 4px;
+        }
+        .embed-info-text p {
+            font-size: 13px;
+            color: var(--admin-text-light);
+            line-height: 1.5;
+        }
+        .copy-success {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--admin-success);
+            font-size: 13px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .copy-success.show {
+            opacity: 1;
+        }
+        .embed-options {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .embed-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .embed-option label {
+            font-size: 13px;
+            color: var(--admin-text);
+            cursor: pointer;
+        }
+
     </style>
 </head>
 <body>
@@ -1880,6 +1979,64 @@
             </div>
 
             </div><!-- End customWidgetSettings -->
+
+            <!-- Embed Widget Code Section -->
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-header-icon">
+                        <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+                    </div>
+                    <div>
+                        <h2>Embed Widget Code</h2>
+                        <p>Generate script to embed widget on your website</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="embed-info">
+                        <div class="embed-info-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                        </div>
+                        <div class="embed-info-text">
+                            <h4>How to use</h4>
+                            <p>Generate the script below and paste it just before the closing <code>&lt;/body&gt;</code> tag on your website. The widget will appear with all your customizations applied.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="embed-options">
+                        <div class="embed-option">
+                            <input type="checkbox" id="embedIncludeSettings" checked>
+                            <label for="embedIncludeSettings">Include current settings</label>
+                        </div>
+                        <div class="embed-option">
+                            <input type="checkbox" id="embedMinified">
+                            <label for="embedMinified">Minified output</label>
+                        </div>
+                    </div>
+                    
+                    <div class="embed-code-container">
+                        <textarea id="embedCodeOutput" class="embed-code-textarea" readonly placeholder="Click 'Generate Embed Code' to create your widget script..."></textarea>
+                    </div>
+                    
+                    <div class="embed-code-actions">
+                        <button class="btn btn-primary" onclick="generateEmbedCode()">
+                            <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg>
+                            Generate Embed Code
+                        </button>
+                        <button class="btn btn-secondary" onclick="copyGeneratedEmbedCode()">
+                            <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            Copy to Clipboard
+                        </button>
+                        <button class="btn btn-secondary" onclick="downloadEmbedCode()">
+                            <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                            Download as HTML
+                        </button>
+                        <span class="copy-success" id="copySuccess">
+                            <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            Copied!
+                        </span>
+                    </div>
+                </div>
+            </div>
 
             <!-- Actions -->
             <div class="settings-card">
@@ -3475,6 +3632,594 @@
                 btn.classList.add('copied');
                 setTimeout(() => btn.classList.remove('copied'), 2000);
             });
+        }
+
+        // ============ EMBED CODE GENERATION ============
+        function generateEmbedCode() {
+            updateSettingsFromForm();
+            
+            const includeSettings = document.getElementById('embedIncludeSettings').checked;
+            const minified = document.getElementById('embedMinified').checked;
+            
+            // Validate required D365 settings
+            if (!settings.orgId || !settings.orgUrl || !settings.widgetId) {
+                showToast('Please configure D365 Connection settings first (Org ID, Org URL, Widget ID)');
+                document.getElementById('embedCodeOutput').value = '⚠️ Please configure D365 Connection settings first.\n\nGo to the "D365 Connection" tab and enter your Org ID, Org URL, and Widget ID.';
+                return;
+            }
+            
+            // Build the configuration object with all customizations
+            const config = {
+                orgId: settings.orgId,
+                orgUrl: settings.orgUrl,
+                widgetId: settings.widgetId,
+                widgetMode: 'custom',
+                headerTitle: settings.headerTitle || 'Support Chat',
+                headerSubtitle: settings.headerSubtitle || "We're here to help",
+                headerLogo: settings.headerLogo || '',
+                fontFamily: settings.fontFamily || 'system',
+                useGradient: settings.useGradient !== false,
+                gradientStart: settings.gradientStart || '#667eea',
+                gradientEnd: settings.gradientEnd || '#764ba2',
+                primaryColor: settings.primaryColor || '#667eea',
+                userBubbleColor: settings.userBubbleColor || '#667eea',
+                userTextColor: settings.userTextColor || '#ffffff',
+                agentBubbleColor: settings.agentBubbleColor || '#ffffff',
+                agentTextColor: settings.agentTextColor || '#2d3748',
+                systemMsgColor: settings.systemMsgColor || '#e2e8f0',
+                systemTextColor: settings.systemTextColor || '#64748b',
+                chatBgColor: settings.chatBgColor || '#f8fafc',
+                inputBgColor: settings.inputBgColor || '#ffffff',
+                inputBorderColor: settings.inputBorderColor || '#e2e8f0',
+                sendBtnColor: settings.sendBtnColor || '#667eea',
+                launcherColor: settings.launcherColor || '#667eea',
+                launcherIcon: settings.launcherIcon || 'chat_multiple',
+                badgeColor: settings.badgeColor || '#ff4757',
+                agentAvatar: settings.agentAvatar || '',
+                customerAvatar: settings.customerAvatar || '',
+                botAvatar: settings.botAvatar || '',
+                enablePrechatForm: settings.enablePrechatForm !== false,
+                welcomeTitle: settings.welcomeTitle || 'Welcome!',
+                welcomeMessage: settings.welcomeMessage || 'Please fill in your details to start chatting with us.',
+                nameFieldLabel: settings.nameFieldLabel || 'Name *',
+                emailFieldLabel: settings.emailFieldLabel || 'Email *',
+                questionFieldLabel: settings.questionFieldLabel || 'How can we help? (optional)',
+                questionFieldPlaceholder: settings.questionFieldPlaceholder || 'Describe your question...',
+                startBtnText: settings.startBtnText || 'Start Chat',
+                enableCustomAuth: settings.enableCustomAuth || false,
+                customAuthName: settings.customAuthName || '',
+                customAuthEmail: settings.customAuthEmail || ''
+            };
+            
+            const configJson = minified ? JSON.stringify(config) : JSON.stringify(config, null, 2);
+            
+            // Generate a fully self-contained embed code
+            const embedCode = `<!-- D365 Modern Chat Widget - Self-Contained Embed -->
+<!-- Generated: ${new Date().toLocaleDateString()} -->
+<!-- Simply copy this entire block and paste it into your HTML page -->
+<!-- Works in <head> or <body> -->
+
+<script>
+(function() {
+  'use strict';
+  
+  // Widget Configuration
+  var config = ${configJson};
+  
+  // Main initialization function - called when DOM is ready
+  function initD365Widget() {
+    // Inject CSS Styles
+    var style = document.createElement('style');
+    style.textContent = \`
+    .d365-chat-launcher {
+      position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px;
+      border-radius: 50%; border: none; cursor: pointer; z-index: 999999;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      background: \${config.useGradient ? 'linear-gradient(135deg, ' + config.gradientStart + ' 0%, ' + config.gradientEnd + ' 100%)' : config.launcherColor};
+    }
+    .d365-chat-launcher:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(0,0,0,0.4); }
+    .d365-chat-launcher svg { width: 28px; height: 28px; fill: white; }
+    .d365-chat-launcher .chat-icon { display: block; }
+    .d365-chat-launcher .close-icon { display: none; }
+    .d365-chat-launcher.open .chat-icon { display: none; }
+    .d365-chat-launcher.open .close-icon { display: block; }
+    .d365-chat-badge {
+      position: absolute; top: -4px; right: -4px; background: \${config.badgeColor};
+      color: white; font-size: 11px; font-weight: 700; min-width: 20px; height: 20px;
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      opacity: 0; transform: scale(0); transition: all 0.2s ease;
+    }
+    .d365-chat-badge.show { opacity: 1; transform: scale(1); }
+    .d365-chat-container {
+      position: fixed; bottom: 100px; right: 24px; width: 400px; height: 600px;
+      max-height: calc(100vh - 120px); background: white; border-radius: 16px;
+      box-shadow: 0 10px 50px rgba(0,0,0,0.2); display: flex; flex-direction: column;
+      overflow: hidden; opacity: 0; transform: translateY(20px) scale(0.95);
+      transition: all 0.3s ease; pointer-events: none; z-index: 999998;
+    }
+    .d365-chat-container.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
+    .d365-chat-header {
+      padding: 16px 20px; display: flex; align-items: center; gap: 12px;
+      background: \${config.useGradient ? 'linear-gradient(135deg, ' + config.gradientStart + ' 0%, ' + config.gradientEnd + ' 100%)' : config.primaryColor};
+    }
+    .d365-header-avatar {
+      width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.5);
+    }
+    .d365-header-avatar svg { width: 26px; height: 26px; fill: white; }
+    .d365-header-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .d365-header-info { flex: 1; }
+    .d365-header-title { color: white; font-weight: 600; font-size: 16px; }
+    .d365-header-status { color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 2px; }
+    .d365-header-btn {
+      background: rgba(255,255,255,0.2); border: none; width: 32px; height: 32px;
+      border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .d365-header-btn:hover { background: rgba(255,255,255,0.3); }
+    .d365-header-btn svg { width: 18px; height: 18px; fill: white; }
+    .d365-chat-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .d365-prechat-form {
+      padding: 24px; display: flex; flex-direction: column; gap: 16px; flex: 1; justify-content: center;
+    }
+    .d365-prechat-form.hidden { display: none; }
+    .d365-form-title { font-size: 20px; font-weight: 600; color: #2d3748; text-align: center; }
+    .d365-form-subtitle { font-size: 14px; color: #718096; text-align: center; margin-bottom: 16px; }
+    .d365-form-group { display: flex; flex-direction: column; gap: 6px; }
+    .d365-form-group label { font-size: 13px; font-weight: 500; color: #4a5568; }
+    .d365-form-group input, .d365-form-group textarea {
+      padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;
+      font-family: inherit;
+    }
+    .d365-form-group input:focus, .d365-form-group textarea:focus {
+      outline: none; border-color: \${config.primaryColor}; box-shadow: 0 0 0 3px \${config.primaryColor}22;
+    }
+    .d365-form-group textarea { resize: none; min-height: 80px; }
+    .d365-start-btn {
+      color: white; border: none; padding: 14px; border-radius: 8px; font-size: 15px;
+      font-weight: 600; cursor: pointer; margin-top: 8px;
+      background: \${config.useGradient ? 'linear-gradient(135deg, ' + config.gradientStart + ' 0%, ' + config.gradientEnd + ' 100%)' : config.primaryColor};
+    }
+    .d365-start-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    .d365-start-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .d365-connecting-view, .d365-chat-ended {
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      flex: 1; gap: 16px; padding: 24px; text-align: center;
+    }
+    .d365-connecting-view.active, .d365-chat-ended.active { display: flex; }
+    .d365-spinner {
+      width: 48px; height: 48px; border: 3px solid #e2e8f0; border-top-color: \${config.primaryColor};
+      border-radius: 50%; animation: d365spin 1s linear infinite;
+    }
+    @keyframes d365spin { to { transform: rotate(360deg); } }
+    .d365-chat-messages {
+      display: none; flex-direction: column; flex: 1; overflow-y: auto;
+      padding: 16px; gap: 12px; background: \${config.chatBgColor};
+    }
+    .d365-chat-messages.active { display: flex; }
+    .d365-message-wrapper { display: flex; gap: 10px; max-width: 85%; animation: d365fadeIn 0.3s ease; }
+    .d365-message-wrapper.user { flex-direction: row-reverse; align-self: flex-end; }
+    .d365-message-wrapper.agent { align-self: flex-start; }
+    @keyframes d365fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .d365-message-avatar {
+      width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0;
+      margin-top: 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    }
+    .d365-message-avatar.agent { background: linear-gradient(135deg, \${config.gradientStart} 0%, \${config.gradientEnd} 100%); color: white; }
+    .d365-message-avatar.user { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; }
+    .d365-message-content { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .d365-message-sender { font-size: 12px; font-weight: 600; color: #64748b; padding: 0 4px; }
+    .d365-message-wrapper.user .d365-message-sender { text-align: right; }
+    .d365-message {
+      padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.5;
+      word-wrap: break-word; white-space: pre-wrap;
+    }
+    .d365-message.agent { background: \${config.agentBubbleColor}; color: \${config.agentTextColor}; border-bottom-left-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .d365-message.user { background: \${config.userBubbleColor}; color: \${config.userTextColor}; border-bottom-right-radius: 4px; }
+    .d365-message-time { font-size: 10px; color: #94a3b8; padding: 0 4px; }
+    .d365-message-wrapper.user .d365-message-time { text-align: right; }
+    .d365-typing-indicator { display: none; padding: 8px 0; align-items: center; gap: 8px; }
+    .d365-typing-indicator.active { display: flex; }
+    .d365-typing-dots { display: flex; gap: 4px; padding: 12px 16px; background: white; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-left: 46px; }
+    .d365-typing-dots span { width: 8px; height: 8px; background: #a0aec0; border-radius: 50%; animation: d365bounce 1.4s infinite ease-in-out; }
+    .d365-typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .d365-typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes d365bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+    .d365-chat-input-area {
+      display: none; padding: 12px 16px 16px; background: \${config.inputBgColor};
+      border-top: 1px solid \${config.inputBorderColor}; flex-direction: column; gap: 10px;
+    }
+    .d365-chat-input-area.active { display: flex; }
+    .d365-message-input {
+      width: 100%; min-height: 50px; max-height: 120px; padding: 12px 14px;
+      border: 1px solid \${config.inputBorderColor}; border-radius: 12px; font-size: 14px;
+      resize: none; font-family: inherit; background: \${config.inputBgColor};
+    }
+    .d365-message-input:focus { outline: none; border-color: \${config.primaryColor}; }
+    .d365-input-row { display: flex; align-items: center; justify-content: flex-end; }
+    .d365-send-btn {
+      width: 40px; height: 40px; border-radius: 10px; background: transparent;
+      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: \${config.sendBtnColor};
+    }
+    .d365-send-btn:hover { background: \${config.sendBtnColor}22; }
+    .d365-send-btn svg { width: 22px; height: 22px; fill: currentColor; }
+    .d365-new-chat-btn {
+      color: white; border: none; padding: 12px 24px; border-radius: 8px;
+      font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px;
+      background: \${config.useGradient ? 'linear-gradient(135deg, ' + config.gradientStart + ' 0%, ' + config.gradientEnd + ' 100%)' : config.primaryColor};
+    }
+  \`;
+  document.head.appendChild(style);
+  
+  // Inject HTML
+  var widgetHTML = \`
+    <button class="d365-chat-launcher" id="d365ChatLauncher">
+      <span class="d365-chat-badge" id="d365ChatBadge">0</span>
+      <svg class="chat-icon" viewBox="0 0 24 24"><path d="M9.56158 3C5.41944 3 2.06158 6.35786 2.06158 10.5C2.06158 11.6329 2.31325 12.7088 2.76423 13.6734C2.5102 14.6714 2.22638 15.7842 2.03999 16.5147C1.80697 17.428 2.6294 18.2588 3.54374 18.039C4.29396 17.8587 5.44699 17.5819 6.47447 17.337C7.41678 17.7631 8.46241 18 9.56158 18C13.7037 18 17.0616 14.6421 17.0616 10.5C17.0616 6.35786 13.7037 3 9.56158 3ZM3.56158 10.5C3.56158 7.18629 6.24787 4.5 9.56158 4.5C12.8753 4.5 15.5616 7.18629 15.5616 10.5C15.5616 13.8137 12.8753 16.5 9.56158 16.5C8.60084 16.5 7.69487 16.2748 6.89161 15.8749L6.6482 15.7537L6.38368 15.8167C5.46095 16.0363 4.39489 16.2919 3.59592 16.4838C3.79467 15.7047 4.05784 14.6724 4.28601 13.7757L4.35619 13.4998L4.22568 13.2468C3.80145 12.4246 3.56158 11.4914 3.56158 10.5ZM14.5616 21.0001C12.5922 21.0001 10.8001 20.241 9.46191 18.9995C9.49511 18.9999 9.52835 19.0001 9.56163 19.0001C10.2796 19.0001 10.9768 18.911 11.6427 18.7434C12.5067 19.2254 13.5021 19.5001 14.5616 19.5001C15.5223 19.5001 16.4283 19.2748 17.2316 18.8749L17.475 18.7537L17.7395 18.8167C18.6611 19.0361 19.7046 19.2625 20.4787 19.4262C20.3037 18.6757 20.065 17.6711 19.8372 16.7757L19.767 16.4999L19.8975 16.2469C20.3217 15.4247 20.5616 14.4915 20.5616 13.5001C20.5616 11.3853 19.4676 9.52617 17.8146 8.45761C17.6363 7.73435 17.3653 7.04756 17.015 6.41052C19.9523 7.42684 22.0616 10.2171 22.0616 13.5001C22.0616 14.6332 21.8098 15.7094 21.3586 16.6741C21.6117 17.6821 21.8679 18.774 22.0304 19.4773C22.2348 20.3623 21.4554 21.1633 20.563 20.9768C19.8358 20.8248 18.6933 20.581 17.6495 20.3367C16.707 20.763 15.6611 21.0001 14.5616 21.0001Z"/></svg>
+      <svg class="close-icon" viewBox="0 0 24 24"><path d="m4.21 4.387.083-.094a1 1 0 0 1 1.32-.083l.094.083L12 10.585l6.293-6.292a1 1 0 1 1 1.414 1.414L13.415 12l6.292 6.293a1 1 0 0 1 .083 1.32l-.083.094a1 1 0 0 1-1.32.083l-.094-.083L12 13.415l-6.293 6.292a1 1 0 0 1-1.414-1.414L10.585 12 4.293 5.707a1 1 0 0 1-.083-1.32l.083-.094-.083.094Z"/></svg>
+    </button>
+    <div class="d365-chat-container" id="d365ChatContainer">
+      <div class="d365-chat-header">
+        <div class="d365-header-avatar">\${config.headerLogo ? '<img src="' + config.headerLogo + '" alt="Logo">' : '<svg viewBox="0 0 24 24"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>'}</div>
+        <div class="d365-header-info">
+          <div class="d365-header-title">\${config.headerTitle}</div>
+          <div class="d365-header-status">\${config.headerSubtitle}</div>
+        </div>
+        <button class="d365-header-btn" id="d365MinimizeChat" title="Minimize">
+          <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
+        </button>
+      </div>
+      <div class="d365-chat-body">
+        <form class="d365-prechat-form" id="d365PrechatForm" onsubmit="return false;">
+          <div class="d365-form-title">\${config.welcomeTitle}</div>
+          <div class="d365-form-subtitle">\${config.welcomeMessage}</div>
+          <div class="d365-form-group">
+            <label>\${config.nameFieldLabel}</label>
+            <input type="text" id="d365UserName" placeholder="Enter your name" required>
+          </div>
+          <div class="d365-form-group">
+            <label>\${config.emailFieldLabel}</label>
+            <input type="email" id="d365UserEmail" placeholder="Enter your email" required>
+          </div>
+          <div class="d365-form-group">
+            <label>\${config.questionFieldLabel}</label>
+            <textarea id="d365UserQuestion" placeholder="\${config.questionFieldPlaceholder}"></textarea>
+          </div>
+          <button type="button" class="d365-start-btn" id="d365StartBtn">\${config.startBtnText}</button>
+        </form>
+        <div class="d365-connecting-view" id="d365ConnectingView">
+          <div class="d365-spinner"></div>
+          <div style="color: #4a5568; font-size: 14px;">Connecting you with an agent...</div>
+        </div>
+        <div class="d365-chat-messages" id="d365ChatMessages">
+          <div class="d365-typing-indicator" id="d365TypingIndicator">
+            <div class="d365-typing-dots"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+        <div class="d365-chat-input-area" id="d365ChatInputArea">
+          <textarea class="d365-message-input" id="d365MessageInput" placeholder="Type your message..." rows="2"></textarea>
+          <div class="d365-input-row">
+            <button type="button" class="d365-send-btn" id="d365SendBtn" title="Send">
+              <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="d365-chat-ended" id="d365ChatEnded">
+          <div style="font-size: 48px;">👋</div>
+          <div style="font-size: 18px; font-weight: 600; color: #2d3748;">Chat Ended</div>
+          <div style="font-size: 14px; color: #718096;">Thank you for chatting with us!</div>
+          <button class="d365-new-chat-btn" id="d365NewChatBtn">Start New Chat</button>
+        </div>
+      </div>
+    </div>
+  \`;
+  
+  var container = document.createElement('div');
+  container.innerHTML = widgetHTML;
+  document.body.appendChild(container);
+  
+  // Load the Microsoft Omnichannel Chat SDK
+  var ocScript = document.createElement('script');
+  ocScript.src = 'https://cdn.jsdelivr.net/npm/@microsoft/omnichannel-chat-sdk@1/dist/Microsoft.OmnichannelChatSDK.min.js';
+  ocScript.onload = initWidget;
+  ocScript.onerror = function() {
+    console.warn('Omnichannel SDK failed to load, trying alternative...');
+    // Try alternative CDN
+    var altScript = document.createElement('script');
+    altScript.src = 'https://unpkg.com/@microsoft/omnichannel-chat-sdk@1/dist/Microsoft.OmnichannelChatSDK.min.js';
+    altScript.onload = initWidget;
+    altScript.onerror = initWidgetFallback;
+    document.head.appendChild(altScript);
+  };
+  document.head.appendChild(ocScript);
+  
+  function initWidget() {
+    var chatSDK = null, chatStarted = false, userName = '', userEmail = '';
+    var launcher = document.getElementById('d365ChatLauncher');
+    var chatContainer = document.getElementById('d365ChatContainer');
+    var badge = document.getElementById('d365ChatBadge');
+    var prechatForm = document.getElementById('d365PrechatForm');
+    var connectingView = document.getElementById('d365ConnectingView');
+    var messagesContainer = document.getElementById('d365ChatMessages');
+    var inputArea = document.getElementById('d365ChatInputArea');
+    var typingIndicator = document.getElementById('d365TypingIndicator');
+    var messageInput = document.getElementById('d365MessageInput');
+    var sendBtn = document.getElementById('d365SendBtn');
+    var startBtn = document.getElementById('d365StartBtn');
+    var minimizeBtn = document.getElementById('d365MinimizeChat');
+    var chatEnded = document.getElementById('d365ChatEnded');
+    var newChatBtn = document.getElementById('d365NewChatBtn');
+    var unreadCount = 0;
+    
+    function showView(view) {
+      prechatForm.classList.add('hidden');
+      connectingView.classList.remove('active');
+      messagesContainer.classList.remove('active');
+      inputArea.classList.remove('active');
+      chatEnded.classList.remove('active');
+      if (view === 'prechat') prechatForm.classList.remove('hidden');
+      else if (view === 'connecting') connectingView.classList.add('active');
+      else if (view === 'chat') { messagesContainer.classList.add('active'); inputArea.classList.add('active'); }
+      else if (view === 'ended') { chatEnded.classList.add('active'); chatStarted = false; }
+    }
+    
+    function getInitials(name) {
+      if (!name) return '?';
+      var parts = name.trim().split(' ');
+      if (parts.length >= 2) return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+      return name.substring(0, 2).toUpperCase();
+    }
+    
+    function formatTime(date) {
+      return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    
+    function addMessage(text, isUser, senderName) {
+      var now = new Date();
+      var wrapper = document.createElement('div');
+      wrapper.className = 'd365-message-wrapper ' + (isUser ? 'user' : 'agent');
+      var avatar = document.createElement('div');
+      avatar.className = 'd365-message-avatar ' + (isUser ? 'user' : 'agent');
+      avatar.textContent = getInitials(isUser ? userName : (senderName || 'Agent'));
+      var content = document.createElement('div');
+      content.className = 'd365-message-content';
+      content.innerHTML = '<div class="d365-message-sender">' + (isUser ? userName : (senderName || 'Agent')) + '</div>' +
+        '<div class="d365-message ' + (isUser ? 'user' : 'agent') + '">' + text + '</div>' +
+        '<div class="d365-message-time">' + formatTime(now) + '</div>';
+      wrapper.appendChild(avatar);
+      wrapper.appendChild(content);
+      typingIndicator.parentNode.insertBefore(wrapper, typingIndicator);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      if (!isUser && !chatContainer.classList.contains('open')) {
+        unreadCount++; badge.textContent = unreadCount; badge.classList.add('show');
+      }
+    }
+    
+    launcher.addEventListener('click', function() {
+      chatContainer.classList.toggle('open');
+      launcher.classList.toggle('open');
+      if (chatContainer.classList.contains('open')) {
+        unreadCount = 0; badge.textContent = '0'; badge.classList.remove('show');
+        if (!config.enablePrechatForm && !chatStarted) {
+          var defaultName = config.enableCustomAuth ? config.customAuthName : 'Anonymous';
+          var defaultEmail = config.enableCustomAuth ? config.customAuthEmail : 'anonymous@example.com';
+          initializeChat(defaultName, defaultEmail, '');
+        }
+      }
+    });
+    
+    minimizeBtn.addEventListener('click', function() {
+      chatContainer.classList.remove('open');
+      launcher.classList.remove('open');
+    });
+    
+    startBtn.addEventListener('click', function() {
+      userName = document.getElementById('d365UserName').value.trim();
+      userEmail = document.getElementById('d365UserEmail').value.trim();
+      var question = document.getElementById('d365UserQuestion').value.trim();
+      if (!userName || !userEmail) { alert('Please fill in all required fields'); return; }
+      startBtn.disabled = true; startBtn.textContent = 'Starting...';
+      initializeChat(userName, userEmail, question);
+    });
+    
+    sendBtn.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+    
+    newChatBtn.addEventListener('click', function() {
+      chatStarted = false; chatSDK = null;
+      startBtn.disabled = false; startBtn.textContent = config.startBtnText;
+      document.getElementById('d365UserName').value = '';
+      document.getElementById('d365UserEmail').value = '';
+      document.getElementById('d365UserQuestion').value = '';
+      while (messagesContainer.firstChild !== typingIndicator) {
+        messagesContainer.removeChild(messagesContainer.firstChild);
+      }
+      showView('prechat');
+    });
+    
+    async function initializeChat(name, email, question) {
+      try {
+        userName = name; userEmail = email;
+        showView('connecting');
+        
+        // Check for Microsoft Omnichannel Chat SDK (multiple possible global names)
+        var SDKClass = (typeof Microsoft !== 'undefined' && Microsoft.OmnichannelChatSDK && Microsoft.OmnichannelChatSDK.OmnichannelChatSDK) ||
+                       (typeof OmnichannelChatSDK !== 'undefined' && OmnichannelChatSDK.default) ||
+                       (typeof OmnichannelChatSDK !== 'undefined' && OmnichannelChatSDK);
+        
+        if (SDKClass) {
+          chatSDK = new SDKClass({
+            orgId: config.orgId,
+            widgetId: config.widgetId,
+            orgUrl: config.orgUrl
+          });
+          await chatSDK.initialize();
+          
+          chatSDK.onNewMessage(function(msg) {
+            if (msg && msg.content) addMessage(msg.content, false, msg.senderDisplayName);
+          });
+          chatSDK.onTypingEvent(function() {
+            typingIndicator.classList.add('active');
+            setTimeout(function() { typingIndicator.classList.remove('active'); }, 3000);
+          });
+          chatSDK.onAgentEndSession(function() { showView('ended'); });
+          
+          await chatSDK.startChat({
+            customContext: {
+              'emailaddress1': { value: email, isDisplayable: true },
+              'Name': { value: name, isDisplayable: true }
+            }
+          });
+          
+          chatStarted = true;
+          showView('chat');
+          if (question) { addMessage(question, true); await chatSDK.sendMessage({ content: question }); }
+          setInterval(pollMessages, 3000);
+        } else {
+          throw new Error('SDK not loaded');
+        }
+      } catch (error) {
+        console.error('Chat init error:', error);
+        alert('Failed to start chat. Please try again.');
+        showView('prechat');
+        startBtn.disabled = false; startBtn.textContent = config.startBtnText;
+      }
+    }
+    
+    async function sendMessage() {
+      var text = messageInput.value.trim();
+      if (!text || !chatSDK || !chatStarted) return;
+      messageInput.value = '';
+      addMessage(text, true);
+      try { await chatSDK.sendMessage({ content: text }); } catch (e) { console.error('Send error:', e); }
+    }
+    
+    async function pollMessages() {
+      if (!chatSDK || !chatStarted) return;
+      try {
+        var messages = await chatSDK.getMessages();
+        // Process new messages here if needed
+      } catch (e) { console.log('Poll error:', e); }
+    }
+    
+    if (!config.enablePrechatForm) {
+      prechatForm.classList.add('hidden');
+    }
+  }
+  
+  function initWidgetFallback() {
+    console.log('Using fallback widget mode - SDK not available');
+    var launcher = document.getElementById('d365ChatLauncher');
+    var chatContainer = document.getElementById('d365ChatContainer');
+    launcher.addEventListener('click', function() {
+      chatContainer.classList.toggle('open');
+      launcher.classList.toggle('open');
+    });
+    document.getElementById('d365MinimizeChat').addEventListener('click', function() {
+      chatContainer.classList.remove('open');
+      launcher.classList.remove('open');
+    });
+    document.getElementById('d365StartBtn').addEventListener('click', function() {
+      alert('Chat SDK could not be loaded. Please check your D365 configuration and try again.');
+    });
+  }
+  } // End of initD365Widget function
+  
+  // Wait for DOM to be ready before initializing
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initD365Widget);
+  } else {
+    // DOM is already ready
+    initD365Widget();
+  }
+})();
+<\/script>`;
+            
+            document.getElementById('embedCodeOutput').value = embedCode;
+            showToast('Self-contained embed code generated! Copy and paste into any HTML page.');
+        }
+        
+        function copyGeneratedEmbedCode() {
+            const embedCodeEl = document.getElementById('embedCodeOutput');
+            const embedCode = embedCodeEl.value;
+            
+            if (!embedCode || embedCode.includes('Click')) {
+                showToast('Please generate the embed code first');
+                return;
+            }
+            
+            navigator.clipboard.writeText(embedCode).then(() => {
+                const successEl = document.getElementById('copySuccess');
+                successEl.classList.add('show');
+                setTimeout(() => successEl.classList.remove('show'), 2000);
+                showToast('Embed code copied to clipboard!');
+            }).catch(err => {
+                // Fallback for older browsers
+                embedCodeEl.select();
+                document.execCommand('copy');
+                showToast('Embed code copied to clipboard!');
+            });
+        }
+        
+        function downloadEmbedCode() {
+            const embedCode = document.getElementById('embedCodeOutput').value;
+            
+            if (!embedCode || embedCode.includes('Click')) {
+                showToast('Please generate the embed code first');
+                return;
+            }
+            
+            // Create a full HTML file with the embed code
+            const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Widget Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        .demo-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 { color: #333; }
+        p { color: #666; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <div class="demo-content">
+        <h1>Chat Widget Demo</h1>
+        <p>This is a demo page with the embedded chat widget. The widget should appear in the bottom-right corner of the page.</p>
+        <p>Click the chat launcher button to open the widget.</p>
+    </div>
+    
+    ${embedCode}
+</body>
+</html>`;
+            
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'chat-widget-embed.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('Embed code downloaded as HTML file!');
         }
 
         // ============ UTILITY ============

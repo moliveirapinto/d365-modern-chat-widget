@@ -1,363 +1,494 @@
 <html>
-<head>
-	<title>Microsoft Chat</title>
+	<head>
+<!-- D365 Modern Chat Widget - Self-Contained Embed -->
+<!-- Generated: 2025-12-17 -->
+<!-- Simply copy this entire block and paste it into your HTML page -->
+<!-- Works in <head> or <body> -->
 
-
-	<!-- WELCOME LOADING MESSAGE SCRIPT HERE -->
 <script>
-function lcw() {
-return {   
-    styleProps: {
-        generalStyles:{
-            width: "400px",
-            height: "600px"
-        },
-        customStyles: `
-            /* Force Close button text color */
-            .oc-lcw-webchat-container button[aria-label="Close"] {
-                color: #000000 !important;   /* <-- change text color */
-                background-color: #FFD700 !important; /* optional, change button background */
-            }
-
-            /* Some themes use this class instead */
-            .oc-lcw-button-close {
-                color: #000000 !important;
-            }
-        `
-    },
-
-    loadingPaneProps: {
-        controlProps: {
-            titleText: "Welcome to Motion!",
-            subtitleText: "Please wait while I connect you...",
-            hideSpinnerText: true,
-            spinnerSize: 3,
-            hideSpinner: false
-        },
-        styleProps: {
-            titleStyleProps: {
-                fontFamily: "Impact",
-                fontSize: "25px"
-            },
-            subtitleStyleProps: {
-                fontSize: "15px"
-            }
-        }
-    },
-
-    chatButtonProps: {
-        controlProps: {
-            hideChatSubtitle: true
-        }
+(function() {
+  'use strict';
+  
+  // Widget Configuration
+  var config = {
+  "orgId": "e0aec93b-f5c0-f011-95c5-6045bd03cf38",
+  "orgUrl": "https://m-e0aec93b-f5c0-f011-95c5-6045bd03cf38.us.omnichannelengagementhub.com",
+  "widgetId": "de416403-f2b1-41fe-9eaf-8f87018c1b4d",
+  "widgetMode": "custom",
+  "headerTitle": "Ola Marcelo",
+  "headerSubtitle": "Hey yo!",
+  "headerLogo": "",
+  "fontFamily": "system",
+  "useGradient": true,
+  "gradientStart": "#667eea",
+  "gradientEnd": "#764ba2",
+  "primaryColor": "#667eea",
+  "userBubbleColor": "#667eea",
+  "userTextColor": "#ffffff",
+  "agentBubbleColor": "#ffffff",
+  "agentTextColor": "#2d3748",
+  "systemMsgColor": "#e2e8f0",
+  "systemTextColor": "#64748b",
+  "chatBgColor": "#f8fafc",
+  "inputBgColor": "#ffffff",
+  "inputBorderColor": "#e2e8f0",
+  "sendBtnColor": "#667eea",
+  "launcherColor": "#667eea",
+  "launcherIcon": "chat_sparkle",
+  "badgeColor": "#ff4757",
+  "agentAvatar": "img/headshots/headshot_female1.png",
+  "customerAvatar": "img/headshots/headshot_female1.png",
+  "botAvatar": "img/bot/bot8.png",
+  "enablePrechatForm": false,
+  "welcomeTitle": "Start a conversation",
+  "welcomeMessage": "We're here to help! Please fill out the form below to start chatting with our team.",
+  "nameFieldLabel": "Your Name",
+  "emailFieldLabel": "Email Address",
+  "questionFieldLabel": "How can we help?",
+  "questionFieldPlaceholder": "Describe your question...",
+  "startBtnText": "Start Chat",
+  "enableCustomAuth": false,
+  "customAuthName": "",
+  "customAuthEmail": ""
+};
+  
+  // Main initialization function - called when DOM is ready
+  function initD365Widget() {
+    // Inject CSS Styles
+    var style = document.createElement('style');
+    style.textContent = `
+    .d365-chat-launcher {
+      position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px;
+      border-radius: 50%; border: none; cursor: pointer; z-index: 999999;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      background: ${config.useGradient ? 'linear-gradient(135deg, ' + config.gradientStart + ' 0%, ' + config.gradientEnd + ' 100%)' : config.launcherColor};
     }
-}}
+    .d365-chat-launcher:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(0,0,0,0.4); }
+    .d365-chat-launcher svg { width: 28px; height: 28px; fill: white; }
+    .d365-chat-launcher .chat-icon { display: block; }
+    .d365-chat-launcher .close-icon { display: none; }
+    .d365-chat-launcher.open .chat-icon { display: none; }
+    .d365-chat-launcher.open .close-icon { display: block; }
+    .d365-chat-badge {
+      position: absolute; top: -4px; right: -4px; background: ${config.badgeColor};
+      color: white; font-size: 11px; font-weight: 700; min-width: 20px; height: 20px;
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      opacity: 0; transform: scale(0); transition: all 0.2s ease;
+    }
+    .d365-chat-badge.show { opacity: 1; transform: scale(1); }
+    .d365-chat-container {
+      position: fixed; bottom: 100px; right: 24px; width: 400px; height: 600px;
+      max-height: calc(100vh - 120px); background: white; border-radius: 16px;
+      box-shadow: 0 10px 50px rgba(0,0,0,0.2); display: flex; flex-direction: column;
+      overflow: hidden; opacity: 0; transform: translateY(20px) scale(0.95);
+      transition: all 0.3s ease; pointer-events: none; z-index: 999998;
+    }
+    .d365-chat-container.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
+    .d365-chat-header {
+      padding: 16px 20px; display: flex; align-items: center; gap: 12px;
+      background: ${config.useGradient ? 'linear-gradient(135deg, ' + config.gradientStart + ' 0%, ' + config.gradientEnd + ' 100%)' : config.primaryColor};
+    }
+    .d365-header-avatar {
+      width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.5);
+    }
+    .d365-header-avatar svg { width: 26px; height: 26px; fill: white; }
+    .d365-header-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .d365-header-info { flex: 1; }
+    .d365-header-title { color: white; font-weight: 600; font-size: 16px; }
+    .d365-header-status { color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 2px; }
+    .d365-header-btn {
+      background: rgba(255,255,255,0.2); border: none; width: 32px; height: 32px;
+      border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .d365-header-btn:hover { background: rgba(255,255,255,0.3); }
+    .d365-header-btn svg { width: 18px; height: 18px; fill: white; }
+    .d365-chat-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .d365-prechat-form {
+      padding: 24px; display: flex; flex-direction: column; gap: 16px; flex: 1; justify-content: center;
+    }
+    .d365-prechat-form.hidden { display: none; }
+    .d365-form-title { font-size: 20px; font-weight: 600; color: #2d3748; text-align: center; }
+    .d365-form-subtitle { font-size: 14px; color: #718096; text-align: center; margin-bottom: 16px; }
+    .d365-form-group { display: flex; flex-direction: column; gap: 6px; }
+    .d365-form-group label { font-size: 13px; font-weight: 500; color: #4a5568; }
+    .d365-form-group input, .d365-form-group textarea {
+      padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;
+      font-family: inherit;
+    }
+    .d365-form-group input:focus, .d365-form-group textarea:focus {
+      outline: none; border-color: ${config.primaryColor}; box-shadow: 0 0 0 3px ${config.primaryColor}22;
+    }
+    .d365-form-group textarea { resize: none; min-height: 80px; }
+    .d365-start-btn {
+      color: white; border: none; padding: 14px; border-radius: 8px; font-size: 15px;
+      font-weight: 600; cursor: pointer; margin-top: 8px;
+      background: ${config.useGradient ? 'linear-gradient(135deg, ' + config.gradientStart + ' 0%, ' + config.gradientEnd + ' 100%)' : config.primaryColor};
+    }
+    .d365-start-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    .d365-start-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .d365-connecting-view, .d365-chat-ended {
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      flex: 1; gap: 16px; padding: 24px; text-align: center;
+    }
+    .d365-connecting-view.active, .d365-chat-ended.active { display: flex; }
+    .d365-spinner {
+      width: 48px; height: 48px; border: 3px solid #e2e8f0; border-top-color: ${config.primaryColor};
+      border-radius: 50%; animation: d365spin 1s linear infinite;
+    }
+    @keyframes d365spin { to { transform: rotate(360deg); } }
+    .d365-chat-messages {
+      display: none; flex-direction: column; flex: 1; overflow-y: auto;
+      padding: 16px; gap: 12px; background: ${config.chatBgColor};
+    }
+    .d365-chat-messages.active { display: flex; }
+    .d365-message-wrapper { display: flex; gap: 10px; max-width: 85%; animation: d365fadeIn 0.3s ease; }
+    .d365-message-wrapper.user { flex-direction: row-reverse; align-self: flex-end; }
+    .d365-message-wrapper.agent { align-self: flex-start; }
+    @keyframes d365fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .d365-message-avatar {
+      width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0;
+      margin-top: 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    }
+    .d365-message-avatar.agent { background: linear-gradient(135deg, ${config.gradientStart} 0%, ${config.gradientEnd} 100%); color: white; }
+    .d365-message-avatar.user { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; }
+    .d365-message-content { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .d365-message-sender { font-size: 12px; font-weight: 600; color: #64748b; padding: 0 4px; }
+    .d365-message-wrapper.user .d365-message-sender { text-align: right; }
+    .d365-message {
+      padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.5;
+      word-wrap: break-word; white-space: pre-wrap;
+    }
+    .d365-message.agent { background: ${config.agentBubbleColor}; color: ${config.agentTextColor}; border-bottom-left-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .d365-message.user { background: ${config.userBubbleColor}; color: ${config.userTextColor}; border-bottom-right-radius: 4px; }
+    .d365-message-time { font-size: 10px; color: #94a3b8; padding: 0 4px; }
+    .d365-message-wrapper.user .d365-message-time { text-align: right; }
+    .d365-typing-indicator { display: none; padding: 8px 0; align-items: center; gap: 8px; }
+    .d365-typing-indicator.active { display: flex; }
+    .d365-typing-dots { display: flex; gap: 4px; padding: 12px 16px; background: white; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-left: 46px; }
+    .d365-typing-dots span { width: 8px; height: 8px; background: #a0aec0; border-radius: 50%; animation: d365bounce 1.4s infinite ease-in-out; }
+    .d365-typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .d365-typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes d365bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+    .d365-chat-input-area {
+      display: none; padding: 12px 16px 16px; background: ${config.inputBgColor};
+      border-top: 1px solid ${config.inputBorderColor}; flex-direction: column; gap: 10px;
+    }
+    .d365-chat-input-area.active { display: flex; }
+    .d365-message-input {
+      width: 100%; min-height: 50px; max-height: 120px; padding: 12px 14px;
+      border: 1px solid ${config.inputBorderColor}; border-radius: 12px; font-size: 14px;
+      resize: none; font-family: inherit; background: ${config.inputBgColor};
+    }
+    .d365-message-input:focus { outline: none; border-color: ${config.primaryColor}; }
+    .d365-input-row { display: flex; align-items: center; justify-content: flex-end; }
+    .d365-send-btn {
+      width: 40px; height: 40px; border-radius: 10px; background: transparent;
+      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: ${config.sendBtnColor};
+    }
+    .d365-send-btn:hover { background: ${config.sendBtnColor}22; }
+    .d365-send-btn svg { width: 22px; height: 22px; fill: currentColor; }
+    .d365-new-chat-btn {
+      color: white; border: none; padding: 12px 24px; border-radius: 8px;
+      font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px;
+      background: ${config.useGradient ? 'linear-gradient(135deg, ' + config.gradientStart + ' 0%, ' + config.gradientEnd + ' 100%)' : config.primaryColor};
+    }
+  `;
+  document.head.appendChild(style);
+  
+  // Inject HTML
+  var widgetHTML = `
+    <button class="d365-chat-launcher" id="d365ChatLauncher">
+      <span class="d365-chat-badge" id="d365ChatBadge">0</span>
+      <svg class="chat-icon" viewBox="0 0 24 24"><path d="M9.56158 3C5.41944 3 2.06158 6.35786 2.06158 10.5C2.06158 11.6329 2.31325 12.7088 2.76423 13.6734C2.5102 14.6714 2.22638 15.7842 2.03999 16.5147C1.80697 17.428 2.6294 18.2588 3.54374 18.039C4.29396 17.8587 5.44699 17.5819 6.47447 17.337C7.41678 17.7631 8.46241 18 9.56158 18C13.7037 18 17.0616 14.6421 17.0616 10.5C17.0616 6.35786 13.7037 3 9.56158 3ZM3.56158 10.5C3.56158 7.18629 6.24787 4.5 9.56158 4.5C12.8753 4.5 15.5616 7.18629 15.5616 10.5C15.5616 13.8137 12.8753 16.5 9.56158 16.5C8.60084 16.5 7.69487 16.2748 6.89161 15.8749L6.6482 15.7537L6.38368 15.8167C5.46095 16.0363 4.39489 16.2919 3.59592 16.4838C3.79467 15.7047 4.05784 14.6724 4.28601 13.7757L4.35619 13.4998L4.22568 13.2468C3.80145 12.4246 3.56158 11.4914 3.56158 10.5ZM14.5616 21.0001C12.5922 21.0001 10.8001 20.241 9.46191 18.9995C9.49511 18.9999 9.52835 19.0001 9.56163 19.0001C10.2796 19.0001 10.9768 18.911 11.6427 18.7434C12.5067 19.2254 13.5021 19.5001 14.5616 19.5001C15.5223 19.5001 16.4283 19.2748 17.2316 18.8749L17.475 18.7537L17.7395 18.8167C18.6611 19.0361 19.7046 19.2625 20.4787 19.4262C20.3037 18.6757 20.065 17.6711 19.8372 16.7757L19.767 16.4999L19.8975 16.2469C20.3217 15.4247 20.5616 14.4915 20.5616 13.5001C20.5616 11.3853 19.4676 9.52617 17.8146 8.45761C17.6363 7.73435 17.3653 7.04756 17.015 6.41052C19.9523 7.42684 22.0616 10.2171 22.0616 13.5001C22.0616 14.6332 21.8098 15.7094 21.3586 16.6741C21.6117 17.6821 21.8679 18.774 22.0304 19.4773C22.2348 20.3623 21.4554 21.1633 20.563 20.9768C19.8358 20.8248 18.6933 20.581 17.6495 20.3367C16.707 20.763 15.6611 21.0001 14.5616 21.0001Z"/></svg>
+      <svg class="close-icon" viewBox="0 0 24 24"><path d="m4.21 4.387.083-.094a1 1 0 0 1 1.32-.083l.094.083L12 10.585l6.293-6.292a1 1 0 1 1 1.414 1.414L13.415 12l6.292 6.293a1 1 0 0 1 .083 1.32l-.083.094a1 1 0 0 1-1.32.083l-.094-.083L12 13.415l-6.293 6.292a1 1 0 0 1-1.414-1.414L10.585 12 4.293 5.707a1 1 0 0 1-.083-1.32l.083-.094-.083.094Z"/></svg>
+    </button>
+    <div class="d365-chat-container" id="d365ChatContainer">
+      <div class="d365-chat-header">
+        <div class="d365-header-avatar">${config.headerLogo ? '<img src="' + config.headerLogo + '" alt="Logo">' : '<svg viewBox="0 0 24 24"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>'}</div>
+        <div class="d365-header-info">
+          <div class="d365-header-title">${config.headerTitle}</div>
+          <div class="d365-header-status">${config.headerSubtitle}</div>
+        </div>
+        <button class="d365-header-btn" id="d365MinimizeChat" title="Minimize">
+          <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
+        </button>
+      </div>
+      <div class="d365-chat-body">
+        <form class="d365-prechat-form" id="d365PrechatForm" onsubmit="return false;">
+          <div class="d365-form-title">${config.welcomeTitle}</div>
+          <div class="d365-form-subtitle">${config.welcomeMessage}</div>
+          <div class="d365-form-group">
+            <label>${config.nameFieldLabel}</label>
+            <input type="text" id="d365UserName" placeholder="Enter your name" required>
+          </div>
+          <div class="d365-form-group">
+            <label>${config.emailFieldLabel}</label>
+            <input type="email" id="d365UserEmail" placeholder="Enter your email" required>
+          </div>
+          <div class="d365-form-group">
+            <label>${config.questionFieldLabel}</label>
+            <textarea id="d365UserQuestion" placeholder="${config.questionFieldPlaceholder}"></textarea>
+          </div>
+          <button type="button" class="d365-start-btn" id="d365StartBtn">${config.startBtnText}</button>
+        </form>
+        <div class="d365-connecting-view" id="d365ConnectingView">
+          <div class="d365-spinner"></div>
+          <div style="color: #4a5568; font-size: 14px;">Connecting you with an agent...</div>
+        </div>
+        <div class="d365-chat-messages" id="d365ChatMessages">
+          <div class="d365-typing-indicator" id="d365TypingIndicator">
+            <div class="d365-typing-dots"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+        <div class="d365-chat-input-area" id="d365ChatInputArea">
+          <textarea class="d365-message-input" id="d365MessageInput" placeholder="Type your message..." rows="2"></textarea>
+          <div class="d365-input-row">
+            <button type="button" class="d365-send-btn" id="d365SendBtn" title="Send">
+              <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="d365-chat-ended" id="d365ChatEnded">
+          <div style="font-size: 48px;">👋</div>
+          <div style="font-size: 18px; font-weight: 600; color: #2d3748;">Chat Ended</div>
+          <div style="font-size: 14px; color: #718096;">Thank you for chatting with us!</div>
+          <button class="d365-new-chat-btn" id="d365NewChatBtn">Start New Chat</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  var container = document.createElement('div');
+  container.innerHTML = widgetHTML;
+  document.body.appendChild(container);
+  
+  // Load the Microsoft Omnichannel Chat SDK
+  var ocScript = document.createElement('script');
+  ocScript.src = 'https://cdn.jsdelivr.net/npm/@microsoft/omnichannel-chat-sdk@1/dist/Microsoft.OmnichannelChatSDK.min.js';
+  ocScript.onload = initWidget;
+  ocScript.onerror = function() {
+    console.warn('Omnichannel SDK failed to load, trying alternative...');
+    // Try alternative CDN
+    var altScript = document.createElement('script');
+    altScript.src = 'https://unpkg.com/@microsoft/omnichannel-chat-sdk@1/dist/Microsoft.OmnichannelChatSDK.min.js';
+    altScript.onload = initWidget;
+    altScript.onerror = initWidgetFallback;
+    document.head.appendChild(altScript);
+  };
+  document.head.appendChild(ocScript);
+  
+  function initWidget() {
+    var chatSDK = null, chatStarted = false, userName = '', userEmail = '';
+    var launcher = document.getElementById('d365ChatLauncher');
+    var chatContainer = document.getElementById('d365ChatContainer');
+    var badge = document.getElementById('d365ChatBadge');
+    var prechatForm = document.getElementById('d365PrechatForm');
+    var connectingView = document.getElementById('d365ConnectingView');
+    var messagesContainer = document.getElementById('d365ChatMessages');
+    var inputArea = document.getElementById('d365ChatInputArea');
+    var typingIndicator = document.getElementById('d365TypingIndicator');
+    var messageInput = document.getElementById('d365MessageInput');
+    var sendBtn = document.getElementById('d365SendBtn');
+    var startBtn = document.getElementById('d365StartBtn');
+    var minimizeBtn = document.getElementById('d365MinimizeChat');
+    var chatEnded = document.getElementById('d365ChatEnded');
+    var newChatBtn = document.getElementById('d365NewChatBtn');
+    var unreadCount = 0;
+    
+    function showView(view) {
+      prechatForm.classList.add('hidden');
+      connectingView.classList.remove('active');
+      messagesContainer.classList.remove('active');
+      inputArea.classList.remove('active');
+      chatEnded.classList.remove('active');
+      if (view === 'prechat') prechatForm.classList.remove('hidden');
+      else if (view === 'connecting') connectingView.classList.add('active');
+      else if (view === 'chat') { messagesContainer.classList.add('active'); inputArea.classList.add('active'); }
+      else if (view === 'ended') { chatEnded.classList.add('active'); chatStarted = false; }
+    }
+    
+    function getInitials(name) {
+      if (!name) return '?';
+      var parts = name.trim().split(' ');
+      if (parts.length >= 2) return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+      return name.substring(0, 2).toUpperCase();
+    }
+    
+    function formatTime(date) {
+      return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    
+    function addMessage(text, isUser, senderName) {
+      var now = new Date();
+      var wrapper = document.createElement('div');
+      wrapper.className = 'd365-message-wrapper ' + (isUser ? 'user' : 'agent');
+      var avatar = document.createElement('div');
+      avatar.className = 'd365-message-avatar ' + (isUser ? 'user' : 'agent');
+      avatar.textContent = getInitials(isUser ? userName : (senderName || 'Agent'));
+      var content = document.createElement('div');
+      content.className = 'd365-message-content';
+      content.innerHTML = '<div class="d365-message-sender">' + (isUser ? userName : (senderName || 'Agent')) + '</div>' +
+        '<div class="d365-message ' + (isUser ? 'user' : 'agent') + '">' + text + '</div>' +
+        '<div class="d365-message-time">' + formatTime(now) + '</div>';
+      wrapper.appendChild(avatar);
+      wrapper.appendChild(content);
+      typingIndicator.parentNode.insertBefore(wrapper, typingIndicator);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      if (!isUser && !chatContainer.classList.contains('open')) {
+        unreadCount++; badge.textContent = unreadCount; badge.classList.add('show');
+      }
+    }
+    
+    launcher.addEventListener('click', function() {
+      chatContainer.classList.toggle('open');
+      launcher.classList.toggle('open');
+      if (chatContainer.classList.contains('open')) {
+        unreadCount = 0; badge.textContent = '0'; badge.classList.remove('show');
+        if (!config.enablePrechatForm && !chatStarted) {
+          var defaultName = config.enableCustomAuth ? config.customAuthName : 'Anonymous';
+          var defaultEmail = config.enableCustomAuth ? config.customAuthEmail : 'anonymous@example.com';
+          initializeChat(defaultName, defaultEmail, '');
+        }
+      }
+    });
+    
+    minimizeBtn.addEventListener('click', function() {
+      chatContainer.classList.remove('open');
+      launcher.classList.remove('open');
+    });
+    
+    startBtn.addEventListener('click', function() {
+      userName = document.getElementById('d365UserName').value.trim();
+      userEmail = document.getElementById('d365UserEmail').value.trim();
+      var question = document.getElementById('d365UserQuestion').value.trim();
+      if (!userName || !userEmail) { alert('Please fill in all required fields'); return; }
+      startBtn.disabled = true; startBtn.textContent = 'Starting...';
+      initializeChat(userName, userEmail, question);
+    });
+    
+    sendBtn.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+    
+    newChatBtn.addEventListener('click', function() {
+      chatStarted = false; chatSDK = null;
+      startBtn.disabled = false; startBtn.textContent = config.startBtnText;
+      document.getElementById('d365UserName').value = '';
+      document.getElementById('d365UserEmail').value = '';
+      document.getElementById('d365UserQuestion').value = '';
+      while (messagesContainer.firstChild !== typingIndicator) {
+        messagesContainer.removeChild(messagesContainer.firstChild);
+      }
+      showView('prechat');
+    });
+    
+    async function initializeChat(name, email, question) {
+      try {
+        userName = name; userEmail = email;
+        showView('connecting');
+        
+        // Check for Microsoft Omnichannel Chat SDK (multiple possible global names)
+        var SDKClass = (typeof Microsoft !== 'undefined' && Microsoft.OmnichannelChatSDK && Microsoft.OmnichannelChatSDK.OmnichannelChatSDK) ||
+                       (typeof OmnichannelChatSDK !== 'undefined' && OmnichannelChatSDK.default) ||
+                       (typeof OmnichannelChatSDK !== 'undefined' && OmnichannelChatSDK);
+        
+        if (SDKClass) {
+          chatSDK = new SDKClass({
+            orgId: config.orgId,
+            widgetId: config.widgetId,
+            orgUrl: config.orgUrl
+          });
+          await chatSDK.initialize();
+          
+          chatSDK.onNewMessage(function(msg) {
+            if (msg && msg.content) addMessage(msg.content, false, msg.senderDisplayName);
+          });
+          chatSDK.onTypingEvent(function() {
+            typingIndicator.classList.add('active');
+            setTimeout(function() { typingIndicator.classList.remove('active'); }, 3000);
+          });
+          chatSDK.onAgentEndSession(function() { showView('ended'); });
+          
+          await chatSDK.startChat({
+            customContext: {
+              'emailaddress1': { value: email, isDisplayable: true },
+              'Name': { value: name, isDisplayable: true }
+            }
+          });
+          
+          chatStarted = true;
+          showView('chat');
+          if (question) { addMessage(question, true); await chatSDK.sendMessage({ content: question }); }
+          setInterval(pollMessages, 3000);
+        } else {
+          throw new Error('SDK not loaded');
+        }
+      } catch (error) {
+        console.error('Chat init error:', error);
+        alert('Failed to start chat. Please try again.');
+        showView('prechat');
+        startBtn.disabled = false; startBtn.textContent = config.startBtnText;
+      }
+    }
+    
+    async function sendMessage() {
+      var text = messageInput.value.trim();
+      if (!text || !chatSDK || !chatStarted) return;
+      messageInput.value = '';
+      addMessage(text, true);
+      try { await chatSDK.sendMessage({ content: text }); } catch (e) { console.error('Send error:', e); }
+    }
+    
+    async function pollMessages() {
+      if (!chatSDK || !chatStarted) return;
+      try {
+        var messages = await chatSDK.getMessages();
+        // Process new messages here if needed
+      } catch (e) { console.log('Poll error:', e); }
+    }
+    
+    if (!config.enablePrechatForm) {
+      prechatForm.classList.add('hidden');
+    }
+  }
+  
+  function initWidgetFallback() {
+    console.log('Using fallback widget mode - SDK not available');
+    var launcher = document.getElementById('d365ChatLauncher');
+    var chatContainer = document.getElementById('d365ChatContainer');
+    launcher.addEventListener('click', function() {
+      chatContainer.classList.toggle('open');
+      launcher.classList.toggle('open');
+    });
+    document.getElementById('d365MinimizeChat').addEventListener('click', function() {
+      chatContainer.classList.remove('open');
+      launcher.classList.remove('open');
+    });
+    document.getElementById('d365StartBtn').addEventListener('click', function() {
+      alert('Chat SDK could not be loaded. Please check your D365 configuration and try again.');
+    });
+  }
+  } // End of initD365Widget function
+  
+  // Wait for DOM to be ready before initializing
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initD365Widget);
+  } else {
+    // DOM is already ready
+    initD365Widget();
+  }
+})();
 </script>
-
-
-
-
-
-
-	<!-- YOUR LIVE CHAT SCRIPT HERE -->
-<script id="Microsoft_Omnichannel_LCWidget" src="https://oc-cdn-ocprod.azureedge.net/livechatwidget/scripts/LiveChatBootstrapper.js" onerror="(function(el){el.parentNode.removeChild(el);var s=document.createElement('script');s.src='https://ocprodocprodnamgs.blob.core.windows.net/livechatwidget/scripts/LiveChatBootstrapper.js';s.setAttribute('id', 'Microsoft_Omnichannel_LCWidget');s.setAttribute('data-app-id', 'de416403-f2b1-41fe-9eaf-8f87018c1b4d');s.setAttribute('data-lcw-version', 'prod');s.setAttribute('data-org-id', 'e0aec93b-f5c0-f011-95c5-6045bd03cf38');s.setAttribute('data-org-url', 'https://m-e0aec93b-f5c0-f011-95c5-6045bd03cf38.us.omnichannelengagementhub.com');document.body.appendChild(s);})(this);" data-app-id="de416403-f2b1-41fe-9eaf-8f87018c1b4d" data-lcw-version="prod" data-org-id="e0aec93b-f5c0-f011-95c5-6045bd03cf38" data-org-url="https://m-e0aec93b-f5c0-f011-95c5-6045bd03cf38.us.omnichannelengagementhub.com" async></script>
-
-<script>
-		window.addEventListener("lcw:ready", function handleLivechatReadyEvent() {
-			console.log('🔍 [NATIVE] lcw:ready event fired');
-			
-			// COMPREHENSIVE LOGGING: Intercept VoiceVideoCallingSDK
-			if (window.Microsoft && window.Microsoft.Omnichannel) {
-				console.log('🔍 [NATIVE] Microsoft.Omnichannel exists');
-				console.log('🔍 [NATIVE] Microsoft.Omnichannel keys:', Object.keys(window.Microsoft.Omnichannel));
-				
-				// Log the SDK object structure
-				if (window.Microsoft.Omnichannel.LiveChatWidget) {
-					console.log('🔍 [NATIVE] LiveChatWidget keys:', Object.keys(window.Microsoft.Omnichannel.LiveChatWidget));
-					if (window.Microsoft.Omnichannel.LiveChatWidget.SDK) {
-						console.log('🔍 [NATIVE] SDK keys:', Object.keys(window.Microsoft.Omnichannel.LiveChatWidget.SDK));
-					}
-				}
-			}
-			
-			// Monitor for video elements being created
-			const observer = new MutationObserver((mutations) => {
-				mutations.forEach((mutation) => {
-					mutation.addedNodes.forEach((node) => {
-						if (node.tagName === 'VIDEO') {
-							console.log('🎥 [NATIVE] VIDEO element added!');
-							console.log('🎥 [NATIVE] Video ID:', node.id);
-							console.log('🎥 [NATIVE] Video classes:', node.className);
-							console.log('🎥 [NATIVE] Video srcObject:', node.srcObject);
-							console.log('🎥 [NATIVE] Video parent:', node.parentElement);
-							
-							// Monitor when srcObject changes
-							const originalDescriptor = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, 'srcObject');
-							Object.defineProperty(node, 'srcObject', {
-								set: function(stream) {
-									console.log('🎥 [NATIVE] srcObject SET on video:', node.id);
-									console.log('🎥 [NATIVE] Stream:', stream);
-									if (stream instanceof MediaStream) {
-										console.log('🎥 [NATIVE] Stream tracks:', stream.getTracks());
-										stream.getTracks().forEach(track => {
-											console.log('🎥 [NATIVE] Track:', track.kind, track.label, track.readyState);
-										});
-									}
-									return originalDescriptor.set.call(this, stream);
-								},
-								get: function() {
-									return originalDescriptor.get.call(this);
-								}
-							});
-						}
-						// Also check for iframes or other containers
-						if (node.nodeType === 1) {
-							const videos = node.querySelectorAll ? node.querySelectorAll('video') : [];
-							videos.forEach(v => {
-								console.log('🎥 [NATIVE] Nested VIDEO found:', v.id, v.className);
-							});
-						}
-					});
-				});
-			});
-			observer.observe(document.body, { childList: true, subtree: true });
-			
-			// Intercept createElement to catch video elements
-			const originalCreateElement = document.createElement.bind(document);
-			document.createElement = function(tagName, options) {
-				const el = originalCreateElement(tagName, options);
-				if (tagName.toLowerCase() === 'video') {
-					console.log('🎥 [NATIVE] document.createElement("video") called');
-					console.log('🎥 [NATIVE] Stack:', new Error().stack);
-				}
-				return el;
-			};
-
-			Microsoft.Omnichannel.LiveChatWidget.SDK.setContextProvider(function contextProvider() {
-				return {
-					'SelfService': {
-						'value':
-							'[ {"msdyn_displaytitle":"Page visited", "msdyn_starttime":"yyyy-mm-ddThh:mm:ssZ","msdyn_type":192350000}, \
-					   {"msdyn_displaytitle":"Phrase searched", "msdyn_starttime":"yyyy-mm-ddThh:mm:ssZ","msdyn_type":192350001}, \
-					   {"msdyn_displaytitle":"Knowledge article viewed", "msdyn_starttime":"yyyy-mm-ddThh:mm:ssZ","msdyn_type":192350002}, \
-					   {"msdyn_displaytitle":"Custom action performed", "msdyn_starttime":"yyyy-mm-ddThh:mm:ssZ","msdyn_type":192350003} \
-					 ]'
-					}, // Additional context can be added as shown below
-                    'emailaddress1': 'lisa.garcia@gmail.com', // contact email in Dynamics
-					'Name': { 'value': 'John Garcia', isDisplayable: true }, // contact name in Dynamics
-					//'Account Number': { 'value': '118842', isDisplayable: true },
-                    //'msdyn_CustomerId': { 'value': 'a7bf9a01-b056-e711-abaa-00155d701c02', 'isDisplayable': true },
-					//'msdyn_CustomerName': { 'value': 'Brad Garza', 'isDisplayable': true },
-					'Location': 'Reno, NV', // string value
-					'Authenticated': 'Authenticated', // string value
-					'languageCode': 'en-US',
-				};
-			});
-		});
-		
-		// ============================================================
-		// ADAPTIVE CARD LOGGING - Capture how native widget handles AC
-		// ============================================================
-		
-		// Listen for ALL lcw events to capture adaptive card handling
-		const lcwEvents = [
-			'lcw:ready', 'lcw:error', 'lcw:startChat', 'lcw:closeChat',
-			'lcw:onMinimize', 'lcw:onMaximize', 'lcw:onMessageReceived',
-			'lcw:onMessageSent', 'lcw:onAgentEndSession', 'lcw:threadUpdate',
-			'lcw:chatRetrieved', 'lcw:chatQueued', 'lcw:onAgentJoined'
-		];
-		
-		lcwEvents.forEach(eventName => {
-			window.addEventListener(eventName, function(e) {
-				console.log(`📨 [NATIVE EVENT] ${eventName}:`, e.detail || e);
-			});
-		});
-		
-		// Specifically capture message events for Adaptive Card analysis
-		window.addEventListener("lcw:onMessageReceived", function(e) {
-			console.log('📩 [NATIVE] MESSAGE RECEIVED:', e.detail);
-			if (e.detail) {
-				console.log('📩 [NATIVE] Message content:', JSON.stringify(e.detail, null, 2));
-				// Check if it's an Adaptive Card
-				if (e.detail.text && e.detail.text.includes('AdaptiveCard')) {
-					console.log('🃏 [NATIVE] ADAPTIVE CARD DETECTED IN RECEIVED MESSAGE');
-				}
-				if (e.detail.attachments) {
-					console.log('🃏 [NATIVE] Message has attachments:', e.detail.attachments);
-				}
-			}
-		});
-		
-		window.addEventListener("lcw:onMessageSent", function(e) {
-			console.log('📤 [NATIVE] MESSAGE SENT:', e.detail);
-			if (e.detail) {
-				console.log('📤 [NATIVE] Sent message content:', JSON.stringify(e.detail, null, 2));
-				// This is KEY - see what format the native widget uses when sending AC responses
-				console.log('📤 [NATIVE] Sent message type:', typeof e.detail);
-				console.log('📤 [NATIVE] Sent message keys:', Object.keys(e.detail));
-			}
-		});
-		
-		// Intercept postMessage to see internal communication
-		const originalPostMessage = window.postMessage.bind(window);
-		window.postMessage = function(message, targetOrigin, transfer) {
-			if (message && (typeof message === 'object' || typeof message === 'string')) {
-				const msgStr = typeof message === 'string' ? message : JSON.stringify(message);
-				if (msgStr.includes('adaptive') || msgStr.includes('Adaptive') || 
-				    msgStr.includes('Submit') || msgStr.includes('actionSubmitId')) {
-					console.log('📬 [NATIVE] postMessage (AC related):', message);
-				}
-			}
-			return originalPostMessage(message, targetOrigin, transfer);
-		};
-		
-		// Intercept fetch to see API calls
-		const originalFetch = window.fetch;
-		window.fetch = function(...args) {
-			const url = args[0];
-			const options = args[1] || {};
-			
-			// Log all POST requests (message sending)
-			if (options.method === 'POST' || (typeof url === 'object' && url.method === 'POST')) {
-				console.log('🌐 [NATIVE] FETCH POST:', url);
-				if (options.body) {
-					try {
-						const bodyStr = typeof options.body === 'string' ? options.body : JSON.stringify(options.body);
-						if (bodyStr.includes('message') || bodyStr.includes('content') || bodyStr.includes('Submit')) {
-							console.log('🌐 [NATIVE] FETCH POST BODY:', options.body);
-						}
-					} catch(e) {}
-				}
-			}
-			
-			return originalFetch.apply(this, args).then(response => {
-				// Clone response to read body without consuming it
-				const cloned = response.clone();
-				cloned.text().then(text => {
-					if (text.includes('AdaptiveCard') || text.includes('attachments')) {
-						console.log('🌐 [NATIVE] FETCH RESPONSE (AC):', text.substring(0, 500));
-					}
-				}).catch(() => {});
-				return response;
-			});
-		};
-		
-		// Intercept XMLHttpRequest to see API calls
-		const originalXHROpen = XMLHttpRequest.prototype.open;
-		const originalXHRSend = XMLHttpRequest.prototype.send;
-		
-		XMLHttpRequest.prototype.open = function(method, url, ...rest) {
-			this._method = method;
-			this._url = url;
-			return originalXHROpen.apply(this, [method, url, ...rest]);
-		};
-		
-		XMLHttpRequest.prototype.send = function(body) {
-			if (this._method === 'POST' && body) {
-				const bodyStr = typeof body === 'string' ? body : JSON.stringify(body);
-				if (bodyStr && (bodyStr.includes('message') || bodyStr.includes('Submit') || bodyStr.includes('content'))) {
-					console.log('🌐 [NATIVE] XHR POST to:', this._url);
-					console.log('🌐 [NATIVE] XHR POST BODY:', body);
-				}
-			}
-			
-			this.addEventListener('load', function() {
-				try {
-					if (this.responseText && (this.responseText.includes('AdaptiveCard') || this.responseText.includes('attachments'))) {
-						console.log('🌐 [NATIVE] XHR RESPONSE (AC):', this.responseText.substring(0, 500));
-					}
-				} catch(e) {}
-			});
-			
-			return originalXHRSend.apply(this, [body]);
-		};
-		
-		// Also listen for voice/video specific events
-		window.addEventListener("lcw:onCallAdded", function(e) {
-			console.log('📞 [NATIVE] lcw:onCallAdded event!', e);
-			console.log('📞 [NATIVE] Event detail:', e.detail);
-		});
-		
-		window.addEventListener("lcw:onCallAccepted", function(e) {
-			console.log('📞 [NATIVE] lcw:onCallAccepted event!', e);
-		});
-		
-		window.addEventListener("lcw:onRemoteVideoStreamAdded", function(e) {
-			console.log('📹 [NATIVE] lcw:onRemoteVideoStreamAdded!', e);
-			console.log('📹 [NATIVE] Event detail:', e.detail);
-		});
-		
-		window.addEventListener("lcw:onLocalVideoStreamAdded", function(e) {
-			console.log('📹 [NATIVE] lcw:onLocalVideoStreamAdded!', e);
-		});
-		
-		// Global error handler to catch any issues
-		window.addEventListener('error', function(e) {
-			if (e.message && (e.message.includes('video') || e.message.includes('Video') || e.message.includes('stream') || e.message.includes('media'))) {
-				console.error('🔴 [NATIVE] Video-related error:', e.message);
-			}
-		});
-		
-		// Log when page loads all iframes
-		window.addEventListener('load', function() {
-			console.log('🔍 [NATIVE] Page loaded');
-			setTimeout(() => {
-				const allVideos = document.querySelectorAll('video');
-				console.log('🎥 [NATIVE] Total video elements on page:', allVideos.length);
-				allVideos.forEach((v, i) => {
-					console.log(`🎥 [NATIVE] Video ${i}:`, v.id, v.className, 'srcObject:', v.srcObject);
-				});
-				
-				// Check for iframes (native widget might use iframe)
-				const iframes = document.querySelectorAll('iframe');
-				console.log('🔍 [NATIVE] Total iframes:', iframes.length);
-				iframes.forEach((iframe, i) => {
-					console.log(`🔍 [NATIVE] Iframe ${i}:`, iframe.id, iframe.src);
-				});
-			}, 2000);
-			
-			// Continuously monitor for video elements every 2 seconds
-			setInterval(() => {
-				const videos = document.querySelectorAll('video');
-				if (videos.length > 0) {
-					console.log('🎥 [NATIVE] VIDEO ELEMENTS DETECTED:', videos.length);
-					videos.forEach((v, i) => {
-						console.log(`🎥 [NATIVE] Video ${i}: id=${v.id}, class=${v.className}`);
-						console.log(`🎥 [NATIVE] Video ${i} srcObject:`, v.srcObject);
-						console.log(`🎥 [NATIVE] Video ${i} src:`, v.src);
-						console.log(`🎥 [NATIVE] Video ${i} parent:`, v.parentElement?.className);
-						if (v.srcObject instanceof MediaStream) {
-							console.log(`🎥 [NATIVE] Video ${i} tracks:`, v.srcObject.getTracks());
-						}
-					});
-				}
-			}, 2000);
-		});
-		
-		console.log('🔬 [NATIVE] Adaptive Card logging initialized - ready to capture AC submissions!');
-	</script>
-
-	
-	<style>
-		html, body {
-			margin: 0;
-			padding: 0;
-			width: 100%;
-			height: auto;
-			overflow-x: hidden; /* Prevents unwanted horizontal scrolling */
-			text-align: center; /* Centers the image */
-		}
-	
-		/* Ensures the image is fully visible and scrollable */
-		.full-image {
-			display: block;
-			width: 100%; /* Adjusts to screen width */
-			height: auto; /* Maintains aspect ratio */
-		}
-	</style>
 	</head>
 	<body>
-	<!-- Add the image as part of the content -->
-	<img src="website.jpeg" alt="Full Image" class="full-image">
-	
+		<h1>Welcome to the Website</h1>
+		<p>This is a sample website page.</p>
 	</body>
-	</html>
+</html>
