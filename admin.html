@@ -6336,8 +6336,8 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       
       var html = mainContent
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        .replace(/```(\w*)\n?([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
-        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\`\`\`(\w*)\n?([\s\S]*?)\`\`\`/g, '<pre><code>$2</code></pre>')
+        .replace(/\`([^\`]+)\`/g, '<code>$1</code>')
         .replace(/^####\s+(.+)$/gm, '<h4>$1</h4>')
         .replace(/^###\s+(.+)$/gm, '<h3>$1</h3>')
         .replace(/^##\s+(.+)$/gm, '<h2>$1</h2>')
