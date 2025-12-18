@@ -3048,14 +3048,26 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v1.2.0';
-        const APP_LAST_UPDATED = 'Dec 18, 2025, 05:30 PM';
+        const APP_VERSION = 'v1.3.0';
+        const APP_LAST_UPDATED = 'Dec 18, 2025, 06:00 PM';
         
         const CHANGELOG = [
             {
-                version: 'v1.2.0',
+                version: 'v1.3.0',
                 date: 'Dec 18, 2025',
                 latest: true,
+                items: [
+                    { type: 'new', text: 'Enhanced markdown rendering for bot messages' },
+                    { type: 'new', text: 'Professional formatting for headers, lists, code blocks' },
+                    { type: 'new', text: 'Collapsible Sources section for citation references' },
+                    { type: 'improve', text: 'Styled citation links as modern badges' },
+                    { type: 'improve', text: 'Links now subtle with dotted underline on hover' }
+                ]
+            },
+            {
+                version: 'v1.2.0',
+                date: 'Dec 18, 2025',
+                latest: false,
                 items: [
                     { type: 'improve', text: 'Updated image upload hints with clearer instructions' },
                     { type: 'improve', text: 'Added guidance for using public URLs or free hosting services' }
@@ -5887,12 +5899,56 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     .d365-message-sender { font-size: 12px; font-weight: 600; color: #64748b; padding: 0 4px; }
     .d365-message-wrapper.user .d365-message-sender { text-align: right; }
     .d365-message {
-      padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.5;
-      word-wrap: break-word; white-space: pre-wrap;
+      padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.6;
+      word-wrap: break-word; white-space: normal;
     }
     .d365-message.agent { background: \${config.agentBubbleColor}; color: \${config.agentTextColor}; border-bottom-left-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
     .d365-message.user { background: \${config.userBubbleColor}; color: \${config.userTextColor}; border-bottom-right-radius: 4px; }
     .d365-message.system { align-self: center; background: \${config.systemMsgColor}; color: \${config.systemTextColor}; font-size: 12px; padding: 6px 12px; border-radius: 12px; max-width: none; }
+    
+    /* Enhanced Markdown Rendering */
+    .d365-message.agent h1, .d365-message.agent h2, .d365-message.agent h3, .d365-message.agent h4 {
+      margin: 16px 0 8px 0; font-weight: 600; line-height: 1.3; color: #1e293b;
+    }
+    .d365-message.agent h1:first-child, .d365-message.agent h2:first-child, .d365-message.agent h3:first-child { margin-top: 0; }
+    .d365-message.agent h1 { font-size: 18px; }
+    .d365-message.agent h2 { font-size: 16px; }
+    .d365-message.agent h3 { font-size: 15px; }
+    .d365-message.agent p { margin: 8px 0; }
+    .d365-message.agent p:first-child { margin-top: 0; }
+    .d365-message.agent p:last-child { margin-bottom: 0; }
+    .d365-message.agent strong { font-weight: 600; color: #1e293b; }
+    .d365-message.agent em { font-style: italic; }
+    .d365-message.agent code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 13px; color: #7c3aed; }
+    .d365-message.agent pre { background: #1e293b; color: #e2e8f0; padding: 12px 16px; border-radius: 8px; overflow-x: auto; margin: 12px 0; }
+    .d365-message.agent pre code { background: none; padding: 0; color: inherit; }
+    .d365-message.agent ul, .d365-message.agent ol { margin: 8px 0; padding-left: 20px; }
+    .d365-message.agent li { margin: 4px 0; line-height: 1.5; }
+    .d365-message.agent li::marker { color: \${config.primaryColor}; }
+    .d365-message.agent hr { border: none; border-top: 1px solid #e2e8f0; margin: 16px 0; }
+    .d365-message.agent a { color: #6366f1; text-decoration: none; border-bottom: 1px dotted #a5b4fc; transition: all 0.2s; }
+    .d365-message.agent a:hover { color: #4f46e5; border-bottom-color: #6366f1; }
+    .d365-message.agent .cite-link { display: inline-flex; align-items: center; justify-content: center; min-width: 16px; height: 16px; padding: 0 4px; font-size: 10px; font-weight: 600; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border-radius: 4px; text-decoration: none; border: none; vertical-align: super; margin: 0 1px; transition: all 0.2s; cursor: pointer; }
+    .d365-message.agent .cite-link:hover { transform: scale(1.1); box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4); }
+    .message-sources { margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e8f0; }
+    .sources-toggle { display: flex; align-items: center; gap: 8px; background: none; border: none; cursor: pointer; font-size: 12px; font-weight: 600; color: #64748b; padding: 6px 10px; border-radius: 6px; transition: all 0.2s; }
+    .sources-toggle:hover { background: #f1f5f9; color: #475569; }
+    .sources-toggle svg { width: 14px; height: 14px; fill: currentColor; transition: transform 0.2s; }
+    .sources-toggle.expanded svg { transform: rotate(180deg); }
+    .sources-count { background: #e0e7ff; color: #4f46e5; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+    .sources-list { display: none; margin-top: 8px; padding: 0; list-style: none; }
+    .sources-list.show { display: block; }
+    .source-item { display: flex; gap: 10px; padding: 10px 12px; background: #f8fafc; border-radius: 8px; margin-bottom: 6px; transition: all 0.2s; border: 1px solid transparent; }
+    .source-item:hover { background: #f1f5f9; border-color: #e2e8f0; }
+    .source-item:last-child { margin-bottom: 0; }
+    .source-number { flex-shrink: 0; width: 20px; height: 20px; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
+    .source-content { flex: 1; min-width: 0; }
+    .source-title { font-size: 13px; font-weight: 500; color: #1e293b; margin-bottom: 2px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .source-url { font-size: 11px; color: #6366f1; text-decoration: none; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .source-url:hover { text-decoration: underline; }
+    .source-domain { font-size: 11px; color: #94a3b8; display: flex; align-items: center; gap: 4px; }
+    .source-domain svg { width: 12px; height: 12px; fill: currentColor; }
+    
     .d365-message-time { font-size: 10px; color: #94a3b8; padding: 0 4px; }
     .d365-message-wrapper.user .d365-message-time { text-align: right; }
     .d365-message-image { max-width: 200px; max-height: 200px; border-radius: 12px; cursor: pointer; transition: transform 0.2s; object-fit: contain; }
@@ -6261,6 +6317,71 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
              name.includes('assistant') || name.includes('ai');
     }
     
+    // Enhanced Markdown & Reference Parser
+    function formatBotMessage(text) {
+      if (!text) return '';
+      
+      var references = [];
+      var refRegex = /\[(\d+)\]:\s*(https?:\/\/[^\s]+)\s*"([^"]+)"/g;
+      var match;
+      var mainContent = text;
+      
+      while ((match = refRegex.exec(text)) !== null) {
+        references.push({ num: match[1], url: match[2], title: match[3] });
+      }
+      
+      if (references.length > 0) {
+        mainContent = text.replace(/\n?\[(\d+)\]:\s*https?:\/\/[^\s]+\s*"[^"]+"/g, '');
+      }
+      
+      var html = mainContent
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/```(\w*)\n?([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/^####\s+(.+)$/gm, '<h4>$1</h4>')
+        .replace(/^###\s+(.+)$/gm, '<h3>$1</h3>')
+        .replace(/^##\s+(.+)$/gm, '<h2>$1</h2>')
+        .replace(/^#\s+(.+)$/gm, '<h1>$1</h1>')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+        .replace(/^---+$/gm, '<hr>')
+        .replace(/^[-*]\s+(.+)$/gm, '<li>$1</li>')
+        .replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>');
+      
+      // Convert citations
+      references.forEach(function(ref) {
+        html = html.replace(new RegExp('\\[' + ref.num + '\\]', 'g'), 
+          '<a href="' + ref.url + '" target="_blank" class="cite-link" title="' + ref.title + '">' + ref.num + '</a>');
+      });
+      
+      html = html
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+        .replace(/\n\n+/g, '</p><p>')
+        .replace(/\n/g, '<br>');
+      
+      html = html.replace(/(<li>[\s\S]*?<\/li>)(\s*<li>)/g, '$1$2');
+      html = html.replace(/(<li>[\s\S]*?<\/li>)(?!\s*<li>)/g, '<ul>$1</ul>');
+      html = html.replace(/<\/ul>\s*<ul>/g, '');
+      
+      if (!html.startsWith('<h') && !html.startsWith('<ul') && !html.startsWith('<pre')) {
+        html = '<p>' + html + '</p>';
+      }
+      html = html.replace(/<p>\s*<\/p>/g, '').replace(/<p>\s*<br>\s*<\/p>/g, '');
+      
+      if (references.length > 0) {
+        var sourcesHtml = '<div class="message-sources"><button class="sources-toggle" onclick="this.classList.toggle(\'expanded\'); this.nextElementSibling.classList.toggle(\'show\');"><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg><span>Sources</span><span class="sources-count">' + references.length + '</span></button><ul class="sources-list">';
+        references.forEach(function(ref) {
+          var domain = '';
+          try { domain = new URL(ref.url).hostname.replace('www.', ''); } catch(e) {}
+          sourcesHtml += '<li class="source-item"><span class="source-number">' + ref.num + '</span><div class="source-content"><div class="source-title">' + ref.title + '</div><div class="source-domain"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>' + domain + '</div><a href="' + ref.url + '" target="_blank" class="source-url">' + ref.url + '</a></div></li>';
+        });
+        sourcesHtml += '</ul></div>';
+        html += sourcesHtml;
+      }
+      
+      return html;
+    }
+    
     function addMessage(text, isUser, senderName) {
       var now = new Date();
       chatMessages.push({ content: text, isUser: isUser, senderName: senderName, timestamp: now });
@@ -6282,10 +6403,13 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
         avatar.textContent = getInitials(isUser ? userName : (senderName || 'Agent'));
       }
       
+      // Format bot messages with enhanced markdown rendering
+      var formattedText = isUser ? text : formatBotMessage(text);
+      
       var content = document.createElement('div');
       content.className = 'd365-message-content';
       content.innerHTML = '<div class="d365-message-sender">' + (isUser ? userName : (senderName || 'Agent')) + '</div>' +
-        '<div class="d365-message ' + (isUser ? 'user' : 'agent') + '">' + text + '</div>' +
+        '<div class="d365-message ' + (isUser ? 'user' : 'agent') + '">' + formattedText + '</div>' +
         '<div class="d365-message-time">' + formatTime(now) + '</div>';
       
       wrapper.appendChild(avatar);
