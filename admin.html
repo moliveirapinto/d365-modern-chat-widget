@@ -733,14 +733,21 @@
             width: 44px;
             height: 44px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.2);
+            background: transparent;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.5);
             flex-shrink: 0;
             position: relative;
+        }
+        .preview-header-avatar.has-image {
+            background: transparent;
+            border: none;
+        }
+        .preview-header-avatar:not(.has-image) {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.5);
         }
         .preview-header-avatar img {
             position: absolute;
@@ -4793,8 +4800,10 @@
                 const headerAvatar = document.getElementById('previewHeaderAvatar');
                 console.log('Updating header logo, settings.headerLogo:', settings.headerLogo, 'isSafe:', isSafeImageData(settings.headerLogo));
                 if (isSafeImageData(settings.headerLogo)) {
-                    headerAvatar.innerHTML = `<img src="${settings.headerLogo}" alt="Logo" onerror="this.style.display='none';this.parentElement.innerHTML='<svg viewBox=\"0 0 24 24\" style=\"fill:white;width:24px;height:24px;\"><path d=\"M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H5v-2h9v2zm5-4H5v-2h14v2zm0-4H5V7h14v2z\"/></svg>';">`;
+                    headerAvatar.classList.add('has-image');
+                    headerAvatar.innerHTML = `<img src="${settings.headerLogo}" alt="Logo" onerror="this.style.display='none';this.parentElement.classList.remove('has-image');this.parentElement.innerHTML='<svg viewBox=\"0 0 24 24\" style=\"fill:white;width:24px;height:24px;\"><path d=\"M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H5v-2h9v2zm5-4H5v-2h14v2zm0-4H5V7h14v2z\"/></svg>';">`;
                 } else {
+                    headerAvatar.classList.remove('has-image');
                     headerAvatar.innerHTML = '<svg viewBox="0 0 24 24" style="fill:white;width:24px;height:24px;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H5v-2h9v2zm5-4H5v-2h14v2zm0-4H5V7h14v2z"/></svg>';
                 }
 
@@ -4855,8 +4864,10 @@
                 
                 const prechatHeaderAvatar = document.getElementById('previewPrechatHeaderAvatar');
                 if (isSafeImageData(settings.headerLogo)) {
-                    prechatHeaderAvatar.innerHTML = `<img src="${settings.headerLogo}" alt="Logo" onerror="this.style.display='none';this.parentElement.innerHTML='<svg viewBox=\"0 0 24 24\" style=\"fill:white;width:24px;height:24px;\"><path d=\"M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H5v-2h9v2zm5-4H5v-2h14v2zm0-4H5V7h14v2z\"/></svg>';">`;
+                    prechatHeaderAvatar.classList.add('has-image');
+                    prechatHeaderAvatar.innerHTML = `<img src="${settings.headerLogo}" alt="Logo" onerror="this.style.display='none';this.parentElement.classList.remove('has-image');this.parentElement.innerHTML='<svg viewBox=\"0 0 24 24\" style=\"fill:white;width:24px;height:24px;\"><path d=\"M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H5v-2h9v2zm5-4H5v-2h14v2zm0-4H5V7h14v2z\"/></svg>';">`;
                 } else {
+                    prechatHeaderAvatar.classList.remove('has-image');
                     prechatHeaderAvatar.innerHTML = '<svg viewBox="0 0 24 24" style="fill:white;width:24px;height:24px;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H5v-2h9v2zm5-4H5v-2h14v2zm0-4H5V7h14v2z"/></svg>';
                 }
 
