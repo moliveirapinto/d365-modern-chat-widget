@@ -126,17 +126,6 @@
             height: 14px;
             fill: currentColor;
         }
-        .btn-header-action.btn-version {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            color: white;
-        }
-        .btn-header-action.btn-version:hover {
-            background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%);
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
-        }
 
         /* Main Layout */
         .admin-container {
@@ -2133,11 +2122,6 @@
         
         <!-- Header Actions -->
         <div class="header-actions">
-            <span id="welcomeText" style="color: var(--admin-text-light); font-size: 13px; margin-right: 8px;">Welcome, <strong id="currentUserName">Guest</strong></span>
-            <button class="btn-header-action btn-version" onclick="showChangelog()" title="View changelog" id="headerVersionBtn">
-                <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
-                <span id="headerVersionNumber">v1.0.0</span>
-            </button>
             <button class="btn-header-action" id="loginBtn" onclick="showLoginOverlay()" title="Sign in with GitHub">
                 <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
                 Sign in
@@ -3135,9 +3119,7 @@
         // Initialize version display
         document.addEventListener('DOMContentLoaded', function() {
             const versionEl = document.getElementById('versionNumber');
-            const headerVersionEl = document.getElementById('headerVersionNumber');
             if (versionEl) versionEl.textContent = APP_VERSION;
-            if (headerVersionEl) headerVersionEl.textContent = APP_VERSION;
         });
 
         // ============================================
