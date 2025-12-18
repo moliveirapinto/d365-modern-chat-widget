@@ -1,9 +1,9 @@
 <html>
 	<head>
-<!-- D365 Modern Chat Widget - Self-Contained Embed -->
+<!-- D365 Modern Chat Widget - Full Featured Self-Contained Embed -->
 <!-- Generated: 2025-12-17 -->
 <!-- Simply copy this entire block and paste it into your HTML page -->
-<!-- Works in <head> or <body> -->
+<!-- Features: Emoji picker, File attachments, Voice recording, Sound toggle, Minimize, Close -->
 
 
 <script>
@@ -15,10 +15,11 @@
   "orgId": "e0aec93b-f5c0-f011-95c5-6045bd03cf38",
   "orgUrl": "https://m-e0aec93b-f5c0-f011-95c5-6045bd03cf38.us.omnichannelengagementhub.com",
   "widgetId": "de416403-f2b1-41fe-9eaf-8f87018c1b4d",
+  "lcwScript": "<script id=\"Microsoft_Omnichannel_LCWidget\" src=\"https://oc-cdn-ocprod.azureedge.net/livechatwidget/scripts/LiveChatBootstrapper.js\" onerror=\"(function(el){el.parentNode.removeChild(el);var s=document.createElement('script');s.src='https://ocprodocprodnamgs.blob.core.windows.net/livechatwidget/scripts/LiveChatBootstrapper.js';s.setAttribute('id', 'Microsoft_Omnichannel_LCWidget');s.setAttribute('data-app-id', 'de416403-f2b1-41fe-9eaf-8f87018c1b4d');s.setAttribute('data-lcw-version', 'prod');s.setAttribute('data-org-id', 'e0aec93b-f5c0-f011-95c5-6045bd03cf38');s.setAttribute('data-org-url', 'https://m-e0aec93b-f5c0-f011-95c5-6045bd03cf38.us.omnichannelengagementhub.com');document.body.appendChild(s);})(this);\" data-app-id=\"de416403-f2b1-41fe-9eaf-8f87018c1b4d\" data-lcw-version=\"prod\" data-org-id=\"e0aec93b-f5c0-f011-95c5-6045bd03cf38\" data-org-url=\"https://m-e0aec93b-f5c0-f011-95c5-6045bd03cf38.us.omnichannelengagementhub.com\" async><\/script>",
   "widgetMode": "custom",
   "headerTitle": "Ola Marcelo",
   "headerSubtitle": "Hey yo!",
-  "headerLogo": "",
+  "headerLogo": "https://www.hatchwise.com/wp-content/uploads/2023/06/LEGO-Symbol-1024x576.png",
   "fontFamily": "system",
   "useGradient": true,
   "gradientStart": "#667eea",
@@ -35,11 +36,11 @@
   "inputBorderColor": "#e2e8f0",
   "sendBtnColor": "#667eea",
   "launcherColor": "#667eea",
-  "launcherIcon": "chat_multiple_heart",
+  "launcherIcon": "chat_empty",
   "badgeColor": "#ff4757",
-  "agentAvatar": "https://raw.githubusercontent.com/moliveirapinto/d365-modern-chat-widget/main/img/headshots/headshot_female1.png",
-  "customerAvatar": "https://raw.githubusercontent.com/moliveirapinto/d365-modern-chat-widget/main/img/headshots/headshot_female2.png",
-  "botAvatar": "https://raw.githubusercontent.com/moliveirapinto/d365-modern-chat-widget/main/img/bot/bot4.png",
+  "agentAvatar": "https://raw.githubusercontent.com/moliveirapinto/d365-modern-chat-widget/main/img/headshots/headshot_female2.png",
+  "customerAvatar": "https://raw.githubusercontent.com/moliveirapinto/d365-modern-chat-widget/main/img/headshots/headshot_female1.png",
+  "botAvatar": "https://raw.githubusercontent.com/moliveirapinto/d365-modern-chat-widget/main/img/bot/bot8.png",
   "enablePrechatForm": false,
   "welcomeTitle": "Start a conversation",
   "welcomeMessage": "We're here to help! Please fill out the form below to start chatting with our team.",
@@ -53,17 +54,54 @@
   "customAuthEmail": ""
 };
   
-  // Launcher icon SVG path for selected icon: chat_multiple_heart
-  var launcherIconPath = 'M6.3412 8.3412C7.1326 7.5498 8.41849 7.55366 9.21333 8.3485L9.49671 8.63188L9.77626 8.35179C10.5691 7.55898 11.8556 7.56284 12.6518 8.3591C13.4468 9.15408 13.4493 10.4364 12.6597 11.2303L9.73275 14.1556C9.6107 14.2777 9.41283 14.2777 9.29079 14.1556L6.3485 11.2133C5.55366 10.4185 5.5498 9.1326 6.3412 8.3412ZM2.06158 10.5C2.06158 6.35786 5.41944 3 9.56158 3C13.7037 3 17.0616 6.35786 17.0616 10.5C17.0616 14.6421 13.7037 18 9.56158 18C8.46241 18 7.41678 17.7631 6.47447 17.337C5.44699 17.5819 4.29396 17.8587 3.54374 18.039C2.6294 18.2588 1.80697 17.428 2.03999 16.5147C2.22638 15.7842 2.5102 14.6714 2.76423 13.6734C2.31325 12.7088 2.06158 11.6329 2.06158 10.5ZM9.56158 4.5C6.24787 4.5 3.56158 7.18629 3.56158 10.5C3.56158 11.4914 3.80145 12.4246 4.22568 13.2468L4.35619 13.4998L4.28601 13.7757C4.05784 14.6724 3.79467 15.7047 3.59592 16.4838C4.39489 16.2919 5.46095 16.0363 6.38368 15.8167L6.6482 15.7537L6.89161 15.8749C7.69487 16.2748 8.60084 16.5 9.56158 16.5C12.8753 16.5 15.5616 13.8137 15.5616 10.5C15.5616 7.18629 12.8753 4.5 9.56158 4.5ZM9.46191 18.9995C10.8001 20.241 12.5922 21.0001 14.5616 21.0001C15.6611 21.0001 16.707 20.763 17.6495 20.3367C18.6933 20.581 19.8358 20.8248 20.563 20.9768C21.4554 21.1633 22.2348 20.3623 22.0304 19.4773C21.8679 18.774 21.6117 17.6821 21.3586 16.6741C21.8098 15.7094 22.0616 14.6332 22.0616 13.5001C22.0616 10.2171 19.9523 7.42684 17.015 6.41052C17.3653 7.04756 17.6363 7.73435 17.8146 8.45761C19.4676 9.52617 20.5616 11.3853 20.5616 13.5001C20.5616 14.4915 20.3217 15.4247 19.8975 16.2469L19.767 16.4999L19.8372 16.7757C20.065 17.6711 20.3037 18.6757 20.4787 19.4262C19.7046 19.2625 18.6611 19.0361 17.7395 18.8167L17.475 18.7537L17.2316 18.8749C16.4283 19.2748 15.5223 19.5001 14.5616 19.5001C13.5021 19.5001 12.5067 19.2254 11.6427 18.7434C10.9768 18.911 10.2796 19.0001 9.56163 19.0001C9.52835 19.0001 9.49511 18.9999 9.46191 18.9995Z';
+  // Launcher icon SVG path for selected icon: chat_empty
+  var launcherIconPath = 'M5.25 18C3.45507 18 2 16.5449 2 14.75V6.25C2 4.45507 3.45507 3 5.25 3H18.75C20.5449 3 22 4.45507 22 6.25V14.75C22 16.5449 20.5449 18 18.75 18H13.0125L7.99868 21.7507C7.44585 22.1642 6.6625 22.0512 6.24901 21.4984C6.08736 21.2822 6 21.0196 6 20.7499L5.99921 18H5.25ZM12.5135 16.5H18.75C19.7165 16.5 20.5 15.7165 20.5 14.75V6.25C20.5 5.2835 19.7165 4.5 18.75 4.5H5.25C4.2835 4.5 3.5 5.2835 3.5 6.25V14.75C3.5 15.7165 4.2835 16.5 5.25 16.5H7.49879L7.499 17.2498L7.49986 20.2506L12.5135 16.5Z';
   
   // Font family
   var fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
   
+  // Emojis for picker
+  var emojis = [
+    '😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂',
+    '🙂', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘',
+    '😗', '😚', '😋', '😛', '😜', '🤪', '😝', '🤑',
+    '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐', '😑',
+    '😶', '😏', '😒', '🙄', '😬', '🤥', '😌', '😔',
+    '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮',
+    '👍', '👎', '👌', '✌️', '🤞', '🤟', '🤘', '👋',
+    '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍'
+  ];
+  
   // Main initialization function - called when DOM is ready
   function initD365Widget() {
-    // Inject CSS Styles
+    // Inject CSS Styles - Full featured version matching index.html
     var style = document.createElement('style');
     style.textContent = `
+    /* Hide the native D365 Omnichannel widget - we use it as backend only */
+    #Microsoft_Omnichannel_LCWidget_Chat_Iframe_Window,
+    #oc-lcw-chat-button,
+    [id^="Microsoft_Omnichannel"],
+    .oc-lcw-widget,
+    .oc-lcw-chat-button,
+    .oc-lcw-chat-button-container,
+    .oc-lcw-chat-widget,
+    .lcw-chat-button,
+    .lcw-components,
+    [class^="lcw-"],
+    [class*=" lcw-"],
+    iframe[id*="Omnichannel"],
+    iframe[id*="lcw"],
+    iframe[title*="Omnichannel"],
+    iframe[title*="Live Chat"] {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      width: 0 !important;
+      height: 0 !important;
+      position: absolute !important;
+      left: -9999px !important;
+    }
     @keyframes d365pulse {
       0% { box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 0 rgba(102,126,234,0.4); }
       50% { box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 12px rgba(102,126,234,0); }
@@ -93,7 +131,7 @@
     }
     .d365-chat-badge.show { opacity: 1; transform: scale(1); }
     .d365-chat-container {
-      position: fixed; bottom: 100px; right: 24px; width: 400px; height: 600px;
+      position: fixed; bottom: 100px; right: 24px; width: 400px; height: 700px;
       max-height: calc(100vh - 120px); background: white; border-radius: 16px;
       box-shadow: 0 10px 50px rgba(0,0,0,0.2); display: flex; flex-direction: column;
       overflow: hidden; opacity: 0; transform: translateY(20px) scale(0.95);
@@ -115,13 +153,20 @@
     .d365-header-info { flex: 1; }
     .d365-header-title { color: white; font-weight: 600; font-size: 16px; }
     .d365-header-status { color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 2px; }
+    .d365-header-actions { display: flex; gap: 8px; }
     .d365-header-btn {
       background: rgba(255,255,255,0.2); border: none; width: 32px; height: 32px;
       border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s; position: relative;
     }
     .d365-header-btn:hover { background: rgba(255,255,255,0.3); }
     .d365-header-btn svg { width: 18px; height: 18px; fill: white; }
-    .d365-chat-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .d365-header-btn.sound-off svg { opacity: 0.5; }
+    .d365-header-btn.sound-off::after {
+      content: ''; position: absolute; width: 2px; height: 20px;
+      background: white; transform: rotate(45deg); border-radius: 1px;
+    }
+    .d365-chat-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
     .d365-prechat-form {
       padding: 24px; display: flex; flex-direction: column; gap: 16px; flex: 1; justify-content: center;
     }
@@ -144,7 +189,7 @@
       background: ${config.useGradient ? 'linear-gradient(135deg, ' + config.gradientStart + ' 0%, ' + config.gradientEnd + ' 100%)' : config.primaryColor};
     }
     .d365-start-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-    .d365-start-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .d365-start-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
     .d365-connecting-view, .d365-chat-ended {
       display: none; flex-direction: column; align-items: center; justify-content: center;
       flex: 1; gap: 16px; padding: 24px; text-align: center;
@@ -157,20 +202,24 @@
     @keyframes d365spin { to { transform: rotate(360deg); } }
     .d365-chat-messages {
       display: none; flex-direction: column; flex: 1; overflow-y: auto;
-      padding: 16px; gap: 12px; background: ${config.chatBgColor};
+      padding: 16px; gap: 12px; background: ${config.chatBgColor}; scroll-behavior: smooth;
     }
     .d365-chat-messages.active { display: flex; }
-    .d365-message-wrapper { display: flex; gap: 10px; max-width: 85%; animation: d365fadeIn 0.3s ease; }
+    .d365-message-wrapper { display: flex; gap: 10px; max-width: 85%; animation: d365fadeIn 0.3s ease; align-items: flex-start; }
     .d365-message-wrapper.user { flex-direction: row-reverse; align-self: flex-end; }
     .d365-message-wrapper.agent { align-self: flex-start; }
     @keyframes d365fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .d365-message-avatar {
       width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center;
-      justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0;
+      justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; overflow: hidden;
       margin-top: 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      border: 2px solid transparent; transition: transform 0.2s ease;
     }
-    .d365-message-avatar.agent { background: linear-gradient(135deg, ${config.gradientStart} 0%, ${config.gradientEnd} 100%); color: white; }
-    .d365-message-avatar.user { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; }
+    .d365-message-avatar:hover { transform: scale(1.05); }
+    .d365-message-avatar.agent { background: linear-gradient(135deg, ${config.gradientStart} 0%, ${config.gradientEnd} 100%); color: white; border-color: rgba(102,126,234,0.3); }
+    .d365-message-avatar.bot { background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%); color: white; border-color: rgba(0,180,216,0.3); }
+    .d365-message-avatar.user { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border-color: rgba(17,153,142,0.3); }
+    .d365-message-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
     .d365-message-content { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
     .d365-message-sender { font-size: 12px; font-weight: 600; color: #64748b; padding: 0 4px; }
     .d365-message-wrapper.user .d365-message-sender { text-align: right; }
@@ -180,8 +229,11 @@
     }
     .d365-message.agent { background: ${config.agentBubbleColor}; color: ${config.agentTextColor}; border-bottom-left-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
     .d365-message.user { background: ${config.userBubbleColor}; color: ${config.userTextColor}; border-bottom-right-radius: 4px; }
+    .d365-message.system { align-self: center; background: ${config.systemMsgColor}; color: ${config.systemTextColor}; font-size: 12px; padding: 6px 12px; border-radius: 12px; max-width: none; }
     .d365-message-time { font-size: 10px; color: #94a3b8; padding: 0 4px; }
     .d365-message-wrapper.user .d365-message-time { text-align: right; }
+    .d365-message-image { max-width: 200px; max-height: 200px; border-radius: 12px; cursor: pointer; transition: transform 0.2s; object-fit: contain; }
+    .d365-message-image:hover { transform: scale(1.02); }
     .d365-typing-indicator { display: none; padding: 8px 0; align-items: center; gap: 8px; }
     .d365-typing-indicator.active { display: flex; }
     .d365-typing-dots { display: flex; gap: 4px; padding: 12px 16px; background: white; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-left: 46px; }
@@ -190,24 +242,90 @@
     .d365-typing-dots span:nth-child(2) { animation-delay: -0.16s; }
     @keyframes d365bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
     .d365-chat-input-area {
-      display: none; padding: 12px 16px 16px; background: ${config.inputBgColor};
-      border-top: 1px solid ${config.inputBorderColor}; flex-direction: column; gap: 10px;
+      display: none; background: ${config.inputBgColor};
+      border-top: 1px solid ${config.inputBorderColor}; position: relative;
     }
-    .d365-chat-input-area.active { display: flex; }
+    .d365-chat-input-area.active { display: block; }
+    .d365-chat-input-wrapper {
+      padding: 12px 16px;
+    }
     .d365-message-input {
-      width: 100%; min-height: 50px; max-height: 120px; padding: 12px 14px;
-      border: 1px solid ${config.inputBorderColor}; border-radius: 12px; font-size: 14px;
-      resize: none; font-family: inherit; background: ${config.inputBgColor};
+      width: 100%; padding: 10px 14px; background: #f1f5f9; border: none;
+      border-radius: 12px; font-size: 14px; font-family: inherit; outline: none;
+      resize: none; min-height: 44px; max-height: 120px;
     }
-    .d365-message-input:focus { outline: none; border-color: ${config.primaryColor}; }
-    .d365-input-row { display: flex; align-items: center; justify-content: flex-end; }
-    .d365-send-btn {
-      width: 40px; height: 40px; border-radius: 10px; background: transparent;
+    .d365-message-input:focus { background: #e2e8f0; }
+    .d365-message-input::placeholder { color: #64748b; }
+    .d365-input-bottom-row {
+      display: flex; justify-content: space-between; align-items: center; margin-top: 8px;
+    }
+    .d365-input-actions {
+      display: flex; gap: 8px;
+    }
+    .d365-action-btn {
+      width: 36px; height: 36px; border-radius: 50%; background: #f1f5f9;
       border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-      color: ${config.sendBtnColor};
+      transition: all 0.2s ease;
     }
-    .d365-send-btn:hover { background: ${config.sendBtnColor}22; }
-    .d365-send-btn svg { width: 22px; height: 22px; fill: currentColor; }
+    .d365-action-btn:hover { background: #e2e8f0; }
+    .d365-action-btn svg { width: 20px; height: 20px; fill: #64748b; }
+    .d365-send-btn {
+      width: 36px; height: 36px; border-radius: 50%; background: ${config.sendBtnColor};
+      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s ease; flex-shrink: 0;
+    }
+    .d365-send-btn:hover { opacity: 0.9; transform: scale(1.05); }
+    .d365-send-btn:active { transform: scale(0.95); }
+    .d365-send-btn svg { width: 18px; height: 18px; fill: white; }
+    .d365-emoji-picker {
+      position: absolute; bottom: 100%; left: 12px; width: 300px; max-height: 250px;
+      background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      padding: 12px; display: none; z-index: 100; overflow: hidden;
+    }
+    .d365-emoji-picker.show { display: block; }
+    .d365-emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; max-height: 200px; overflow-y: auto; padding-right: 4px; }
+    .d365-emoji-item {
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border-radius: 6px; font-size: 20px; transition: background 0.2s; border: none; background: transparent;
+    }
+    .d365-emoji-item:hover { background: #f1f5f9; transform: scale(1.1); }
+    .d365-voice-recording {
+      position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+      background: #ef4444; color: white; padding: 10px 20px; border-radius: 24px;
+      display: none; align-items: center; gap: 10px; font-size: 14px; font-weight: 500;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    }
+    .d365-voice-recording.show { display: flex; animation: d365slideUp 0.3s ease; }
+    @keyframes d365slideUp { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+    .d365-voice-dot { width: 10px; height: 10px; background: white; border-radius: 50%; animation: d365pulseDot 1s infinite; }
+    @keyframes d365pulseDot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+    .d365-voice-waveform { display: flex; gap: 2px; align-items: center; }
+    .d365-voice-waveform span { width: 3px; background: white; border-radius: 2px; animation: d365wave 0.6s infinite ease-in-out; }
+    .d365-voice-waveform span:nth-child(1) { height: 8px; animation-delay: 0s; }
+    .d365-voice-waveform span:nth-child(2) { height: 16px; animation-delay: 0.1s; }
+    .d365-voice-waveform span:nth-child(3) { height: 12px; animation-delay: 0.2s; }
+    .d365-voice-waveform span:nth-child(4) { height: 20px; animation-delay: 0.3s; }
+    .d365-voice-waveform span:nth-child(5) { height: 12px; animation-delay: 0.4s; }
+    @keyframes d365wave { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.5); } }
+    .d365-stop-voice-btn {
+      background: rgba(255,255,255,0.2); border: none; padding: 6px 12px;
+      border-radius: 6px; color: white; cursor: pointer; font-size: 12px; font-weight: 500;
+    }
+    .d365-stop-voice-btn:hover { background: rgba(255,255,255,0.3); }
+    .d365-confirm-modal {
+      position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: none;
+      align-items: center; justify-content: center; z-index: 200;
+    }
+    .d365-confirm-modal.show { display: flex; }
+    .d365-confirm-content { background: white; padding: 24px; border-radius: 16px; text-align: center; max-width: 280px; margin: 20px; }
+    .d365-confirm-title { font-size: 16px; font-weight: 600; color: #2d3748; margin-bottom: 8px; }
+    .d365-confirm-text { font-size: 14px; color: #64748b; margin-bottom: 20px; }
+    .d365-confirm-buttons { display: flex; gap: 12px; justify-content: center; }
+    .d365-confirm-btn { padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; }
+    .d365-confirm-btn.cancel { background: #e2e8f0; color: #4a5568; }
+    .d365-confirm-btn.cancel:hover { background: #cbd5e1; }
+    .d365-confirm-btn.end { background: #ef4444; color: white; }
+    .d365-confirm-btn.end:hover { background: #dc2626; }
     .d365-new-chat-btn {
       color: white; border: none; padding: 12px 24px; border-radius: 8px;
       font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px;
@@ -216,7 +334,7 @@
   `;
   document.head.appendChild(style);
   
-  // Inject HTML
+  // Inject HTML - Full featured version with all buttons
   var widgetHTML = `
     <button class="d365-chat-launcher" id="d365ChatLauncher">
       <span class="d365-chat-badge" id="d365ChatBadge">0</span>
@@ -230,9 +348,20 @@
           <div class="d365-header-title">${config.headerTitle}</div>
           <div class="d365-header-status">${config.headerSubtitle}</div>
         </div>
-        <button class="d365-header-btn" id="d365MinimizeChat" title="Minimize">
-          <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
-        </button>
+        <div class="d365-header-actions">
+          <button class="d365-header-btn" id="d365ToggleSound" title="Sound notifications on">
+            <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+          </button>
+          <button class="d365-header-btn" id="d365DownloadChat" title="Download transcript" style="display:none;">
+            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          </button>
+          <button class="d365-header-btn" id="d365MinimizeChat" title="Minimize">
+            <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
+          </button>
+          <button class="d365-header-btn" id="d365CloseChat" title="Close">
+            <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+          </button>
+        </div>
       </div>
       <div class="d365-chat-body">
         <form class="d365-prechat-form" id="d365PrechatForm" onsubmit="return false;">
@@ -262,11 +391,34 @@
           </div>
         </div>
         <div class="d365-chat-input-area" id="d365ChatInputArea">
-          <textarea class="d365-message-input" id="d365MessageInput" placeholder="Type your message..." rows="2"></textarea>
-          <div class="d365-input-row">
-            <button type="button" class="d365-send-btn" id="d365SendBtn" title="Send">
-              <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-            </button>
+          <div class="d365-emoji-picker" id="d365EmojiPicker">
+            <div class="d365-emoji-grid" id="d365EmojiGrid"></div>
+          </div>
+          <div class="d365-voice-recording" id="d365VoiceRecording">
+            <div class="d365-voice-dot"></div>
+            <div class="d365-voice-waveform"><span></span><span></span><span></span><span></span><span></span></div>
+            <span>Recording...</span>
+            <button class="d365-stop-voice-btn" id="d365StopVoiceBtn">Stop</button>
+          </div>
+          <div class="d365-chat-input-wrapper">
+            <textarea class="d365-message-input" id="d365MessageInput" placeholder="Type your message..." rows="3"></textarea>
+            <div class="d365-input-bottom-row">
+              <div class="d365-input-actions">
+                <input type="file" id="d365FileInput" style="display:none;">
+                <button type="button" class="d365-action-btn" id="d365AttachBtn" title="Attach file">
+                  <svg viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/></svg>
+                </button>
+                <button type="button" class="d365-action-btn" id="d365EmojiBtn" title="Emoji">
+                  <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+                </button>
+                <button type="button" class="d365-action-btn" id="d365VoiceBtn" title="Voice input">
+                  <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
+                </button>
+              </div>
+              <button type="button" class="d365-send-btn" id="d365SendBtn" title="Send">
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
           </div>
         </div>
         <div class="d365-chat-ended" id="d365ChatEnded">
@@ -276,6 +428,16 @@
           <button class="d365-new-chat-btn" id="d365NewChatBtn">Start New Chat</button>
         </div>
       </div>
+      <div class="d365-confirm-modal" id="d365ConfirmModal">
+        <div class="d365-confirm-content">
+          <div class="d365-confirm-title">End Chat?</div>
+          <div class="d365-confirm-text">Are you sure you want to end this conversation?</div>
+          <div class="d365-confirm-buttons">
+            <button class="d365-confirm-btn cancel" id="d365ConfirmNo">Cancel</button>
+            <button class="d365-confirm-btn end" id="d365ConfirmYes">End Chat</button>
+          </div>
+        </div>
+      </div>
     </div>
   `;
   
@@ -283,23 +445,52 @@
   container.innerHTML = widgetHTML;
   document.body.appendChild(container);
   
-  // Load the Microsoft Omnichannel Chat SDK
-  var ocScript = document.createElement('script');
-  ocScript.src = 'https://cdn.jsdelivr.net/npm/@microsoft/omnichannel-chat-sdk@1/dist/Microsoft.OmnichannelChatSDK.min.js';
-  ocScript.onload = initWidget;
-  ocScript.onerror = function() {
-    console.warn('Omnichannel SDK failed to load, trying alternative...');
-    // Try alternative CDN
-    var altScript = document.createElement('script');
-    altScript.src = 'https://unpkg.com/@microsoft/omnichannel-chat-sdk@1/dist/Microsoft.OmnichannelChatSDK.min.js';
-    altScript.onload = initWidget;
-    altScript.onerror = initWidgetFallback;
-    document.head.appendChild(altScript);
-  };
-  document.head.appendChild(ocScript);
+  // Load the Microsoft Omnichannel Chat SDK for custom UI integration
+  // Using GitHub-hosted bundle to avoid CDN blocking by Power Pages CSP
+  console.log('Loading Omnichannel Chat SDK...');
+  
+  var sdkSources = [
+    'https://raw.githubusercontent.com/moliveirapinto/d365-modern-chat-widget/main/dist/chat-sdk-bundle.js',
+    'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/chat-sdk-bundle.js',
+    'https://cdn.jsdelivr.net/gh/moliveirapinto/d365-modern-chat-widget@main/dist/chat-sdk-bundle.js'
+  ];
+  var currentSdkIndex = 0;
+  
+  function loadNextSdk() {
+    if (currentSdkIndex >= sdkSources.length) {
+      console.error('All SDK sources failed to load. Chat will not connect to D365.');
+      console.log('Power Pages may be blocking external scripts. Check CSP settings.');
+      initWidgetFallback();
+      return;
+    }
+    
+    var sdkScript = document.createElement('script');
+    sdkScript.src = sdkSources[currentSdkIndex];
+    console.log('Trying SDK source:', sdkSources[currentSdkIndex]);
+    
+    sdkScript.onload = function() {
+      console.log('✅ Omnichannel Chat SDK loaded successfully from:', sdkSources[currentSdkIndex]);
+      initWidget();
+    };
+    
+    sdkScript.onerror = function() {
+      console.warn('SDK failed to load from:', sdkSources[currentSdkIndex]);
+      currentSdkIndex++;
+      loadNextSdk();
+    };
+    
+    document.head.appendChild(sdkScript);
+  }
+  
+  loadNextSdk();
   
   function initWidget() {
     var chatSDK = null, chatStarted = false, userName = '', userEmail = '';
+    var chatMessages = [];
+    var soundEnabled = true;
+    var processedMessageIds = {}; // Track processed message IDs to avoid duplicates
+    
+    // DOM Elements
     var launcher = document.getElementById('d365ChatLauncher');
     var chatContainer = document.getElementById('d365ChatContainer');
     var badge = document.getElementById('d365ChatBadge');
@@ -312,8 +503,14 @@
     var sendBtn = document.getElementById('d365SendBtn');
     var startBtn = document.getElementById('d365StartBtn');
     var minimizeBtn = document.getElementById('d365MinimizeChat');
+    var closeBtn = document.getElementById('d365CloseChat');
     var chatEnded = document.getElementById('d365ChatEnded');
     var newChatBtn = document.getElementById('d365NewChatBtn');
+    var confirmModal = document.getElementById('d365ConfirmModal');
+    var confirmYes = document.getElementById('d365ConfirmYes');
+    var confirmNo = document.getElementById('d365ConfirmNo');
+    var toggleSoundBtn = document.getElementById('d365ToggleSound');
+    var downloadChatBtn = document.getElementById('d365DownloadChat');
     var unreadCount = 0;
     
     function showView(view) {
@@ -322,10 +519,19 @@
       messagesContainer.classList.remove('active');
       inputArea.classList.remove('active');
       chatEnded.classList.remove('active');
+      downloadChatBtn.style.display = 'none';
       if (view === 'prechat') prechatForm.classList.remove('hidden');
       else if (view === 'connecting') connectingView.classList.add('active');
-      else if (view === 'chat') { messagesContainer.classList.add('active'); inputArea.classList.add('active'); }
-      else if (view === 'ended') { chatEnded.classList.add('active'); chatStarted = false; }
+      else if (view === 'chat') { 
+        messagesContainer.classList.add('active'); 
+        inputArea.classList.add('active'); 
+        downloadChatBtn.style.display = 'flex';
+      }
+      else if (view === 'ended') { 
+        chatEnded.classList.add('active'); 
+        chatStarted = false; 
+        downloadChatBtn.style.display = 'flex';
+      }
     }
     
     function getInitials(name) {
@@ -339,27 +545,99 @@
       return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
     
+    function isBotSender(senderName) {
+      if (!senderName) return false;
+      var name = senderName.toLowerCase();
+      return name.includes('bot') || name.includes('copilot') || name.includes('virtual') || 
+             name.includes('assistant') || name.includes('ai');
+    }
+    
     function addMessage(text, isUser, senderName) {
       var now = new Date();
+      chatMessages.push({ content: text, isUser: isUser, senderName: senderName, timestamp: now });
+      
       var wrapper = document.createElement('div');
       wrapper.className = 'd365-message-wrapper ' + (isUser ? 'user' : 'agent');
+      
       var avatar = document.createElement('div');
-      avatar.className = 'd365-message-avatar ' + (isUser ? 'user' : 'agent');
-      avatar.textContent = getInitials(isUser ? userName : (senderName || 'Agent'));
+      var isBot = !isUser && isBotSender(senderName);
+      avatar.className = 'd365-message-avatar ' + (isUser ? 'user' : (isBot ? 'bot' : 'agent'));
+      
+      if (isUser && config.customerAvatar) {
+        avatar.innerHTML = '<img src="' + config.customerAvatar + '" alt="You">';
+      } else if (!isUser && isBot && config.botAvatar) {
+        avatar.innerHTML = '<img src="' + config.botAvatar + '" alt="Bot">';
+      } else if (!isUser && !isBot && config.agentAvatar) {
+        avatar.innerHTML = '<img src="' + config.agentAvatar + '" alt="Agent">';
+      } else {
+        avatar.textContent = getInitials(isUser ? userName : (senderName || 'Agent'));
+      }
+      
       var content = document.createElement('div');
       content.className = 'd365-message-content';
       content.innerHTML = '<div class="d365-message-sender">' + (isUser ? userName : (senderName || 'Agent')) + '</div>' +
         '<div class="d365-message ' + (isUser ? 'user' : 'agent') + '">' + text + '</div>' +
         '<div class="d365-message-time">' + formatTime(now) + '</div>';
+      
       wrapper.appendChild(avatar);
       wrapper.appendChild(content);
       typingIndicator.parentNode.insertBefore(wrapper, typingIndicator);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      
       if (!isUser && !chatContainer.classList.contains('open')) {
         unreadCount++; badge.textContent = unreadCount; badge.classList.add('show');
+        if (soundEnabled) playNotificationSound();
       }
     }
     
+    function playNotificationSound() {
+      try {
+        var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        var oscillator = audioContext.createOscillator();
+        var gainNode = audioContext.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        oscillator.frequency.value = 800;
+        oscillator.type = 'sine';
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.3);
+      } catch (e) { console.log('Sound not supported'); }
+    }
+    
+    // Sound toggle
+    toggleSoundBtn.addEventListener('click', function() {
+      soundEnabled = !soundEnabled;
+      toggleSoundBtn.classList.toggle('sound-off', !soundEnabled);
+      toggleSoundBtn.title = soundEnabled ? 'Sound notifications on' : 'Sound notifications off';
+    });
+    
+    // Download transcript
+    downloadChatBtn.addEventListener('click', function() {
+      if (chatMessages.length === 0) { alert('No messages to download'); return; }
+      var transcript = 'Chat Transcript\n';
+      transcript += 'Date: ' + new Date().toLocaleDateString() + '\n';
+      transcript += 'User: ' + userName + '\n';
+      transcript += '='.repeat(50) + '\n\n';
+      chatMessages.forEach(function(msg) {
+        var time = formatTime(msg.timestamp);
+        var sender = msg.isUser ? userName : (msg.senderName || 'Agent');
+        transcript += '[' + time + '] ' + sender + ':\n' + msg.content + '\n\n';
+      });
+      transcript += '='.repeat(50) + '\nEnd of transcript';
+      var blob = new Blob([transcript], { type: 'text/plain' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'chat-transcript-' + new Date().toISOString().slice(0,10) + '.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+    
+    // Launcher click
     launcher.addEventListener('click', function() {
       chatContainer.classList.toggle('open');
       launcher.classList.toggle('open');
@@ -373,11 +651,36 @@
       }
     });
     
+    // Minimize button
     minimizeBtn.addEventListener('click', function() {
       chatContainer.classList.remove('open');
       launcher.classList.remove('open');
     });
     
+    // Close button with confirmation
+    closeBtn.addEventListener('click', function() {
+      if (chatStarted) {
+        confirmModal.classList.add('show');
+      } else {
+        chatContainer.classList.remove('open');
+        launcher.classList.remove('open');
+      }
+    });
+    
+    // Confirm dialog
+    confirmNo.addEventListener('click', function() {
+      confirmModal.classList.remove('show');
+    });
+    
+    confirmYes.addEventListener('click', async function() {
+      confirmModal.classList.remove('show');
+      if (chatSDK) {
+        try { await chatSDK.endChat(); } catch (e) { console.log('End chat error:', e); }
+      }
+      showView('ended');
+    });
+    
+    // Start chat button
     startBtn.addEventListener('click', function() {
       userName = document.getElementById('d365UserName').value.trim();
       userEmail = document.getElementById('d365UserEmail').value.trim();
@@ -387,13 +690,117 @@
       initializeChat(userName, userEmail, question);
     });
     
+    // Send message
     sendBtn.addEventListener('click', sendMessage);
     messageInput.addEventListener('keydown', function(e) {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
     });
     
+    // File attachment
+    var attachBtn = document.getElementById('d365AttachBtn');
+    var fileInput = document.getElementById('d365FileInput');
+    if (attachBtn && fileInput) {
+      attachBtn.addEventListener('click', function() { fileInput.click(); });
+      fileInput.addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 25000000) { alert('File too large. Maximum size is 25MB.'); fileInput.value = ''; return; }
+        var reader = new FileReader();
+        reader.onload = function(evt) {
+          var fileName = file.name;
+          var fileType = file.type || 'application/octet-stream';
+          var base64 = evt.target.result;
+          if (chatSDK && chatStarted) {
+            chatSDK.uploadFileAttachment({ name: fileName, type: fileType, data: base64 }).then(function() {
+              console.log('File uploaded:', fileName);
+              addMessage('📎 ' + fileName, true);
+            }).catch(function(err) {
+              console.error('File upload error:', err);
+              if (err.message === 'FeatureDisabled') {
+                alert('File attachments are disabled. Please enable file attachments in your D365 Omnichannel widget configuration.');
+              } else {
+                alert('Failed to upload file: ' + (err.message || 'Unknown error'));
+              }
+            });
+          }
+          fileInput.value = '';
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    
+    // Emoji picker
+    var emojiBtn = document.getElementById('d365EmojiBtn');
+    var emojiPicker = document.getElementById('d365EmojiPicker');
+    var emojiGrid = document.getElementById('d365EmojiGrid');
+    if (emojiBtn && emojiPicker && emojiGrid) {
+      var emojis = ['😀','😃','😄','😁','😅','😂','🤣','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡','🤬','🤯','😳','🥵','🥶','😱','😨','😰','😥','😓','🤗','🤔','🤭','🤫','🤥','😶','😐','😑','😬','🙄','😯','😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐','🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','👍','👎','👌','✌️','🤞','🤟','🤘','🤙','👈','👉','👆','👇','☝️','✋','🤚','🖐️','🖖','👋','🤝','💪','🙏','❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❣️','💕','💞','💓','💗','💖','💘','💝','✨','⭐','🌟','💫','💥','💯','🔥','👏','🎉','🎊','🎈','🎁','🏆','🥇','🥈','🥉'];
+      emojis.forEach(function(emoji) {
+        var btn = document.createElement('button');
+        btn.className = 'd365-emoji-item';
+        btn.textContent = emoji;
+        btn.type = 'button';
+        btn.addEventListener('click', function() {
+          messageInput.value += emoji;
+          messageInput.focus();
+          emojiPicker.classList.remove('show');
+        });
+        emojiGrid.appendChild(btn);
+      });
+      emojiBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        emojiPicker.classList.toggle('show');
+      });
+      document.addEventListener('click', function(e) {
+        if (!emojiPicker.contains(e.target) && e.target !== emojiBtn) {
+          emojiPicker.classList.remove('show');
+        }
+      });
+    }
+    
+    // Voice recording
+    var voiceBtn = document.getElementById('d365VoiceBtn');
+    var voiceRecording = document.getElementById('d365VoiceRecording');
+    var stopVoiceBtn = document.getElementById('d365StopVoiceBtn');
+    if (voiceBtn && voiceRecording && stopVoiceBtn && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      var recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      var isRecording = false;
+      recognition.onstart = function() {
+        isRecording = true;
+        voiceBtn.classList.add('recording');
+        voiceRecording.classList.add('show');
+      };
+      recognition.onresult = function(event) {
+        var transcript = event.results[0][0].transcript;
+        messageInput.value += (messageInput.value ? ' ' : '') + transcript;
+        messageInput.focus();
+      };
+      recognition.onend = function() {
+        isRecording = false;
+        voiceBtn.classList.remove('recording');
+        voiceRecording.classList.remove('show');
+      };
+      recognition.onerror = function(event) {
+        console.log('Speech recognition error:', event.error);
+        isRecording = false;
+        voiceBtn.classList.remove('recording');
+        voiceRecording.classList.remove('show');
+      };
+      voiceBtn.addEventListener('click', function() {
+        if (isRecording) { recognition.stop(); } else { recognition.start(); }
+      });
+      stopVoiceBtn.addEventListener('click', function() { recognition.stop(); });
+    } else if (voiceBtn) {
+      voiceBtn.style.display = 'none';
+    }
+    
+    // New chat button
     newChatBtn.addEventListener('click', function() {
-      chatStarted = false; chatSDK = null;
+      chatStarted = false; chatSDK = null; chatMessages = []; processedMessageIds = {};
       startBtn.disabled = false; startBtn.textContent = config.startBtnText;
       document.getElementById('d365UserName').value = '';
       document.getElementById('d365UserEmail').value = '';
@@ -408,64 +815,208 @@
       try {
         userName = name; userEmail = email;
         showView('connecting');
+        console.log('Starting chat initialization...');
         
-        // Check for Microsoft Omnichannel Chat SDK (multiple possible global names)
-        var SDKClass = (typeof Microsoft !== 'undefined' && Microsoft.OmnichannelChatSDK && Microsoft.OmnichannelChatSDK.OmnichannelChatSDK) ||
-                       (typeof OmnichannelChatSDK !== 'undefined' && OmnichannelChatSDK.default) ||
-                       (typeof OmnichannelChatSDK !== 'undefined' && OmnichannelChatSDK);
+        // Get the Omnichannel Chat SDK
+        var SDKClass = null;
         
-        if (SDKClass) {
-          chatSDK = new SDKClass({
-            orgId: config.orgId,
-            widgetId: config.widgetId,
-            orgUrl: config.orgUrl
-          });
-          await chatSDK.initialize();
-          
-          chatSDK.onNewMessage(function(msg) {
-            if (msg && msg.content) addMessage(msg.content, false, msg.senderDisplayName);
-          });
-          chatSDK.onTypingEvent(function() {
-            typingIndicator.classList.add('active');
-            setTimeout(function() { typingIndicator.classList.remove('active'); }, 3000);
-          });
-          chatSDK.onAgentEndSession(function() { showView('ended'); });
-          
-          await chatSDK.startChat({
-            customContext: {
-              'emailaddress1': { value: email, isDisplayable: true },
-              'Name': { value: name, isDisplayable: true }
+        // Check various ways the SDK might be exposed (our custom bundle exposes it as window.OmnichannelChatSDK)
+        if (typeof OmnichannelChatSDK !== 'undefined') {
+          // Our custom bundle or direct global
+          if (typeof OmnichannelChatSDK === 'function') {
+            SDKClass = OmnichannelChatSDK;
+            console.log('Found SDK as direct constructor (OmnichannelChatSDK)');
+          } else if (OmnichannelChatSDK.default && typeof OmnichannelChatSDK.default === 'function') {
+            SDKClass = OmnichannelChatSDK.default;
+            console.log('Found SDK via OmnichannelChatSDK.default');
+          } else if (OmnichannelChatSDK.OmnichannelChatSDK) {
+            SDKClass = OmnichannelChatSDK.OmnichannelChatSDK;
+            console.log('Found SDK via OmnichannelChatSDK.OmnichannelChatSDK');
+          } else {
+            // Search for constructor in module
+            for (var key in OmnichannelChatSDK) {
+              if (typeof OmnichannelChatSDK[key] === 'function' && OmnichannelChatSDK[key].prototype) {
+                SDKClass = OmnichannelChatSDK[key];
+                console.log('Found SDK constructor at OmnichannelChatSDK.' + key);
+                break;
+              }
             }
-          });
-          
-          chatStarted = true;
-          showView('chat');
-          if (question) { addMessage(question, true); await chatSDK.sendMessage({ content: question }); }
-          setInterval(pollMessages, 3000);
-        } else {
-          throw new Error('SDK not loaded');
+          }
+        } else if (typeof Microsoft !== 'undefined' && Microsoft.OmnichannelChatSDK) {
+          SDKClass = Microsoft.OmnichannelChatSDK.OmnichannelChatSDK || Microsoft.OmnichannelChatSDK;
+          console.log('Found SDK via Microsoft.OmnichannelChatSDK');
         }
+        
+        if (!SDKClass) {
+          console.error('SDK not found. Available window keys with Omni/Microsoft:', 
+            Object.keys(window).filter(function(k) { 
+              return k.toLowerCase().includes('omni') || k.toLowerCase().includes('microsoft'); 
+            })
+          );
+          console.log('OmnichannelChatSDK value:', typeof OmnichannelChatSDK !== 'undefined' ? OmnichannelChatSDK : 'undefined');
+          throw new Error('Omnichannel Chat SDK not loaded. Please check your D365 configuration.');
+        }
+        
+        console.log('Creating SDK instance with config:', {
+          orgId: config.orgId,
+          orgUrl: config.orgUrl,
+          widgetId: config.widgetId
+        });
+        
+        chatSDK = new SDKClass({
+          orgId: config.orgId,
+          orgUrl: config.orgUrl,
+          widgetId: config.widgetId
+        });
+        
+        console.log('Initializing SDK...');
+        await chatSDK.initialize();
+        console.log('SDK initialized successfully');
+        
+        // Set up event handlers
+        chatSDK.onNewMessage(function(msg) {
+          console.log('New message received:', msg);
+          if (msg && msg.content) {
+            addMessage(msg.content, false, msg.senderDisplayName || 'Agent');
+          }
+        });
+        
+        chatSDK.onTypingEvent(function() {
+          typingIndicator.classList.add('active');
+          setTimeout(function() { typingIndicator.classList.remove('active'); }, 3000);
+        });
+        
+        chatSDK.onAgentEndSession(function() {
+          console.log('Agent ended session');
+          showView('ended');
+        });
+        
+        console.log('Starting chat with context...');
+        await chatSDK.startChat({
+          customContext: {
+            'emailaddress1': { value: email, isDisplayable: true },
+            'Name': { value: name, isDisplayable: true }
+          }
+        });
+        
+        console.log('Chat started successfully!');
+        chatStarted = true;
+        showView('chat');
+        
+        // Send initial question if provided
+        if (question) {
+          addMessage(question, true, name);
+          await chatSDK.sendMessage({ content: question });
+        }
+        
+        // Start polling for messages
+        setInterval(pollMessages, 3000);
+        
       } catch (error) {
-        console.error('Chat init error:', error);
-        alert('Failed to start chat. Please try again.');
+        console.error('Chat initialization error:', error);
+        console.error('Error stack:', error.stack);
+        alert('Failed to start chat: ' + (error.message || 'Unknown error') + '\n\nPlease check the browser console for more details.');
         showView('prechat');
-        startBtn.disabled = false; startBtn.textContent = config.startBtnText;
+        startBtn.disabled = false;
+        startBtn.textContent = config.startBtnText;
       }
     }
     
     async function sendMessage() {
       var text = messageInput.value.trim();
-      if (!text || !chatSDK || !chatStarted) return;
+      if (!text) {
+        console.log('No message to send');
+        return;
+      }
+      if (!chatSDK) {
+        console.error('Cannot send message: chatSDK is not initialized');
+        alert('Chat is not connected. Please restart the conversation.');
+        return;
+      }
+      if (!chatStarted) {
+        console.error('Cannot send message: chat has not started');
+        alert('Chat has not started yet. Please wait for connection.');
+        return;
+      }
+      
       messageInput.value = '';
-      addMessage(text, true);
-      try { await chatSDK.sendMessage({ content: text }); } catch (e) { console.error('Send error:', e); }
+      addMessage(text, true, userName);
+      
+      try {
+        console.log('Sending message:', text);
+        await chatSDK.sendMessage({ content: text });
+        console.log('Message sent successfully');
+      } catch (e) {
+        console.error('Error sending message:', e);
+        addMessage('Failed to send message. Please try again.', false, 'System');
+      }
     }
     
+    function processMessage(message) {
+      if (!message) return;
+      
+      // Get message ID - try various possible ID fields
+      var messageId = message.messageId || message.id || message.clientmessageid || message.messageid;
+      
+      // Skip if already processed
+      if (messageId && processedMessageIds[messageId]) {
+        console.log('Skipping already processed message:', messageId);
+        return;
+      }
+      
+      // Mark as processed
+      if (messageId) {
+        processedMessageIds[messageId] = true;
+      }
+      
+      // Get message content - try various possible content fields
+      var content = message.content || message.text || message.body;
+      
+      if (!content) {
+        console.log('Message has no content:', message);
+        return;
+      }
+      
+      // Determine message role
+      var role = message.role || message.senderRole || message.deliveryMode;
+      
+      // Extract sender info
+      var senderId = message.senderId || message.sender;
+      var senderName = 'Agent';
+      if (typeof senderId === 'object' && senderId !== null) {
+        senderName = senderId.displayName || senderId.name || 'Agent';
+      } else if (typeof senderId === 'string') {
+        senderName = senderId;
+      }
+      if (message.senderDisplayName) {
+        senderName = message.senderDisplayName;
+      }
+      
+      console.log('Processing message - role:', role, 'senderName:', senderName, 'content:', content);
+      
+      var isFromUser = role === 'user' || role === 'User' || role === 1;
+      var isSystem = role === 'system' || role === 'System';
+      
+      // Skip user messages (those are added when sent)
+      if (isFromUser) {
+        console.log('Skipping user message');
+        return;
+      }
+      
+      // Add agent/bot/system messages
+      addMessage(content, false, senderName);
+    }
+
     async function pollMessages() {
       if (!chatSDK || !chatStarted) return;
       try {
         var messages = await chatSDK.getMessages();
-        // Process new messages here if needed
+        console.log('Polled messages:', messages);
+        if (messages && messages.length) {
+          messages.forEach(function(msg) {
+            processMessage(msg);
+          });
+        }
       } catch (e) { console.log('Poll error:', e); }
     }
     
@@ -476,8 +1027,20 @@
   
   function initWidgetFallback() {
     console.log('Using fallback widget mode - SDK not available');
+    console.log('If using Power Pages, you may need to:');
+    console.log('1. Add CDN domains to Content Security Policy, OR');
+    console.log('2. Use the native Power Pages Omnichannel integration');
+    
     var launcher = document.getElementById('d365ChatLauncher');
     var chatContainer = document.getElementById('d365ChatContainer');
+    var prechatForm = document.getElementById('d365PrechatForm');
+    
+    // Update form to show contact info instead
+    var formTitle = prechatForm.querySelector('.d365-form-title');
+    var formSubtitle = prechatForm.querySelector('.d365-form-subtitle');
+    if (formTitle) formTitle.textContent = 'Contact Us';
+    if (formSubtitle) formSubtitle.textContent = 'Live chat is temporarily unavailable. Please fill in your details and we will contact you.';
+    
     launcher.addEventListener('click', function() {
       chatContainer.classList.toggle('open');
       launcher.classList.toggle('open');
@@ -487,7 +1050,25 @@
       launcher.classList.remove('open');
     });
     document.getElementById('d365StartBtn').addEventListener('click', function() {
-      alert('Chat SDK could not be loaded. Please check your D365 configuration and try again.');
+      var name = document.getElementById('d365UserName').value.trim();
+      var email = document.getElementById('d365UserEmail').value.trim();
+      var question = document.getElementById('d365UserQuestion').value.trim();
+      
+      if (!name || !email) {
+        alert('Please fill in your name and email.');
+        return;
+      }
+      
+      // Show a message that we'll contact them
+      alert('Thank you! We received your message and will contact you at ' + email + ' soon.\n\nNote: Live chat SDK could not be loaded. If you are the site admin using Power Pages, please configure Content Security Policy to allow the Omnichannel SDK CDN.');
+      
+      // Log the contact attempt for debugging
+      console.log('Contact form submitted:', { name: name, email: email, question: question });
+      
+      // Reset form
+      document.getElementById('d365UserName').value = '';
+      document.getElementById('d365UserEmail').value = '';
+      document.getElementById('d365UserQuestion').value = '';
     });
   }
   } // End of initD365Widget function
