@@ -57,6 +57,64 @@
             background: #94a3b8;
         }
 
+        /* User Bar - Top strip */
+        .user-bar {
+            background: #1e293b;
+            color: white;
+            padding: 8px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 16px;
+            font-size: 13px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .user-avatar svg {
+            width: 16px;
+            height: 16px;
+            fill: white;
+        }
+        .user-name {
+            font-weight: 500;
+            color: #e2e8f0;
+        }
+        .btn-logout {
+            background: transparent;
+            border: 1px solid #475569;
+            color: #94a3b8;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-logout:hover {
+            background: #334155;
+            color: white;
+            border-color: #64748b;
+        }
+        .btn-logout svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
         /* Header - Cleaner, more minimal */
         .admin-header {
             background: white;
@@ -67,7 +125,7 @@
             align-items: center;
             justify-content: space-between;
             position: sticky;
-            top: 0;
+            top: 44px;
             z-index: 200;
         }
         .admin-header-left {
@@ -1389,6 +1447,20 @@
     </style>
 </head>
 <body>
+    <!-- User Bar -->
+    <div class="user-bar">
+        <div class="user-info">
+            <div class="user-avatar">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+            <span class="user-name" id="currentUserName" onclick="changeUserName()" title="Click to change name" style="cursor: pointer;">Loading...</span>
+        </div>
+        <button class="btn-logout" onclick="logout()" title="Sign out">
+            <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+            Logout
+        </button>
+    </div>
+
     <header class="admin-header">
         <div class="admin-header-left">
             <div class="admin-logo">
@@ -2428,6 +2500,7 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
+            loadCurrentUser();
             loadProfiles();
             loadSettings();
             setupEventListeners();
@@ -5573,6 +5646,50 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             URL.revokeObjectURL(url);
             
             showToast('Embed code downloaded as HTML file!');
+        }
+
+        // ============ USER MANAGEMENT ============
+        function loadCurrentUser() {
+            // Get Windows username from environment or use a stored name
+            let userName = localStorage.getItem('chatWidgetUserName');
+            
+            if (!userName) {
+                // Try to get from environment variable (won't work in browser, but fallback)
+                // Use a prompt for first-time setup
+                userName = prompt('Welcome! Please enter your name:', 'Admin User');
+                if (!userName || userName.trim() === '') {
+                    userName = 'Admin User';
+                }
+                localStorage.setItem('chatWidgetUserName', userName);
+            }
+            
+            document.getElementById('currentUserName').textContent = userName;
+        }
+        
+        function logout() {
+            if (confirm('Are you sure you want to logout? Your settings will be preserved.')) {
+                // Clear user name
+                localStorage.removeItem('chatWidgetUserName');
+                // Optionally clear other session data
+                // localStorage.removeItem('chatWidgetActiveProfile');
+                
+                showToast('Logged out successfully');
+                
+                // Reload page to show login prompt
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
+            }
+        }
+        
+        function changeUserName() {
+            const currentName = localStorage.getItem('chatWidgetUserName') || '';
+            const newName = prompt('Enter your name:', currentName);
+            if (newName && newName.trim() !== '') {
+                localStorage.setItem('chatWidgetUserName', newName.trim());
+                document.getElementById('currentUserName').textContent = newName.trim();
+                showToast('Name updated!');
+            }
         }
 
         // ============ UTILITY ============
