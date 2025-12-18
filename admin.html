@@ -568,6 +568,11 @@
             cursor: pointer;
             transition: all 0.2s;
             background: var(--admin-bg);
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         .image-upload-area:hover {
             border-color: var(--admin-primary);
@@ -576,6 +581,7 @@
         .image-upload-area.has-image {
             padding: 10px;
             border-style: solid;
+            min-height: 140px;
         }
         .image-upload-area.processing {
             opacity: 0.6;
@@ -2086,7 +2092,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; align-items: start;">
                         <div class="form-group">
                             <label class="form-label">Default Agent Avatar</label>
                             <div class="image-upload-area" id="agentAvatarArea">
@@ -2225,9 +2231,6 @@
                                     <code style="display: block; margin-top: 8px; padding: 8px; background: #fffbeb; border-radius: 4px; font-size: 11px;">
                                         cdn.jsdelivr.net, unpkg.com, oc-cdn-ocprod.azureedge.net
                                     </code>
-                                    <span style="display: block; margin-top: 8px;">
-                                        Or use the <a href="https://learn.microsoft.com/en-us/dynamics365/customer-service/configure-chat-widget-power-pages" target="_blank" style="color: #d97706;">native Power Pages Omnichannel integration</a> instead.
-                                    </span>
                                 </p>
                             </div>
                         </div>
@@ -5510,9 +5513,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
   
   function initWidgetFallback() {
     console.log('Using fallback widget mode - SDK not available');
-    console.log('If using Power Pages, you may need to:');
-    console.log('1. Add CDN domains to Content Security Policy, OR');
-    console.log('2. Use the native Power Pages Omnichannel integration');
+    console.log('If using Power Pages, you may need to add CDN domains to Content Security Policy');
     
     var launcher = document.getElementById('d365ChatLauncher');
     var chatContainer = document.getElementById('d365ChatContainer');
