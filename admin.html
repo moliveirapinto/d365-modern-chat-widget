@@ -2180,7 +2180,7 @@
                     <div class="form-group">
                         <label class="form-label">Image URL</label>
                         <input type="text" class="form-input" id="backgroundImageUrl" placeholder="https://i.postimg.cc/your-image.png">
-                        <p class="form-hint">💡 Only public image URLs are supported. You can upload your screenshot for free at <a href="https://postimages.org/" target="_blank" style="color: var(--admin-primary);">postimages.org</a> or <a href="https://imgbb.com/" target="_blank" style="color: var(--admin-primary);">imgbb.com</a>. Copy the direct image URL (not the page URL).</p>
+                        <p class="form-hint">💡 Paste any public image URL directly, or upload your own image to <a href="https://postimages.org/" target="_blank" style="color: var(--admin-primary);">postimages.org</a> / <a href="https://imgbb.com/" target="_blank" style="color: var(--admin-primary);">imgbb.com</a> to get a public URL. Copy the direct image link (ends in .png, .jpg, etc.).</p>
                     </div>
                 </div>
             </div>
@@ -2450,7 +2450,7 @@
                             <input type="text" class="form-input" id="logoPathInput" placeholder="https://i.postimg.cc/your-image.png" style="font-size: 12px;">
                             <button type="button" class="btn-small" onclick="applyImagePath('headerLogo', 'logoPathInput', 'logoUploadArea', false)">Apply</button>
                         </div>
-                        <p class="form-hint" style="margin-top: 8px;">💡 Only public image URLs are supported. You can upload your screenshot for free at <a href="https://postimages.org" target="_blank" style="color: #6366f1;">postimages.org</a> or <a href="https://imgbb.com" target="_blank" style="color: #6366f1;">imgbb.com</a>. Copy the direct image URL (not the page URL).</p>
+                        <p class="form-hint" style="margin-top: 8px;">💡 Paste any public image URL directly, or upload your own image to <a href="https://postimages.org" target="_blank" style="color: #6366f1;">postimages.org</a> / <a href="https://imgbb.com" target="_blank" style="color: #6366f1;">imgbb.com</a> to get a public URL. Copy the direct image link (ends in .png, .jpg, etc.).</p>
                     </div>
                 </div>
             </div>
@@ -2813,7 +2813,7 @@
                         </div>
                     </div>
                     <p class="form-hint" style="margin-top: 12px;">These avatars will be used as defaults. Agent's actual photo from D365 will override if available.</p>
-                    <p class="form-hint" style="margin-top: 8px;">💡 Only public image URLs are supported. You can upload your screenshot for free at <a href="https://postimages.org" target="_blank" style="color: #6366f1;">postimages.org</a> or <a href="https://imgbb.com" target="_blank" style="color: #6366f1;">imgbb.com</a>. Copy the direct image URL (not the page URL).</p>
+                    <p class="form-hint" style="margin-top: 8px;">💡 Paste any public image URL directly, or upload your own image to <a href="https://postimages.org" target="_blank" style="color: #6366f1;">postimages.org</a> / <a href="https://imgbb.com" target="_blank" style="color: #6366f1;">imgbb.com</a> to get a public URL. Copy the direct image link (ends in .png, .jpg, etc.).</p>
                 </div>
             </div>
 
@@ -3048,14 +3048,23 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v1.1.0';
-        const APP_LAST_UPDATED = 'Dec 18, 2025, 04:15 PM';
+        const APP_VERSION = 'v1.2.0';
+        const APP_LAST_UPDATED = 'Dec 18, 2025, 05:30 PM';
         
         const CHANGELOG = [
             {
-                version: 'v1.1.0',
+                version: 'v1.2.0',
                 date: 'Dec 18, 2025',
                 latest: true,
+                items: [
+                    { type: 'improve', text: 'Updated image upload hints with clearer instructions' },
+                    { type: 'improve', text: 'Added guidance for using public URLs or free hosting services' }
+                ]
+            },
+            {
+                version: 'v1.1.0',
+                date: 'Dec 18, 2025',
+                latest: false,
                 items: [
                     { type: 'new', text: 'Version control with changelog modal' },
                     { type: 'improve', text: 'Auto-save interval reduced to 5 seconds' },
