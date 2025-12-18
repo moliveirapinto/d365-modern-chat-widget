@@ -3243,7 +3243,6 @@
             document.getElementById('loginOverlay').classList.add('hidden');
             document.getElementById('userBar').classList.add('show');
             document.getElementById('userName').textContent = cloudUser.name || cloudUser.login;
-            document.getElementById('currentUserName').textContent = cloudUser.name || cloudUser.login;
             if (cloudUser.avatar) {
                 document.getElementById('userAvatar').src = cloudUser.avatar;
             }
@@ -3279,7 +3278,6 @@
                     localStorage.removeItem('d365_user');
                     localStorage.removeItem('d365_github_token');
                     document.getElementById('userBar').classList.remove('show');
-                    document.getElementById('currentUserName').textContent = 'Guest';
                     // Show login button in header
                     const loginBtn = document.getElementById('loginBtn');
                     if (loginBtn) loginBtn.style.display = '';
@@ -7103,13 +7101,8 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
 
         // ============ USER MANAGEMENT ============
         function loadCurrentUser() {
-            // If logged in with GitHub, use that name
-            if (cloudUser) {
-                document.getElementById('currentUserName').textContent = cloudUser.name || cloudUser.login;
-                return;
-            }
-            // Otherwise show Guest
-            document.getElementById('currentUserName').textContent = 'Guest';
+            // User info is shown in the user bar when logged in
+            // No additional action needed here
         }
 
         // ============ UTILITY ============
