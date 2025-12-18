@@ -983,7 +983,24 @@
       if (!chatSDK || !chatStarted) return;
       try {
         var msgs = await chatSDK.getMessages();
-        if (msgs && msgs.length) msgs.forEach(processMessage);
+        if (msgs && msgs.length) {
+          // Sort messages by timestamp/sequence to ensure correct order
+          msgs.sort(function(a, b) {
+            // Try timestamp first
+            var timeA = a.timestamp || a.createdOn || a.sentOn || a.originalarrivaltime || 0;
+            var timeB = b.timestamp || b.createdOn || b.sentOn || b.originalarrivaltime || 0;
+            if (timeA && timeB) {
+              var dateA = new Date(timeA).getTime();
+              var dateB = new Date(timeB).getTime();
+              if (dateA !== dateB) return dateA - dateB;
+            }
+            // Fall back to sequence/order number
+            var seqA = a.sequenceId || a.order || a.clientmessageid || 0;
+            var seqB = b.sequenceId || b.order || b.clientmessageid || 0;
+            return seqA - seqB;
+          });
+          msgs.forEach(processMessage);
+        }
       } catch(e) {}
     }
 
@@ -1003,7 +1020,7 @@
         await chatSDK.initialize();
 
         chatSDK.onNewMessage(function(m) {
-          if (m && m.content) addMessage(m.content, false, m.senderDisplayName);
+          if (m) processMessage(m);
         });
         chatSDK.onTypingEvent(function() {
           typing.classList.add('active');
