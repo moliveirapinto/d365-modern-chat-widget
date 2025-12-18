@@ -280,12 +280,34 @@
       if (loaded >= total) callback();
     }
 
-    // Load Adaptive Cards
-    var acScript = document.createElement('script');
-    acScript.src = 'https://unpkg.com/adaptivecards@3.0.2/dist/adaptivecards.min.js';
-    acScript.onload = checkDone;
-    acScript.onerror = checkDone;
-    document.head.appendChild(acScript);
+    // Load Adaptive Cards - use multiple sources with fallback
+    var acSources = [
+      'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/adaptivecards.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/adaptivecards/3.0.2/adaptivecards.min.js',
+      'https://unpkg.com/adaptivecards@3.0.2/dist/adaptivecards.min.js'
+    ];
+    var acIndex = 0;
+
+    function loadAC() {
+      if (acIndex >= acSources.length) {
+        console.warn('D365 Widget: AdaptiveCards failed to load from all sources');
+        checkDone();
+        return;
+      }
+      var script = document.createElement('script');
+      script.src = acSources[acIndex];
+      script.onload = function() {
+        console.log('D365 Widget: AdaptiveCards loaded from', acSources[acIndex]);
+        checkDone();
+      };
+      script.onerror = function() {
+        console.warn('D365 Widget: AdaptiveCards failed from', acSources[acIndex]);
+        acIndex++;
+        loadAC();
+      };
+      document.head.appendChild(script);
+    }
+    loadAC();
 
     // Load Chat SDK
     var sdkSources = [
