@@ -61,14 +61,18 @@
         .admin-header {
             background: white;
             color: var(--admin-text);
-            padding: 20px 32px;
             border-bottom: 1px solid var(--admin-border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
             position: sticky;
             top: 0;
             z-index: 200;
+            display: flex;
+            flex-direction: column;
+        }
+        .admin-header-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 32px;
         }
         .admin-header-left {
             display: flex;
@@ -720,8 +724,12 @@
             overflow: hidden;
             border: 2px solid rgba(255,255,255,0.5);
             flex-shrink: 0;
+            position: relative;
         }
         .preview-header-avatar img {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -1404,23 +1412,477 @@
             cursor: pointer;
         }
 
+        /* ============================================
+           GitHub Login Overlay & Cloud Sync
+           ============================================ */
+        
+        /* Login Overlay */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .login-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .login-box {
+            background: white;
+            padding: 48px;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+            text-align: center;
+            max-width: 480px;
+            width: 90%;
+        }
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+        .login-logo svg { width: 40px; height: 40px; fill: white; }
+        .login-box h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--admin-text);
+            margin-bottom: 8px;
+        }
+        .login-box > p {
+            color: var(--admin-text-light);
+            margin-bottom: 32px;
+            font-size: 15px;
+        }
+        .btn-github-login {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 32px;
+            background: #24292e;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            justify-content: center;
+        }
+        .btn-github-login:hover {
+            background: #1b1f23;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .btn-github-login svg { width: 24px; height: 24px; fill: currentColor; }
+        
+        .login-note {
+            margin-top: 24px;
+            font-size: 13px;
+            color: var(--admin-text-light);
+        }
+        .login-skip {
+            margin-top: 16px;
+        }
+        .login-skip button {
+            background: none;
+            border: none;
+            color: var(--admin-primary);
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .login-skip button:hover {
+            color: var(--admin-primary-dark);
+        }
+
+        /* Token Entry (fallback for non-Azure hosting) */
+        .token-entry {
+            display: none;
+            text-align: left;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--admin-border);
+        }
+        .token-entry.show { display: block; }
+        .token-entry h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: var(--admin-text);
+        }
+        .token-entry ol {
+            font-size: 14px;
+            color: var(--admin-text-light);
+            margin-left: 20px;
+            margin-bottom: 16px;
+            line-height: 1.8;
+        }
+        .token-entry ol a {
+            color: var(--admin-primary);
+            font-weight: 600;
+        }
+        .token-input-row {
+            display: flex;
+            gap: 8px;
+        }
+        .token-input-row input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid var(--admin-border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: monospace;
+        }
+        .token-input-row input:focus {
+            outline: none;
+            border-color: var(--admin-primary);
+        }
+        .token-input-row button {
+            padding: 12px 20px;
+            background: var(--admin-primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .token-status {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+        .token-status.error {
+            display: block;
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+        .token-status.success {
+            display: block;
+            background: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        /* User Bar (shown when logged in) */
+        .user-bar {
+            background: rgba(0,0,0,0.1);
+            padding: 8px 32px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+        .user-bar.show { display: flex; }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        .user-name { font-weight: 500; }
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .saved-widgets-dropdown {
+            position: relative;
+        }
+        .saved-widgets-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .saved-widgets-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        .saved-widgets-btn svg { width: 18px; height: 18px; fill: currentColor; }
+        .saved-widgets-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            min-width: 280px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        .saved-widgets-menu.show { display: block; }
+        .saved-widgets-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--admin-border);
+            font-weight: 600;
+            color: var(--admin-text);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .saved-widgets-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .saved-widget-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--admin-border);
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .saved-widget-item:hover { background: var(--admin-bg); }
+        .saved-widget-item:last-child { border-bottom: none; }
+        .saved-widget-name {
+            font-weight: 500;
+            color: var(--admin-text);
+        }
+        .saved-widget-date {
+            font-size: 12px;
+            color: var(--admin-text-light);
+        }
+        .saved-widget-delete {
+            padding: 4px 8px;
+            background: none;
+            border: none;
+            color: #dc2626;
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .saved-widget-item:hover .saved-widget-delete { opacity: 1; }
+        .saved-widgets-empty {
+            padding: 32px 16px;
+            text-align: center;
+            color: var(--admin-text-light);
+        }
+        .btn-save-cloud {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--admin-success);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-save-cloud:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+        .btn-save-cloud svg { width: 18px; height: 18px; fill: currentColor; }
+        .btn-logout {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .btn-logout:hover { color: white; }
+
+        /* Save Modal */
+        .save-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10001;
+        }
+        .save-modal-overlay.show { display: flex; }
+        .save-modal {
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+        }
+        .save-modal h3 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            color: var(--admin-text);
+        }
+        .save-modal input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--admin-border);
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        .save-modal input:focus {
+            outline: none;
+            border-color: var(--admin-primary);
+        }
+        .save-modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        .save-modal-actions button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .save-modal-cancel {
+            background: var(--admin-bg);
+            border: 1px solid var(--admin-border);
+            color: var(--admin-text);
+        }
+        .save-modal-save {
+            background: var(--admin-primary);
+            border: none;
+            color: white;
+        }
+
     </style>
 </head>
 <body>
-    <header class="admin-header">
-        <div class="admin-header-left">
-            <div class="admin-logo">
-                <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+    <!-- Login Overlay -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-box">
+            <div class="login-logo">
+                <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
             </div>
-            <div>
-                <h1>Chat Widget Studio</h1>
-                <p>Customize your D365 chat widget</p>
+            <h1>D365 Widget Studio</h1>
+            <p>Create and customize beautiful chat widgets for Dynamics 365</p>
+            
+            <button id="githubLoginBtn" class="btn-github-login">
+                <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                Sign in with GitHub
+            </button>
+            
+            <p class="login-note">Your widget configurations will be saved to your GitHub account</p>
+            
+            <!-- Token entry fallback -->
+            <div id="tokenEntry" class="token-entry">
+                <h3>Connect your GitHub Account</h3>
+                <ol>
+                    <li><a href="https://github.com/settings/tokens/new?description=D365%20Widget%20Studio&scopes=gist,read:user" target="_blank">Click here to create a token on GitHub</a></li>
+                    <li>Select <strong>gist</strong> and <strong>read:user</strong> scopes</li>
+                    <li>Click "Generate token" and paste below:</li>
+                </ol>
+                <div class="token-input-row">
+                    <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx">
+                    <button id="tokenConnectBtn">Connect</button>
+                </div>
+                <div id="tokenStatus" class="token-status"></div>
+            </div>
+            
+            <div class="login-skip">
+                <button id="skipLoginBtn">Continue without signing in →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save Widget Modal -->
+    <div id="saveModal" class="save-modal-overlay">
+        <div class="save-modal">
+            <h3>💾 Save Widget to Cloud</h3>
+            <input type="text" id="saveWidgetName" placeholder="Widget name (e.g., Contoso Support Chat)">
+            <div class="save-modal-actions">
+                <button class="save-modal-cancel" onclick="closeSaveModal()">Cancel</button>
+                <button class="save-modal-save" id="saveModalConfirmBtn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <header class="admin-header">
+        <!-- User Bar (shown when logged in with GitHub) -->
+        <div id="userBar" class="user-bar">
+            <div class="user-info">
+                <img id="userAvatar" class="user-avatar" src="" alt="">
+                <span id="userName" class="user-name"></span>
+            </div>
+            <div class="user-actions">
+                <div class="saved-widgets-dropdown">
+                    <button id="savedWidgetsBtn" class="saved-widgets-btn">
+                        <svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
+                        My Saved Widgets
+                        <svg viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M7 10l5 5 5-5z"/></svg>
+                    </button>
+                    <div id="savedWidgetsMenu" class="saved-widgets-menu">
+                        <div class="saved-widgets-header">
+                            <span>My Saved Widgets</span>
+                            <span id="widgetCount">0</span>
+                        </div>
+                        <div id="savedWidgetsList" class="saved-widgets-list">
+                            <div class="saved-widgets-empty">No saved widgets yet</div>
+                        </div>
+                    </div>
+                </div>
+                <button id="saveToCloudBtn" class="btn-save-cloud">
+                    <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+                    Save to Cloud
+                </button>
+                <button id="logoutBtn" class="btn-logout">Logout</button>
             </div>
         </div>
         
+        <!-- Main Header Content -->
+        <div class="admin-header-main">
+            <div class="admin-header-left">
+                <div class="admin-logo">
+                    <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+                </div>
+                <div>
+                    <h1>Chat Widget Studio</h1>
+                    <p>Customize your D365 chat widget</p>
+                </div>
+            </div>
+        
         <!-- Header Actions -->
         <div class="header-actions">
-            <span style="color: var(--admin-text-light); font-size: 13px; margin-right: 8px;">Welcome, <strong id="currentUserName">User</strong></span>
+            <span id="welcomeText" style="color: var(--admin-text-light); font-size: 13px; margin-right: 8px;">Welcome, <strong id="currentUserName">Guest</strong></span>
+            <button class="btn-header-action" id="loginBtn" onclick="showLoginOverlay()" title="Sign in with GitHub">
+                <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                Sign in
+            </button>
             <button class="btn-header-action" onclick="exportSettings()" title="Export settings as JSON">
                 <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
                 Export
@@ -1431,6 +1893,7 @@
             </button>
             <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importSettings(event)">
         </div>
+        </div><!-- End admin-header-main -->
     </header>
 
     <div class="admin-container">
@@ -2338,6 +2801,429 @@
 
     <script>
         // ============================================
+        // GitHub Cloud Sync
+        // ============================================
+        const GIST_PREFIX = '[D365-Widget] ';
+        let cloudUser = null;
+        let cloudToken = null;
+        let savedWidgets = [];
+        let currentLoadedWidgetId = null;
+
+        // Check for existing login on page load
+        function checkExistingLogin() {
+            const savedUser = localStorage.getItem('d365_user');
+            const savedToken = localStorage.getItem('d365_github_token');
+            
+            if (savedUser && savedToken) {
+                try {
+                    cloudUser = JSON.parse(savedUser);
+                    cloudToken = savedToken;
+                    showLoggedInUI();
+                    return true;
+                } catch (e) {
+                    localStorage.removeItem('d365_user');
+                    localStorage.removeItem('d365_github_token');
+                }
+            }
+            return false;
+        }
+
+        // Show login overlay
+        function showLoginOverlay() {
+            document.getElementById('loginOverlay').classList.remove('hidden');
+        }
+
+        // GitHub login button - show token entry
+        document.addEventListener('DOMContentLoaded', function() {
+            const githubLoginBtn = document.getElementById('githubLoginBtn');
+            if (githubLoginBtn) {
+                githubLoginBtn.addEventListener('click', function() {
+                    document.getElementById('tokenEntry').classList.add('show');
+                });
+            }
+        });
+
+        // Token connect button
+        document.addEventListener('DOMContentLoaded', function() {
+            const tokenConnectBtn = document.getElementById('tokenConnectBtn');
+            if (tokenConnectBtn) {
+                tokenConnectBtn.addEventListener('click', async function() {
+                    const token = document.getElementById('tokenInput').value.trim();
+                    const statusEl = document.getElementById('tokenStatus');
+                    
+                    if (!token) {
+                        statusEl.className = 'token-status error';
+                        statusEl.textContent = 'Please enter a token';
+                        return;
+                    }
+                    
+                    this.disabled = true;
+                    this.textContent = 'Connecting...';
+                    statusEl.className = 'token-status';
+                    statusEl.style.display = 'none';
+                    
+                    await verifyAndLogin(token);
+                    
+                    this.disabled = false;
+                    this.textContent = 'Connect';
+                });
+            }
+        });
+
+        async function verifyAndLogin(token) {
+            const statusEl = document.getElementById('tokenStatus');
+            
+            try {
+                // Verify token
+                const userRes = await fetch('https://api.github.com/user', {
+                    headers: { 'Authorization': 'token ' + token }
+                });
+                
+                if (!userRes.ok) throw new Error('Invalid token');
+                
+                const user = await userRes.json();
+                
+                // Check gist scope
+                const gistRes = await fetch('https://api.github.com/gists', {
+                    headers: { 'Authorization': 'token ' + token }
+                });
+                
+                if (!gistRes.ok) throw new Error('Token needs "gist" scope');
+                
+                // Success
+                cloudUser = {
+                    id: user.id,
+                    name: user.name || user.login,
+                    login: user.login,
+                    avatar: user.avatar_url
+                };
+                cloudToken = token;
+                
+                localStorage.setItem('d365_user', JSON.stringify(cloudUser));
+                localStorage.setItem('d365_github_token', token);
+                
+                if (statusEl) {
+                    statusEl.className = 'token-status success';
+                    statusEl.textContent = '✓ Connected! Welcome, ' + cloudUser.name;
+                }
+                
+                setTimeout(() => showLoggedInUI(), 500);
+                
+            } catch (err) {
+                if (statusEl) {
+                    statusEl.className = 'token-status error';
+                    statusEl.textContent = '✗ ' + (err.message || 'Failed to connect');
+                }
+            }
+        }
+
+        function showLoggedInUI() {
+            document.getElementById('loginOverlay').classList.add('hidden');
+            document.getElementById('userBar').classList.add('show');
+            document.getElementById('userName').textContent = cloudUser.name || cloudUser.login;
+            document.getElementById('currentUserName').textContent = cloudUser.name || cloudUser.login;
+            if (cloudUser.avatar) {
+                document.getElementById('userAvatar').src = cloudUser.avatar;
+            }
+            // Hide login button in header
+            const loginBtn = document.getElementById('loginBtn');
+            if (loginBtn) loginBtn.style.display = 'none';
+            
+            loadSavedWidgets();
+        }
+
+        // Skip login
+        document.addEventListener('DOMContentLoaded', function() {
+            const skipLoginBtn = document.getElementById('skipLoginBtn');
+            if (skipLoginBtn) {
+                skipLoginBtn.addEventListener('click', function() {
+                    document.getElementById('loginOverlay').classList.add('hidden');
+                });
+            }
+        });
+
+        // Logout
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    cloudUser = null;
+                    cloudToken = null;
+                    currentLoadedWidgetId = null;
+                    localStorage.removeItem('d365_user');
+                    localStorage.removeItem('d365_github_token');
+                    document.getElementById('userBar').classList.remove('show');
+                    document.getElementById('currentUserName').textContent = 'Guest';
+                    // Show login button in header
+                    const loginBtn = document.getElementById('loginBtn');
+                    if (loginBtn) loginBtn.style.display = '';
+                    // Reset token entry
+                    document.getElementById('tokenEntry').classList.remove('show');
+                    document.getElementById('tokenInput').value = '';
+                    document.getElementById('tokenStatus').style.display = 'none';
+                    showToast('Logged out successfully');
+                });
+            }
+        });
+
+        // Saved Widgets Dropdown
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedWidgetsBtn = document.getElementById('savedWidgetsBtn');
+            if (savedWidgetsBtn) {
+                savedWidgetsBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    document.getElementById('savedWidgetsMenu').classList.toggle('show');
+                });
+            }
+            
+            document.addEventListener('click', function() {
+                const menu = document.getElementById('savedWidgetsMenu');
+                if (menu) menu.classList.remove('show');
+            });
+        });
+
+        async function loadSavedWidgets() {
+            if (!cloudToken) return;
+            
+            try {
+                const res = await fetch('https://api.github.com/gists', {
+                    headers: { 'Authorization': 'token ' + cloudToken }
+                });
+                
+                if (!res.ok) throw new Error('Failed to load');
+                
+                const gists = await res.json();
+                savedWidgets = gists
+                    .filter(g => g.description && g.description.startsWith(GIST_PREFIX))
+                    .map(g => ({
+                        id: g.id,
+                        name: g.description.replace(GIST_PREFIX, ''),
+                        updated: g.updated_at,
+                        files: g.files
+                    }));
+                
+                renderSavedWidgets();
+                
+            } catch (e) {
+                console.error('Error loading widgets:', e);
+            }
+        }
+
+        function renderSavedWidgets() {
+            const list = document.getElementById('savedWidgetsList');
+            const count = document.getElementById('widgetCount');
+            
+            if (!list || !count) return;
+            
+            count.textContent = savedWidgets.length;
+            
+            if (savedWidgets.length === 0) {
+                list.innerHTML = '<div class="saved-widgets-empty">No saved widgets yet.<br>Create one and click "Save to Cloud"!</div>';
+                return;
+            }
+            
+            list.innerHTML = savedWidgets.map(w => `
+                <div class="saved-widget-item" onclick="loadWidget('${w.id}')">
+                    <div>
+                        <div class="saved-widget-name">${escapeHtml(w.name)}</div>
+                        <div class="saved-widget-date">Updated ${formatTimeAgo(w.updated)}</div>
+                    </div>
+                    <button class="saved-widget-delete" onclick="event.stopPropagation(); deleteWidget('${w.id}', '${escapeHtml(w.name)}')">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function formatTimeAgo(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) return 'just now';
+            if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+            if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+            if (diff < 604800000) return Math.floor(diff / 86400000) + 'd ago';
+            return date.toLocaleDateString();
+        }
+
+        async function loadWidget(gistId) {
+            try {
+                const res = await fetch('https://api.github.com/gists/' + gistId, {
+                    headers: { 'Authorization': 'token ' + cloudToken }
+                });
+                
+                if (!res.ok) throw new Error('Failed to load widget');
+                
+                const gist = await res.json();
+                
+                if (gist.files['config.json']) {
+                    const config = JSON.parse(gist.files['config.json'].content);
+                    
+                    // Load the config into the form
+                    applyCloudConfig(config);
+                    currentLoadedWidgetId = gistId;
+                    
+                    showToast('Widget loaded: ' + gist.description.replace(GIST_PREFIX, ''));
+                }
+                
+                document.getElementById('savedWidgetsMenu').classList.remove('show');
+                
+            } catch (e) {
+                console.error('Error loading widget:', e);
+                showToast('Failed to load widget');
+            }
+        }
+
+        function applyCloudConfig(config) {
+            // Merge cloud config into settings
+            Object.assign(settings, config);
+            
+            // Update form fields
+            Object.keys(config).forEach(key => {
+                const el = document.getElementById(key);
+                if (el) {
+                    if (el.type === 'checkbox') {
+                        el.checked = config[key];
+                    } else if (el.type === 'color') {
+                        el.value = config[key];
+                    } else {
+                        el.value = config[key];
+                    }
+                    // Trigger change event
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
+            
+            // Update preview
+            if (typeof updatePreview === 'function') {
+                updatePreview();
+            }
+            
+            // Restore images
+            restoreUploadedImages();
+        }
+
+        async function deleteWidget(gistId, name) {
+            if (!confirm('Delete widget "' + name + '"?')) return;
+            
+            try {
+                await fetch('https://api.github.com/gists/' + gistId, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'token ' + cloudToken }
+                });
+                
+                showToast('Widget deleted');
+                loadSavedWidgets();
+                
+                if (currentLoadedWidgetId === gistId) {
+                    currentLoadedWidgetId = null;
+                }
+                
+            } catch (e) {
+                showToast('Failed to delete widget');
+            }
+        }
+
+        // Save to Cloud button
+        document.addEventListener('DOMContentLoaded', function() {
+            const saveToCloudBtn = document.getElementById('saveToCloudBtn');
+            if (saveToCloudBtn) {
+                saveToCloudBtn.addEventListener('click', function() {
+                    if (!cloudToken) {
+                        showToast('Please sign in first');
+                        showLoginOverlay();
+                        return;
+                    }
+                    document.getElementById('saveWidgetName').value = currentLoadedWidgetId ? 
+                        (savedWidgets.find(w => w.id === currentLoadedWidgetId)?.name || '') : '';
+                    document.getElementById('saveModal').classList.add('show');
+                });
+            }
+        });
+
+        function closeSaveModal() {
+            document.getElementById('saveModal').classList.remove('show');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const saveModalConfirmBtn = document.getElementById('saveModalConfirmBtn');
+            if (saveModalConfirmBtn) {
+                saveModalConfirmBtn.addEventListener('click', saveWidgetToCloud);
+            }
+        });
+
+        async function saveWidgetToCloud() {
+            const name = document.getElementById('saveWidgetName').value.trim();
+            
+            if (!name) {
+                showToast('Please enter a widget name');
+                return;
+            }
+            
+            // Update settings from form before saving
+            if (typeof updateSettingsFromForm === 'function') {
+                updateSettingsFromForm();
+            }
+            
+            const gistData = {
+                description: GIST_PREFIX + name,
+                public: false,
+                files: {
+                    'config.json': {
+                        content: JSON.stringify(settings, null, 2)
+                    },
+                    'README.md': {
+                        content: `# ${name}\n\nD365 Chat Widget Configuration\n\nCreated with [D365 Widget Studio](https://moliveirapinto.github.io/d365-modern-chat-widget/admin.html)`
+                    }
+                }
+            };
+            
+            try {
+                let res;
+                if (currentLoadedWidgetId) {
+                    // Update existing
+                    res = await fetch('https://api.github.com/gists/' + currentLoadedWidgetId, {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': 'token ' + cloudToken,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(gistData)
+                    });
+                } else {
+                    // Create new
+                    res = await fetch('https://api.github.com/gists', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'token ' + cloudToken,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(gistData)
+                    });
+                }
+                
+                if (!res.ok) throw new Error('Failed to save');
+                
+                const gist = await res.json();
+                currentLoadedWidgetId = gist.id;
+                
+                closeSaveModal();
+                showToast('Widget saved to cloud! ☁️');
+                loadSavedWidgets();
+                
+            } catch (e) {
+                console.error('Save error:', e);
+                showToast('Failed to save widget');
+            }
+        }
+
+        // ============================================
         // Admin Settings
         // ============================================
 
@@ -2444,6 +3330,12 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
+            // Check for existing GitHub login
+            if (!checkExistingLogin()) {
+                // No existing login - show login overlay
+                // (user can skip if they want)
+            }
+            
             loadCurrentUser();
             loadProfiles();
             loadSettings();
@@ -3612,8 +4504,9 @@
                 document.getElementById('previewStatus').textContent = settings.headerSubtitle;
 
                 const headerAvatar = document.getElementById('previewHeaderAvatar');
+                console.log('Updating header logo, settings.headerLogo:', settings.headerLogo, 'isSafe:', isSafeImageData(settings.headerLogo));
                 if (isSafeImageData(settings.headerLogo)) {
-                    headerAvatar.innerHTML = `<img src="${settings.headerLogo}" alt="Logo" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.parentElement.innerHTML='<svg viewBox=\"0 0 24 24\" style=\"fill:white;width:24px;height:24px;\"><path d=\"M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H5v-2h9v2zm5-4H5v-2h14v2zm0-4H5V7h14v2z\"/></svg>';">`;
+                    headerAvatar.innerHTML = `<img src="${settings.headerLogo}" alt="Logo" onerror="this.style.display='none';this.parentElement.innerHTML='<svg viewBox=\"0 0 24 24\" style=\"fill:white;width:24px;height:24px;\"><path d=\"M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H5v-2h9v2zm5-4H5v-2h14v2zm0-4H5V7h14v2z\"/></svg>';">`;
                 } else {
                     headerAvatar.innerHTML = '<svg viewBox="0 0 24 24" style="fill:white;width:24px;height:24px;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H5v-2h9v2zm5-4H5v-2h14v2zm0-4H5V7h14v2z"/></svg>';
                 }
@@ -3675,7 +4568,7 @@
                 
                 const prechatHeaderAvatar = document.getElementById('previewPrechatHeaderAvatar');
                 if (isSafeImageData(settings.headerLogo)) {
-                    prechatHeaderAvatar.innerHTML = `<img src="${settings.headerLogo}" alt="Logo" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.parentElement.innerHTML='<svg viewBox=\"0 0 24 24\" style=\"fill:white;width:24px;height:24px;\"><path d=\"M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H5v-2h9v2zm5-4H5v-2h14v2zm0-4H5V7h14v2z\"/></svg>';">`;
+                    prechatHeaderAvatar.innerHTML = `<img src="${settings.headerLogo}" alt="Logo" onerror="this.style.display='none';this.parentElement.innerHTML='<svg viewBox=\"0 0 24 24\" style=\"fill:white;width:24px;height:24px;\"><path d=\"M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H5v-2h9v2zm5-4H5v-2h14v2zm0-4H5V7h14v2z\"/></svg>';">`;
                 } else {
                     prechatHeaderAvatar.innerHTML = '<svg viewBox="0 0 24 24" style="fill:white;width:24px;height:24px;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H5v-2h9v2zm5-4H5v-2h14v2zm0-4H5V7h14v2z"/></svg>';
                 }
@@ -5592,17 +6485,17 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
 
         // ============ USER MANAGEMENT ============
         function loadCurrentUser() {
-            // Get username from localStorage or use default
-            const userName = localStorage.getItem('chatWidgetUserName') || 'Admin';
-            document.getElementById('currentUserName').textContent = userName;
+            // If logged in with GitHub, use that name
+            if (cloudUser) {
+                document.getElementById('currentUserName').textContent = cloudUser.name || cloudUser.login;
+                return;
+            }
+            // Otherwise show Guest
+            document.getElementById('currentUserName').textContent = 'Guest';
         }
 
         // ============ UTILITY ============
-        function escapeHtml(str) {
-            const div = document.createElement('div');
-            div.textContent = str;
-            return div.innerHTML;
-        }
+        // Note: escapeHtml is defined in the GitHub Cloud Sync section above
 
         function showToast(message) {
             const toast = document.getElementById('toast');
