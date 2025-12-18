@@ -1837,22 +1837,6 @@
                 <span id="userName" class="user-name"></span>
             </div>
             <div class="user-actions">
-                <div class="saved-widgets-dropdown">
-                    <button id="savedWidgetsBtn" class="saved-widgets-btn">
-                        <svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
-                        My Saved Widgets
-                        <svg viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M7 10l5 5 5-5z"/></svg>
-                    </button>
-                    <div id="savedWidgetsMenu" class="saved-widgets-menu">
-                        <div class="saved-widgets-header">
-                            <span>My Saved Widgets</span>
-                            <span id="widgetCount">0</span>
-                        </div>
-                        <div id="savedWidgetsList" class="saved-widgets-list">
-                            <div class="saved-widgets-empty">No saved widgets yet</div>
-                        </div>
-                    </div>
-                </div>
                 <div id="cloudSyncStatus" class="cloud-sync-status synced">
                     <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM10 17l-3.5-3.5 1.41-1.41L10 14.17l4.59-4.58L16 11l-6 6z"/></svg>
                     <span>Cloud synced</span>
@@ -4825,6 +4809,24 @@
             });
             
             localStorage.setItem('chatWidgetSettings', JSON.stringify(settingsToSave));
+            
+            // If there's an active profile, update it and sync to cloud
+            if (activeProfileId) {
+                const profile = profiles.find(p => p.id === activeProfileId);
+                if (profile) {
+                    profile.settings = { ...settingsToSave };
+                    profile.updatedAt = new Date().toISOString();
+                    saveProfiles();
+                    
+                    if (cloudToken) {
+                        saveProfileToCloud(profile);
+                    } else {
+                        showToast('Settings saved!');
+                    }
+                    updateLastSavedInfo(settingsToSave.lastSaved);
+                    return;
+                }
+            }
             
             // Verify the save worked
             const verification = localStorage.getItem('chatWidgetSettings');
