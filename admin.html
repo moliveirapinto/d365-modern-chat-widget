@@ -1720,14 +1720,21 @@
         .cloud-sync-status.pending { color: #fbbf24; }
         .cloud-sync-status.error { color: #f87171; }
         .btn-logout {
-            background: none;
+            background: #dc2626;
             border: none;
-            color: rgba(255,255,255,0.8);
-            font-size: 13px;
+            color: white;
+            font-size: 12px;
+            font-weight: 500;
             cursor: pointer;
-            text-decoration: underline;
+            padding: 6px 14px;
+            border-radius: 6px;
+            transition: all 0.2s;
         }
-        .btn-logout:hover { color: white; }
+        .btn-logout:hover { 
+            background: #b91c1c;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+        }
 
         /* Save Modal */
         .save-modal-overlay {
