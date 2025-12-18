@@ -169,6 +169,15 @@
       '.d365-hero-card-btn{padding:10px 12px;background:'+gradient+';color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;text-align:center;transition:all .2s}',
       '.d365-hero-card-btn:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(102,126,234,.3)}',
       '.d365-hero-card-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}',
+      '.d365-hero-carousel-wrap{position:relative;width:100%}',
+      '.d365-hero-carousel{display:flex;gap:12px;overflow-x:auto;padding:8px 4px;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}',
+      '.d365-hero-carousel::-webkit-scrollbar{display:none}',
+      '.d365-hero-carousel .d365-hero-card{flex:0 0 auto;scroll-snap-align:start;min-width:220px;max-width:240px}',
+      '.d365-carousel-btn{position:absolute;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;background:#fff;border:none;box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;transition:all .2s;opacity:.9}',
+      '.d365-carousel-btn:hover{background:#f8f9fa;box-shadow:0 4px 12px rgba(0,0,0,.2);opacity:1}',
+      '.d365-carousel-btn.prev{left:-6px}',
+      '.d365-carousel-btn.next{right:-6px}',
+      '.d365-carousel-btn svg{width:14px;height:14px;fill:#4a5568}',
       '.d365-suggested-actions{display:flex;flex-direction:column;gap:8px;margin-top:12px}',
       '.d365-suggested-btn{padding:10px 16px;background:'+gradient+';color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;transition:all .2s;font-weight:500;text-align:center}',
       '.d365-suggested-btn:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(102,126,234,.3)}',
@@ -581,10 +590,91 @@
       messages.scrollTop = messages.scrollHeight;
     }
 
+    function createHeroCardElement(cardData, gradient) {
+      var card = document.createElement('div');
+      card.className = 'd365-hero-card';
+
+      // Image
+      if (cardData.images && cardData.images.length > 0 && cardData.images[0].url) {
+        var img = document.createElement('img');
+        img.src = cardData.images[0].url;
+        img.alt = cardData.title || '';
+        img.onerror = function() { this.style.display = 'none'; };
+        card.appendChild(img);
+      }
+
+      var bodyDiv = document.createElement('div');
+      bodyDiv.className = 'd365-hero-card-body';
+
+      // Title
+      if (cardData.title) {
+        var titleDiv = document.createElement('div');
+        titleDiv.className = 'd365-hero-card-title';
+        titleDiv.textContent = cardData.title;
+        bodyDiv.appendChild(titleDiv);
+      }
+
+      // Subtitle
+      if (cardData.subtitle) {
+        var subtitleDiv = document.createElement('div');
+        subtitleDiv.className = 'd365-hero-card-subtitle';
+        subtitleDiv.textContent = cardData.subtitle;
+        bodyDiv.appendChild(subtitleDiv);
+      }
+
+      // Text
+      if (cardData.text) {
+        var textDiv = document.createElement('div');
+        textDiv.className = 'd365-hero-card-text';
+        textDiv.textContent = cardData.text;
+        bodyDiv.appendChild(textDiv);
+      }
+
+      // Buttons
+      if (cardData.buttons && cardData.buttons.length > 0) {
+        var btnsDiv = document.createElement('div');
+        btnsDiv.className = 'd365-hero-card-buttons';
+
+        cardData.buttons.forEach(function(btn) {
+          var button = document.createElement('button');
+          button.className = 'd365-hero-card-btn';
+          button.textContent = btn.title || btn.text || 'Click';
+          
+          button.onclick = function() {
+            console.log('Hero card button clicked:', btn);
+            var value = btn.value || btn.title;
+            
+            if (btn.type === 'openUrl' && btn.value) {
+              window.open(btn.value, '_blank');
+            } else if (chatSDK && chatStarted) {
+              btnsDiv.querySelectorAll('button').forEach(function(b) { b.disabled = true; });
+              card.style.opacity = '0.7';
+              
+              chatSDK.sendMessage({ content: value }).then(function() {
+                addMessage(btn.title || value, true, userName);
+              }).catch(function(err) {
+                console.error('Error sending hero card response:', err);
+                btnsDiv.querySelectorAll('button').forEach(function(b) { b.disabled = false; });
+                card.style.opacity = '1';
+              });
+            }
+          };
+          
+          btnsDiv.appendChild(button);
+        });
+
+        bodyDiv.appendChild(btnsDiv);
+      }
+
+      card.appendChild(bodyDiv);
+      return card;
+    }
+
     function addHeroCard(content, senderName) {
       try {
         var parsed = JSON.parse(content);
         var heroCards = [];
+        var isCarousel = false;
         
         // Extract hero cards from different formats
         if (parsed.contentType === 'application/vnd.microsoft.card.hero' && parsed.content) {
@@ -596,6 +686,7 @@
                       att.contentType === 'application/vnd.microsoft.card.thumbnail') && att.content;
             })
             .map(function(att) { return att.content; });
+          isCarousel = heroCards.length > 1 || parsed.attachmentLayout === 'carousel';
         }
         
         if (heroCards.length === 0) {
@@ -604,113 +695,65 @@
           return;
         }
         
-        console.log('Rendering', heroCards.length, 'hero card(s)');
+        console.log('Rendering', heroCards.length, 'hero card(s), isCarousel:', isCarousel);
         
-        heroCards.forEach(function(cardData) {
-          var wrap = document.createElement('div');
-          wrap.className = 'd365-msg-wrap agent';
+        // Create single message wrapper for all cards
+        var wrap = document.createElement('div');
+        wrap.className = 'd365-msg-wrap agent';
 
-          var avatar = document.createElement('div');
-          avatar.className = 'd365-msg-avatar ' + (isBot(senderName) ? 'bot' : 'agent');
-          avatar.textContent = getInitials(senderName || 'Agent');
+        var avatar = document.createElement('div');
+        avatar.className = 'd365-msg-avatar ' + (isBot(senderName) ? 'bot' : 'agent');
+        avatar.textContent = getInitials(senderName || 'Agent');
 
-          var contentDiv = document.createElement('div');
-          contentDiv.className = 'd365-msg-content';
+        var contentDiv = document.createElement('div');
+        contentDiv.className = 'd365-msg-content';
 
-          var senderDiv = document.createElement('div');
-          senderDiv.className = 'd365-msg-sender';
-          senderDiv.textContent = senderName || 'Agent';
-          contentDiv.appendChild(senderDiv);
+        var senderDiv = document.createElement('div');
+        senderDiv.className = 'd365-msg-sender';
+        senderDiv.textContent = senderName || 'Agent';
+        contentDiv.appendChild(senderDiv);
 
-          var heroDiv = document.createElement('div');
-          heroDiv.className = 'd365-hero-card';
+        if (isCarousel) {
+          // Multiple cards - render as horizontal carousel
+          var carouselWrap = document.createElement('div');
+          carouselWrap.className = 'd365-hero-carousel-wrap';
+          
+          var carousel = document.createElement('div');
+          carousel.className = 'd365-hero-carousel';
+          
+          heroCards.forEach(function(cardData) {
+            carousel.appendChild(createHeroCardElement(cardData));
+          });
+          
+          // Navigation buttons
+          var prevBtn = document.createElement('button');
+          prevBtn.className = 'd365-carousel-btn prev';
+          prevBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>';
+          prevBtn.onclick = function() { carousel.scrollBy({ left: -240, behavior: 'smooth' }); };
+          
+          var nextBtn = document.createElement('button');
+          nextBtn.className = 'd365-carousel-btn next';
+          nextBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>';
+          nextBtn.onclick = function() { carousel.scrollBy({ left: 240, behavior: 'smooth' }); };
+          
+          carouselWrap.appendChild(prevBtn);
+          carouselWrap.appendChild(carousel);
+          carouselWrap.appendChild(nextBtn);
+          contentDiv.appendChild(carouselWrap);
+        } else {
+          // Single card
+          contentDiv.appendChild(createHeroCardElement(heroCards[0]));
+        }
 
-          // Image
-          if (cardData.images && cardData.images.length > 0 && cardData.images[0].url) {
-            var img = document.createElement('img');
-            img.src = cardData.images[0].url;
-            img.alt = cardData.title || '';
-            img.onerror = function() { this.style.display = 'none'; };
-            heroDiv.appendChild(img);
-          }
+        var timeDiv = document.createElement('div');
+        timeDiv.className = 'd365-msg-time';
+        timeDiv.textContent = formatTime(new Date());
+        contentDiv.appendChild(timeDiv);
 
-          var bodyDiv = document.createElement('div');
-          bodyDiv.className = 'd365-hero-card-body';
-
-          // Title
-          if (cardData.title) {
-            var titleDiv = document.createElement('div');
-            titleDiv.className = 'd365-hero-card-title';
-            titleDiv.textContent = cardData.title;
-            bodyDiv.appendChild(titleDiv);
-          }
-
-          // Subtitle
-          if (cardData.subtitle) {
-            var subtitleDiv = document.createElement('div');
-            subtitleDiv.className = 'd365-hero-card-subtitle';
-            subtitleDiv.textContent = cardData.subtitle;
-            bodyDiv.appendChild(subtitleDiv);
-          }
-
-          // Text
-          if (cardData.text) {
-            var textDiv = document.createElement('div');
-            textDiv.className = 'd365-hero-card-text';
-            textDiv.textContent = cardData.text;
-            bodyDiv.appendChild(textDiv);
-          }
-
-          // Buttons (stacked vertically)
-          if (cardData.buttons && cardData.buttons.length > 0) {
-            var btnsDiv = document.createElement('div');
-            btnsDiv.className = 'd365-hero-card-buttons';
-
-            cardData.buttons.forEach(function(btn) {
-              var button = document.createElement('button');
-              button.className = 'd365-hero-card-btn';
-              button.textContent = btn.title || btn.text || 'Click';
-              
-              button.onclick = function() {
-                console.log('Hero card button clicked:', btn);
-                var value = btn.value || btn.title;
-                
-                if (btn.type === 'openUrl' && btn.value) {
-                  window.open(btn.value, '_blank');
-                } else if (chatSDK && chatStarted) {
-                  // Disable all buttons
-                  btnsDiv.querySelectorAll('button').forEach(function(b) { b.disabled = true; });
-                  heroDiv.style.opacity = '0.7';
-                  
-                  chatSDK.sendMessage({ content: value }).then(function() {
-                    addMessage(btn.title || value, true, userName);
-                  }).catch(function(err) {
-                    console.error('Error sending hero card response:', err);
-                    btnsDiv.querySelectorAll('button').forEach(function(b) { b.disabled = false; });
-                    heroDiv.style.opacity = '1';
-                  });
-                }
-              };
-              
-              btnsDiv.appendChild(button);
-            });
-
-            bodyDiv.appendChild(btnsDiv);
-          }
-
-          heroDiv.appendChild(bodyDiv);
-          contentDiv.appendChild(heroDiv);
-
-          var timeDiv = document.createElement('div');
-          timeDiv.className = 'd365-msg-time';
-          timeDiv.textContent = formatTime(new Date());
-          contentDiv.appendChild(timeDiv);
-
-          wrap.appendChild(avatar);
-          wrap.appendChild(contentDiv);
-          typing.parentNode.insertBefore(wrap, typing);
-          messages.scrollTop = messages.scrollHeight;
-        });
+        wrap.appendChild(avatar);
+        wrap.appendChild(contentDiv);
+        typing.parentNode.insertBefore(wrap, typing);
+        messages.scrollTop = messages.scrollHeight;
 
         // Handle any text that came with the attachments
         if (parsed.text) {
