@@ -854,7 +854,17 @@
       if (!content) return;
 
       var role = msg.role || msg.senderRole;
-      var senderName = msg.senderDisplayName || 'Agent';
+      
+      // Extract sender name - check multiple possible locations
+      var senderId = msg.senderId || msg.sender;
+      var senderName = 'Agent';
+      if (msg.senderDisplayName) {
+        senderName = msg.senderDisplayName;
+      } else if (typeof senderId === 'object' && senderId !== null) {
+        senderName = senderId.displayName || senderId.name || 'Agent';
+      } else if (typeof senderId === 'string' && senderId) {
+        senderName = senderId;
+      }
 
       // Skip user messages
       if (role === 'user' || role === 'User' || role === 1) return;
