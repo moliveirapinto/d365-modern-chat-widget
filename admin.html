@@ -991,22 +991,25 @@
         .tab-btn {
             flex: 1;
             padding: 10px 16px;
-            border: none;
-            background: none;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
             border-radius: 8px;
             font-size: 13px;
             font-weight: 500;
-            color: var(--admin-text-light);
+            color: #64748b;
             cursor: pointer;
             transition: all 0.2s;
         }
         .tab-btn.active {
-            background: white;
-            color: var(--admin-text);
-            box-shadow: var(--admin-shadow);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
         }
         .tab-btn:hover:not(.active) {
-            color: var(--admin-text);
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+            color: #475569;
         }
 
         .tab-content { display: none; }
