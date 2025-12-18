@@ -447,6 +447,12 @@
       var contentDiv = document.createElement('div');
       contentDiv.className = 'd365-msg-content';
 
+      // Create sender div
+      var senderDiv = document.createElement('div');
+      senderDiv.className = 'd365-msg-sender';
+      senderDiv.textContent = senderName || 'Agent';
+      contentDiv.appendChild(senderDiv);
+
       var cardBox = document.createElement('div');
       cardBox.className = 'd365-msg agent d365-adaptive-card';
 
@@ -479,11 +485,20 @@
           card.parse(payload);
           
           card.onExecuteAction = function(action) {
-            console.log('Adaptive Card action:', action);
-            // Handle Submit actions (check both constructor name and data property)
-            if (action.constructor.name === 'SubmitAction' || action.data !== undefined) {
+            console.log('Adaptive Card action triggered:', action);
+            console.log('Action type:', action.getJsonTypeName ? action.getJsonTypeName() : 'unknown');
+            console.log('Action data:', action.data);
+            console.log('chatSDK:', chatSDK ? 'exists' : 'null');
+            console.log('chatStarted:', chatStarted);
+            
+            // Handle Submit actions - check multiple ways since constructor.name is unreliable
+            var isSubmit = (action.data !== undefined) || 
+                          (action.getJsonTypeName && action.getJsonTypeName() === 'Action.Submit') ||
+                          (action instanceof AdaptiveCards.SubmitAction);
+            
+            if (isSubmit) {
               var data = action.data;
-              console.log('Submit action data:', data);
+              console.log('Processing submit with data:', data);
               if (chatSDK && chatStarted) {
                 // Disable the card after clicking
                 cardBox.style.opacity = '0.6';
@@ -492,33 +507,48 @@
                 var actionLabel = (data && data.actionSubmitId) || action.title || 'Submit';
                 var sendContent = JSON.stringify({value: data});
                 
+                console.log('Sending message:', sendContent);
                 chatSDK.sendMessage({ 
                   content: sendContent,
                   metadata: { 'microsoft.azure.communication.chat.bot.contenttype': 'azurebotservice.adaptivecard' }
                 }).then(function() {
+                  console.log('Message sent successfully');
                   addMessage(actionLabel, true, userName);
                 }).catch(function(err) {
                   console.error('Error sending card response:', err);
                   cardBox.style.opacity = '1';
                   cardBox.style.pointerEvents = 'auto';
                 });
+              } else {
+                console.warn('Cannot send - chatSDK or chatStarted is false');
               }
             } else if (action.url) {
+              console.log('Opening URL:', action.url);
               window.open(action.url, '_blank');
             }
           };
           
           var rendered = card.render();
-          if (rendered) cardBox.appendChild(rendered);
+          if (rendered) {
+            cardBox.appendChild(rendered);
+            console.log('Adaptive Card rendered with action handler');
+          }
+        } else {
+          console.warn('AdaptiveCards library not available or no payload');
         }
       } catch(e) {
         console.error('Error rendering Adaptive Card:', e);
         cardBox.innerHTML = '<p style="color:#e74c3c">Error displaying card</p>';
       }
 
-      contentDiv.innerHTML = '<div class="d365-msg-sender">'+(senderName||'Agent')+'</div>';
+      // Append cardBox BEFORE adding time (don't use innerHTML += which destroys event listeners!)
       contentDiv.appendChild(cardBox);
-      contentDiv.innerHTML += '<div class="d365-msg-time">'+formatTime(new Date())+'</div>';
+      
+      // Create time div
+      var timeDiv = document.createElement('div');
+      timeDiv.className = 'd365-msg-time';
+      timeDiv.textContent = formatTime(new Date());
+      contentDiv.appendChild(timeDiv);
 
       wrap.appendChild(avatar);
       wrap.appendChild(contentDiv);
