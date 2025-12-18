@@ -3048,14 +3048,23 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v1.3.0';
-        const APP_LAST_UPDATED = 'Dec 18, 2025, 06:00 PM';
+        const APP_VERSION = 'v1.3.1';
+        const APP_LAST_UPDATED = 'Dec 18, 2025, 06:15 PM';
         
         const CHANGELOG = [
             {
-                version: 'v1.3.0',
+                version: 'v1.3.1',
                 date: 'Dec 18, 2025',
                 latest: true,
+                items: [
+                    { type: 'fix', text: 'Message timestamp now properly discrete (10px)' },
+                    { type: 'fix', text: 'Fixed CSS cascade issues for timestamp styling' }
+                ]
+            },
+            {
+                version: 'v1.3.0',
+                date: 'Dec 18, 2025',
+                latest: false,
                 items: [
                     { type: 'new', text: 'Enhanced markdown rendering for bot messages' },
                     { type: 'new', text: 'Professional formatting for headers, lists, code blocks' },
@@ -5949,8 +5958,9 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     .source-domain { font-size: 11px; color: #94a3b8; display: flex; align-items: center; gap: 4px; }
     .source-domain svg { width: 12px; height: 12px; fill: currentColor; }
     
-    .d365-message-time { font-size: 10px; color: #94a3b8; padding: 0 4px; }
+    .d365-message-time { font-size: 10px !important; color: #94a3b8 !important; padding: 0 4px; line-height: 1.2; margin-top: 2px; }
     .d365-message-wrapper.user .d365-message-time { text-align: right; }
+    .d365-message-content .d365-message-time { font-size: 10px !important; }
     .d365-message-image { max-width: 200px; max-height: 200px; border-radius: 12px; cursor: pointer; transition: transform 0.2s; object-fit: contain; }
     .d365-message-image:hover { transform: scale(1.02); }
     

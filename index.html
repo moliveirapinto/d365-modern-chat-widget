@@ -645,11 +645,10 @@
             display: flex; align-items: center; gap: 4px;
         }
         .source-domain svg { width: 12px; height: 12px; fill: currentColor; }
-            padding: 6px 12px; border-radius: 12px; max-width: none;
-        }
 
-        .message-time { font-size: 10px; color: #94a3b8; padding: 0 4px; }
+        .message-time { font-size: 10px !important; color: #94a3b8 !important; padding: 0 4px; line-height: 1.2; margin-top: 2px; }
         .message-wrapper.user .message-time { text-align: right; }
+        .message-content .message-time { font-size: 10px !important; }
 
         /* Image message styles */
         .message-image-container { display: flex; flex-direction: column; gap: 4px; }
@@ -5529,6 +5528,7 @@
                 .message.agent { background: ${s.agentBubbleColor || '#ffffff'} !important; color: ${s.agentTextColor || '#2d3748'} !important; }
                 .message.system { background: ${s.systemMsgColor || '#e2e8f0'} !important; color: ${s.systemTextColor || '#64748b'} !important; }
                 .message-avatar.agent { background: ${gradient} !important; }
+                .message-time { font-size: 10px !important; color: #94a3b8 !important; }
 
                 /* Input Area */
                 .chat-input-area { background: ${s.inputBgColor || '#ffffff'} !important; }
