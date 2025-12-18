@@ -9,12 +9,17 @@
     user: null,
     widgets: [],
     currentWidget: null,
-    isDirty: false
+    isDirty: false,
+    deviceFlowPollTimer: null
   };
 
   // Config
   const GIST_PREFIX = 'd365-widget-';
   const WIDGET_CORE_URL = 'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js';
+  
+  // GitHub OAuth App - You need to create one at https://github.com/settings/developers
+  // Enable "Device Flow" in the OAuth App settings
+  const GITHUB_CLIENT_ID = 'Ov23liMqkFz0eV7fUZJi'; // Replace with your Client ID
 
   // DOM Elements
   const $ = id => document.getElementById(id);
@@ -36,7 +41,7 @@
   // Check authentication
   async function checkAuth() {
     try {
-      // Try Azure Static Web Apps auth
+      // Try Azure Static Web Apps auth first
       const res = await fetch('/.auth/me');
       if (res.ok) {
         const data = await res.json();
@@ -46,7 +51,6 @@
             name: data.clientPrincipal.userDetails,
             provider: data.clientPrincipal.identityProvider
           };
-          // Get GitHub token for API calls
           await getGitHubToken();
           showDashboard();
           return;
@@ -56,28 +60,46 @@
       console.log('Not using Azure SWA auth');
     }
 
-    // Check localStorage for dev/testing
+    // Check localStorage for saved session
     const savedUser = localStorage.getItem('d365_user');
-    if (savedUser) {
+    const savedToken = localStorage.getItem('d365_github_token');
+    
+    if (savedUser && savedToken) {
       state.user = JSON.parse(savedUser);
-      showDashboard();
-      return;
+      state.githubToken = savedToken;
+      
+      // Verify token is still valid
+      try {
+        const res = await fetch('https://api.github.com/user', {
+          headers: { 'Authorization': 'token ' + savedToken }
+        });
+        if (res.ok) {
+          showDashboard();
+          return;
+        }
+      } catch (e) {
+        console.log('Saved token invalid');
+      }
+      
+      // Clear invalid session
+      localStorage.removeItem('d365_user');
+      localStorage.removeItem('d365_github_token');
     }
 
     showScreen('login');
   }
 
   async function getGitHubToken() {
-    // In Azure SWA, we'd get this from the auth endpoint
-    // For now, check if user has a PAT stored
     state.githubToken = localStorage.getItem('d365_github_token');
   }
 
   // Event Listeners
   function setupEventListeners() {
     // Login
-    $('loginBtn').onclick = login;
+    $('loginBtn').onclick = startDeviceFlow;
     $('logoutBtn').onclick = logout;
+    $('cancelDeviceBtn').onclick = cancelDeviceFlow;
+    $('copyCodeDeviceBtn').onclick = copyDeviceCode;
 
     // Dashboard
     $('newWidgetBtn').onclick = () => createNewWidget();
@@ -121,55 +143,144 @@
     screens[name].classList.add('active');
   }
 
-  // Login
-  function login() {
-    // Try Azure SWA login first
-    const swaLoginUrl = '/.auth/login/github?post_login_redirect_uri=' + encodeURIComponent(window.location.pathname);
+  // ==========================================
+  // GitHub Device Flow Authentication
+  // ==========================================
+  
+  async function startDeviceFlow() {
+    $('loginInitial').style.display = 'none';
+    $('deviceCodeUI').style.display = 'flex';
     
-    // Check if we're on Azure SWA
-    fetch('/.auth/me').then(res => {
-      if (res.ok) {
-        window.location.href = swaLoginUrl;
-      } else {
-        // Fallback: prompt for GitHub PAT for local dev
-        showTokenPrompt();
-      }
-    }).catch(() => {
-      showTokenPrompt();
-    });
-  }
-
-  function showTokenPrompt() {
-    const token = prompt(
-      'Enter your GitHub Personal Access Token (with gist scope):\n\n' +
-      'Create one at: https://github.com/settings/tokens/new?scopes=gist\n\n' +
-      'This is only needed for local development.'
-    );
+    const statusEl = $('deviceStatus');
+    statusEl.className = 'device-status';
+    statusEl.innerHTML = '<div class="spinner-small"></div><span>Getting code...</span>';
     
-    if (token) {
-      // Verify token works
-      fetch('https://api.github.com/user', {
-        headers: { 'Authorization': 'token ' + token }
-      })
-      .then(res => res.json())
-      .then(user => {
-        if (user.login) {
-          state.user = {
-            id: user.id,
-            name: user.name || user.login,
-            login: user.login,
-            avatar: user.avatar_url
-          };
-          state.githubToken = token;
-          localStorage.setItem('d365_user', JSON.stringify(state.user));
-          localStorage.setItem('d365_github_token', token);
-          showDashboard();
-        } else {
-          alert('Invalid token');
-        }
-      })
-      .catch(() => alert('Failed to verify token'));
+    try {
+      // Step 1: Request device code
+      const codeRes = await fetch('https://github.com/login/device/code', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          client_id: GITHUB_CLIENT_ID,
+          scope: 'gist read:user'
+        })
+      });
+      
+      if (!codeRes.ok) throw new Error('Failed to get device code');
+      
+      const codeData = await codeRes.json();
+      
+      // Display the user code
+      $('userCode').textContent = codeData.user_code;
+      $('verificationLink').href = codeData.verification_uri;
+      
+      statusEl.innerHTML = '<div class="spinner-small"></div><span>Waiting for authorization...</span>';
+      
+      // Step 2: Poll for the token
+      pollForToken(codeData.device_code, codeData.interval || 5);
+      
+    } catch (err) {
+      console.error('Device flow error:', err);
+      statusEl.className = 'device-status error';
+      statusEl.innerHTML = '<span>❌ Failed to start login. Please try again.</span>';
     }
+  }
+  
+  async function pollForToken(deviceCode, interval) {
+    const statusEl = $('deviceStatus');
+    
+    const poll = async () => {
+      try {
+        const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            client_id: GITHUB_CLIENT_ID,
+            device_code: deviceCode,
+            grant_type: 'urn:ietf:params:oauth:grant-type:device_code'
+          })
+        });
+        
+        const tokenData = await tokenRes.json();
+        
+        if (tokenData.access_token) {
+          // Success! We got the token
+          clearInterval(state.deviceFlowPollTimer);
+          
+          statusEl.className = 'device-status success';
+          statusEl.innerHTML = '<span>✓ Authorized! Loading your dashboard...</span>';
+          
+          // Get user info
+          const userRes = await fetch('https://api.github.com/user', {
+            headers: { 'Authorization': 'token ' + tokenData.access_token }
+          });
+          const userData = await userRes.json();
+          
+          state.user = {
+            id: userData.id,
+            name: userData.name || userData.login,
+            login: userData.login,
+            avatar: userData.avatar_url
+          };
+          state.githubToken = tokenData.access_token;
+          
+          // Save to localStorage
+          localStorage.setItem('d365_user', JSON.stringify(state.user));
+          localStorage.setItem('d365_github_token', tokenData.access_token);
+          
+          // Show dashboard
+          setTimeout(() => showDashboard(), 500);
+          
+        } else if (tokenData.error === 'authorization_pending') {
+          // User hasn't authorized yet, keep polling
+          // (timer continues)
+        } else if (tokenData.error === 'slow_down') {
+          // Need to slow down polling
+          clearInterval(state.deviceFlowPollTimer);
+          state.deviceFlowPollTimer = setInterval(poll, (interval + 5) * 1000);
+        } else if (tokenData.error === 'expired_token') {
+          clearInterval(state.deviceFlowPollTimer);
+          statusEl.className = 'device-status error';
+          statusEl.innerHTML = '<span>⏱ Code expired. Please try again.</span>';
+        } else if (tokenData.error === 'access_denied') {
+          clearInterval(state.deviceFlowPollTimer);
+          statusEl.className = 'device-status error';
+          statusEl.innerHTML = '<span>❌ Authorization denied.</span>';
+        }
+        
+      } catch (err) {
+        console.error('Poll error:', err);
+      }
+    };
+    
+    // Start polling
+    state.deviceFlowPollTimer = setInterval(poll, interval * 1000);
+    // Also do an immediate first poll after a short delay
+    setTimeout(poll, 2000);
+  }
+  
+  function cancelDeviceFlow() {
+    if (state.deviceFlowPollTimer) {
+      clearInterval(state.deviceFlowPollTimer);
+      state.deviceFlowPollTimer = null;
+    }
+    $('loginInitial').style.display = 'block';
+    $('deviceCodeUI').style.display = 'none';
+  }
+  
+  function copyDeviceCode() {
+    const code = $('userCode').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+      const btn = $('copyCodeDeviceBtn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy Code', 2000);
+    });
   }
 
   function logout() {
@@ -178,12 +289,11 @@
     localStorage.removeItem('d365_user');
     localStorage.removeItem('d365_github_token');
     
-    // Try Azure SWA logout
-    fetch('/.auth/logout').then(() => {
-      showScreen('login');
-    }).catch(() => {
-      showScreen('login');
-    });
+    // Reset login UI
+    $('loginInitial').style.display = 'block';
+    $('deviceCodeUI').style.display = 'none';
+    
+    showScreen('login');
   }
 
   // Dashboard

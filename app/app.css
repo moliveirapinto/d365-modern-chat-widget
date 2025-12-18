@@ -79,6 +79,83 @@ body {
   color: var(--text-muted);
 }
 
+/* Device Code Flow UI */
+.device-code-ui {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  animation: fadeIn 0.3s ease;
+}
+
+.device-code-box {
+  background: #f8fafc;
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 24px 32px;
+  text-align: center;
+}
+
+.device-code-label {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.device-code {
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--text);
+  background: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+  user-select: all;
+}
+
+.btn-small {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.device-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: #f0f9ff;
+  border-radius: 8px;
+  color: #0369a1;
+  font-size: 14px;
+}
+
+.device-status.success {
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.device-status.error {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #0369a1;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Buttons */
 .btn-primary {
   display: inline-flex;
