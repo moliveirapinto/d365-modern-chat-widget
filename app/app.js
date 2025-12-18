@@ -246,10 +246,6 @@
       spinner.style.display = 'none';
     }
   }
-      btn.textContent = 'Copied!';
-      setTimeout(() => btn.textContent = 'Copy Code', 2000);
-    });
-  }
 
   function logout() {
     state.user = null;
