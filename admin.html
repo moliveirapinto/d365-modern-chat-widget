@@ -568,13 +568,16 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.5);
+            flex-shrink: 0;
         }
         .preview-header-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border-radius: 50%;
         }
-        .preview-header-avatar svg { width: 24px; height: 24px; fill: white; }
+        .preview-header-avatar svg { width: 26px; height: 26px; fill: white; }
         .preview-header-info { flex: 1; }
         .preview-header-title { color: white; font-weight: 600; font-size: 15px; }
         .preview-header-status { color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 2px; }
