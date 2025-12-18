@@ -2577,13 +2577,6 @@
 
                     <!-- Messages Colors Tab -->
                     <div class="tab-content" id="tab-messages">
-                        <div class="gradient-toggle" style="margin-bottom: 16px;">
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="useBubbleGradient" checked>
-                                <span class="toggle-slider"></span>
-                            </label>
-                            <span class="toggle-label">Use gradient for user message bubbles</span>
-                        </div>
                         <div class="color-grid">
                             <div class="color-item">
                                 <label>User Bubble</label>
@@ -3055,32 +3048,14 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v1.4.0';
-        const APP_LAST_UPDATED = 'Dec 18, 2025, 08:00 PM';
+        const APP_VERSION = 'v1.3.0';
+        const APP_LAST_UPDATED = 'Dec 18, 2025, 06:00 PM';
         
         const CHANGELOG = [
             {
-                version: 'v1.4.0',
-                date: 'Dec 18, 2025',
-                latest: true,
-                items: [
-                    { type: 'new', text: 'Separate toggle for user message bubble gradient' },
-                    { type: 'improve', text: 'Users can now choose solid or gradient for message bubbles independently' }
-                ]
-            },
-            {
-                version: 'v1.3.1',
-                date: 'Dec 18, 2025',
-                latest: false,
-                items: [
-                    { type: 'fix', text: 'Message timestamp now properly discrete (10px)' },
-                    { type: 'fix', text: 'Fixed CSS cascade issues for timestamp styling' }
-                ]
-            },
-            {
                 version: 'v1.3.0',
                 date: 'Dec 18, 2025',
-                latest: false,
+                latest: true,
                 items: [
                     { type: 'new', text: 'Enhanced markdown rendering for bot messages' },
                     { type: 'new', text: 'Professional formatting for headers, lists, code blocks' },
@@ -3801,7 +3776,6 @@
             fontFamily: 'system',
             // Colors
             useGradient: true,
-            useBubbleGradient: true,
             gradientStart: '#667eea',
             gradientEnd: '#764ba2',
             primaryColor: '#667eea',
@@ -4381,7 +4355,6 @@
 
             // Gradient toggle - call AFTER colors are populated
             document.getElementById('useGradient').checked = settings.useGradient;
-            document.getElementById('useBubbleGradient').checked = settings.useBubbleGradient !== false;
             toggleGradient();
 
             // Launcher Icon - restore selection
@@ -4459,12 +4432,6 @@
 
             // Gradient toggle
             document.getElementById('useGradient').addEventListener('change', toggleGradient);
-            
-            // Bubble gradient toggle
-            document.getElementById('useBubbleGradient').addEventListener('change', () => {
-                updateSettingsFromForm();
-                updatePreview();
-            });
 
             // Color pickers sync
             document.querySelectorAll('input[type="color"]').forEach(picker => {
@@ -5104,7 +5071,6 @@
 
             // Colors
             settings.useGradient = document.getElementById('useGradient').checked;
-            settings.useBubbleGradient = document.getElementById('useBubbleGradient').checked;
             settings.gradientStart = document.getElementById('gradientStart').value;
             settings.gradientEnd = document.getElementById('gradientEnd').value;
             settings.primaryColor = document.getElementById('primaryColor').value;
@@ -5203,7 +5169,7 @@
 
                 // User bubble
                 const userBubble = document.getElementById('previewUserBubble');
-                userBubble.style.background = settings.useBubbleGradient ? gradient : settings.userBubbleColor;
+                userBubble.style.background = settings.useGradient ? gradient : settings.userBubbleColor;
                 userBubble.style.color = settings.userTextColor;
 
                 const userAvatar = document.getElementById('previewUserAvatar');
@@ -5342,7 +5308,6 @@
                 document.getElementById('headerTitle').value = defaultSettings.headerTitle;
                 document.getElementById('headerSubtitle').value = defaultSettings.headerSubtitle;
                 document.getElementById('useGradient').checked = defaultSettings.useGradient;
-                document.getElementById('useBubbleGradient').checked = defaultSettings.useBubbleGradient;
 
                 // Reset pre-chat form fields
                 document.getElementById('welcomeTitle').value = defaultSettings.welcomeTitle;
@@ -5674,7 +5639,6 @@ window.D365WidgetConfig=${configJson};
                 headerLogo: toGitHubRawUrl(settings.headerLogo) || '',
                 fontFamily: settings.fontFamily || 'system',
                 useGradient: settings.useGradient !== false,
-                useBubbleGradient: settings.useBubbleGradient !== false,
                 gradientStart: settings.gradientStart || '#667eea',
                 gradientEnd: settings.gradientEnd || '#764ba2',
                 primaryColor: settings.primaryColor || '#667eea',
@@ -5939,7 +5903,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       word-wrap: break-word; white-space: normal;
     }
     .d365-message.agent { background: \${config.agentBubbleColor}; color: \${config.agentTextColor}; border-bottom-left-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-    .d365-message.user { background: \${config.useBubbleGradient ? 'linear-gradient(135deg, ' + config.gradientStart + ' 0%, ' + config.gradientEnd + ' 100%)' : config.userBubbleColor}; color: \${config.userTextColor}; border-bottom-right-radius: 4px; }
+    .d365-message.user { background: \${config.userBubbleColor}; color: \${config.userTextColor}; border-bottom-right-radius: 4px; }
     .d365-message.system { align-self: center; background: \${config.systemMsgColor}; color: \${config.systemTextColor}; font-size: 12px; padding: 6px 12px; border-radius: 12px; max-width: none; }
     
     /* Enhanced Markdown Rendering */
@@ -5985,9 +5949,8 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     .source-domain { font-size: 11px; color: #94a3b8; display: flex; align-items: center; gap: 4px; }
     .source-domain svg { width: 12px; height: 12px; fill: currentColor; }
     
-    .d365-message-time { font-size: 10px !important; color: #94a3b8 !important; padding: 0 4px; line-height: 1.2; margin-top: 2px; }
+    .d365-message-time { font-size: 10px; color: #94a3b8; padding: 0 4px; }
     .d365-message-wrapper.user .d365-message-time { text-align: right; }
-    .d365-message-content .d365-message-time { font-size: 10px !important; }
     .d365-message-image { max-width: 200px; max-height: 200px; border-radius: 12px; cursor: pointer; transition: transform 0.2s; object-fit: contain; }
     .d365-message-image:hover { transform: scale(1.02); }
     
