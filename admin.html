@@ -126,6 +126,17 @@
             height: 14px;
             fill: currentColor;
         }
+        .btn-header-action.btn-version {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+        }
+        .btn-header-action.btn-version:hover {
+            background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+        }
 
         /* Main Layout */
         .admin-container {
@@ -1747,6 +1758,214 @@
             box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
         }
 
+        /* Version Badge */
+        .version-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: all 0.2s;
+        }
+        .version-info:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-1px);
+        }
+        .version-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: white;
+        }
+        .version-badge svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+        .version-date {
+            font-size: 10px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* Changelog Modal */
+        .changelog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        .changelog-overlay.show { display: flex; }
+        .changelog-modal {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+        @keyframes modalSlideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .changelog-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 24px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .changelog-header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .changelog-header-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .changelog-header-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+        .changelog-header-title h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .changelog-header-title p {
+            margin: 4px 0 0;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .changelog-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .changelog-close:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+        .changelog-close svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+        .changelog-content {
+            padding: 24px;
+            max-height: calc(80vh - 120px);
+            overflow-y: auto;
+        }
+        .changelog-version {
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .changelog-version:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .changelog-version-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .changelog-version-number {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .changelog-version-number.latest {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        .changelog-version-number svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+        .changelog-version-date {
+            font-size: 13px;
+            color: #6b7280;
+        }
+        .changelog-items {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .changelog-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+        }
+        .changelog-item-type {
+            flex-shrink: 0;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .changelog-item-type.new {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .changelog-item-type.fix {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .changelog-item-type.improve {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .changelog-item-type.remove {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .changelog-item-text {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.5;
+        }
+
         /* Save Modal */
         .save-modal-overlay {
             position: fixed;
@@ -1861,6 +2080,29 @@
         </div>
     </div>
 
+    <!-- Changelog Modal -->
+    <div id="changelogOverlay" class="changelog-overlay" onclick="if(event.target === this) hideChangelog()">
+        <div class="changelog-modal">
+            <div class="changelog-header">
+                <div class="changelog-header-left">
+                    <div class="changelog-header-icon">
+                        <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+                    </div>
+                    <div class="changelog-header-title">
+                        <h2>Changelog</h2>
+                        <p>What's new in Chat Widget Studio</p>
+                    </div>
+                </div>
+                <button class="changelog-close" onclick="hideChangelog()">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="changelog-content" id="changelogContent">
+                <!-- Changelog items will be rendered here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
     <header class="admin-header">
         <!-- User Bar (shown when logged in with GitHub) -->
         <div id="userBar" class="user-bar">
@@ -1869,6 +2111,13 @@
                 <span id="userName" class="user-name"></span>
             </div>
             <div class="user-actions">
+                <div class="version-info" onclick="showChangelog()" title="View changelog">
+                    <div class="version-badge">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        <span id="versionNumber">v1.0.0</span>
+                    </div>
+                    <span class="version-date" id="versionDate">Updated: Dec 18, 2025</span>
+                </div>
                 <div id="cloudSyncStatus" class="cloud-sync-status synced">
                     <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM10 17l-3.5-3.5 1.41-1.41L10 14.17l4.59-4.58L16 11l-6 6z"/></svg>
                     <span>Cloud synced</span>
@@ -1892,6 +2141,10 @@
         <!-- Header Actions -->
         <div class="header-actions">
             <span id="welcomeText" style="color: var(--admin-text-light); font-size: 13px; margin-right: 8px;">Welcome, <strong id="currentUserName">Guest</strong></span>
+            <button class="btn-header-action btn-version" onclick="showChangelog()" title="View changelog" id="headerVersionBtn">
+                <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+                <span id="headerVersionNumber">v1.0.0</span>
+            </button>
             <button class="btn-header-action" id="loginBtn" onclick="showLoginOverlay()" title="Sign in with GitHub">
                 <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
                 Sign in
@@ -2820,6 +3073,76 @@
     </div>
 
     <script>
+        // ============================================
+        // Version & Changelog
+        // ============================================
+        const APP_VERSION = 'v1.0.0';
+        const APP_LAST_UPDATED = 'Dec 18, 2025, 03:45 PM';
+        
+        const CHANGELOG = [
+            {
+                version: 'v1.0.0',
+                date: 'Dec 18, 2025',
+                latest: true,
+                items: [
+                    { type: 'new', text: 'Initial release of Chat Widget Studio' },
+                    { type: 'new', text: 'GitHub cloud sync for widget configurations' },
+                    { type: 'new', text: 'Auto-save to cloud every 30 seconds' },
+                    { type: 'new', text: 'Demo profiles with rename functionality' },
+                    { type: 'new', text: 'Live preview with real-time updates' },
+                    { type: 'new', text: 'Export/Import settings as JSON' },
+                    { type: 'new', text: 'Embed code generation for iframe and JavaScript' },
+                    { type: 'new', text: 'Prechat form customization' },
+                    { type: 'new', text: 'Message styling (alignment, colors, avatars)' },
+                    { type: 'new', text: 'Version control with changelog' }
+                ]
+            }
+        ];
+
+        function showChangelog() {
+            const content = document.getElementById('changelogContent');
+            let html = '';
+            
+            CHANGELOG.forEach(release => {
+                html += `
+                    <div class="changelog-version">
+                        <div class="changelog-version-header">
+                            <span class="changelog-version-number ${release.latest ? 'latest' : ''}">
+                                ${release.latest ? '<svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>' : ''}
+                                ${release.version}
+                            </span>
+                            <span class="changelog-version-date">${release.date}</span>
+                        </div>
+                        <ul class="changelog-items">
+                            ${release.items.map(item => `
+                                <li class="changelog-item">
+                                    <span class="changelog-item-type ${item.type}">${item.type}</span>
+                                    <span class="changelog-item-text">${item.text}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            });
+            
+            content.innerHTML = html;
+            document.getElementById('changelogOverlay').classList.add('show');
+        }
+
+        function hideChangelog() {
+            document.getElementById('changelogOverlay').classList.remove('show');
+        }
+
+        // Initialize version display
+        document.addEventListener('DOMContentLoaded', function() {
+            const versionEl = document.getElementById('versionNumber');
+            const dateEl = document.getElementById('versionDate');
+            const headerVersionEl = document.getElementById('headerVersionNumber');
+            if (versionEl) versionEl.textContent = APP_VERSION;
+            if (dateEl) dateEl.textContent = 'Updated: ' + APP_LAST_UPDATED;
+            if (headerVersionEl) headerVersionEl.textContent = APP_VERSION;
+        });
+
         // ============================================
         // GitHub Cloud Sync
         // ============================================
