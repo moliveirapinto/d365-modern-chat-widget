@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D365 Chat Widget Studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="app.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="screen active">
+        <div class="login-container">
+            <div class="login-logo">
+                <svg viewBox="0 0 24 24" width="64" height="64"><path fill="#667eea" d="M9.56 3C5.42 3 2.06 6.36 2.06 10.5c0 1.13.25 2.21.7 3.17-.25 1-.54 2.11-.72 2.84-.23.91.59 1.74 1.5 1.52.75-.18 1.9-.46 2.93-.7.94.43 1.99.67 3.09.67 4.14 0 7.5-3.36 7.5-7.5S13.7 3 9.56 3zm5 18c-1.97 0-3.76-.76-5.1-2 .03 0 .07 0 .1 0 .72 0 1.42-.09 2.08-.26.86.48 1.86.76 2.92.76.96 0 1.87-.23 2.67-.63l.24-.12.27.06c.92.22 1.96.45 2.74.61-.18-.75-.42-1.75-.65-2.65l-.07-.28.13-.25c.42-.82.66-1.75.66-2.74 0-2.11-1.09-3.97-2.74-5.04-.18-.72-.45-1.41-.8-2.05 2.94 1.02 5.05 3.81 5.05 7.09 0 1.13-.25 2.21-.7 3.17.25 1 .51 2.09.67 2.81.2.89-.58 1.69-1.47 1.5-.73-.15-1.87-.4-2.93-.64-.94.43-1.99.66-3.07.66z"/></svg>
+            </div>
+            <h1>D365 Chat Widget Studio</h1>
+            <p>Create beautiful, customizable chat widgets for Dynamics 365</p>
+            <button id="loginBtn" class="btn-github">
+                <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                Sign in with GitHub
+            </button>
+            <p class="login-note">Your widget configs will be saved to your GitHub account</p>
+        </div>
+    </div>
+
+    <!-- Dashboard Screen -->
+    <div id="dashboardScreen" class="screen">
+        <header class="dashboard-header">
+            <div class="header-brand">
+                <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#667eea" d="M9.56 3C5.42 3 2.06 6.36 2.06 10.5c0 1.13.25 2.21.7 3.17-.25 1-.54 2.11-.72 2.84-.23.91.59 1.74 1.5 1.52.75-.18 1.9-.46 2.93-.7.94.43 1.99.67 3.09.67 4.14 0 7.5-3.36 7.5-7.5S13.7 3 9.56 3z"/></svg>
+                <span>Widget Studio</span>
+            </div>
+            <div class="header-user">
+                <img id="userAvatar" src="" alt="">
+                <span id="userName"></span>
+                <button id="logoutBtn" class="btn-text">Logout</button>
+            </div>
+        </header>
+        
+        <main class="dashboard-main">
+            <div class="dashboard-title">
+                <h2>My Widgets</h2>
+                <button id="newWidgetBtn" class="btn-primary">
+                    <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                    New Widget
+                </button>
+            </div>
+            
+            <div id="widgetsList" class="widgets-grid">
+                <!-- Widgets will be loaded here -->
+            </div>
+            
+            <div id="emptyState" class="empty-state">
+                <svg viewBox="0 0 24 24" width="64" height="64"><path fill="#cbd5e1" d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+                <h3>No widgets yet</h3>
+                <p>Create your first chat widget to get started</p>
+                <button id="emptyNewBtn" class="btn-primary">Create Widget</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Editor Screen -->
+    <div id="editorScreen" class="screen">
+        <header class="editor-header">
+            <button id="backBtn" class="btn-icon">
+                <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+            </button>
+            <input type="text" id="widgetName" class="widget-name-input" placeholder="Widget Name" value="My Chat Widget">
+            <div class="editor-actions">
+                <button id="previewBtn" class="btn-secondary">Preview</button>
+                <button id="saveBtn" class="btn-primary">Save & Get Code</button>
+            </div>
+        </header>
+        
+        <div class="editor-body">
+            <aside class="editor-sidebar">
+                <nav class="editor-nav">
+                    <button class="nav-item active" data-tab="connection">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                        D365 Connection
+                    </button>
+                    <button class="nav-item" data-tab="appearance">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                        Appearance
+                    </button>
+                    <button class="nav-item" data-tab="prechat">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zm-3-7H9v-2h6v2zm0 4H9v-2h6v2z"/></svg>
+                        Pre-chat Form
+                    </button>
+                    <button class="nav-item" data-tab="avatars">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        Avatars
+                    </button>
+                </nav>
+            </aside>
+            
+            <div class="editor-content">
+                <!-- Connection Tab -->
+                <div id="tab-connection" class="tab-panel active">
+                    <h3>D365 Connection Settings</h3>
+                    <p class="tab-desc">Connect your widget to Dynamics 365 Omnichannel</p>
+                    
+                    <div class="form-group">
+                        <label>Organization ID *</label>
+                        <input type="text" id="orgId" placeholder="e.g., 12345678-1234-1234-1234-123456789012">
+                    </div>
+                    <div class="form-group">
+                        <label>Organization URL *</label>
+                        <input type="text" id="orgUrl" placeholder="e.g., https://yourorg.crm.dynamics.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Widget ID *</label>
+                        <input type="text" id="widgetId" placeholder="e.g., 12345678-1234-1234-1234-123456789012">
+                    </div>
+                </div>
+                
+                <!-- Appearance Tab -->
+                <div id="tab-appearance" class="tab-panel">
+                    <h3>Appearance</h3>
+                    <p class="tab-desc">Customize the look and feel of your widget</p>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Header Title</label>
+                            <input type="text" id="headerTitle" value="Support Chat">
+                        </div>
+                        <div class="form-group">
+                            <label>Header Subtitle</label>
+                            <input type="text" id="headerSubtitle" value="We're here to help">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Use Gradient</label>
+                        <label class="switch">
+                            <input type="checkbox" id="useGradient" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="form-row" id="gradientColors">
+                        <div class="form-group">
+                            <label>Gradient Start</label>
+                            <input type="color" id="gradientStart" value="#667eea">
+                        </div>
+                        <div class="form-group">
+                            <label>Gradient End</label>
+                            <input type="color" id="gradientEnd" value="#764ba2">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Primary Color</label>
+                            <input type="color" id="primaryColor" value="#667eea">
+                        </div>
+                        <div class="form-group">
+                            <label>Chat Background</label>
+                            <input type="color" id="chatBgColor" value="#f8fafc">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>User Bubble Color</label>
+                            <input type="color" id="userBubbleColor" value="#667eea">
+                        </div>
+                        <div class="form-group">
+                            <label>Agent Bubble Color</label>
+                            <input type="color" id="agentBubbleColor" value="#ffffff">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pre-chat Tab -->
+                <div id="tab-prechat" class="tab-panel">
+                    <h3>Pre-chat Form</h3>
+                    <p class="tab-desc">Configure the form users see before starting a chat</p>
+                    
+                    <div class="form-group">
+                        <label>Enable Pre-chat Form</label>
+                        <label class="switch">
+                            <input type="checkbox" id="enablePrechat" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div id="prechatFields">
+                        <div class="form-group">
+                            <label>Welcome Title</label>
+                            <input type="text" id="welcomeTitle" value="Welcome!">
+                        </div>
+                        <div class="form-group">
+                            <label>Welcome Message</label>
+                            <textarea id="welcomeMessage" rows="2">Please fill in your details to start chatting.</textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Name Field Label</label>
+                                <input type="text" id="nameFieldLabel" value="Name *">
+                            </div>
+                            <div class="form-group">
+                                <label>Email Field Label</label>
+                                <input type="text" id="emailFieldLabel" value="Email *">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Start Button Text</label>
+                            <input type="text" id="startBtnText" value="Start Chat">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Avatars Tab -->
+                <div id="tab-avatars" class="tab-panel">
+                    <h3>Avatars</h3>
+                    <p class="tab-desc">Set custom avatars for agents, bots, and customers</p>
+                    
+                    <div class="form-group">
+                        <label>Header Logo URL</label>
+                        <input type="text" id="headerLogo" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>Agent Avatar URL</label>
+                        <input type="text" id="agentAvatar" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>Bot Avatar URL</label>
+                        <input type="text" id="botAvatar" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>Customer Avatar URL</label>
+                        <input type="text" id="customerAvatar" placeholder="https://...">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Live Preview -->
+            <div class="editor-preview">
+                <div class="preview-header">
+                    <span>Live Preview</span>
+                </div>
+                <div class="preview-frame" id="previewFrame">
+                    <!-- Preview widget renders here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Embed Code Modal -->
+    <div id="embedModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Your Embed Code</h3>
+                <button id="closeModal" class="btn-icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Copy this code and paste it into your website's HTML:</p>
+                <div class="code-box">
+                    <pre id="embedCode"></pre>
+                    <button id="copyCodeBtn" class="btn-copy">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <div class="code-stats">
+                    <span id="codeSize"></span> characters
+                    <span class="success-badge">✓ Power Pages compatible</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
