@@ -16,10 +16,6 @@
   // Config
   const GIST_PREFIX = 'd365-widget-';
   const WIDGET_CORE_URL = 'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js';
-  
-  // GitHub OAuth App - You need to create one at https://github.com/settings/developers
-  // Enable "Device Flow" in the OAuth App settings
-  const GITHUB_CLIENT_ID = 'Ov23liMqkFz0eV7fUZJi'; // Replace with your Client ID
 
   // DOM Elements
   const $ = id => document.getElementById(id);
@@ -96,10 +92,16 @@
   // Event Listeners
   function setupEventListeners() {
     // Login
-    $('loginBtn').onclick = startDeviceFlow;
+    $('loginBtn').onclick = showTokenEntry;
     $('logoutBtn').onclick = logout;
-    $('cancelDeviceBtn').onclick = cancelDeviceFlow;
-    $('copyCodeDeviceBtn').onclick = copyDeviceCode;
+    $('cancelTokenBtn').onclick = hideTokenEntry;
+    $('connectBtn').onclick = connectWithToken;
+    $('toggleTokenBtn').onclick = toggleTokenVisibility;
+    
+    // Allow Enter key to submit
+    $('tokenInput').onkeypress = (e) => {
+      if (e.key === 'Enter') connectWithToken();
+    };
 
     // Dashboard
     $('newWidgetBtn').onclick = () => createNewWidget();
@@ -144,140 +146,104 @@
   }
 
   // ==========================================
-  // GitHub Device Flow Authentication
+  // Token-based Authentication (Nice UI)
   // ==========================================
   
-  async function startDeviceFlow() {
+  function showTokenEntry() {
     $('loginInitial').style.display = 'none';
-    $('deviceCodeUI').style.display = 'flex';
+    $('tokenEntryUI').style.display = 'block';
+    $('tokenInput').value = '';
+    $('tokenStatus').style.display = 'none';
+    $('tokenInput').focus();
+  }
+  
+  function hideTokenEntry() {
+    $('loginInitial').style.display = 'block';
+    $('tokenEntryUI').style.display = 'none';
+  }
+  
+  function toggleTokenVisibility() {
+    const input = $('tokenInput');
+    const icon = $('eyeIcon');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.innerHTML = '<path fill="currentColor" d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>';
+    } else {
+      input.type = 'password';
+      icon.innerHTML = '<path fill="currentColor" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>';
+    }
+  }
+  
+  async function connectWithToken() {
+    const token = $('tokenInput').value.trim();
+    const statusEl = $('tokenStatus');
+    const btnText = $('connectBtnText');
+    const spinner = $('connectSpinner');
+    const btn = $('connectBtn');
     
-    const statusEl = $('deviceStatus');
-    statusEl.className = 'device-status';
-    statusEl.innerHTML = '<div class="spinner-small"></div><span>Getting code...</span>';
+    if (!token) {
+      statusEl.className = 'token-status error';
+      statusEl.innerHTML = '⚠️ Please enter your GitHub token';
+      statusEl.style.display = 'flex';
+      return;
+    }
+    
+    // Show loading state
+    btn.disabled = true;
+    btnText.textContent = 'Connecting...';
+    spinner.style.display = 'block';
+    statusEl.style.display = 'none';
     
     try {
-      // Step 1: Request device code
-      const codeRes = await fetch('https://github.com/login/device/code', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          client_id: GITHUB_CLIENT_ID,
-          scope: 'gist read:user'
-        })
+      // Verify token works
+      const res = await fetch('https://api.github.com/user', {
+        headers: { 'Authorization': 'token ' + token }
       });
       
-      if (!codeRes.ok) throw new Error('Failed to get device code');
+      if (!res.ok) {
+        throw new Error(res.status === 401 ? 'Invalid token' : 'GitHub API error');
+      }
       
-      const codeData = await codeRes.json();
+      const user = await res.json();
       
-      // Display the user code
-      $('userCode').textContent = codeData.user_code;
-      $('verificationLink').href = codeData.verification_uri;
+      // Check if token has gist scope
+      const scopeCheck = await fetch('https://api.github.com/gists', {
+        headers: { 'Authorization': 'token ' + token }
+      });
       
-      statusEl.innerHTML = '<div class="spinner-small"></div><span>Waiting for authorization...</span>';
+      if (!scopeCheck.ok) {
+        throw new Error('Token needs "gist" scope. Please create a new token with the gist permission.');
+      }
       
-      // Step 2: Poll for the token
-      pollForToken(codeData.device_code, codeData.interval || 5);
+      // Success!
+      statusEl.className = 'token-status success';
+      statusEl.innerHTML = '✓ Connected! Welcome, ' + (user.name || user.login);
+      statusEl.style.display = 'flex';
+      
+      state.user = {
+        id: user.id,
+        name: user.name || user.login,
+        login: user.login,
+        avatar: user.avatar_url
+      };
+      state.githubToken = token;
+      
+      localStorage.setItem('d365_user', JSON.stringify(state.user));
+      localStorage.setItem('d365_github_token', token);
+      
+      // Navigate to dashboard after brief delay
+      setTimeout(() => showDashboard(), 800);
       
     } catch (err) {
-      console.error('Device flow error:', err);
-      statusEl.className = 'device-status error';
-      statusEl.innerHTML = '<span>❌ Failed to start login. Please try again.</span>';
+      statusEl.className = 'token-status error';
+      statusEl.innerHTML = '❌ ' + (err.message || 'Failed to connect. Check your token and try again.');
+      statusEl.style.display = 'flex';
+    } finally {
+      btn.disabled = false;
+      btnText.textContent = 'Connect';
+      spinner.style.display = 'none';
     }
   }
-  
-  async function pollForToken(deviceCode, interval) {
-    const statusEl = $('deviceStatus');
-    
-    const poll = async () => {
-      try {
-        const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            client_id: GITHUB_CLIENT_ID,
-            device_code: deviceCode,
-            grant_type: 'urn:ietf:params:oauth:grant-type:device_code'
-          })
-        });
-        
-        const tokenData = await tokenRes.json();
-        
-        if (tokenData.access_token) {
-          // Success! We got the token
-          clearInterval(state.deviceFlowPollTimer);
-          
-          statusEl.className = 'device-status success';
-          statusEl.innerHTML = '<span>✓ Authorized! Loading your dashboard...</span>';
-          
-          // Get user info
-          const userRes = await fetch('https://api.github.com/user', {
-            headers: { 'Authorization': 'token ' + tokenData.access_token }
-          });
-          const userData = await userRes.json();
-          
-          state.user = {
-            id: userData.id,
-            name: userData.name || userData.login,
-            login: userData.login,
-            avatar: userData.avatar_url
-          };
-          state.githubToken = tokenData.access_token;
-          
-          // Save to localStorage
-          localStorage.setItem('d365_user', JSON.stringify(state.user));
-          localStorage.setItem('d365_github_token', tokenData.access_token);
-          
-          // Show dashboard
-          setTimeout(() => showDashboard(), 500);
-          
-        } else if (tokenData.error === 'authorization_pending') {
-          // User hasn't authorized yet, keep polling
-          // (timer continues)
-        } else if (tokenData.error === 'slow_down') {
-          // Need to slow down polling
-          clearInterval(state.deviceFlowPollTimer);
-          state.deviceFlowPollTimer = setInterval(poll, (interval + 5) * 1000);
-        } else if (tokenData.error === 'expired_token') {
-          clearInterval(state.deviceFlowPollTimer);
-          statusEl.className = 'device-status error';
-          statusEl.innerHTML = '<span>⏱ Code expired. Please try again.</span>';
-        } else if (tokenData.error === 'access_denied') {
-          clearInterval(state.deviceFlowPollTimer);
-          statusEl.className = 'device-status error';
-          statusEl.innerHTML = '<span>❌ Authorization denied.</span>';
-        }
-        
-      } catch (err) {
-        console.error('Poll error:', err);
-      }
-    };
-    
-    // Start polling
-    state.deviceFlowPollTimer = setInterval(poll, interval * 1000);
-    // Also do an immediate first poll after a short delay
-    setTimeout(poll, 2000);
-  }
-  
-  function cancelDeviceFlow() {
-    if (state.deviceFlowPollTimer) {
-      clearInterval(state.deviceFlowPollTimer);
-      state.deviceFlowPollTimer = null;
-    }
-    $('loginInitial').style.display = 'block';
-    $('deviceCodeUI').style.display = 'none';
-  }
-  
-  function copyDeviceCode() {
-    const code = $('userCode').textContent;
-    navigator.clipboard.writeText(code).then(() => {
-      const btn = $('copyCodeDeviceBtn');
       btn.textContent = 'Copied!';
       setTimeout(() => btn.textContent = 'Copy Code', 2000);
     });
@@ -291,7 +257,7 @@
     
     // Reset login UI
     $('loginInitial').style.display = 'block';
-    $('deviceCodeUI').style.display = 'none';
+    $('tokenEntryUI').style.display = 'none';
     
     showScreen('login');
   }
