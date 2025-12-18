@@ -1705,6 +1705,8 @@
         }
         .cloud-sync-status.synced { color: #86efac; }
         .cloud-sync-status.syncing { color: #fde68a; }
+        .cloud-sync-status.pending { color: #fbbf24; }
+        .cloud-sync-status.error { color: #f87171; }
         .btn-logout {
             background: none;
             border: none;
@@ -3218,36 +3220,16 @@
                 
                 // Store the cloud ID in the profile for future updates
                 profile.cloudId = gist.id;
+                isDirty = false; // Reset dirty flag after successful cloud save
                 saveProfiles();
                 
                 updateCloudSyncStatus('synced');
-                loadSavedWidgets();
                 showToast(`Profile "${profile.name}" saved to cloud! ☁️`);
                 
             } catch (e) {
                 console.error('Cloud save error:', e);
                 updateCloudSyncStatus('error');
                 showToast(`Profile saved locally (cloud sync failed)`);
-            }
-        }
-        
-        function updateCloudSyncStatus(status) {
-            const statusEl = document.getElementById('cloudSyncStatus');
-            if (!statusEl) return;
-            
-            statusEl.className = 'cloud-sync-status ' + status;
-            const span = statusEl.querySelector('span');
-            const svg = statusEl.querySelector('svg');
-            
-            if (status === 'syncing') {
-                span.textContent = 'Syncing...';
-                svg.innerHTML = '<path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>';
-            } else if (status === 'synced') {
-                span.textContent = 'Cloud synced';
-                svg.innerHTML = '<path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM10 17l-3.5-3.5 1.41-1.41L10 14.17l4.59-4.58L16 11l-6 6z"/>';
-            } else {
-                span.textContent = 'Sync error';
-                svg.innerHTML = '<path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>';
             }
         }
 
@@ -3473,6 +3455,67 @@
         let profiles = [];
         let activeProfileId = null;
         let isInitializing = true; // Flag to prevent auto-save during form population
+        let isDirty = false; // Track if settings have changed since last cloud sync
+        let lastCloudSync = null; // Timestamp of last cloud sync
+
+        // Auto-save to cloud every 30 seconds if there are changes
+        setInterval(async function() {
+            if (!cloudToken || !activeProfileId || !isDirty || isInitializing) return;
+            
+            const profile = profiles.find(p => p.id === activeProfileId);
+            if (!profile) return;
+            
+            // Update the profile with current settings
+            updateSettingsFromForm();
+            profile.settings = { ...settings };
+            profile.updatedAt = new Date().toISOString();
+            saveProfiles();
+            
+            // Sync to cloud silently (no toast)
+            try {
+                await saveProfileToCloudSync(profile);
+                saveProfiles(); // Save cloudId
+                isDirty = false;
+                lastCloudSync = new Date();
+                updateCloudSyncStatus('synced');
+                console.log('☁️ Auto-saved to cloud');
+            } catch (e) {
+                console.error('Auto-save failed:', e);
+                updateCloudSyncStatus('error');
+            }
+        }, 30000); // Every 30 seconds
+
+        // Mark as dirty when settings change
+        function markDirty() {
+            if (!isInitializing) {
+                isDirty = true;
+                updateCloudSyncStatus('pending');
+            }
+        }
+        
+        // Update cloud status to show pending changes
+        function updateCloudSyncStatus(status) {
+            const statusEl = document.getElementById('cloudSyncStatus');
+            if (!statusEl) return;
+            
+            statusEl.className = 'cloud-sync-status ' + status;
+            const span = statusEl.querySelector('span');
+            const svg = statusEl.querySelector('svg');
+            
+            if (status === 'syncing') {
+                span.textContent = 'Syncing...';
+                svg.innerHTML = '<path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>';
+            } else if (status === 'synced') {
+                span.textContent = 'Cloud synced';
+                svg.innerHTML = '<path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM10 17l-3.5-3.5 1.41-1.41L10 14.17l4.59-4.58L16 11l-6 6z"/>';
+            } else if (status === 'pending') {
+                span.textContent = 'Unsaved changes';
+                svg.innerHTML = '<path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM12 10c.55 0 1 .45 1 1v4c0 .55-.45 1-1 1s-1-.45-1-1v-4c0-.55.45-1 1-1zm0 8c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/>';
+            } else {
+                span.textContent = 'Sync error';
+                svg.innerHTML = '<path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>';
+            }
+        }
 
         // Tab switching
         function switchPreviewTab(tab) {
@@ -3624,6 +3667,9 @@
             if (activeProfileId) {
                 localStorage.setItem('chatWidgetActiveProfile', activeProfileId);
             }
+            
+            // Mark as needing cloud sync
+            markDirty();
         }
 
         function renderProfiles() {
