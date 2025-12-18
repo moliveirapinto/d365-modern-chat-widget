@@ -403,20 +403,26 @@
     function isBot(name) {
       if (!name) return false;
       var n = name.toLowerCase();
-      return n.includes('bot') || n.includes('copilot') || n.includes('virtual') || n.includes('assistant');
+      return n.includes('bot') || n.includes('copilot') || n.includes('virtual') || 
+             n.includes('assistant') || n.includes('ai') || n === 'cps';
     }
 
-    function addMessage(text, isUser, senderName) {
+    function isBotRole(role) {
+      return role === 'bot' || role === 'Bot' || role === 2;
+    }
+
+    function addMessage(text, isUser, senderName, isBotMsg) {
       var wrap = document.createElement('div');
       wrap.className = 'd365-msg-wrap ' + (isUser ? 'user' : 'agent');
 
       var avatar = document.createElement('div');
-      var avatarType = isUser ? 'user' : (isBot(senderName) ? 'bot' : 'agent');
+      var isBotAvatar = isBotMsg || isBot(senderName);
+      var avatarType = isUser ? 'user' : (isBotAvatar ? 'bot' : 'agent');
       avatar.className = 'd365-msg-avatar ' + avatarType;
 
       if (isUser && config.customerAvatar) avatar.innerHTML = '<img src="'+config.customerAvatar+'">';
-      else if (!isUser && isBot(senderName) && config.botAvatar) avatar.innerHTML = '<img src="'+config.botAvatar+'">';
-      else if (!isUser && config.agentAvatar) avatar.innerHTML = '<img src="'+config.agentAvatar+'">';
+      else if (!isUser && isBotAvatar && config.botAvatar) avatar.innerHTML = '<img src="'+config.botAvatar+'">';
+      else if (!isUser && !isBotAvatar && config.agentAvatar) avatar.innerHTML = '<img src="'+config.agentAvatar+'">';
       else avatar.textContent = getInitials(isUser ? userName : senderName);
 
       var content = document.createElement('div');
@@ -471,13 +477,17 @@
       return false;
     }
 
-    function addAdaptiveCard(content, senderName) {
+    function addAdaptiveCard(content, senderName, isBotMsg) {
       var wrap = document.createElement('div');
       wrap.className = 'd365-msg-wrap agent';
 
       var avatar = document.createElement('div');
-      avatar.className = 'd365-msg-avatar ' + (isBot(senderName) ? 'bot' : 'agent');
-      avatar.textContent = getInitials(senderName || 'Agent');
+      var isBotAvatar = isBotMsg || isBot(senderName);
+      avatar.className = 'd365-msg-avatar ' + (isBotAvatar ? 'bot' : 'agent');
+      
+      if (isBotAvatar && config.botAvatar) avatar.innerHTML = '<img src="'+config.botAvatar+'">';
+      else if (!isBotAvatar && config.agentAvatar) avatar.innerHTML = '<img src="'+config.agentAvatar+'">';
+      else avatar.textContent = getInitials(senderName || 'Agent');
 
       var contentDiv = document.createElement('div');
       contentDiv.className = 'd365-msg-content';
@@ -671,11 +681,12 @@
       return card;
     }
 
-    function addHeroCard(content, senderName) {
+    function addHeroCard(content, senderName, isBotMsg) {
       try {
         var parsed = JSON.parse(content);
         var heroCards = [];
         var isCarousel = false;
+        var isBotAvatar = isBotMsg || isBot(senderName);
         
         // Extract hero cards from different formats
         if (parsed.contentType === 'application/vnd.microsoft.card.hero' && parsed.content) {
@@ -692,7 +703,7 @@
         
         if (heroCards.length === 0) {
           console.warn('No hero cards found');
-          addMessage(content, false, senderName);
+          addMessage(content, false, senderName, isBotMsg);
           return;
         }
         
@@ -703,8 +714,11 @@
         wrap.className = 'd365-msg-wrap agent';
 
         var avatar = document.createElement('div');
-        avatar.className = 'd365-msg-avatar ' + (isBot(senderName) ? 'bot' : 'agent');
-        avatar.textContent = getInitials(senderName || 'Agent');
+        avatar.className = 'd365-msg-avatar ' + (isBotAvatar ? 'bot' : 'agent');
+        
+        if (isBotAvatar && config.botAvatar) avatar.innerHTML = '<img src="'+config.botAvatar+'">';
+        else if (!isBotAvatar && config.agentAvatar) avatar.innerHTML = '<img src="'+config.agentAvatar+'">';
+        else avatar.textContent = getInitials(senderName || 'Agent');
 
         var contentDiv = document.createElement('div');
         contentDiv.className = 'd365-msg-content';
@@ -758,26 +772,30 @@
 
         // Handle any text that came with the attachments
         if (parsed.text) {
-          addMessage(parsed.text, false, senderName);
+          addMessage(parsed.text, false, senderName, isBotMsg);
         }
       } catch(e) {
         console.error('Error rendering Hero Card:', e);
-        addMessage(content, false, senderName);
+        addMessage(content, false, senderName, isBotMsg);
       }
     }
 
-    function addSuggestedActions(content, senderName) {
+    function addSuggestedActions(content, senderName, isBotMsg) {
       try {
         var parsed = JSON.parse(content);
         var text = parsed.text || '';
         var actions = parsed.suggestedActions.actions;
+        var isBotAvatar = isBotMsg || isBot(senderName);
 
         var wrap = document.createElement('div');
         wrap.className = 'd365-msg-wrap agent';
 
         var avatar = document.createElement('div');
-        avatar.className = 'd365-msg-avatar ' + (isBot(senderName) ? 'bot' : 'agent');
-        avatar.textContent = getInitials(senderName || 'Agent');
+        avatar.className = 'd365-msg-avatar ' + (isBotAvatar ? 'bot' : 'agent');
+        
+        if (isBotAvatar && config.botAvatar) avatar.innerHTML = '<img src="'+config.botAvatar+'">';
+        else if (!isBotAvatar && config.agentAvatar) avatar.innerHTML = '<img src="'+config.agentAvatar+'">';
+        else avatar.textContent = getInitials(senderName || 'Agent');
 
         var contentDiv = document.createElement('div');
         contentDiv.className = 'd365-msg-content';
@@ -822,7 +840,7 @@
         typing.parentNode.insertBefore(wrap, typing);
         messages.scrollTop = messages.scrollHeight;
       } catch(e) {
-        addMessage(content, false, senderName);
+        addMessage(content, false, senderName, isBotMsg);
       }
     }
 
@@ -848,10 +866,13 @@
         return;
       }
 
-      if (isAdaptiveCard(content)) addAdaptiveCard(content, senderName);
-      else if (isHeroCard(content)) addHeroCard(content, senderName);
-      else if (isSuggestedActions(content)) addSuggestedActions(content, senderName);
-      else addMessage(content, false, senderName);
+      // Detect bot by role OR by sender name
+      var isBotMsg = isBotRole(role) || isBot(senderName);
+
+      if (isAdaptiveCard(content)) addAdaptiveCard(content, senderName, isBotMsg);
+      else if (isHeroCard(content)) addHeroCard(content, senderName, isBotMsg);
+      else if (isSuggestedActions(content)) addSuggestedActions(content, senderName, isBotMsg);
+      else addMessage(content, false, senderName, isBotMsg);
     }
 
     function addSystemMessage(text) {
