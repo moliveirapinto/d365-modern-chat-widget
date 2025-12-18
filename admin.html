@@ -2451,13 +2451,28 @@
                     </div>
                     
                     <div class="embed-options">
+                        <div class="embed-option" style="flex: 2;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">Embed Code Mode:</label>
+                            <select id="embedCodeMode" style="width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
+                                <option value="compact">🚀 Compact (Power Pages) - Under 2KB!</option>
+                                <option value="full">📦 Full (Self-Contained) - ~100KB</option>
+                            </select>
+                        </div>
                         <div class="embed-option">
                             <input type="checkbox" id="embedIncludeSettings" checked>
                             <label for="embedIncludeSettings">Include current settings</label>
                         </div>
                         <div class="embed-option">
-                            <input type="checkbox" id="embedMinified">
+                            <input type="checkbox" id="embedMinified" checked>
                             <label for="embedMinified">Minified output</label>
+                        </div>
+                    </div>
+
+                    <!-- Character count indicator -->
+                    <div id="embedCharCount" style="margin: 12px 0; padding: 12px 16px; border-radius: 8px; font-size: 13px; display: none;">
+                        <span id="charCountText"></span>
+                        <div style="margin-top: 8px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                            <div id="charCountBar" style="height: 100%; border-radius: 3px; transition: width 0.3s, background 0.3s;"></div>
                         </div>
                     </div>
                     
@@ -4651,6 +4666,7 @@
         function generateEmbedCode() {
             updateSettingsFromForm();
             
+            const embedMode = document.getElementById('embedCodeMode').value;
             const includeSettings = document.getElementById('embedIncludeSettings').checked;
             const minified = document.getElementById('embedMinified').checked;
             
@@ -4658,9 +4674,110 @@
             if (!settings.orgId || !settings.orgUrl || !settings.widgetId) {
                 showToast('Please configure D365 Connection settings first (Org ID, Org URL, Widget ID)');
                 document.getElementById('embedCodeOutput').value = '⚠️ Please configure D365 Connection settings first.\n\nGo to the "D365 Connection" tab and enter your Org ID, Org URL, and Widget ID.';
+                hideCharCount();
                 return;
             }
             
+            if (embedMode === 'compact') {
+                generateCompactEmbedCode(minified);
+            } else {
+                generateFullEmbedCode(minified);
+            }
+        }
+        
+        function hideCharCount() {
+            document.getElementById('embedCharCount').style.display = 'none';
+        }
+        
+        function showCharCount(charCount) {
+            const maxChars = 65536;
+            const percent = Math.min(100, (charCount / maxChars) * 100);
+            const countEl = document.getElementById('embedCharCount');
+            const textEl = document.getElementById('charCountText');
+            const barEl = document.getElementById('charCountBar');
+            
+            countEl.style.display = 'block';
+            
+            if (charCount <= maxChars) {
+                countEl.style.background = '#f0fdf4';
+                countEl.style.borderColor = '#22c55e';
+                textEl.innerHTML = `<span style="color: #15803d; font-weight: 600;">✅ ${charCount.toLocaleString()} characters</span> — Safe for Power Pages (limit: ${maxChars.toLocaleString()})`;
+                barEl.style.background = '#22c55e';
+            } else {
+                countEl.style.background = '#fef2f2';
+                countEl.style.borderColor = '#ef4444';
+                textEl.innerHTML = `<span style="color: #dc2626; font-weight: 600;">⚠️ ${charCount.toLocaleString()} characters</span> — Exceeds Power Pages limit by ${(charCount - maxChars).toLocaleString()}!`;
+                barEl.style.background = '#ef4444';
+            }
+            barEl.style.width = Math.min(100, percent) + '%';
+        }
+        
+        function generateCompactEmbedCode(minified) {
+            // Build config object for compact mode (only non-default values to minimize size)
+            const config = buildCompactConfig();
+            
+            // Generate minified config JSON
+            const configJson = JSON.stringify(config);
+            
+            // Tiny loader that fetches from GitHub Pages
+            const embedCode = `<!-- D365 Chat Widget - Compact Loader (Power Pages Compatible) -->
+<!-- Generated: ${new Date().toLocaleDateString()} | Size: ~1.5KB -->
+<script>
+window.D365WidgetConfig=${configJson};
+(function(){var s=document.createElement('script');s.src='https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js';document.head.appendChild(s);})();
+<\/script>`;
+            
+            document.getElementById('embedCodeOutput').value = embedCode;
+            showCharCount(embedCode.length);
+            showToast('🚀 Compact embed code generated! Only ' + embedCode.length + ' characters!');
+        }
+        
+        function buildCompactConfig() {
+            // Only include essential config + non-default customizations to minimize size
+            const config = {
+                orgId: settings.orgId,
+                orgUrl: settings.orgUrl,
+                widgetId: settings.widgetId
+            };
+            
+            // Only add non-default values to minimize JSON size
+            if (settings.lcwCode) config.lcwScript = settings.lcwCode;
+            if (settings.headerTitle && settings.headerTitle !== 'Support Chat') config.headerTitle = settings.headerTitle;
+            if (settings.headerSubtitle && settings.headerSubtitle !== "We're here to help") config.headerSubtitle = settings.headerSubtitle;
+            if (settings.headerLogo) config.headerLogo = toGitHubRawUrl(settings.headerLogo);
+            if (settings.fontFamily && settings.fontFamily !== 'system') config.fontFamily = settings.fontFamily;
+            if (settings.useGradient === false) config.useGradient = false;
+            if (settings.gradientStart && settings.gradientStart !== '#667eea') config.gradientStart = settings.gradientStart;
+            if (settings.gradientEnd && settings.gradientEnd !== '#764ba2') config.gradientEnd = settings.gradientEnd;
+            if (settings.primaryColor && settings.primaryColor !== '#667eea') config.primaryColor = settings.primaryColor;
+            if (settings.userBubbleColor && settings.userBubbleColor !== '#667eea') config.userBubbleColor = settings.userBubbleColor;
+            if (settings.userTextColor && settings.userTextColor !== '#ffffff') config.userTextColor = settings.userTextColor;
+            if (settings.agentBubbleColor && settings.agentBubbleColor !== '#ffffff') config.agentBubbleColor = settings.agentBubbleColor;
+            if (settings.agentTextColor && settings.agentTextColor !== '#2d3748') config.agentTextColor = settings.agentTextColor;
+            if (settings.chatBgColor && settings.chatBgColor !== '#f8fafc') config.chatBgColor = settings.chatBgColor;
+            if (settings.launcherColor && settings.launcherColor !== '#667eea') config.launcherColor = settings.launcherColor;
+            if (settings.launcherIcon && settings.launcherIcon !== 'chat_multiple') config.launcherIcon = settings.launcherIcon;
+            if (settings.badgeColor && settings.badgeColor !== '#ff4757') config.badgeColor = settings.badgeColor;
+            if (settings.sendBtnColor && settings.sendBtnColor !== '#667eea') config.sendBtnColor = settings.sendBtnColor;
+            if (settings.agentAvatar) config.agentAvatar = toGitHubRawUrl(settings.agentAvatar);
+            if (settings.customerAvatar) config.customerAvatar = toGitHubRawUrl(settings.customerAvatar);
+            if (settings.botAvatar) config.botAvatar = toGitHubRawUrl(settings.botAvatar);
+            if (settings.enablePrechatForm === false) config.enablePrechatForm = false;
+            if (settings.welcomeTitle && settings.welcomeTitle !== 'Welcome!') config.welcomeTitle = settings.welcomeTitle;
+            if (settings.welcomeMessage && settings.welcomeMessage !== 'Please fill in your details to start chatting with us.') config.welcomeMessage = settings.welcomeMessage;
+            if (settings.nameFieldLabel && settings.nameFieldLabel !== 'Name *') config.nameFieldLabel = settings.nameFieldLabel;
+            if (settings.emailFieldLabel && settings.emailFieldLabel !== 'Email *') config.emailFieldLabel = settings.emailFieldLabel;
+            if (settings.startBtnText && settings.startBtnText !== 'Start Chat') config.startBtnText = settings.startBtnText;
+            if (settings.enableCustomAuth) {
+                config.enableCustomAuth = true;
+                if (settings.customAuthName) config.customAuthName = settings.customAuthName;
+                if (settings.customAuthEmail) config.customAuthEmail = settings.customAuthEmail;
+            }
+            
+            return config;
+        }
+        
+        function generateFullEmbedCode(minified) {
             // Build the configuration object with all customizations
             // Use GitHub raw URLs for images so they work when embedded anywhere
             const config = {
@@ -6083,7 +6200,8 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
 <\/script>`;
             
             document.getElementById('embedCodeOutput').value = embedCode;
-            showToast('Self-contained embed code generated! Copy and paste into any HTML page.');
+            showCharCount(embedCode.length);
+            showToast('Full embed code generated! ' + embedCode.length.toLocaleString() + ' characters.');
         }
         
         function copyGeneratedEmbedCode() {
