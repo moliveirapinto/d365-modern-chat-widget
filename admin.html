@@ -1581,12 +1581,13 @@
 
         /* User Bar (shown when logged in) */
         .user-bar {
-            background: rgba(0,0,0,0.1);
-            padding: 8px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 10px 32px;
             display: none;
             align-items: center;
             justify-content: space-between;
             font-size: 14px;
+            color: white;
         }
         .user-bar.show { display: flex; }
         .user-info {
@@ -1598,9 +1599,10 @@
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 2px solid rgba(255,255,255,0.5);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
-        .user-name { font-weight: 500; }
+        .user-name { font-weight: 500; color: white; }
         .user-actions {
             display: flex;
             align-items: center;
@@ -1689,25 +1691,20 @@
             text-align: center;
             color: var(--admin-text-light);
         }
-        .btn-save-cloud {
+        .cloud-sync-status {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: var(--admin-success);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
+            gap: 6px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
         }
-        .btn-save-cloud:hover {
-            background: #059669;
-            transform: translateY(-1px);
+        .cloud-sync-status svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
         }
-        .btn-save-cloud svg { width: 18px; height: 18px; fill: currentColor; }
+        .cloud-sync-status.synced { color: #86efac; }
+        .cloud-sync-status.syncing { color: #fde68a; }
         .btn-logout {
             background: none;
             border: none;
@@ -1856,10 +1853,10 @@
                         </div>
                     </div>
                 </div>
-                <button id="saveToCloudBtn" class="btn-save-cloud">
-                    <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
-                    Save to Cloud
-                </button>
+                <div id="cloudSyncStatus" class="cloud-sync-status synced">
+                    <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM10 17l-3.5-3.5 1.41-1.41L10 14.17l4.59-4.58L16 11l-6 6z"/></svg>
+                    <span>Cloud synced</span>
+                </div>
                 <button id="logoutBtn" class="btn-logout">Logout</button>
             </div>
         </div>
@@ -3158,6 +3155,91 @@
             }
         });
 
+        // Auto-save profile to cloud (called when saving/updating profiles)
+        async function saveProfileToCloud(profile) {
+            if (!cloudToken) return;
+            
+            updateCloudSyncStatus('syncing');
+            
+            const gistData = {
+                description: GIST_PREFIX + profile.name,
+                public: false,
+                files: {
+                    'config.json': {
+                        content: JSON.stringify(profile.settings, null, 2)
+                    },
+                    'README.md': {
+                        content: `# ${profile.name}\n\nD365 Chat Widget Configuration\n\nCreated with [D365 Widget Studio](https://moliveirapinto.github.io/d365-modern-chat-widget/admin.html)`
+                    }
+                }
+            };
+            
+            try {
+                // Check if this profile already has a cloud ID
+                const existingGistId = profile.cloudId || null;
+                
+                let res;
+                if (existingGistId) {
+                    // Update existing gist
+                    res = await fetch('https://api.github.com/gists/' + existingGistId, {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': 'token ' + cloudToken,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(gistData)
+                    });
+                } else {
+                    // Create new gist
+                    res = await fetch('https://api.github.com/gists', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'token ' + cloudToken,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(gistData)
+                    });
+                }
+                
+                if (!res.ok) throw new Error('Failed to save');
+                
+                const gist = await res.json();
+                
+                // Store the cloud ID in the profile for future updates
+                profile.cloudId = gist.id;
+                saveProfiles();
+                
+                updateCloudSyncStatus('synced');
+                loadSavedWidgets();
+                showToast(`Profile "${profile.name}" saved to cloud! ☁️`);
+                
+            } catch (e) {
+                console.error('Cloud save error:', e);
+                updateCloudSyncStatus('error');
+                showToast(`Profile saved locally (cloud sync failed)`);
+            }
+        }
+        
+        function updateCloudSyncStatus(status) {
+            const statusEl = document.getElementById('cloudSyncStatus');
+            if (!statusEl) return;
+            
+            statusEl.className = 'cloud-sync-status ' + status;
+            const span = statusEl.querySelector('span');
+            const svg = statusEl.querySelector('svg');
+            
+            if (status === 'syncing') {
+                span.textContent = 'Syncing...';
+                svg.innerHTML = '<path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>';
+            } else if (status === 'synced') {
+                span.textContent = 'Cloud synced';
+                svg.innerHTML = '<path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM10 17l-3.5-3.5 1.41-1.41L10 14.17l4.59-4.58L16 11l-6 6z"/>';
+            } else {
+                span.textContent = 'Sync error';
+                svg.innerHTML = '<path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>';
+            }
+        }
+
         async function saveWidgetToCloud() {
             const name = document.getElementById('saveWidgetName').value.trim();
             
@@ -3509,7 +3591,13 @@
             saveProfiles();
             renderProfiles();
             nameInput.value = '';
-            showToast(`Profile "${name}" saved!`);
+            
+            // Auto-sync to cloud if logged in
+            if (cloudToken) {
+                saveProfileToCloud(profile);
+            } else {
+                showToast(`Profile "${name}" saved locally`);
+            }
         }
 
         function loadProfile(id) {
