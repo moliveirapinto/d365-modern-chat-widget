@@ -4061,6 +4061,41 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     .d365-message-wrapper.user .d365-message-time { text-align: right; }
     .d365-message-image { max-width: 200px; max-height: 200px; border-radius: 12px; cursor: pointer; transition: transform 0.2s; object-fit: contain; }
     .d365-message-image:hover { transform: scale(1.02); }
+    
+    /* Adaptive Card Styles */
+    .d365-adaptive-card { background: #ffffff !important; padding: 0 !important; overflow: hidden; border-radius: 12px; }
+    .d365-adaptive-card .ac-adaptiveCard { background: transparent !important; }
+    .d365-adaptive-card .ac-container { padding: 12px; }
+    .d365-adaptive-card .ac-textBlock { margin-bottom: 8px; }
+    .d365-adaptive-card .ac-actionSet { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .d365-adaptive-card .ac-pushButton {
+      padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s; border: none; min-width: 80px;
+    }
+    .d365-adaptive-card .ac-pushButton.style-positive { background: \${config.primaryColor}; color: white; }
+    .d365-adaptive-card .ac-pushButton.style-positive:hover { opacity: 0.9; }
+    .d365-adaptive-card .ac-pushButton.style-destructive { background: #ef4444; color: white; }
+    .d365-adaptive-card .ac-pushButton.style-destructive:hover { background: #dc2626; }
+    .d365-adaptive-card .ac-pushButton.style-default, .d365-adaptive-card .ac-pushButton:not([class*="style-"]) {
+      background: #f1f5f9; color: #374151; border: 1px solid #e2e8f0;
+    }
+    .d365-adaptive-card .ac-pushButton.style-default:hover { background: #e2e8f0; }
+    .d365-adaptive-card .ac-input { 
+      width: 100%; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px;
+      font-size: 14px; margin-bottom: 8px;
+    }
+    .d365-adaptive-card .ac-input:focus { outline: none; border-color: \${config.primaryColor}; }
+    
+    /* Suggested Actions Styles */
+    .d365-suggested-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .d365-suggested-btn {
+      padding: 8px 16px; background: #f1f5f9; border: 1px solid #e2e8f0;
+      border-radius: 20px; font-size: 13px; cursor: pointer; transition: all 0.2s;
+      color: \${config.primaryColor}; font-weight: 500;
+    }
+    .d365-suggested-btn:hover { background: \${config.primaryColor}; color: white; border-color: \${config.primaryColor}; }
+    .d365-suggested-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    
     .d365-typing-indicator { display: none; padding: 8px 0; align-items: center; gap: 8px; }
     .d365-typing-indicator.active { display: flex; }
     .d365-typing-dots { display: flex; gap: 4px; padding: 12px 16px; background: white; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-left: 46px; }
@@ -4276,6 +4311,17 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
   // Using GitHub-hosted bundle to avoid CDN blocking by Power Pages CSP
   console.log('Loading Omnichannel Chat SDK...');
   
+  // Load Adaptive Cards library first
+  var adaptiveCardsScript = document.createElement('script');
+  adaptiveCardsScript.src = 'https://unpkg.com/adaptivecards@3.0.2/dist/adaptivecards.min.js';
+  adaptiveCardsScript.onload = function() {
+    console.log('✅ Adaptive Cards library loaded');
+  };
+  adaptiveCardsScript.onerror = function() {
+    console.warn('⚠️ Adaptive Cards library failed to load - cards will not render');
+  };
+  document.head.appendChild(adaptiveCardsScript);
+  
   var sdkSources = [
     'https://raw.githubusercontent.com/moliveirapinto/d365-modern-chat-widget/main/dist/chat-sdk-bundle.js',
     'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/chat-sdk-bundle.js',
@@ -4315,6 +4361,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     var chatSDK = null, chatStarted = false, userName = '', userEmail = '';
     var chatMessages = [];
     var soundEnabled = true;
+    var processedMessageIds = {}; // Track processed message IDs to avoid duplicates
     
     // DOM Elements
     var launcher = document.getElementById('d365ChatLauncher');
@@ -4778,10 +4825,314 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       }
     }
     
+    // Adaptive Card detection
+    function isAdaptiveCardContent(content) {
+      if (!content || typeof content !== 'string') return false;
+      try {
+        var parsed = JSON.parse(content);
+        if (parsed.type === 'AdaptiveCard') return true;
+        if (parsed.attachments && Array.isArray(parsed.attachments)) {
+          return parsed.attachments.some(function(att) {
+            return att.contentType === 'application/vnd.microsoft.card.adaptive' ||
+                   (att.content && att.content.type === 'AdaptiveCard');
+          });
+        }
+        return false;
+      } catch (e) {
+        return false;
+      }
+    }
+    
+    // Suggested Actions detection (PVA-style)
+    function isSuggestedActionsContent(content) {
+      if (!content || typeof content !== 'string') return false;
+      try {
+        var parsed = JSON.parse(content);
+        if (parsed.text && parsed.suggestedActions && parsed.suggestedActions.actions) {
+          return parsed.suggestedActions.actions.length > 0;
+        }
+        return false;
+      } catch (e) {
+        return false;
+      }
+    }
+    
+    // Render Adaptive Card
+    function addAdaptiveCardMessage(content, senderName) {
+      var now = new Date();
+      var wrapper = document.createElement('div');
+      wrapper.className = 'd365-message-wrapper agent';
+      
+      var avatar = document.createElement('div');
+      avatar.className = 'd365-message-avatar ' + (isBotSender(senderName) ? 'bot' : 'agent');
+      if (isBotSender(senderName) && config.botAvatar) {
+        avatar.innerHTML = '<img src="' + config.botAvatar + '" alt="Bot">';
+      } else if (config.agentAvatar) {
+        avatar.innerHTML = '<img src="' + config.agentAvatar + '" alt="Agent">';
+      } else {
+        avatar.textContent = getInitials(senderName || 'Agent');
+      }
+      
+      var contentDiv = document.createElement('div');
+      contentDiv.className = 'd365-message-content';
+      
+      var senderDiv = document.createElement('div');
+      senderDiv.className = 'd365-message-sender';
+      senderDiv.textContent = senderName || 'Agent';
+      
+      var cardContainer = document.createElement('div');
+      cardContainer.className = 'd365-message agent d365-adaptive-card';
+      
+      try {
+        var parsed = JSON.parse(content);
+        var cardPayload = null;
+        
+        if (parsed.type === 'AdaptiveCard') {
+          cardPayload = parsed;
+        } else if (parsed.attachments && Array.isArray(parsed.attachments)) {
+          var cardAtt = parsed.attachments.find(function(att) {
+            return att.contentType === 'application/vnd.microsoft.card.adaptive' && att.content;
+          });
+          if (cardAtt) cardPayload = cardAtt.content;
+        }
+        
+        if (cardPayload && typeof AdaptiveCards !== 'undefined') {
+          var adaptiveCard = new AdaptiveCards.AdaptiveCard();
+          adaptiveCard.hostConfig = new AdaptiveCards.HostConfig({
+            fontFamily: "inherit",
+            spacing: { small: 8, default: 12, medium: 16, large: 20, extraLarge: 24, padding: 16 },
+            separator: { lineThickness: 1, lineColor: "#e2e8f0" },
+            fontSizes: { small: 12, default: 14, medium: 16, large: 18, extraLarge: 20 },
+            containerStyles: {
+              default: { backgroundColor: "#ffffff", foregroundColors: { default: { default: "#2d3748", subtle: "#64748b" } } }
+            }
+          });
+          
+          adaptiveCard.parse(cardPayload);
+          
+          adaptiveCard.onExecuteAction = function(action) {
+            console.log('Adaptive Card action executed:', action);
+            if (action.constructor.name === 'SubmitAction' || (action.data !== undefined)) {
+              var data = action.data;
+              console.log('Submit action data:', data);
+              if (data && chatSDK && chatStarted) {
+                cardContainer.style.opacity = '0.6';
+                cardContainer.style.pointerEvents = 'none';
+                var actionId = (data && data.actionSubmitId) || action.title || 'Submit';
+                var sendContent = JSON.stringify({value: data});
+                chatSDK.sendMessage({ 
+                  content: sendContent,
+                  metadata: { 'microsoft.azure.communication.chat.bot.contenttype': 'azurebotservice.adaptivecard' }
+                }).then(function() {
+                  addMessage(actionId, true, userName);
+                }).catch(function(err) {
+                  console.error('Error sending card response:', err);
+                  cardContainer.style.opacity = '1';
+                  cardContainer.style.pointerEvents = 'auto';
+                });
+              }
+            } else if (action.url) {
+              window.open(action.url, '_blank');
+            }
+          };
+          
+          var renderedCard = adaptiveCard.render();
+          if (renderedCard) {
+            cardContainer.appendChild(renderedCard);
+          } else {
+            cardContainer.innerHTML = '<p style="color:#e74c3c;">Could not render card</p>';
+          }
+        } else {
+          cardContainer.innerHTML = '<p style="color:#e74c3c;">Adaptive Cards library not loaded</p>';
+        }
+      } catch (e) {
+        console.error('Error rendering Adaptive Card:', e);
+        cardContainer.innerHTML = '<p style="color:#e74c3c;">Error displaying card</p>';
+      }
+      
+      var timeDiv = document.createElement('div');
+      timeDiv.className = 'd365-message-time';
+      timeDiv.textContent = formatTime(now);
+      
+      contentDiv.appendChild(senderDiv);
+      contentDiv.appendChild(cardContainer);
+      contentDiv.appendChild(timeDiv);
+      wrapper.appendChild(avatar);
+      wrapper.appendChild(contentDiv);
+      typingIndicator.parentNode.insertBefore(wrapper, typingIndicator);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      chatMessages.push({ content: '[Adaptive Card]', isUser: false, senderName: senderName, timestamp: now });
+      
+      if (!chatContainer.classList.contains('open')) {
+        unreadCount++; badge.textContent = unreadCount; badge.classList.add('show');
+        if (soundEnabled) playNotificationSound();
+      }
+    }
+    
+    // Render Suggested Actions message
+    function addSuggestedActionsMessage(content, senderName) {
+      var now = new Date();
+      var wrapper = document.createElement('div');
+      wrapper.className = 'd365-message-wrapper agent';
+      
+      var avatar = document.createElement('div');
+      avatar.className = 'd365-message-avatar ' + (isBotSender(senderName) ? 'bot' : 'agent');
+      if (isBotSender(senderName) && config.botAvatar) {
+        avatar.innerHTML = '<img src="' + config.botAvatar + '" alt="Bot">';
+      } else if (config.agentAvatar) {
+        avatar.innerHTML = '<img src="' + config.agentAvatar + '" alt="Agent">';
+      } else {
+        avatar.textContent = getInitials(senderName || 'Agent');
+      }
+      
+      var contentDiv = document.createElement('div');
+      contentDiv.className = 'd365-message-content';
+      
+      var senderDiv = document.createElement('div');
+      senderDiv.className = 'd365-message-sender';
+      senderDiv.textContent = senderName || 'Agent';
+      
+      try {
+        var parsed = JSON.parse(content);
+        var messageText = parsed.text || '';
+        var actions = (parsed.suggestedActions && parsed.suggestedActions.actions) || [];
+        
+        var messageBubble = document.createElement('div');
+        messageBubble.className = 'd365-message agent';
+        messageBubble.textContent = messageText;
+        
+        if (actions.length > 0) {
+          var actionsContainer = document.createElement('div');
+          actionsContainer.className = 'd365-suggested-actions';
+          
+          actions.forEach(function(action) {
+            var button = document.createElement('button');
+            button.className = 'd365-suggested-btn';
+            button.textContent = action.title || action.text || 'Select';
+            button.onclick = function() {
+              var value = action.value || action.text || action.title;
+              actionsContainer.querySelectorAll('.d365-suggested-btn').forEach(function(btn) { btn.disabled = true; });
+              if (action.type === 'openUrl' && action.value) {
+                window.open(action.value, '_blank');
+              } else if (chatSDK && chatStarted) {
+                chatSDK.sendMessage({ content: value }).then(function() {
+                  addMessage(value, true, userName);
+                }).catch(function(err) {
+                  console.error('Error sending action:', err);
+                  actionsContainer.querySelectorAll('.d365-suggested-btn').forEach(function(btn) { btn.disabled = false; });
+                });
+              }
+            };
+            actionsContainer.appendChild(button);
+          });
+          messageBubble.appendChild(actionsContainer);
+        }
+        
+        var timeDiv = document.createElement('div');
+        timeDiv.className = 'd365-message-time';
+        timeDiv.textContent = formatTime(now);
+        
+        contentDiv.appendChild(senderDiv);
+        contentDiv.appendChild(messageBubble);
+        contentDiv.appendChild(timeDiv);
+      } catch (e) {
+        console.error('Error rendering suggested actions:', e);
+        contentDiv.innerHTML = '<div class="d365-message-sender">' + (senderName || 'Agent') + '</div>' +
+          '<div class="d365-message agent">' + content + '</div>' +
+          '<div class="d365-message-time">' + formatTime(now) + '</div>';
+      }
+      
+      wrapper.appendChild(avatar);
+      wrapper.appendChild(contentDiv);
+      typingIndicator.parentNode.insertBefore(wrapper, typingIndicator);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      chatMessages.push({ content: messageText || content, isUser: false, senderName: senderName, timestamp: now });
+      
+      if (!chatContainer.classList.contains('open')) {
+        unreadCount++; badge.textContent = unreadCount; badge.classList.add('show');
+        if (soundEnabled) playNotificationSound();
+      }
+    }
+    
+    function processMessage(message) {
+      if (!message) return;
+      
+      // Get message ID - try various possible ID fields
+      var messageId = message.messageId || message.id || message.clientmessageid || message.messageid;
+      
+      // Skip if already processed
+      if (messageId && processedMessageIds[messageId]) {
+        console.log('Skipping already processed message:', messageId);
+        return;
+      }
+      
+      // Mark as processed
+      if (messageId) {
+        processedMessageIds[messageId] = true;
+      }
+      
+      // Get message content - try various possible content fields
+      var content = message.content || message.text || message.body;
+      
+      if (!content) {
+        console.log('Message has no content:', message);
+        return;
+      }
+      
+      // Determine message role
+      var role = message.role || message.senderRole || message.deliveryMode;
+      
+      // Extract sender info
+      var senderId = message.senderId || message.sender;
+      var senderName = 'Agent';
+      if (typeof senderId === 'object' && senderId !== null) {
+        senderName = senderId.displayName || senderId.name || 'Agent';
+      } else if (typeof senderId === 'string') {
+        senderName = senderId;
+      }
+      if (message.senderDisplayName) {
+        senderName = message.senderDisplayName;
+      }
+      
+      console.log('Processing message - role:', role, 'senderName:', senderName, 'content:', content);
+      
+      var isFromUser = role === 'user' || role === 'User' || role === 1;
+      var isSystem = role === 'system' || role === 'System';
+      
+      // Skip user messages (those are added when sent)
+      if (isFromUser) {
+        console.log('Skipping user message');
+        return;
+      }
+      
+      // Check for Adaptive Cards
+      if (isAdaptiveCardContent(content)) {
+        console.log('\ud83d\udccb Detected Adaptive Card');
+        addAdaptiveCardMessage(content, senderName);
+        return;
+      }
+      
+      // Check for Suggested Actions
+      if (isSuggestedActionsContent(content)) {
+        console.log('\ud83d\udcac Detected Suggested Actions');
+        addSuggestedActionsMessage(content, senderName);
+        return;
+      }
+      
+      // Add regular text messages
+      addMessage(content, false, senderName);
+    }
+    
     async function pollMessages() {
       if (!chatSDK || !chatStarted) return;
       try {
         var messages = await chatSDK.getMessages();
+        console.log('Polled messages:', messages);
+        if (messages && messages.length) {
+          messages.forEach(function(msg) {
+            processMessage(msg);
+          });
+        }
       } catch (e) { console.log('Poll error:', e); }
     }
     
