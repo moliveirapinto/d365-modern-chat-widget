@@ -430,24 +430,67 @@
 
       try {
         var parsed = JSON.parse(content);
-        var payload = parsed.type === 'AdaptiveCard' ? parsed : 
-          (parsed.attachments && parsed.attachments.find(function(a) { return a.content; }))?.content;
+        var payload = parsed.type === 'AdaptiveCard' ? parsed : null;
+        
+        // Check for attachments format
+        if (!payload && parsed.attachments) {
+          var cardAtt = parsed.attachments.find(function(a) {
+            return a.contentType === 'application/vnd.microsoft.card.adaptive' && a.content;
+          });
+          if (cardAtt) payload = cardAtt.content;
+        }
 
         if (payload && typeof AdaptiveCards !== 'undefined') {
           var card = new AdaptiveCards.AdaptiveCard();
+          
+          // Configure host config for better styling
+          card.hostConfig = new AdaptiveCards.HostConfig({
+            fontFamily: "inherit",
+            spacing: { small: 8, default: 12, medium: 16, large: 20, extraLarge: 24, padding: 16 },
+            separator: { lineThickness: 1, lineColor: "#e2e8f0" },
+            fontSizes: { small: 12, default: 14, medium: 16, large: 18, extraLarge: 20 },
+            containerStyles: {
+              default: { backgroundColor: "#ffffff", foregroundColors: { default: { default: "#2d3748", subtle: "#64748b" } } }
+            }
+          });
+          
           card.parse(payload);
+          
           card.onExecuteAction = function(action) {
-            if (action.data && chatSDK && chatStarted) {
-              chatSDK.sendMessage({ content: JSON.stringify({value: action.data}) });
-              addMessage(action.title || 'Submit', true, userName);
+            console.log('Adaptive Card action:', action);
+            // Handle Submit actions (check both constructor name and data property)
+            if (action.constructor.name === 'SubmitAction' || action.data !== undefined) {
+              var data = action.data;
+              console.log('Submit action data:', data);
+              if (chatSDK && chatStarted) {
+                // Disable the card after clicking
+                cardBox.style.opacity = '0.6';
+                cardBox.style.pointerEvents = 'none';
+                
+                var actionLabel = (data && data.actionSubmitId) || action.title || 'Submit';
+                var sendContent = JSON.stringify({value: data});
+                
+                chatSDK.sendMessage({ 
+                  content: sendContent,
+                  metadata: { 'microsoft.azure.communication.chat.bot.contenttype': 'azurebotservice.adaptivecard' }
+                }).then(function() {
+                  addMessage(actionLabel, true, userName);
+                }).catch(function(err) {
+                  console.error('Error sending card response:', err);
+                  cardBox.style.opacity = '1';
+                  cardBox.style.pointerEvents = 'auto';
+                });
+              }
             } else if (action.url) {
               window.open(action.url, '_blank');
             }
           };
+          
           var rendered = card.render();
           if (rendered) cardBox.appendChild(rendered);
         }
       } catch(e) {
+        console.error('Error rendering Adaptive Card:', e);
         cardBox.innerHTML = '<p style="color:#e74c3c">Error displaying card</p>';
       }
 
