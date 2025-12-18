@@ -120,6 +120,8 @@
       '.d365-header-btn{background:rgba(255,255,255,.2);border:none;width:32px;height:32px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}',
       '.d365-header-btn:hover{background:rgba(255,255,255,.3)}',
       '.d365-header-btn svg{width:18px;height:18px;fill:#fff}',
+      '.d365-header-btn.sound-off svg{opacity:.5}',
+      '.d365-header-btn.sound-off::after{content:"";position:absolute;width:2px;height:18px;background:#fff;transform:rotate(45deg);border-radius:1px}',
       '.d365-body{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}',
       '.d365-prechat{padding:24px;display:flex;flex-direction:column;gap:16px;flex:1;justify-content:center}',
       '.d365-prechat.hidden{display:none}',
@@ -234,6 +236,7 @@
             '<div class="d365-header-status">'+c.headerSubtitle+'</div>',
           '</div>',
           '<div class="d365-header-actions">',
+            '<button class="d365-header-btn" id="d365Sound" title="Sound notifications on"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg></button>',
             '<button class="d365-header-btn" id="d365Minimize" title="Minimize"><svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg></button>',
             '<button class="d365-header-btn" id="d365Close" title="Close"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>',
           '</div>',
@@ -377,6 +380,45 @@
     var input = $('d365Input');
     var ended = $('d365Ended');
     var confirm = $('d365Confirm');
+    var soundBtn = $('d365Sound');
+
+    // Sound notification setup
+    var soundEnabled = localStorage.getItem('d365SoundEnabled') !== 'false';
+    var notificationAudio = new Audio('https://moliveirapinto.github.io/d365-modern-chat-widget/notification/new-notification-3-398649.mp3');
+    notificationAudio.volume = 0.5;
+
+    // Initialize sound button state
+    if (!soundEnabled && soundBtn) {
+      soundBtn.classList.add('sound-off');
+      soundBtn.title = 'Sound notifications off';
+    }
+
+    // Sound toggle handler
+    if (soundBtn) {
+      soundBtn.onclick = function() {
+        soundEnabled = !soundEnabled;
+        localStorage.setItem('d365SoundEnabled', soundEnabled);
+        if (soundEnabled) {
+          soundBtn.classList.remove('sound-off');
+          soundBtn.title = 'Sound notifications on';
+        } else {
+          soundBtn.classList.add('sound-off');
+          soundBtn.title = 'Sound notifications off';
+        }
+      };
+    }
+
+    function playNotificationSound() {
+      if (!soundEnabled) return;
+      try {
+        notificationAudio.currentTime = 0;
+        notificationAudio.play().catch(function(e) {
+          console.log('Could not play notification sound:', e);
+        });
+      } catch(e) {
+        console.log('Could not play notification sound:', e);
+      }
+    }
 
     function showView(v) {
       prechat.classList.add('hidden');
@@ -436,10 +478,13 @@
       typing.parentNode.insertBefore(wrap, typing);
       messages.scrollTop = messages.scrollHeight;
 
-      if (!isUser && !container.classList.contains('open')) {
-        unreadCount++;
-        badge.textContent = unreadCount;
-        badge.classList.add('show');
+      if (!isUser) {
+        playNotificationSound();
+        if (!container.classList.contains('open')) {
+          unreadCount++;
+          badge.textContent = unreadCount;
+          badge.classList.add('show');
+        }
       }
     }
 
@@ -599,6 +644,7 @@
       wrap.appendChild(contentDiv);
       typing.parentNode.insertBefore(wrap, typing);
       messages.scrollTop = messages.scrollHeight;
+      playNotificationSound();
     }
 
     function createHeroCardElement(cardData, gradient) {
@@ -769,6 +815,7 @@
         wrap.appendChild(contentDiv);
         typing.parentNode.insertBefore(wrap, typing);
         messages.scrollTop = messages.scrollHeight;
+        playNotificationSound();
 
         // Handle any text that came with the attachments
         if (parsed.text) {
@@ -839,6 +886,7 @@
         wrap.appendChild(contentDiv);
         typing.parentNode.insertBefore(wrap, typing);
         messages.scrollTop = messages.scrollHeight;
+        playNotificationSound();
       } catch(e) {
         addMessage(content, false, senderName, isBotMsg);
       }
