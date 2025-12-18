@@ -155,23 +155,24 @@
       '.d365-msg-time{font-size:10px;color:#94a3b8;padding:0 4px}',
       '.d365-msg-wrap.user .d365-msg-time{text-align:right}',
       '.d365-adaptive-card{background:#fff!important;padding:0!important;overflow:hidden;border-radius:12px}',
-      '.d365-adaptive-card .ac-pushButton{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;border:none;min-width:80px;display:block;width:100%;margin-top:8px}',
+      '.d365-adaptive-card .ac-pushButton{padding:10px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;border:none;display:block;width:100%;margin-top:8px;background:'+gradient+';color:#fff}',
+      '.d365-adaptive-card .ac-pushButton:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.2)}',
       '.d365-adaptive-card .ac-actionSet{display:flex!important;flex-direction:column!important;gap:8px!important}',
-      '.d365-adaptive-card .ac-pushButton.style-positive{background:'+c.primaryColor+';color:#fff}',
-      '.d365-adaptive-card .ac-pushButton.style-default{background:#f1f5f9;color:#374151;border:1px solid #e2e8f0}',
-      '.d365-hero-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.1)}',
-      '.d365-hero-card img{width:100%;max-height:180px;object-fit:cover}',
-      '.d365-hero-card-body{padding:12px 16px}',
-      '.d365-hero-card-title{font-size:16px;font-weight:600;color:#1f2937;margin-bottom:4px}',
-      '.d365-hero-card-subtitle{font-size:13px;color:#6b7280;margin-bottom:8px}',
-      '.d365-hero-card-text{font-size:14px;color:#374151;margin-bottom:12px}',
-      '.d365-hero-card-buttons{display:flex;flex-direction:column;gap:8px}',
-      '.d365-hero-card-btn{padding:10px 16px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;color:'+c.primaryColor+';text-align:center}',
-      '.d365-hero-card-btn:hover{background:'+c.primaryColor+';color:#fff;border-color:'+c.primaryColor+'}',
-      '.d365-hero-card-btn:disabled{opacity:.5;cursor:not-allowed}',
+      '.d365-hero-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1);max-width:280px}',
+      '.d365-hero-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.15)}',
+      '.d365-hero-card img{width:100%;height:160px;object-fit:cover;background:#f0f4f8}',
+      '.d365-hero-card-body{padding:12px}',
+      '.d365-hero-card-title{font-size:14px;font-weight:600;color:#1a202c;margin-bottom:4px;line-height:1.3}',
+      '.d365-hero-card-subtitle{font-size:12px;color:#64748b;margin-bottom:8px;line-height:1.4}',
+      '.d365-hero-card-text{font-size:13px;color:#4a5568;margin-bottom:8px;line-height:1.4}',
+      '.d365-hero-card-buttons{display:flex;flex-direction:column;gap:6px}',
+      '.d365-hero-card-btn{padding:10px 12px;background:'+gradient+';color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;text-align:center;transition:all .2s}',
+      '.d365-hero-card-btn:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(102,126,234,.3)}',
+      '.d365-hero-card-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}',
       '.d365-suggested-actions{display:flex;flex-direction:column;gap:8px;margin-top:12px}',
-      '.d365-suggested-btn{padding:8px 16px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:20px;font-size:13px;cursor:pointer;transition:all .2s;color:'+c.primaryColor+';font-weight:500}',
-      '.d365-suggested-btn:hover{background:'+c.primaryColor+';color:#fff;border-color:'+c.primaryColor+'}',
+      '.d365-suggested-btn{padding:10px 16px;background:'+gradient+';color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;transition:all .2s;font-weight:500;text-align:center}',
+      '.d365-suggested-btn:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(102,126,234,.3)}',
+      '.d365-suggested-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}',
       '.d365-typing{display:none;padding:8px 0;align-items:center;gap:8px}',
       '.d365-typing.active{display:flex}',
       '.d365-typing-dots{display:flex;gap:4px;padding:12px 16px;background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-left:46px}',
@@ -442,6 +443,7 @@
       if (!content || typeof content !== 'string') return false;
       try {
         var p = JSON.parse(content);
+        if (p.contentType === 'application/vnd.microsoft.card.hero') return true;
         if (p.attachments) return p.attachments.some(function(a) {
           return a.contentType === 'application/vnd.microsoft.card.hero' ||
                  a.contentType === 'application/vnd.microsoft.card.thumbnail';
@@ -582,15 +584,29 @@
     function addHeroCard(content, senderName) {
       try {
         var parsed = JSON.parse(content);
-        var cards = parsed.attachments ? parsed.attachments.filter(function(a) {
-          return a.contentType === 'application/vnd.microsoft.card.hero' ||
-                 a.contentType === 'application/vnd.microsoft.card.thumbnail';
-        }) : [];
-
-        cards.forEach(function(att) {
-          var card = att.content;
-          if (!card) return;
-
+        var heroCards = [];
+        
+        // Extract hero cards from different formats
+        if (parsed.contentType === 'application/vnd.microsoft.card.hero' && parsed.content) {
+          heroCards.push(parsed.content);
+        } else if (parsed.attachments && Array.isArray(parsed.attachments)) {
+          heroCards = parsed.attachments
+            .filter(function(att) {
+              return (att.contentType === 'application/vnd.microsoft.card.hero' ||
+                      att.contentType === 'application/vnd.microsoft.card.thumbnail') && att.content;
+            })
+            .map(function(att) { return att.content; });
+        }
+        
+        if (heroCards.length === 0) {
+          console.warn('No hero cards found');
+          addMessage(content, false, senderName);
+          return;
+        }
+        
+        console.log('Rendering', heroCards.length, 'hero card(s)');
+        
+        heroCards.forEach(function(cardData) {
           var wrap = document.createElement('div');
           wrap.className = 'd365-msg-wrap agent';
 
@@ -609,11 +625,11 @@
           var heroDiv = document.createElement('div');
           heroDiv.className = 'd365-hero-card';
 
-          // Add image if present
-          if (card.images && card.images.length > 0 && card.images[0].url) {
+          // Image
+          if (cardData.images && cardData.images.length > 0 && cardData.images[0].url) {
             var img = document.createElement('img');
-            img.src = card.images[0].url;
-            img.alt = card.title || '';
+            img.src = cardData.images[0].url;
+            img.alt = cardData.title || '';
             img.onerror = function() { this.style.display = 'none'; };
             heroDiv.appendChild(img);
           }
@@ -621,36 +637,36 @@
           var bodyDiv = document.createElement('div');
           bodyDiv.className = 'd365-hero-card-body';
 
-          // Add title
-          if (card.title) {
+          // Title
+          if (cardData.title) {
             var titleDiv = document.createElement('div');
             titleDiv.className = 'd365-hero-card-title';
-            titleDiv.textContent = card.title;
+            titleDiv.textContent = cardData.title;
             bodyDiv.appendChild(titleDiv);
           }
 
-          // Add subtitle
-          if (card.subtitle) {
+          // Subtitle
+          if (cardData.subtitle) {
             var subtitleDiv = document.createElement('div');
             subtitleDiv.className = 'd365-hero-card-subtitle';
-            subtitleDiv.textContent = card.subtitle;
+            subtitleDiv.textContent = cardData.subtitle;
             bodyDiv.appendChild(subtitleDiv);
           }
 
-          // Add text
-          if (card.text) {
+          // Text
+          if (cardData.text) {
             var textDiv = document.createElement('div');
             textDiv.className = 'd365-hero-card-text';
-            textDiv.textContent = card.text;
+            textDiv.textContent = cardData.text;
             bodyDiv.appendChild(textDiv);
           }
 
-          // Add buttons (stacked vertically)
-          if (card.buttons && card.buttons.length > 0) {
+          // Buttons (stacked vertically)
+          if (cardData.buttons && cardData.buttons.length > 0) {
             var btnsDiv = document.createElement('div');
             btnsDiv.className = 'd365-hero-card-buttons';
 
-            card.buttons.forEach(function(btn) {
+            cardData.buttons.forEach(function(btn) {
               var button = document.createElement('button');
               button.className = 'd365-hero-card-btn';
               button.textContent = btn.title || btn.text || 'Click';
@@ -662,19 +678,15 @@
                 if (btn.type === 'openUrl' && btn.value) {
                   window.open(btn.value, '_blank');
                 } else if (chatSDK && chatStarted) {
-                  // Disable all buttons in this card
-                  btnsDiv.querySelectorAll('button').forEach(function(b) { 
-                    b.disabled = true; 
-                  });
+                  // Disable all buttons
+                  btnsDiv.querySelectorAll('button').forEach(function(b) { b.disabled = true; });
                   heroDiv.style.opacity = '0.7';
                   
                   chatSDK.sendMessage({ content: value }).then(function() {
                     addMessage(btn.title || value, true, userName);
                   }).catch(function(err) {
                     console.error('Error sending hero card response:', err);
-                    btnsDiv.querySelectorAll('button').forEach(function(b) { 
-                      b.disabled = false; 
-                    });
+                    btnsDiv.querySelectorAll('button').forEach(function(b) { b.disabled = false; });
                     heroDiv.style.opacity = '1';
                   });
                 }
@@ -723,9 +735,17 @@
         avatar.className = 'd365-msg-avatar ' + (isBot(senderName) ? 'bot' : 'agent');
         avatar.textContent = getInitials(senderName || 'Agent');
 
+        var contentDiv = document.createElement('div');
+        contentDiv.className = 'd365-msg-content';
+
+        var senderDiv = document.createElement('div');
+        senderDiv.className = 'd365-msg-sender';
+        senderDiv.textContent = senderName || 'Agent';
+        contentDiv.appendChild(senderDiv);
+
         var bubble = document.createElement('div');
         bubble.className = 'd365-msg agent';
-        bubble.textContent = text;
+        if (text) bubble.textContent = text;
 
         var actionsDiv = document.createElement('div');
         actionsDiv.className = 'd365-suggested-actions';
@@ -736,20 +756,22 @@
           btn.onclick = function() {
             var val = a.value || a.title;
             if (chatSDK && chatStarted) {
-              chatSDK.sendMessage({ content: val });
-              addMessage(val, true, userName);
+              // Disable all buttons
+              actionsDiv.querySelectorAll('button').forEach(function(b) { b.disabled = true; });
+              chatSDK.sendMessage({ content: val }).then(function() {
+                addMessage(val, true, userName);
+              });
             }
-            actionsDiv.querySelectorAll('button').forEach(function(b) { b.disabled = true; });
           };
           actionsDiv.appendChild(btn);
         });
         bubble.appendChild(actionsDiv);
-
-        var contentDiv = document.createElement('div');
-        contentDiv.className = 'd365-msg-content';
-        contentDiv.innerHTML = '<div class="d365-msg-sender">'+(senderName||'Agent')+'</div>';
         contentDiv.appendChild(bubble);
-        contentDiv.innerHTML += '<div class="d365-msg-time">'+formatTime(new Date())+'</div>';
+
+        var timeDiv = document.createElement('div');
+        timeDiv.className = 'd365-msg-time';
+        timeDiv.textContent = formatTime(new Date());
+        contentDiv.appendChild(timeDiv);
 
         wrap.appendChild(avatar);
         wrap.appendChild(contentDiv);
