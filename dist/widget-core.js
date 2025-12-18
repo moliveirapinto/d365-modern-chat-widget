@@ -155,10 +155,21 @@
       '.d365-msg-time{font-size:10px;color:#94a3b8;padding:0 4px}',
       '.d365-msg-wrap.user .d365-msg-time{text-align:right}',
       '.d365-adaptive-card{background:#fff!important;padding:0!important;overflow:hidden;border-radius:12px}',
-      '.d365-adaptive-card .ac-pushButton{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;border:none;min-width:80px}',
+      '.d365-adaptive-card .ac-pushButton{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;border:none;min-width:80px;display:block;width:100%;margin-top:8px}',
+      '.d365-adaptive-card .ac-actionSet{display:flex!important;flex-direction:column!important;gap:8px!important}',
       '.d365-adaptive-card .ac-pushButton.style-positive{background:'+c.primaryColor+';color:#fff}',
       '.d365-adaptive-card .ac-pushButton.style-default{background:#f1f5f9;color:#374151;border:1px solid #e2e8f0}',
-      '.d365-suggested-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}',
+      '.d365-hero-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.1)}',
+      '.d365-hero-card img{width:100%;max-height:180px;object-fit:cover}',
+      '.d365-hero-card-body{padding:12px 16px}',
+      '.d365-hero-card-title{font-size:16px;font-weight:600;color:#1f2937;margin-bottom:4px}',
+      '.d365-hero-card-subtitle{font-size:13px;color:#6b7280;margin-bottom:8px}',
+      '.d365-hero-card-text{font-size:14px;color:#374151;margin-bottom:12px}',
+      '.d365-hero-card-buttons{display:flex;flex-direction:column;gap:8px}',
+      '.d365-hero-card-btn{padding:10px 16px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;color:'+c.primaryColor+';text-align:center}',
+      '.d365-hero-card-btn:hover{background:'+c.primaryColor+';color:#fff;border-color:'+c.primaryColor+'}',
+      '.d365-hero-card-btn:disabled{opacity:.5;cursor:not-allowed}',
+      '.d365-suggested-actions{display:flex;flex-direction:column;gap:8px;margin-top:12px}',
       '.d365-suggested-btn{padding:8px 16px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:20px;font-size:13px;cursor:pointer;transition:all .2s;color:'+c.primaryColor+';font-weight:500}',
       '.d365-suggested-btn:hover{background:'+c.primaryColor+';color:#fff;border-color:'+c.primaryColor+'}',
       '.d365-typing{display:none;padding:8px 0;align-items:center;gap:8px}',
@@ -427,6 +438,18 @@
       return false;
     }
 
+    function isHeroCard(content) {
+      if (!content || typeof content !== 'string') return false;
+      try {
+        var p = JSON.parse(content);
+        if (p.attachments) return p.attachments.some(function(a) {
+          return a.contentType === 'application/vnd.microsoft.card.hero' ||
+                 a.contentType === 'application/vnd.microsoft.card.thumbnail';
+        });
+      } catch(e) {}
+      return false;
+    }
+
     function isSuggestedActions(content) {
       if (!content || typeof content !== 'string') return false;
       try {
@@ -556,6 +579,137 @@
       messages.scrollTop = messages.scrollHeight;
     }
 
+    function addHeroCard(content, senderName) {
+      try {
+        var parsed = JSON.parse(content);
+        var cards = parsed.attachments ? parsed.attachments.filter(function(a) {
+          return a.contentType === 'application/vnd.microsoft.card.hero' ||
+                 a.contentType === 'application/vnd.microsoft.card.thumbnail';
+        }) : [];
+
+        cards.forEach(function(att) {
+          var card = att.content;
+          if (!card) return;
+
+          var wrap = document.createElement('div');
+          wrap.className = 'd365-msg-wrap agent';
+
+          var avatar = document.createElement('div');
+          avatar.className = 'd365-msg-avatar ' + (isBot(senderName) ? 'bot' : 'agent');
+          avatar.textContent = getInitials(senderName || 'Agent');
+
+          var contentDiv = document.createElement('div');
+          contentDiv.className = 'd365-msg-content';
+
+          var senderDiv = document.createElement('div');
+          senderDiv.className = 'd365-msg-sender';
+          senderDiv.textContent = senderName || 'Agent';
+          contentDiv.appendChild(senderDiv);
+
+          var heroDiv = document.createElement('div');
+          heroDiv.className = 'd365-hero-card';
+
+          // Add image if present
+          if (card.images && card.images.length > 0 && card.images[0].url) {
+            var img = document.createElement('img');
+            img.src = card.images[0].url;
+            img.alt = card.title || '';
+            img.onerror = function() { this.style.display = 'none'; };
+            heroDiv.appendChild(img);
+          }
+
+          var bodyDiv = document.createElement('div');
+          bodyDiv.className = 'd365-hero-card-body';
+
+          // Add title
+          if (card.title) {
+            var titleDiv = document.createElement('div');
+            titleDiv.className = 'd365-hero-card-title';
+            titleDiv.textContent = card.title;
+            bodyDiv.appendChild(titleDiv);
+          }
+
+          // Add subtitle
+          if (card.subtitle) {
+            var subtitleDiv = document.createElement('div');
+            subtitleDiv.className = 'd365-hero-card-subtitle';
+            subtitleDiv.textContent = card.subtitle;
+            bodyDiv.appendChild(subtitleDiv);
+          }
+
+          // Add text
+          if (card.text) {
+            var textDiv = document.createElement('div');
+            textDiv.className = 'd365-hero-card-text';
+            textDiv.textContent = card.text;
+            bodyDiv.appendChild(textDiv);
+          }
+
+          // Add buttons (stacked vertically)
+          if (card.buttons && card.buttons.length > 0) {
+            var btnsDiv = document.createElement('div');
+            btnsDiv.className = 'd365-hero-card-buttons';
+
+            card.buttons.forEach(function(btn) {
+              var button = document.createElement('button');
+              button.className = 'd365-hero-card-btn';
+              button.textContent = btn.title || btn.text || 'Click';
+              
+              button.onclick = function() {
+                console.log('Hero card button clicked:', btn);
+                var value = btn.value || btn.title;
+                
+                if (btn.type === 'openUrl' && btn.value) {
+                  window.open(btn.value, '_blank');
+                } else if (chatSDK && chatStarted) {
+                  // Disable all buttons in this card
+                  btnsDiv.querySelectorAll('button').forEach(function(b) { 
+                    b.disabled = true; 
+                  });
+                  heroDiv.style.opacity = '0.7';
+                  
+                  chatSDK.sendMessage({ content: value }).then(function() {
+                    addMessage(btn.title || value, true, userName);
+                  }).catch(function(err) {
+                    console.error('Error sending hero card response:', err);
+                    btnsDiv.querySelectorAll('button').forEach(function(b) { 
+                      b.disabled = false; 
+                    });
+                    heroDiv.style.opacity = '1';
+                  });
+                }
+              };
+              
+              btnsDiv.appendChild(button);
+            });
+
+            bodyDiv.appendChild(btnsDiv);
+          }
+
+          heroDiv.appendChild(bodyDiv);
+          contentDiv.appendChild(heroDiv);
+
+          var timeDiv = document.createElement('div');
+          timeDiv.className = 'd365-msg-time';
+          timeDiv.textContent = formatTime(new Date());
+          contentDiv.appendChild(timeDiv);
+
+          wrap.appendChild(avatar);
+          wrap.appendChild(contentDiv);
+          typing.parentNode.insertBefore(wrap, typing);
+          messages.scrollTop = messages.scrollHeight;
+        });
+
+        // Handle any text that came with the attachments
+        if (parsed.text) {
+          addMessage(parsed.text, false, senderName);
+        }
+      } catch(e) {
+        console.error('Error rendering Hero Card:', e);
+        addMessage(content, false, senderName);
+      }
+    }
+
     function addSuggestedActions(content, senderName) {
       try {
         var parsed = JSON.parse(content);
@@ -621,6 +775,7 @@
       if (role === 'user' || role === 'User' || role === 1) return;
 
       if (isAdaptiveCard(content)) addAdaptiveCard(content, senderName);
+      else if (isHeroCard(content)) addHeroCard(content, senderName);
       else if (isSuggestedActions(content)) addSuggestedActions(content, senderName);
       else addMessage(content, false, senderName);
     }
