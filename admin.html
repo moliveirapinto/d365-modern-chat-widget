@@ -1271,29 +1271,32 @@
         /* Launcher Preview */
         .launcher-preview-section {
             margin-top: 0;
-            padding: 16px 20px;
+            padding: 10px 16px;
             background: white;
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
         .launcher-preview-label {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: #4b5563;
-            margin-bottom: 10px;
-            display: block;
+            white-space: nowrap;
         }
 
         .launcher-preview-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 32px 30px;
+            padding: 12px 24px;
             background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
             border-radius: 8px;
             position: relative;
             overflow: visible;
+            flex: 1;
         }
 
         /* Elegant pulse animation - matching real widget */
@@ -3816,7 +3819,7 @@
                 console.error('Auto-save failed:', e);
                 updateCloudSyncStatus('error');
             }
-        }, 30000); // Every 30 seconds
+        }, 5000); // Every 5 seconds
 
         // Mark as dirty when settings change
         function markDirty() {
