@@ -5524,7 +5524,7 @@
 
                 /* Messages */
                 .chat-messages { background: ${s.chatBgColor || '#f8fafc'} !important; }
-                .message.user { background: ${s.useGradient ? gradient : (s.userBubbleColor || '#667eea')} !important; color: ${s.userTextColor || '#ffffff'} !important; }
+                .message.user { background: ${s.useBubbleGradient !== false ? gradient : (s.userBubbleColor || '#667eea')} !important; color: ${s.userTextColor || '#ffffff'} !important; }
                 .message.agent { background: ${s.agentBubbleColor || '#ffffff'} !important; color: ${s.agentTextColor || '#2d3748'} !important; }
                 .message.system { background: ${s.systemMsgColor || '#e2e8f0'} !important; color: ${s.systemTextColor || '#64748b'} !important; }
                 .message-avatar.agent { background: ${gradient} !important; }
