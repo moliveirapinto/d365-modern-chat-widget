@@ -143,10 +143,11 @@
       '.d365-msg-wrap{display:flex;gap:10px;max-width:85%;animation:d365fadeIn .3s ease;align-items:flex-start}',
       '.d365-msg-wrap.user{flex-direction:row-reverse;align-self:flex-end}',
       '.d365-msg-wrap.agent{align-self:flex-start}',
-      '.d365-msg-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;flex-shrink:0;overflow:hidden;margin-top:18px;box-shadow:0 2px 6px rgba(0,0,0,.12)}',
-      '.d365-msg-avatar.agent{background:linear-gradient(135deg,'+c.gradientStart+' 0%,'+c.gradientEnd+' 100%);color:#fff}',
-      '.d365-msg-avatar.bot{background:linear-gradient(135deg,#00b4d8 0%,#0077b6 100%);color:#fff}',
-      '.d365-msg-avatar.user{background:linear-gradient(135deg,#11998e 0%,#38ef7d 100%);color:#fff}',
+      '.d365-msg-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;flex-shrink:0;overflow:hidden;margin-top:18px;border:2px solid transparent;box-shadow:0 2px 8px rgba(0,0,0,.15),0 0 12px rgba(102,126,234,.2);transition:transform .2s ease,box-shadow .2s ease}',
+      '.d365-msg-avatar:hover{transform:scale(1.05);box-shadow:0 4px 12px rgba(0,0,0,.2),0 0 16px rgba(102,126,234,.35)}',
+      '.d365-msg-avatar.agent{background:linear-gradient(135deg,'+c.gradientStart+' 0%,'+c.gradientEnd+' 100%);color:#fff;border-color:rgba(102,126,234,.3);box-shadow:0 2px 8px rgba(0,0,0,.15),0 0 12px rgba(102,126,234,.25)}',
+      '.d365-msg-avatar.bot{background:linear-gradient(135deg,#00b4d8 0%,#0077b6 100%);color:#fff;border-color:rgba(0,180,216,.3);box-shadow:0 2px 8px rgba(0,0,0,.15),0 0 12px rgba(0,180,216,.25)}',
+      '.d365-msg-avatar.user{background:linear-gradient(135deg,#11998e 0%,#38ef7d 100%);color:#fff;border-color:rgba(17,153,142,.3);box-shadow:0 2px 8px rgba(0,0,0,.15),0 0 12px rgba(17,153,142,.25)}',
       '.d365-msg-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}',
       '.d365-msg-content{display:flex;flex-direction:column;gap:4px;min-width:0}',
       '.d365-msg-sender{font-size:12px;font-weight:600;color:#64748b;padding:0 4px}',
@@ -157,8 +158,9 @@
       '.d365-msg-time{font-size:10px;color:#94a3b8;padding:0 4px}',
       '.d365-msg-wrap.user .d365-msg-time{text-align:right}',
       '.d365-adaptive-card{background:#fff!important;padding:0!important;overflow:hidden;border-radius:12px}',
-      '.d365-adaptive-card .ac-pushButton{padding:10px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;border:none;display:block;width:100%;margin-top:8px;background:'+gradient+';color:#fff}',
-      '.d365-adaptive-card .ac-pushButton:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.2)}',
+      '.d365-adaptive-card .ac-pushButton{padding:10px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .25s ease;border:none;display:block;width:100%;margin-top:8px;background:'+gradient+';color:#fff;box-shadow:0 2px 4px rgba(102,126,234,.2)}',
+      '.d365-adaptive-card .ac-pushButton:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 6px 20px rgba(102,126,234,.4),0 0 15px rgba(102,126,234,.2);background:linear-gradient(135deg,'+c.gradientEnd+' 0%,'+c.gradientStart+' 100%)}',
+      '.d365-adaptive-card .ac-pushButton:active{transform:translateY(0) scale(.98);box-shadow:0 2px 8px rgba(102,126,234,.3)}',
       '.d365-adaptive-card .ac-actionSet{display:flex!important;flex-direction:column!important;gap:8px!important}',
       '.d365-hero-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1);max-width:280px}',
       '.d365-hero-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.15)}',
@@ -168,8 +170,9 @@
       '.d365-hero-card-subtitle{font-size:12px;color:#64748b;margin-bottom:8px;line-height:1.4}',
       '.d365-hero-card-text{font-size:13px;color:#4a5568;margin-bottom:8px;line-height:1.4}',
       '.d365-hero-card-buttons{display:flex;flex-direction:column;gap:6px}',
-      '.d365-hero-card-btn{padding:10px 12px;background:'+gradient+';color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;text-align:center;transition:all .2s}',
-      '.d365-hero-card-btn:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(102,126,234,.3)}',
+      '.d365-hero-card-btn{padding:10px 12px;background:'+gradient+';color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;text-align:center;transition:all .25s ease;box-shadow:0 2px 4px rgba(102,126,234,.2)}',
+      '.d365-hero-card-btn:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 6px 16px rgba(102,126,234,.4),0 0 12px rgba(102,126,234,.2);background:linear-gradient(135deg,'+c.gradientEnd+' 0%,'+c.gradientStart+' 100%)}',
+      '.d365-hero-card-btn:active{transform:translateY(0) scale(.98);box-shadow:0 2px 6px rgba(102,126,234,.3)}',
       '.d365-hero-card-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}',
       '.d365-hero-carousel-wrap{position:relative;width:100%}',
       '.d365-hero-carousel{display:flex;gap:12px;overflow-x:auto;padding:8px 4px;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}',
@@ -181,8 +184,9 @@
       '.d365-carousel-btn.next{right:-6px}',
       '.d365-carousel-btn svg{width:14px;height:14px;fill:#4a5568}',
       '.d365-suggested-actions{display:flex;flex-direction:column;gap:8px;margin-top:12px}',
-      '.d365-suggested-btn{padding:10px 16px;background:'+gradient+';color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;transition:all .2s;font-weight:500;text-align:center}',
-      '.d365-suggested-btn:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(102,126,234,.3)}',
+      '.d365-suggested-btn{padding:10px 16px;background:'+gradient+';color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;transition:all .25s ease;font-weight:500;text-align:center;box-shadow:0 2px 4px rgba(102,126,234,.2)}',
+      '.d365-suggested-btn:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 6px 16px rgba(102,126,234,.4),0 0 12px rgba(102,126,234,.2);background:linear-gradient(135deg,'+c.gradientEnd+' 0%,'+c.gradientStart+' 100%)}',
+      '.d365-suggested-btn:active{transform:translateY(0) scale(.98);box-shadow:0 2px 6px rgba(102,126,234,.3)}',
       '.d365-suggested-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}',
       '.d365-typing{display:none;padding:8px 0;align-items:center;gap:8px}',
       '.d365-typing.active{display:flex}',
@@ -198,8 +202,27 @@
       '.d365-input-row{display:flex;justify-content:space-between;align-items:center;margin-top:8px}',
       '.d365-input-actions{display:flex;gap:8px}',
       '.d365-action-btn{width:36px;height:36px;border-radius:50%;background:#f1f5f9;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}',
-      '.d365-action-btn:hover{background:#e2e8f0}',
-      '.d365-action-btn svg{width:20px;height:20px;fill:#64748b}',
+      '.d365-action-btn:hover{background:#e2e8f0;color:#667eea}',
+      '.d365-action-btn:hover svg{fill:#667eea}',
+      '.d365-action-btn svg{width:20px;height:20px;fill:#64748b;transition:fill .2s}',
+      '.d365-action-btn.recording{background:#fee2e2;color:#ef4444}',
+      '.d365-action-btn.recording svg{fill:#ef4444;animation:d365pulseMic 1s infinite}',
+      '@keyframes d365pulseMic{0%,100%{opacity:1}50%{opacity:.5}}',
+      '.d365-voice-recording{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#ef4444;color:#fff;padding:10px 20px;border-radius:24px;display:none;align-items:center;gap:10px;font-size:14px;font-weight:500;box-shadow:0 4px 15px rgba(239,68,68,.4);z-index:100}',
+      '.d365-voice-recording.show{display:flex;animation:d365slideDown .3s ease}',
+      '@keyframes d365slideDown{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}',
+      '.d365-voice-dot{width:10px;height:10px;background:#fff;border-radius:50%;animation:d365pulseDot 1s infinite}',
+      '@keyframes d365pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}',
+      '.d365-voice-wave{display:flex;gap:2px;align-items:center}',
+      '.d365-voice-wave span{width:3px;background:#fff;border-radius:2px;animation:d365wave .6s infinite ease-in-out}',
+      '.d365-voice-wave span:nth-child(1){height:8px;animation-delay:0s}',
+      '.d365-voice-wave span:nth-child(2){height:16px;animation-delay:.1s}',
+      '.d365-voice-wave span:nth-child(3){height:12px;animation-delay:.2s}',
+      '.d365-voice-wave span:nth-child(4){height:20px;animation-delay:.3s}',
+      '.d365-voice-wave span:nth-child(5){height:12px;animation-delay:.4s}',
+      '@keyframes d365wave{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.5)}}',
+      '.d365-stop-voice{background:rgba(255,255,255,.2);border:none;padding:6px 12px;border-radius:6px;color:#fff;cursor:pointer;font-size:12px;font-weight:500;transition:background .2s}',
+      '.d365-stop-voice:hover{background:rgba(255,255,255,.3)}',
       '.d365-send-btn{width:36px;height:36px;border-radius:50%;background:'+c.primaryColor+';border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}',
       '.d365-send-btn:hover{opacity:.9;transform:scale(1.05)}',
       '.d365-send-btn svg{width:18px;height:18px;fill:#fff}',
@@ -258,6 +281,12 @@
             '<div class="d365-typing" id="d365Typing"><div class="d365-typing-dots"><span></span><span></span><span></span></div></div>',
           '</div>',
           '<div class="d365-input-area" id="d365InputArea">',
+            '<div class="d365-voice-recording" id="d365VoiceRec">',
+              '<div class="d365-voice-dot"></div>',
+              '<div class="d365-voice-wave"><span></span><span></span><span></span><span></span><span></span></div>',
+              '<span>Recording...</span>',
+              '<button class="d365-stop-voice" id="d365StopVoice">Stop</button>',
+            '</div>',
             '<div class="d365-input-wrap">',
               '<textarea class="d365-input" id="d365Input" placeholder="Type your message..." rows="1"></textarea>',
               '<div class="d365-input-row">',
@@ -265,6 +294,7 @@
                   '<input type="file" id="d365File" style="display:none">',
                   '<button type="button" class="d365-action-btn" id="d365AttachBtn" title="Attach"><svg viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/></svg></button>',
                   '<button type="button" class="d365-action-btn" id="d365EmojiBtn" title="Emoji"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg></button>',
+                  '<button type="button" class="d365-action-btn" id="d365VoiceBtn" title="Voice input"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg></button>',
                 '</div>',
                 '<button type="button" class="d365-send-btn" id="d365SendBtn" title="Send"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>',
               '</div>',
@@ -1085,6 +1115,64 @@
       while (messages.firstChild !== typing) messages.removeChild(messages.firstChild);
       showView('prechat');
     };
+
+    // Voice input with visual indicator
+    var recognition = null;
+    var isRecording = false;
+    var voiceBtn = $('d365VoiceBtn');
+    var voiceRec = $('d365VoiceRec');
+    var stopVoiceBtn = $('d365StopVoice');
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = function() {
+        isRecording = true;
+        if (voiceBtn) voiceBtn.classList.add('recording');
+        if (voiceRec) voiceRec.classList.add('show');
+      };
+
+      recognition.onresult = function(event) {
+        var transcript = event.results[0][0].transcript;
+        if (input) input.value += transcript;
+      };
+
+      recognition.onend = function() {
+        isRecording = false;
+        if (voiceBtn) voiceBtn.classList.remove('recording');
+        if (voiceRec) voiceRec.classList.remove('show');
+      };
+
+      recognition.onerror = function(event) {
+        console.log('Speech recognition error:', event.error);
+        isRecording = false;
+        if (voiceBtn) voiceBtn.classList.remove('recording');
+        if (voiceRec) voiceRec.classList.remove('show');
+      };
+
+      if (voiceBtn) {
+        voiceBtn.onclick = function() {
+          if (isRecording) {
+            recognition.stop();
+          } else {
+            recognition.start();
+          }
+        };
+      }
+
+      if (stopVoiceBtn) {
+        stopVoiceBtn.onclick = function() {
+          recognition.stop();
+        };
+      }
+    } else {
+      // Speech recognition not supported - hide button
+      if (voiceBtn) voiceBtn.style.display = 'none';
+    }
 
     if (!config.enablePrechatForm) prechat.classList.add('hidden');
   }
