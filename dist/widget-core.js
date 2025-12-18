@@ -63,6 +63,9 @@
     badgeColor: '#ff4757',
     launcherIcon: 'chat_multiple',
     enablePrechatForm: true,
+    enableCustomAuth: false,
+    customAuthName: '',
+    customAuthEmail: '',
     welcomeTitle: 'Welcome!',
     welcomeMessage: 'Please fill in your details to start chatting.',
     nameFieldLabel: 'Name *',
@@ -1077,7 +1080,12 @@
         unreadCount = 0;
         badge.textContent = '0';
         badge.classList.remove('show');
-        if (!config.enablePrechatForm && !chatStarted) initChat('Anonymous', 'anon@example.com', '');
+        if (!config.enablePrechatForm && !chatStarted) {
+          // Use custom auth credentials if enabled, otherwise anonymous
+          var authName = config.enableCustomAuth && config.customAuthName ? config.customAuthName : 'Anonymous';
+          var authEmail = config.enableCustomAuth && config.customAuthEmail ? config.customAuthEmail : 'anonymous@example.com';
+          initChat(authName, authEmail, '');
+        }
       }
     };
 
