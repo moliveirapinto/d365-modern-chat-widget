@@ -213,6 +213,7 @@
       '.d365-confirm-btn{padding:10px 24px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;border:none}',
       '.d365-confirm-btn.cancel{background:#e2e8f0;color:#4a5568}',
       '.d365-confirm-btn.end{background:#ef4444;color:#fff}',
+      '.d365-system-msg{text-align:center;padding:8px 16px;color:#64748b;font-size:12px;background:#e2e8f0;border-radius:12px;margin:8px auto;max-width:fit-content}',
       '@media(max-width:480px){.d365-container{width:100%;height:100%;max-height:100%;bottom:0;right:0;border-radius:0}.d365-launcher{bottom:16px;right:16px}}'
     ].join('');
     document.head.appendChild(css);
@@ -837,12 +838,36 @@
       var role = msg.role || msg.senderRole;
       var senderName = msg.senderDisplayName || 'Agent';
 
+      // Skip user messages
       if (role === 'user' || role === 'User' || role === 1) return;
+
+      // Handle system messages (centered, no avatar)
+      var isSystem = role === 'system' || role === 'System' || role === 0;
+      if (isSystem) {
+        addSystemMessage(content);
+        return;
+      }
 
       if (isAdaptiveCard(content)) addAdaptiveCard(content, senderName);
       else if (isHeroCard(content)) addHeroCard(content, senderName);
       else if (isSuggestedActions(content)) addSuggestedActions(content, senderName);
       else addMessage(content, false, senderName);
+    }
+
+    function addSystemMessage(text) {
+      var wrapper = document.createElement('div');
+      wrapper.style.display = 'flex';
+      wrapper.style.justifyContent = 'center';
+      wrapper.style.width = '100%';
+      wrapper.style.animation = 'd365fadeIn .3s ease';
+      
+      var msg = document.createElement('div');
+      msg.className = 'd365-system-msg';
+      msg.textContent = text;
+      
+      wrapper.appendChild(msg);
+      typing.parentNode.insertBefore(wrapper, typing);
+      messages.scrollTop = messages.scrollHeight;
     }
 
     async function pollMessages() {
