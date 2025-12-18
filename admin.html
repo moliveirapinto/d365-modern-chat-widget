@@ -3823,7 +3823,9 @@
                 customAuthEmail: settings.customAuthEmail || ''
             };
             
-            const configJson = minified ? JSON.stringify(config) : JSON.stringify(config, null, 2);
+            // Generate JSON and escape closing script tags to prevent breaking HTML parsing
+            let configJson = minified ? JSON.stringify(config) : JSON.stringify(config, null, 2);
+            configJson = configJson.replace(/<\x2fscript>/gi, '<\\/script>');
             
             // Icon SVG paths mapping for dynamic launcher icons
             const iconSvgPaths = {
@@ -3902,6 +3904,31 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     // Inject CSS Styles - Full featured version matching index.html
     var style = document.createElement('style');
     style.textContent = \`
+    /* Hide the native D365 Omnichannel widget - we use it as backend only */
+    #Microsoft_Omnichannel_LCWidget_Chat_Iframe_Window,
+    #oc-lcw-chat-button,
+    [id^="Microsoft_Omnichannel"],
+    .oc-lcw-widget,
+    .oc-lcw-chat-button,
+    .oc-lcw-chat-button-container,
+    .oc-lcw-chat-widget,
+    .lcw-chat-button,
+    .lcw-components,
+    [class^="lcw-"],
+    [class*=" lcw-"],
+    iframe[id*="Omnichannel"],
+    iframe[id*="lcw"],
+    iframe[title*="Omnichannel"],
+    iframe[title*="Live Chat"] {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      width: 0 !important;
+      height: 0 !important;
+      position: absolute !important;
+      left: -9999px !important;
+    }
     @keyframes d365pulse {
       0% { box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 0 rgba(102,126,234,0.4); }
       50% { box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 12px rgba(102,126,234,0); }
@@ -4245,84 +4272,44 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
   container.innerHTML = widgetHTML;
   document.body.appendChild(container);
   
-  // Load the D365 Omnichannel SDK
-  // Priority: Use custom LCW script from admin config, otherwise fall back to CDN SDK
-  if (config.lcwScript && config.lcwScript.trim()) {
-    // User has provided their own D365 LCW script - inject it directly
-    console.log('Using custom D365 LCW script from configuration');
-    var tempDiv = document.createElement('div');
-    tempDiv.innerHTML = config.lcwScript;
-    var lcwScriptEl = tempDiv.querySelector('script');
-    if (lcwScriptEl) {
-      var newScript = document.createElement('script');
-      // Copy all attributes from the LCW script
-      Array.from(lcwScriptEl.attributes).forEach(function(attr) {
-        newScript.setAttribute(attr.name, attr.value);
-      });
-      // Copy inline script content if any
-      if (lcwScriptEl.textContent) {
-        newScript.textContent = lcwScriptEl.textContent;
-      }
-      newScript.onload = function() {
-        console.log('D365 LCW script loaded successfully');
-        // Wait a bit for LCW to initialize, then init our widget
-        setTimeout(initWidget, 500);
-      };
-      newScript.onerror = function() {
-        console.error('Failed to load D365 LCW script, falling back to SDK');
-        loadSdkFallback();
-      };
-      document.head.appendChild(newScript);
-    } else {
-      console.warn('Could not parse LCW script, falling back to SDK');
-      loadSdkFallback();
+  // Load the Microsoft Omnichannel Chat SDK for custom UI integration
+  // Using GitHub-hosted bundle to avoid CDN blocking by Power Pages CSP
+  console.log('Loading Omnichannel Chat SDK...');
+  
+  var sdkSources = [
+    'https://raw.githubusercontent.com/moliveirapinto/d365-modern-chat-widget/main/dist/chat-sdk-bundle.js',
+    'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/chat-sdk-bundle.js',
+    'https://cdn.jsdelivr.net/gh/moliveirapinto/d365-modern-chat-widget@main/dist/chat-sdk-bundle.js'
+  ];
+  var currentSdkIndex = 0;
+  
+  function loadNextSdk() {
+    if (currentSdkIndex >= sdkSources.length) {
+      console.error('All SDK sources failed to load. Chat will not connect to D365.');
+      console.log('Power Pages may be blocking external scripts. Check CSP settings.');
+      initWidgetFallback();
+      return;
     }
-  } else {
-    // No custom script provided, use SDK fallback
-    console.log('No custom LCW script, using SDK fallback');
-    loadSdkFallback();
+    
+    var sdkScript = document.createElement('script');
+    sdkScript.src = sdkSources[currentSdkIndex];
+    console.log('Trying SDK source:', sdkSources[currentSdkIndex]);
+    
+    sdkScript.onload = function() {
+      console.log('✅ Omnichannel Chat SDK loaded successfully from:', sdkSources[currentSdkIndex]);
+      initWidget();
+    };
+    
+    sdkScript.onerror = function() {
+      console.warn('SDK failed to load from:', sdkSources[currentSdkIndex]);
+      currentSdkIndex++;
+      loadNextSdk();
+    };
+    
+    document.head.appendChild(sdkScript);
   }
   
-  function loadSdkFallback() {
-    // Load the Microsoft Omnichannel Chat SDK from multiple sources
-    // Note: For best results, provide your own D365 LCW script in admin config
-    var sdkSources = [
-      // jsDelivr CDN serving from your GitHub repo (if dist/ is committed)
-      'https://cdn.jsdelivr.net/gh/moliveirapinto/d365-modern-chat-widget@main/dist/chat-sdk-bundle.js',
-      // jsDelivr CDN for npm package
-      'https://cdn.jsdelivr.net/npm/@microsoft/omnichannel-chat-sdk@1/dist/Microsoft.OmnichannelChatSDK.min.js',
-      // unpkg CDN fallback
-      'https://unpkg.com/@microsoft/omnichannel-chat-sdk@1/dist/Microsoft.OmnichannelChatSDK.min.js'
-    ];
-    var currentSdkIndex = 0;
-    
-    function loadNextSdk() {
-      if (currentSdkIndex >= sdkSources.length) {
-        console.error('All SDK sources failed to load');
-        initWidgetFallback();
-        return;
-      }
-      
-      var ocScript = document.createElement('script');
-      ocScript.src = sdkSources[currentSdkIndex];
-      console.log('Trying SDK source:', sdkSources[currentSdkIndex]);
-      
-      ocScript.onload = function() {
-        console.log('SDK loaded successfully from:', sdkSources[currentSdkIndex]);
-        initWidget();
-      };
-      
-      ocScript.onerror = function() {
-        console.warn('SDK failed to load from:', sdkSources[currentSdkIndex]);
-        currentSdkIndex++;
-        loadNextSdk();
-      };
-      
-      document.head.appendChild(ocScript);
-    }
-    
-    loadNextSdk();
-  }
+  loadNextSdk();
   
   function initWidget() {
     var chatSDK = null, chatStarted = false, userName = '', userEmail = '';
@@ -4654,58 +4641,141 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       try {
         userName = name; userEmail = email;
         showView('connecting');
+        console.log('Starting chat initialization...');
         
-        var SDKClass = (typeof Microsoft !== 'undefined' && Microsoft.OmnichannelChatSDK && Microsoft.OmnichannelChatSDK.OmnichannelChatSDK) ||
-                       (typeof OmnichannelChatSDK !== 'undefined' && OmnichannelChatSDK.default) ||
-                       (typeof OmnichannelChatSDK !== 'undefined' && OmnichannelChatSDK);
+        // Get the Omnichannel Chat SDK
+        var SDKClass = null;
         
-        if (SDKClass) {
-          chatSDK = new SDKClass({
-            orgId: config.orgId,
-            widgetId: config.widgetId,
-            orgUrl: config.orgUrl
-          });
-          await chatSDK.initialize();
-          
-          chatSDK.onNewMessage(function(msg) {
-            if (msg && msg.content) {
-              addMessage(msg.content, false, msg.senderDisplayName);
+        // Check various ways the SDK might be exposed (our custom bundle exposes it as window.OmnichannelChatSDK)
+        if (typeof OmnichannelChatSDK !== 'undefined') {
+          // Our custom bundle or direct global
+          if (typeof OmnichannelChatSDK === 'function') {
+            SDKClass = OmnichannelChatSDK;
+            console.log('Found SDK as direct constructor (OmnichannelChatSDK)');
+          } else if (OmnichannelChatSDK.default && typeof OmnichannelChatSDK.default === 'function') {
+            SDKClass = OmnichannelChatSDK.default;
+            console.log('Found SDK via OmnichannelChatSDK.default');
+          } else if (OmnichannelChatSDK.OmnichannelChatSDK) {
+            SDKClass = OmnichannelChatSDK.OmnichannelChatSDK;
+            console.log('Found SDK via OmnichannelChatSDK.OmnichannelChatSDK');
+          } else {
+            // Search for constructor in module
+            for (var key in OmnichannelChatSDK) {
+              if (typeof OmnichannelChatSDK[key] === 'function' && OmnichannelChatSDK[key].prototype) {
+                SDKClass = OmnichannelChatSDK[key];
+                console.log('Found SDK constructor at OmnichannelChatSDK.' + key);
+                break;
+              }
             }
-          });
-          chatSDK.onTypingEvent(function() {
-            typingIndicator.classList.add('active');
-            setTimeout(function() { typingIndicator.classList.remove('active'); }, 3000);
-          });
-          chatSDK.onAgentEndSession(function() { showView('ended'); });
-          
-          await chatSDK.startChat({
-            customContext: {
-              'emailaddress1': { value: email, isDisplayable: true },
-              'Name': { value: name, isDisplayable: true }
-            }
-          });
-          
-          chatStarted = true;
-          showView('chat');
-          if (question) { addMessage(question, true); await chatSDK.sendMessage({ content: question }); }
-          setInterval(pollMessages, 3000);
-        } else {
-          throw new Error('SDK not loaded');
+          }
+        } else if (typeof Microsoft !== 'undefined' && Microsoft.OmnichannelChatSDK) {
+          SDKClass = Microsoft.OmnichannelChatSDK.OmnichannelChatSDK || Microsoft.OmnichannelChatSDK;
+          console.log('Found SDK via Microsoft.OmnichannelChatSDK');
         }
+        
+        if (!SDKClass) {
+          console.error('SDK not found. Available window keys with Omni/Microsoft:', 
+            Object.keys(window).filter(function(k) { 
+              return k.toLowerCase().includes('omni') || k.toLowerCase().includes('microsoft'); 
+            })
+          );
+          console.log('OmnichannelChatSDK value:', typeof OmnichannelChatSDK !== 'undefined' ? OmnichannelChatSDK : 'undefined');
+          throw new Error('Omnichannel Chat SDK not loaded. Please check your D365 configuration.');
+        }
+        
+        console.log('Creating SDK instance with config:', {
+          orgId: config.orgId,
+          orgUrl: config.orgUrl,
+          widgetId: config.widgetId
+        });
+        
+        chatSDK = new SDKClass({
+          orgId: config.orgId,
+          orgUrl: config.orgUrl,
+          widgetId: config.widgetId
+        });
+        
+        console.log('Initializing SDK...');
+        await chatSDK.initialize();
+        console.log('SDK initialized successfully');
+        
+        // Set up event handlers
+        chatSDK.onNewMessage(function(msg) {
+          console.log('New message received:', msg);
+          if (msg && msg.content) {
+            addMessage(msg.content, false, msg.senderDisplayName || 'Agent');
+          }
+        });
+        
+        chatSDK.onTypingEvent(function() {
+          typingIndicator.classList.add('active');
+          setTimeout(function() { typingIndicator.classList.remove('active'); }, 3000);
+        });
+        
+        chatSDK.onAgentEndSession(function() {
+          console.log('Agent ended session');
+          showView('ended');
+        });
+        
+        console.log('Starting chat with context...');
+        await chatSDK.startChat({
+          customContext: {
+            'emailaddress1': { value: email, isDisplayable: true },
+            'Name': { value: name, isDisplayable: true }
+          }
+        });
+        
+        console.log('Chat started successfully!');
+        chatStarted = true;
+        showView('chat');
+        
+        // Send initial question if provided
+        if (question) {
+          addMessage(question, true, name);
+          await chatSDK.sendMessage({ content: question });
+        }
+        
+        // Start polling for messages
+        setInterval(pollMessages, 3000);
+        
       } catch (error) {
-        console.error('Chat init error:', error);
-        alert('Failed to start chat. Please try again.');
+        console.error('Chat initialization error:', error);
+        console.error('Error stack:', error.stack);
+        alert('Failed to start chat: ' + (error.message || 'Unknown error') + '\\n\\nPlease check the browser console for more details.');
         showView('prechat');
-        startBtn.disabled = false; startBtn.textContent = config.startBtnText;
+        startBtn.disabled = false;
+        startBtn.textContent = config.startBtnText;
       }
     }
     
     async function sendMessage() {
       var text = messageInput.value.trim();
-      if (!text || !chatSDK || !chatStarted) return;
+      if (!text) {
+        console.log('No message to send');
+        return;
+      }
+      if (!chatSDK) {
+        console.error('Cannot send message: chatSDK is not initialized');
+        alert('Chat is not connected. Please restart the conversation.');
+        return;
+      }
+      if (!chatStarted) {
+        console.error('Cannot send message: chat has not started');
+        alert('Chat has not started yet. Please wait for connection.');
+        return;
+      }
+      
       messageInput.value = '';
-      addMessage(text, true);
-      try { await chatSDK.sendMessage({ content: text }); } catch (e) { console.error('Send error:', e); }
+      addMessage(text, true, userName);
+      
+      try {
+        console.log('Sending message:', text);
+        await chatSDK.sendMessage({ content: text });
+        console.log('Message sent successfully');
+      } catch (e) {
+        console.error('Error sending message:', e);
+        addMessage('Failed to send message. Please try again.', false, 'System');
+      }
     }
     
     async function pollMessages() {
