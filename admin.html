@@ -733,27 +733,19 @@
             width: 44px;
             height: 44px;
             border-radius: 50%;
+            background: rgba(255,255,255,0.2);
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: visible;
+            overflow: hidden;
             flex-shrink: 0;
-            position: relative;
-        }
-        .preview-header-avatar.has-image {
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-        }
-        .preview-header-avatar:not(.has-image) {
-            background: rgba(255,255,255,0.2);
             border: 2px solid rgba(255,255,255,0.5);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15), 0 0 0 2px rgba(255,255,255,0.1);
         }
         .preview-header-avatar img {
-            width: 44px;
-            height: 44px;
-            object-fit: contain;
-            border-radius: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .preview-header-avatar svg { width: 26px; height: 26px; fill: white; }
         .preview-header-info { flex: 1; }
