@@ -4717,7 +4717,12 @@
             const config = buildCompactConfig();
             
             // Generate minified config JSON
-            const configJson = JSON.stringify(config);
+            // Generate minified config JSON - escape for safe embedding
+            let configJson = JSON.stringify(config);
+            // Escape any closing script tags to prevent breaking HTML
+            configJson = configJson.replace(/<\/script>/gi, '<\\/script>');
+            // Escape any problematic characters for inline JS
+            configJson = configJson.replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
             
             // Tiny loader that fetches from GitHub Pages
             const embedCode = `<!-- D365 Chat Widget - Compact Loader (Power Pages Compatible) -->
@@ -4734,6 +4739,7 @@ window.D365WidgetConfig=${configJson};
         
         function buildCompactConfig() {
             // Only include essential config + non-default customizations to minimize size
+            // NOTE: We do NOT include lcwScript in compact mode - the widget-core.js handles SDK loading
             const config = {
                 orgId: settings.orgId,
                 orgUrl: settings.orgUrl,
@@ -4741,7 +4747,7 @@ window.D365WidgetConfig=${configJson};
             };
             
             // Only add non-default values to minimize JSON size
-            if (settings.lcwCode) config.lcwScript = settings.lcwCode;
+            // DO NOT include lcwCode/lcwScript - it's too large and contains script tags that break embedding
             if (settings.headerTitle && settings.headerTitle !== 'Support Chat') config.headerTitle = settings.headerTitle;
             if (settings.headerSubtitle && settings.headerSubtitle !== "We're here to help") config.headerSubtitle = settings.headerSubtitle;
             if (settings.headerLogo) config.headerLogo = toGitHubRawUrl(settings.headerLogo);
