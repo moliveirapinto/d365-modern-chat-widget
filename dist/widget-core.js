@@ -1199,6 +1199,34 @@
       if (voiceBtn) voiceBtn.style.display = 'none';
     }
 
+    // Emoji button - show tooltip with keyboard shortcut
+    var emojiBtn = $('d365EmojiBtn');
+    if (emojiBtn) {
+      emojiBtn.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (input) input.focus();
+        
+        // Show tooltip with keyboard shortcut
+        var isWindows = navigator.platform.indexOf('Win') > -1;
+        var isMac = navigator.platform.indexOf('Mac') > -1;
+        
+        var tooltip = document.createElement('div');
+        tooltip.style.cssText = 'position:fixed;bottom:120px;right:30px;background:#1e293b;color:white;padding:12px 16px;border-radius:8px;font-size:13px;z-index:10000;box-shadow:0 4px 20px rgba(0,0,0,0.3);';
+        
+        if (isWindows) {
+          tooltip.innerHTML = '<strong>💡 Tip:</strong> Press <kbd style="background:#374151;padding:2px 6px;border-radius:4px;margin:0 2px;">Win</kbd> + <kbd style="background:#374151;padding:2px 6px;border-radius:4px;margin:0 2px;">.</kbd> for emojis';
+        } else if (isMac) {
+          tooltip.innerHTML = '<strong>💡 Tip:</strong> Press <kbd style="background:#374151;padding:2px 6px;border-radius:4px;margin:0 2px;">Cmd</kbd> + <kbd style="background:#374151;padding:2px 6px;border-radius:4px;margin:0 2px;">Ctrl</kbd> + <kbd style="background:#374151;padding:2px 6px;border-radius:4px;margin:0 2px;">Space</kbd> for emojis';
+        } else {
+          tooltip.innerHTML = '<strong>💡 Tip:</strong> Use your keyboard emoji shortcut';
+        }
+        
+        document.body.appendChild(tooltip);
+        setTimeout(function() { tooltip.remove(); }, 3000);
+      };
+    }
+
     if (!config.enablePrechatForm) prechat.classList.add('hidden');
   }
 
