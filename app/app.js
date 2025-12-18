@@ -9,8 +9,7 @@
     user: null,
     widgets: [],
     currentWidget: null,
-    isDirty: false,
-    deviceFlowPollTimer: null
+    isDirty: false
   };
 
   // Config
@@ -21,17 +20,20 @@
   const $ = id => document.getElementById(id);
   const $$ = sel => document.querySelectorAll(sel);
 
-  // Screens
-  const screens = {
-    login: $('loginScreen'),
-    dashboard: $('dashboardScreen'),
-    editor: $('editorScreen')
-  };
+  // Screens (initialized after DOM ready)
+  let screens = {};
 
-  // Initialize app
-  async function init() {
+  // Initialize app when DOM is ready
+  function init() {
+    // Initialize screen references
+    screens = {
+      login: $('loginScreen'),
+      dashboard: $('dashboardScreen'),
+      editor: $('editorScreen')
+    };
+    
     setupEventListeners();
-    await checkAuth();
+    checkAuth();
   }
 
   // Check authentication
@@ -675,6 +677,10 @@ var D365WidgetConfig = ${inlineConfig};
     deleteWidget
   };
 
-  // Start app
-  init();
+  // Start app when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();
