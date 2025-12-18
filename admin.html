@@ -1761,9 +1761,7 @@
         /* Version Badge */
         .version-info {
             display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 2px;
+            align-items: center;
             cursor: pointer;
             padding: 6px 12px;
             border-radius: 8px;
@@ -1787,10 +1785,6 @@
             width: 14px;
             height: 14px;
             fill: currentColor;
-        }
-        .version-date {
-            font-size: 10px;
-            color: rgba(255,255,255,0.7);
         }
 
         /* Changelog Modal */
@@ -2089,8 +2083,8 @@
                         <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
                     </div>
                     <div class="changelog-header-title">
-                        <h2>Changelog</h2>
-                        <p>What's new in Chat Widget Studio</p>
+                        <h2>Changelog <span id="changelogVersion" style="font-size: 14px; font-weight: 500; opacity: 0.9;"></span></h2>
+                        <p id="changelogLastUpdated">Last updated: Dec 18, 2025, 03:45 PM</p>
                     </div>
                 </div>
                 <button class="changelog-close" onclick="hideChangelog()">
@@ -2116,7 +2110,6 @@
                         <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                         <span id="versionNumber">v1.0.0</span>
                     </div>
-                    <span class="version-date" id="versionDate">Updated: Dec 18, 2025</span>
                 </div>
                 <div id="cloudSyncStatus" class="cloud-sync-status synced">
                     <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM10 17l-3.5-3.5 1.41-1.41L10 14.17l4.59-4.58L16 11l-6 6z"/></svg>
@@ -3103,6 +3096,12 @@
             const content = document.getElementById('changelogContent');
             let html = '';
             
+            // Update header with version and last updated
+            const changelogVersionEl = document.getElementById('changelogVersion');
+            const changelogLastUpdatedEl = document.getElementById('changelogLastUpdated');
+            if (changelogVersionEl) changelogVersionEl.textContent = APP_VERSION;
+            if (changelogLastUpdatedEl) changelogLastUpdatedEl.textContent = 'Last updated: ' + APP_LAST_UPDATED;
+            
             CHANGELOG.forEach(release => {
                 html += `
                     <div class="changelog-version">
@@ -3136,10 +3135,8 @@
         // Initialize version display
         document.addEventListener('DOMContentLoaded', function() {
             const versionEl = document.getElementById('versionNumber');
-            const dateEl = document.getElementById('versionDate');
             const headerVersionEl = document.getElementById('headerVersionNumber');
             if (versionEl) versionEl.textContent = APP_VERSION;
-            if (dateEl) dateEl.textContent = 'Updated: ' + APP_LAST_UPDATED;
             if (headerVersionEl) headerVersionEl.textContent = APP_VERSION;
         });
 
