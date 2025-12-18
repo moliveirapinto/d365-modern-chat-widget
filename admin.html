@@ -125,10 +125,10 @@
 
         /* Main Layout */
         .admin-container {
-            max-width: 1400px;
+            max-width: 1500px;
             margin: 0 auto;
             padding: 24px 32px;
-            padding-right: 440px;
+            padding-right: 420px;
             overflow-x: hidden;
             overflow-y: visible;
             width: 100%;
@@ -216,7 +216,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .card-body { padding: 20px; overflow-x: auto; max-width: 100%; }
+        .card-body { padding: 20px; overflow: visible; }
 
         /* Form Elements - Lighter styling */
         .form-group {
@@ -504,8 +504,8 @@
         /* Image Upload */
         .image-upload-area {
             border: 2px dashed var(--admin-border);
-            border-radius: 12px;
-            padding: 24px;
+            border-radius: 10px;
+            padding: 16px 12px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
@@ -516,7 +516,7 @@
             background: rgba(99, 102, 241, 0.02);
         }
         .image-upload-area.has-image {
-            padding: 12px;
+            padding: 10px;
             border-style: solid;
         }
         .image-upload-area.processing {
@@ -524,14 +524,14 @@
             pointer-events: none;
         }
         .upload-icon {
-            width: 48px; height: 48px; margin: 0 auto 12px;
+            width: 36px; height: 36px; margin: 0 auto 8px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
+            border-radius: 8px;
             display: flex; align-items: center; justify-content: center;
         }
-        .upload-icon svg { width: 24px; height: 24px; fill: white; }
-        .upload-text { font-size: 14px; color: var(--admin-text); font-weight: 500; }
-        .upload-hint { font-size: 12px; color: var(--admin-text-light); margin-top: 4px; }
+        .upload-icon svg { width: 18px; height: 18px; fill: white; }
+        .upload-text { font-size: 12px; color: var(--admin-text); font-weight: 500; }
+        .upload-hint { font-size: 11px; color: var(--admin-text-light); margin-top: 2px; }
 
         .uploaded-image-preview {
             position: relative;
@@ -902,27 +902,28 @@
         .avatar-thumbnails {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-top: 12px;
-            padding: 12px;
+            gap: 6px;
+            margin-top: 10px;
+            padding: 8px;
             background: var(--admin-bg);
             border-radius: 8px;
             border: 1px solid var(--admin-border);
         }
         .avatar-thumb {
             width: 100%;
+            max-width: 40px;
             aspect-ratio: 1;
             border-radius: 50%;
             object-fit: cover;
             cursor: pointer;
-            border: 3px solid transparent;
+            border: 2px solid transparent;
             transition: all 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .avatar-thumb:hover {
             border-color: var(--admin-primary);
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
+            transform: scale(1.08);
+            box-shadow: 0 3px 6px rgba(99, 102, 241, 0.3);
         }
         .avatar-thumb.selected {
             border-color: var(--admin-primary);
