@@ -617,12 +617,24 @@
         /* Preview Panel */
         .preview-panel {
             position: fixed;
-            top: 100px;
-            right: 32px;
-            width: 400px;
-            height: calc(100vh - 130px);
+            top: 140px;
+            right: 24px;
+            width: 420px;
+            height: calc(100vh - 160px);
             overflow-y: auto;
             z-index: 100;
+        }
+        .preview-panel .card-header {
+            padding: 12px 16px;
+            border-radius: 12px 12px 0 0;
+        }
+        .preview-panel .card-header h2 {
+            font-size: 15px;
+            margin: 0;
+        }
+        .preview-panel .card-header p {
+            font-size: 12px;
+            margin: 0;
         }
 
         /* Preview Tabs */
@@ -2674,14 +2686,14 @@
         <!-- Live Preview -->
         <div class="preview-panel">
             <div class="preview-card">
-                <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                    <div class="card-header-icon">
-                        <svg viewBox="0 0 24 24" style="fill: white;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 10px 16px;">
+                    <div class="card-header-icon" style="width: 28px; height: 28px; min-width: 28px;">
+                        <svg viewBox="0 0 24 24" style="fill: white; width: 16px; height: 16px;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
                     </div>
-                    <div>
-                        <h2 style="color: white;">Live Preview</h2>
-                        <p style="color: rgba(255,255,255,0.9);">See changes in real-time</p>
+                    <div style="flex: 1;">
+                        <h2 style="color: white; font-size: 14px; margin: 0;">Live Preview</h2>
                     </div>
+                    <span style="font-size: 11px; color: rgba(255,255,255,0.8);">Real-time</span>
                 </div>
                 
                 <!-- Preview Tabs -->
