@@ -1897,14 +1897,18 @@
         <div class="settings-panel">
             <!-- Demo Profiles -->
             <div class="settings-card">
-                <div class="card-header">
+                <div class="card-header" style="display:flex;align-items:flex-start;gap:12px;">
                     <div class="card-header-icon">
                         <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
                     </div>
-                    <div>
+                    <div style="flex:1;">
                         <h2>Demo Profiles</h2>
                         <p>Save and switch between customer configurations</p>
                     </div>
+                    <button class="btn btn-sm" style="display:none;background:#667eea;color:white;white-space:nowrap;" onclick="syncAllProfilesToCloud()" id="syncAllBtn" title="Sync all profiles to cloud">
+                        <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:white;vertical-align:middle;margin-right:4px;"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+                        Sync All
+                    </button>
                 </div>
                 <div class="card-body">
                     <div class="profile-list" id="profileList">
@@ -2926,6 +2930,10 @@
             const loginBtn = document.getElementById('loginBtn');
             if (loginBtn) loginBtn.style.display = 'none';
             
+            // Show Sync All button
+            const syncAllBtn = document.getElementById('syncAllBtn');
+            if (syncAllBtn) syncAllBtn.style.display = 'inline-flex';
+            
             loadSavedWidgets();
         }
 
@@ -2954,6 +2962,9 @@
                     // Show login button in header
                     const loginBtn = document.getElementById('loginBtn');
                     if (loginBtn) loginBtn.style.display = '';
+                    // Hide Sync All button
+                    const syncAllBtn = document.getElementById('syncAllBtn');
+                    if (syncAllBtn) syncAllBtn.style.display = 'none';
                     // Reset token entry
                     document.getElementById('tokenEntry').classList.remove('show');
                     document.getElementById('tokenInput').value = '';
@@ -3238,6 +3249,93 @@
                 span.textContent = 'Sync error';
                 svg.innerHTML = '<path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>';
             }
+        }
+
+        // Sync all profiles to cloud (for existing profiles without cloudId)
+        async function syncAllProfilesToCloud() {
+            if (!cloudToken) {
+                showToast('Please sign in with GitHub first');
+                return;
+            }
+            
+            if (profiles.length === 0) {
+                showToast('No profiles to sync');
+                return;
+            }
+            
+            showToast(`Syncing ${profiles.length} profiles to cloud...`);
+            updateCloudSyncStatus('syncing');
+            
+            let successCount = 0;
+            let errorCount = 0;
+            
+            // Sync profiles one at a time to avoid rate limits
+            for (const profile of profiles) {
+                try {
+                    await saveProfileToCloudSync(profile);
+                    successCount++;
+                } catch (e) {
+                    console.error(`Failed to sync "${profile.name}":`, e);
+                    errorCount++;
+                }
+                // Small delay to avoid rate limiting
+                await new Promise(r => setTimeout(r, 500));
+            }
+            
+            saveProfiles(); // Save cloudIds to localStorage
+            loadSavedWidgets(); // Refresh the dropdown
+            
+            if (errorCount === 0) {
+                updateCloudSyncStatus('synced');
+                showToast(`✅ All ${successCount} profiles synced to cloud!`);
+            } else {
+                updateCloudSyncStatus('error');
+                showToast(`⚠️ Synced ${successCount}, failed ${errorCount}`);
+            }
+        }
+        
+        // Sync version that returns promise (for syncAll)
+        async function saveProfileToCloudSync(profile) {
+            const gistData = {
+                description: GIST_PREFIX + profile.name,
+                public: false,
+                files: {
+                    'config.json': {
+                        content: JSON.stringify(profile.settings, null, 2)
+                    },
+                    'README.md': {
+                        content: `# ${profile.name}\n\nD365 Chat Widget Configuration\n\nCreated with [D365 Widget Studio](https://moliveirapinto.github.io/d365-modern-chat-widget/admin.html)`
+                    }
+                }
+            };
+            
+            let res;
+            if (profile.cloudId) {
+                // Update existing gist
+                res = await fetch('https://api.github.com/gists/' + profile.cloudId, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': 'token ' + cloudToken,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(gistData)
+                });
+            } else {
+                // Create new gist
+                res = await fetch('https://api.github.com/gists', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'token ' + cloudToken,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(gistData)
+                });
+            }
+            
+            if (!res.ok) throw new Error('Failed to save');
+            
+            const gist = await res.json();
+            profile.cloudId = gist.id; // Store cloud ID for future updates
         }
 
         async function saveWidgetToCloud() {
@@ -3664,7 +3762,13 @@
                 }
                 
                 saveProfiles();
-                showToast(`Profile "${profile.name}" updated!`);
+                
+                // Auto-sync to cloud if logged in
+                if (cloudToken) {
+                    saveProfileToCloud(profile);
+                } else {
+                    showToast(`Profile "${profile.name}" updated!`);
+                }
             }
         }
 
