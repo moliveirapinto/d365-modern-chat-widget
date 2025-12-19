@@ -2057,6 +2057,79 @@
         </div>
     </div>
 
+    <!-- Tutorial Modal -->
+    <div id="tutorialOverlay" class="changelog-overlay" onclick="if(event.target === this) hideTutorial()">
+        <div class="changelog-modal" style="max-width: 700px;">
+            <div class="changelog-header">
+                <div class="changelog-header-left">
+                    <div class="changelog-header-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                    </div>
+                    <div class="changelog-header-title">
+                        <h2>Quick Start Guide</h2>
+                        <p>Learn how to use Chat Widget Studio</p>
+                    </div>
+                </div>
+                <button class="changelog-close" onclick="hideTutorial()">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="changelog-content" style="padding: 30px;">
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #667eea; font-size: 18px; margin-bottom: 12px;">What is Chat Widget Studio?</h3>
+                    <p style="color: #666; line-height: 1.6;">
+                        A customization tool that lets you personalize your D365 Omnichannel chat widget's look and feel. 
+                        Design your widget once, then deploy it anywhere using one of three simple methods.
+                    </p>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h3 style="color: #667eea; font-size: 18px; margin-bottom: 15px;">Three Ways to Use Your Widget</h3>
+                    
+                    <div style="background: #f8f9ff; border-left: 4px solid #667eea; padding: 20px; margin-bottom: 15px; border-radius: 8px;">
+                        <h4 style="color: #333; font-size: 16px; margin-bottom: 8px;">1️⃣ Go To Widget</h4>
+                        <p style="color: #666; line-height: 1.6; margin-bottom: 8px;">
+                            <strong>Best for:</strong> Testing and sharing with others
+                        </p>
+                        <p style="color: #666; line-height: 1.6;">
+                            Click "Go To Widget" to open your customized chat in a new browser tab. 
+                            Share the URL with teammates or customers to try your widget instantly.
+                        </p>
+                    </div>
+
+                    <div style="background: #f8f9ff; border-left: 4px solid #764ba2; padding: 20px; margin-bottom: 15px; border-radius: 8px;">
+                        <h4 style="color: #333; font-size: 16px; margin-bottom: 8px;">2️⃣ TamperMonkey (Browser Extension)</h4>
+                        <p style="color: #666; line-height: 1.6; margin-bottom: 8px;">
+                            <strong>Best for:</strong> Adding the widget to existing websites you visit
+                        </p>
+                        <p style="color: #666; line-height: 1.6;">
+                            Generate a TamperMonkey script that adds your widget to any website automatically. 
+                            Perfect for internal portals or sites where you can't edit the code directly.
+                        </p>
+                    </div>
+
+                    <div style="background: #f8f9ff; border-left: 4px solid #10b981; padding: 20px; border-radius: 8px;">
+                        <h4 style="color: #333; font-size: 16px; margin-bottom: 8px;">3️⃣ Embed in Custom Pages</h4>
+                        <p style="color: #666; line-height: 1.6; margin-bottom: 8px;">
+                            <strong>Best for:</strong> Your own websites and applications
+                        </p>
+                        <p style="color: #666; line-height: 1.6;">
+                            Copy the embed code and paste it into your website's HTML. 
+                            Choose between iframe or JavaScript methods depending on your needs.
+                        </p>
+                    </div>
+                </div>
+
+                <div style="background: #fffbeb; border: 1px solid #fbbf24; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                    <p style="color: #92400e; line-height: 1.6; margin: 0;">
+                        💡 <strong>Tip:</strong> Start by customizing your widget's appearance, then click "Go To Widget" to see your changes live. 
+                        Once you're happy with the design, choose your preferred deployment method!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Changelog Modal -->
     <div id="changelogOverlay" class="changelog-overlay" onclick="if(event.target === this) hideChangelog()">
         <div class="changelog-modal">
@@ -2116,6 +2189,10 @@
         
         <!-- Header Actions -->
         <div class="header-actions">
+            <button class="btn-header-action" onclick="showTutorial()" title="Quick start guide">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                Guide
+            </button>
             <button class="btn-header-action" id="loginBtn" onclick="showLoginOverlay()" title="Sign in with GitHub">
                 <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
                 Sign in
@@ -3178,6 +3255,14 @@
 
         function hideChangelog() {
             document.getElementById('changelogOverlay').classList.remove('show');
+        }
+
+        function showTutorial() {
+            document.getElementById('tutorialOverlay').classList.add('show');
+        }
+
+        function hideTutorial() {
+            document.getElementById('tutorialOverlay').classList.remove('show');
         }
 
         // Initialize version display
