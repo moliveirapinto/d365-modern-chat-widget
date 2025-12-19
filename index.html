@@ -1299,30 +1299,16 @@
 
                 console.log('%c📊 INDEX.HTML TRACKING EVENT: ' + eventType + ' | Domain: ' + domain, 'background: #38a169; color: white; padding: 2px 6px; border-radius: 3px;');
 
-                // Store locally for demo purposes
-                var analytics = JSON.parse(localStorage.getItem('d365WidgetAnalytics') || '{"totalLoads":0,"totalChats":0,"totalCalls":0,"domains":{},"events":[]}');
-                
-                // Update counters
-                if (eventType === 'load') analytics.totalLoads++;
-                if (eventType === 'chat') analytics.totalChats++;
-                if (eventType === 'call') analytics.totalCalls++;
-                
-                // Track domains
-                analytics.domains[domain] = (analytics.domains[domain] || 0) + 1;
-                
-                // Add event to timeline (keep last 100)
-                analytics.events.unshift(event);
-                if (analytics.events.length > 100) analytics.events = analytics.events.slice(0, 100);
-                
-                localStorage.setItem('d365WidgetAnalytics', JSON.stringify(analytics));
-                console.log('%c✅ Analytics saved | Total: Loads=' + analytics.totalLoads + ', Chats=' + analytics.totalChats + ', Calls=' + analytics.totalCalls, 'color: #38a169;');
-
-                // TODO: Send to Cloudflare Worker endpoint when configured
-                // fetch('YOUR_CLOUDFLARE_WORKER_URL/analytics', {
-                //   method: 'POST',
-                //   headers: { 'Content-Type': 'application/json' },
-                //   body: JSON.stringify(event)
-                // }).catch(function() { /* silently fail */ });
+                // Send to Cloudflare Worker
+                fetch('https://d365-widget-analytics.mauricio-o-pinto.workers.dev/track', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(event)
+                }).then(function(res) {
+                    if (res.ok) console.log('%c✅ Analytics sent to server', 'color: #38a169;');
+                }).catch(function() {
+                    console.log('%c⚠️ Analytics: offline mode', 'color: #d69e2e;');
+                });
             } catch (e) {
                 console.error('❌ Analytics tracking error:', e);
             }

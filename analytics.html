@@ -266,37 +266,27 @@
     </div>
 
     <script>
-        // Load analytics data
+        // Load analytics data from Cloudflare Worker
         async function loadAnalytics() {
             try {
-                // Check localStorage for data
-                const storageData = localStorage.getItem('d365WidgetAnalytics');
+                console.log('📊 Loading analytics from Cloudflare Worker...');
                 
-                console.log('📊 Loading analytics from localStorage...');
-                console.log('📊 Raw data:', storageData);
+                const response = await fetch('https://d365-widget-analytics.mauricio-o-pinto.workers.dev/analytics');
                 
-                if (storageData) {
-                    // Load from localStorage
-                    const data = JSON.parse(storageData);
-                    console.log('✅ Analytics data found:', data);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Analytics data received:', data);
                     updateDashboard(data);
                 } else {
-                    console.log('⚠️ No analytics data in localStorage');
-                    // Show empty data
-                    const emptyData = {
-                        totalLoads: 0,
-                        totalChats: 0,
-                        totalCalls: 0,
-                        domains: {},
-                        events: []
-                    };
-                    updateDashboard(emptyData);
+                    console.error('❌ Failed to load analytics:', response.status);
+                    updateDashboard({ totalLoads: 0, totalChats: 0, totalCalls: 0, domains: {}, events: [] });
                 }
                 
                 document.getElementById('lastUpdated').textContent = 
                     'Last updated: ' + new Date().toLocaleString();
             } catch (error) {
                 console.error('❌ Error loading analytics:', error);
+                updateDashboard({ totalLoads: 0, totalChats: 0, totalCalls: 0, domains: {}, events: [] });
             }
         }
 
