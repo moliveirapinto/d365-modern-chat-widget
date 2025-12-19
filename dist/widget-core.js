@@ -250,6 +250,39 @@
       '.d365-confirm-btn.cancel{background:#e2e8f0;color:#4a5568}',
       '.d365-confirm-btn.end{background:#ef4444;color:#fff}',
       '.d365-system-msg{text-align:center;padding:8px 16px;color:#64748b;font-size:12px;background:#e2e8f0;border-radius:12px;margin:8px auto;max-width:fit-content}',
+      // Voice/Video Call styles
+      '.d365-incoming-call{display:none;background:linear-gradient(135deg,'+c.gradientStart+' 0%,'+c.gradientEnd+' 100%);padding:16px;border-radius:12px;margin:12px;animation:d365fadeIn .3s ease}',
+      '.d365-incoming-call.show{display:block}',
+      '.d365-incoming-call-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}',
+      '.d365-incoming-call-icon{width:44px;height:44px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center}',
+      '.d365-incoming-call-icon svg{width:24px;height:24px;fill:#fff}',
+      '.d365-incoming-call-info{flex:1}',
+      '.d365-incoming-call-title{color:#fff;font-weight:600;font-size:15px}',
+      '.d365-incoming-call-subtitle{color:rgba(255,255,255,.8);font-size:13px}',
+      '.d365-incoming-call-actions{display:flex;gap:8px;justify-content:center}',
+      '.d365-call-btn-accept{background:#22c55e;color:#fff;border:none;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s}',
+      '.d365-call-btn-accept:hover{background:#16a34a;transform:scale(1.05)}',
+      '.d365-call-btn-accept svg{width:16px;height:16px;fill:#fff}',
+      '.d365-call-btn-decline{background:#ef4444;color:#fff;border:none;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s}',
+      '.d365-call-btn-decline:hover{background:#dc2626;transform:scale(1.05)}',
+      '.d365-call-btn-decline svg{width:16px;height:16px;fill:#fff}',
+      '.d365-call-container{display:none;flex-direction:column;background:#1a1a2e;border-radius:12px;margin:12px;overflow:hidden}',
+      '.d365-call-container.active{display:flex}',
+      '.d365-call-header{padding:12px 16px;display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,.2)}',
+      '.d365-call-status{color:#fff;font-size:14px;font-weight:500}',
+      '.d365-call-duration{color:rgba(255,255,255,.7);font-size:13px}',
+      '.d365-call-video-area{position:relative;min-height:200px;background:#0d0d1a;display:flex;align-items:center;justify-content:center}',
+      '.d365-call-connecting{display:flex;flex-direction:column;align-items:center;gap:12px;color:rgba(255,255,255,.8);font-size:14px}',
+      '.d365-call-avatar{width:80px;height:80px;background:linear-gradient(135deg,'+c.gradientStart+' 0%,'+c.gradientEnd+' 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px;font-weight:600}',
+      '.d365-remote-video,.d365-local-video{width:100%;height:100%;object-fit:cover}',
+      '.d365-local-video{position:absolute;bottom:12px;right:12px;width:100px;height:75px;border-radius:8px;border:2px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.3)}',
+      '.d365-call-controls{padding:16px;display:flex;justify-content:center;gap:12px;background:rgba(0,0,0,.2)}',
+      '.d365-call-ctrl-btn{width:44px;height:44px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;background:rgba(255,255,255,.1)}',
+      '.d365-call-ctrl-btn:hover{background:rgba(255,255,255,.2)}',
+      '.d365-call-ctrl-btn svg{width:22px;height:22px;fill:#fff}',
+      '.d365-call-ctrl-btn.muted{background:#ef4444}',
+      '.d365-call-ctrl-btn.end-call{background:#ef4444}',
+      '.d365-call-ctrl-btn.end-call:hover{background:#dc2626}',
       '@media(max-width:480px){.d365-container{width:100%;height:100%;max-height:100%;bottom:0;right:0;border-radius:0}.d365-launcher{bottom:16px;right:16px}}'
     ].join('');
     document.head.appendChild(css);
@@ -276,6 +309,39 @@
           '</div>',
         '</div>',
         '<div class="d365-body">',
+          // Incoming Call Notification
+          '<div class="d365-incoming-call" id="d365IncomingCall">',
+            '<div class="d365-incoming-call-header">',
+              '<div class="d365-incoming-call-icon"><svg viewBox="0 0 24 24"><path fill="white" d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg></div>',
+              '<div class="d365-incoming-call-info">',
+                '<div class="d365-incoming-call-title" id="d365CallTitle">Incoming Call</div>',
+                '<div class="d365-incoming-call-subtitle" id="d365CallSubtitle">Agent is calling...</div>',
+              '</div>',
+            '</div>',
+            '<div class="d365-incoming-call-actions">',
+              '<button class="d365-call-btn-accept" id="d365AcceptVideo" title="Accept with video"><svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>Video</button>',
+              '<button class="d365-call-btn-accept" id="d365AcceptVoice" title="Accept voice only"><svg viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg>Voice</button>',
+              '<button class="d365-call-btn-decline" id="d365DeclineCall" title="Decline"><svg viewBox="0 0 24 24"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>Decline</button>',
+            '</div>',
+          '</div>',
+          // Active Call Container
+          '<div class="d365-call-container" id="d365CallContainer">',
+            '<div class="d365-call-header">',
+              '<div class="d365-call-status" id="d365CallStatus">Connecting...</div>',
+              '<div class="d365-call-duration" id="d365CallDuration">00:00</div>',
+            '</div>',
+            '<div class="d365-call-video-area" id="d365CallVideoArea">',
+              '<div class="d365-call-connecting" id="d365CallConnecting"><div class="d365-spinner"></div><div>Connecting to agent...</div></div>',
+              '<div class="d365-call-avatar" id="d365CallAvatar" style="display:none">A</div>',
+              '<video id="d365RemoteVideo" class="d365-remote-video" autoplay playsinline style="display:none"></video>',
+              '<video id="d365LocalVideo" class="d365-local-video" autoplay playsinline muted style="display:none"></video>',
+            '</div>',
+            '<div class="d365-call-controls">',
+              '<button class="d365-call-ctrl-btn" id="d365MuteMic" title="Mute"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg></button>',
+              '<button class="d365-call-ctrl-btn" id="d365ToggleCamera" title="Camera" style="display:none"><svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg></button>',
+              '<button class="d365-call-ctrl-btn end-call" id="d365EndCall" title="End call"><svg viewBox="0 0 24 24"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg></button>',
+            '</div>',
+          '</div>',
           '<form class="d365-prechat" id="d365Prechat">',
             '<div class="d365-form-title">'+c.welcomeTitle+'</div>',
             '<div class="d365-form-subtitle">'+c.welcomeMessage+'</div>',
@@ -407,6 +473,16 @@
     var chatSDK = null, chatStarted = false, userName = '', userEmail = '';
     var processedMsgs = {};
     var unreadCount = 0;
+    
+    // Voice/Video calling state
+    var VoiceVideoCallingSDK = null;
+    var isInCall = false;
+    var isMuted = false;
+    var isCameraOff = false;
+    var callDurationTimer = null;
+    var callStartTime = null;
+    var pendingCallData = null;
+    var currentAgentName = 'Agent';
 
     // DOM refs
     var $ = function(id) { return document.getElementById(id); };
@@ -422,6 +498,16 @@
     var ended = $('d365Ended');
     var confirm = $('d365Confirm');
     var soundBtn = $('d365Sound');
+    
+    // Call UI refs
+    var incomingCall = $('d365IncomingCall');
+    var callContainer = $('d365CallContainer');
+    var callStatus = $('d365CallStatus');
+    var callDuration = $('d365CallDuration');
+    var callConnecting = $('d365CallConnecting');
+    var callAvatar = $('d365CallAvatar');
+    var remoteVideo = $('d365RemoteVideo');
+    var localVideo = $('d365LocalVideo');
 
     // Sound notification setup
     var soundEnabled = localStorage.getItem('d365SoundEnabled') !== 'false';
@@ -460,6 +546,235 @@
         console.log('Could not play notification sound:', e);
       }
     }
+
+    // ============ VOICE/VIDEO CALLING FUNCTIONS ============
+    
+    async function preloadVoiceVideoCallingSDK(sdk) {
+      console.log('📞 Pre-loading VoiceVideoCallingSDK...');
+      try {
+        if (!sdk.getVoiceVideoCalling) {
+          console.log('⚠️ getVoiceVideoCalling not available on SDK');
+          return;
+        }
+        VoiceVideoCallingSDK = await sdk.getVoiceVideoCalling();
+        console.log('📞 VoiceVideoCallingSDK pre-loaded:', VoiceVideoCallingSDK ? 'Yes' : 'No');
+      } catch (err) {
+        console.log('⚠️ VoiceVideoCalling pre-load error:', err.message);
+      }
+    }
+    
+    async function initializeVoiceVideoCallingSDK(sdk) {
+      console.log('📞 Initializing VoiceVideoCallingSDK...');
+      if (!VoiceVideoCallingSDK) {
+        console.log('⚠️ VoiceVideoCallingSDK was not pre-loaded');
+        return;
+      }
+      
+      try {
+        var chatToken = await sdk.getChatToken();
+        console.log('📞 Chat token obtained:', chatToken ? 'Yes' : 'No');
+        if (!chatToken) {
+          console.error('❌ Failed to get chat token for VoiceVideoCalling');
+          return;
+        }
+        
+        await VoiceVideoCallingSDK.initialize({
+          chatToken: chatToken,
+          selfVideoHTMLElementId: 'd365LocalVideo',
+          remoteVideoHTMLElementId: 'd365RemoteVideo',
+          OCClient: sdk.OCClient
+        });
+        console.log('✅ VoiceVideoCallingSDK initialized successfully');
+        
+        // Set up incoming call listener
+        VoiceVideoCallingSDK.onCallAdded(function(callInfo) {
+          console.log('📞 INCOMING CALL DETECTED!', callInfo);
+          var hasVideo = false;
+          if (callInfo) {
+            hasVideo = callInfo.isVideoCall || callInfo.hasVideo || callInfo.videoEnabled || 
+                       callInfo.isVideo || callInfo.callType === 'video' || callInfo.type === 'video' ||
+                       callInfo.mediaType === 'video' || callInfo.withVideo || false;
+          }
+          showIncomingCallNotification({ isVideo: hasVideo, agentName: currentAgentName });
+        });
+        
+        // Set up call disconnected listener
+        VoiceVideoCallingSDK.onCallDisconnected(function() {
+          console.log('📞 Call disconnected');
+          if (incomingCall) incomingCall.classList.remove('show');
+          pendingCallData = null;
+          if (isInCall) endCall();
+        });
+        
+        if (VoiceVideoCallingSDK.onCallRemoved) {
+          VoiceVideoCallingSDK.onCallRemoved(function() {
+            console.log('📞 Call removed (agent cancelled)');
+            if (incomingCall) incomingCall.classList.remove('show');
+            pendingCallData = null;
+            if (isInCall) endCall();
+          });
+        }
+        
+        console.log('📞 Voice/Video call listeners registered');
+      } catch (err) {
+        console.error('❌ VoiceVideoCallingSDK init error:', err);
+      }
+    }
+    
+    function showIncomingCallNotification(data) {
+      console.log('📞 Showing incoming call notification:', data);
+      pendingCallData = data;
+      if ($('d365CallTitle')) $('d365CallTitle').textContent = data.isVideo ? 'Incoming Video Call' : 'Incoming Voice Call';
+      if ($('d365CallSubtitle')) $('d365CallSubtitle').textContent = (data.agentName || 'Agent') + ' is calling...';
+      if (incomingCall) incomingCall.classList.add('show');
+      playNotificationSound();
+      
+      // Open widget if minimized
+      if (!container.classList.contains('open')) {
+        container.classList.add('open');
+        launcher.classList.add('open');
+      }
+    }
+    
+    async function acceptCall(withVideo) {
+      console.log('📞 Accepting call, withVideo:', withVideo);
+      if (incomingCall) incomingCall.classList.remove('show');
+      if (callContainer) callContainer.classList.add('active');
+      if (callConnecting) callConnecting.style.display = 'flex';
+      if (callAvatar) callAvatar.style.display = 'none';
+      if (callStatus) callStatus.textContent = 'Connecting...';
+      
+      try {
+        if (VoiceVideoCallingSDK && VoiceVideoCallingSDK.acceptCall) {
+          await VoiceVideoCallingSDK.acceptCall({ withVideo: withVideo });
+          console.log('✅ Call accepted');
+        }
+        
+        isInCall = true;
+        if (callConnecting) callConnecting.style.display = 'none';
+        
+        if (withVideo) {
+          if ($('d365ToggleCamera')) $('d365ToggleCamera').style.display = 'flex';
+          if (localVideo) localVideo.style.display = 'block';
+          if (remoteVideo) remoteVideo.style.display = 'block';
+          if (callStatus) callStatus.textContent = 'Video Call';
+        } else {
+          if (callAvatar) {
+            callAvatar.textContent = getInitials(currentAgentName);
+            callAvatar.style.display = 'flex';
+          }
+          if (callStatus) callStatus.textContent = 'Voice Call';
+        }
+        
+        // Start duration timer
+        callStartTime = Date.now();
+        callDurationTimer = setInterval(updateCallDuration, 1000);
+        
+        // Add call message to chat
+        addMessage('📞 ' + (withVideo ? 'Video' : 'Voice') + ' call connected', false, 'System');
+      } catch (err) {
+        console.error('❌ Error accepting call:', err);
+        endCall();
+      }
+    }
+    
+    async function declineCall() {
+      console.log('📞 Declining call');
+      if (incomingCall) incomingCall.classList.remove('show');
+      pendingCallData = null;
+      
+      try {
+        if (VoiceVideoCallingSDK && VoiceVideoCallingSDK.rejectCall) {
+          await VoiceVideoCallingSDK.rejectCall();
+        }
+        addMessage('📞 Call declined', false, 'System');
+      } catch (err) {
+        console.error('❌ Error declining call:', err);
+      }
+    }
+    
+    async function endCall() {
+      console.log('📞 Ending call');
+      isInCall = false;
+      
+      if (callDurationTimer) {
+        clearInterval(callDurationTimer);
+        callDurationTimer = null;
+      }
+      
+      if (callContainer) callContainer.classList.remove('active');
+      if (localVideo) localVideo.style.display = 'none';
+      if (remoteVideo) remoteVideo.style.display = 'none';
+      if ($('d365ToggleCamera')) $('d365ToggleCamera').style.display = 'none';
+      
+      // Reset mute/camera state
+      isMuted = false;
+      isCameraOff = false;
+      if ($('d365MuteMic')) $('d365MuteMic').classList.remove('muted');
+      if ($('d365ToggleCamera')) $('d365ToggleCamera').classList.remove('muted');
+      
+      try {
+        if (VoiceVideoCallingSDK && VoiceVideoCallingSDK.stopCall) {
+          await VoiceVideoCallingSDK.stopCall();
+        }
+      } catch (err) {
+        console.log('Call end error:', err);
+      }
+      
+      addMessage('📞 Call ended', false, 'System');
+    }
+    
+    function updateCallDuration() {
+      if (!callStartTime || !callDuration) return;
+      var elapsed = Math.floor((Date.now() - callStartTime) / 1000);
+      var mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
+      var secs = (elapsed % 60).toString().padStart(2, '0');
+      callDuration.textContent = mins + ':' + secs;
+    }
+    
+    async function toggleMute() {
+      if (!VoiceVideoCallingSDK) return;
+      try {
+        if (isMuted) {
+          await VoiceVideoCallingSDK.unmute();
+          isMuted = false;
+          if ($('d365MuteMic')) $('d365MuteMic').classList.remove('muted');
+        } else {
+          await VoiceVideoCallingSDK.mute();
+          isMuted = true;
+          if ($('d365MuteMic')) $('d365MuteMic').classList.add('muted');
+        }
+      } catch (err) {
+        console.error('Mute toggle error:', err);
+      }
+    }
+    
+    async function toggleCamera() {
+      if (!VoiceVideoCallingSDK) return;
+      try {
+        if (isCameraOff) {
+          await VoiceVideoCallingSDK.startLocalVideo();
+          isCameraOff = false;
+          if ($('d365ToggleCamera')) $('d365ToggleCamera').classList.remove('muted');
+          if (localVideo) localVideo.style.display = 'block';
+        } else {
+          await VoiceVideoCallingSDK.stopLocalVideo();
+          isCameraOff = true;
+          if ($('d365ToggleCamera')) $('d365ToggleCamera').classList.add('muted');
+          if (localVideo) localVideo.style.display = 'none';
+        }
+      } catch (err) {
+        console.error('Camera toggle error:', err);
+      }
+    }
+    
+    // Call button event listeners
+    if ($('d365AcceptVideo')) $('d365AcceptVideo').onclick = function() { acceptCall(true); };
+    if ($('d365AcceptVoice')) $('d365AcceptVoice').onclick = function() { acceptCall(false); };
+    if ($('d365DeclineCall')) $('d365DeclineCall').onclick = declineCall;
+    if ($('d365EndCall')) $('d365EndCall').onclick = endCall;
+    if ($('d365MuteMic')) $('d365MuteMic').onclick = toggleMute;
+    if ($('d365ToggleCamera')) $('d365ToggleCamera').onclick = toggleCamera;
 
     function showView(v) {
       prechat.classList.add('hidden');
@@ -1029,15 +1344,26 @@
 
         chatSDK = new SDKClass({ orgId: config.orgId, orgUrl: config.orgUrl, widgetId: config.widgetId });
         await chatSDK.initialize();
+        
+        // Pre-load voice/video calling SDK BEFORE startChat
+        await preloadVoiceVideoCallingSDK(chatSDK);
 
         chatSDK.onNewMessage(function(m) {
           if (m) processMessage(m);
+          // Extract agent name from messages
+          if (m && m.sender && m.sender.displayName) {
+            var senderName = m.sender.displayName;
+            if (!isBot(senderName)) currentAgentName = senderName;
+          }
         });
         chatSDK.onTypingEvent(function() {
           typing.classList.add('active');
           setTimeout(function() { typing.classList.remove('active'); }, 3000);
         });
-        chatSDK.onAgentEndSession(function() { showView('ended'); });
+        chatSDK.onAgentEndSession(function() { 
+          if (isInCall) endCall();
+          showView('ended'); 
+        });
 
         await chatSDK.startChat({
           customContext: {
@@ -1048,6 +1374,10 @@
 
         chatStarted = true;
         showView('chat');
+        
+        // Initialize voice/video calling SDK AFTER startChat (chat token now valid)
+        await initializeVoiceVideoCallingSDK(chatSDK);
+        
         if (question) {
           addMessage(question, true, name);
           await chatSDK.sendMessage({ content: question });
