@@ -32,6 +32,8 @@
         timestamp: new Date().toISOString()
       };
 
+      console.log('📊 TRACKING EVENT:', eventType, 'Domain:', domain);
+
       // Store locally for demo purposes
       var analytics = JSON.parse(localStorage.getItem('d365WidgetAnalytics') || '{"totalLoads":0,"totalChats":0,"totalCalls":0,"domains":{},"events":[]}');
       
@@ -48,6 +50,7 @@
       if (analytics.events.length > 100) analytics.events = analytics.events.slice(0, 100);
       
       localStorage.setItem('d365WidgetAnalytics', JSON.stringify(analytics));
+      console.log('✅ Analytics saved to localStorage:', analytics);
 
       // TODO: Send to Cloudflare Worker endpoint when configured
       // fetch('YOUR_CLOUDFLARE_WORKER_URL/analytics', {
@@ -56,7 +59,7 @@
       //   body: JSON.stringify(event)
       // }).catch(function() { /* silently fail */ });
     } catch (e) {
-      // Silent fail - analytics should never break the widget
+      console.error('❌ Analytics tracking error:', e);
     }
   }
 

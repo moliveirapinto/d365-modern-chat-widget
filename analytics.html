@@ -269,37 +269,34 @@
         // Load analytics data
         async function loadAnalytics() {
             try {
-                // Check if we're using localStorage (demo mode) or actual endpoint
+                // Check localStorage for data
                 const storageData = localStorage.getItem('d365WidgetAnalytics');
                 
+                console.log('📊 Loading analytics from localStorage...');
+                console.log('📊 Raw data:', storageData);
+                
                 if (storageData) {
-                    // Demo mode - load from localStorage
+                    // Load from localStorage
                     const data = JSON.parse(storageData);
+                    console.log('✅ Analytics data found:', data);
                     updateDashboard(data);
                 } else {
-                    // Production mode - fetch from Cloudflare Worker
-                    // Uncomment when Cloudflare Worker is deployed:
-                    /*
-                    const response = await fetch('YOUR_CLOUDFLARE_WORKER_URL/analytics');
-                    const data = await response.json();
-                    updateDashboard(data);
-                    */
-                    
-                    // For now, show demo data
-                    const demoData = {
+                    console.log('⚠️ No analytics data in localStorage');
+                    // Show empty data
+                    const emptyData = {
                         totalLoads: 0,
                         totalChats: 0,
                         totalCalls: 0,
                         domains: {},
                         events: []
                     };
-                    updateDashboard(demoData);
+                    updateDashboard(emptyData);
                 }
                 
                 document.getElementById('lastUpdated').textContent = 
                     'Last updated: ' + new Date().toLocaleString();
             } catch (error) {
-                console.error('Error loading analytics:', error);
+                console.error('❌ Error loading analytics:', error);
             }
         }
 
