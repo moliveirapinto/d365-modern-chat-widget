@@ -2098,7 +2098,10 @@
                     </div>
 
                     <div style="background: #f8f9ff; border-left: 4px solid #764ba2; padding: 20px; margin-bottom: 15px; border-radius: 8px;">
-                        <h4 style="color: #333; font-size: 16px; margin-bottom: 8px;">2️⃣ TamperMonkey (Browser Extension)</h4>
+                        <h4 style="color: #333; font-size: 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                            <img src="img/Logo/tampermonkey.png" alt="TamperMonkey" style="width: 20px; height: 20px; object-fit: contain;">
+                            TamperMonkey (Browser Extension)
+                        </h4>
                         <p style="color: #666; line-height: 1.6; margin-bottom: 8px;">
                             <strong>Best for:</strong> Adding the widget to existing websites you visit
                         </p>
@@ -2190,8 +2193,8 @@
         
         <!-- Header Actions -->
         <div class="header-actions">
-            <button class="btn-header-action" onclick="showTutorial()" title="Quick start guide">
-                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            <button class="btn-header-action" onclick="showTutorial()" title="Quick start guide" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                <svg viewBox="0 0 24 24" style="fill: white;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
                 Guide
             </button>
             <button class="btn-header-action" id="loginBtn" onclick="showLoginOverlay()" title="Sign in with GitHub">
