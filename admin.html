@@ -3060,14 +3060,31 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v1.4.0';
-        const APP_LAST_UPDATED = 'Dec 18, 2025, 08:30 PM';
+        const APP_VERSION = 'v1.5.0';
+        const APP_LAST_UPDATED = 'Dec 19, 2025, 09:45 PM';
         
         const CHANGELOG = [
             {
+                version: 'v1.5.0',
+                date: 'Dec 19, 2025',
+                latest: true,
+                items: [
+                    { type: 'new', text: 'Cloudflare D1 SQL database for analytics (100K writes/day)' },
+                    { type: 'new', text: 'Analytics dashboard with real-time tracking' },
+                    { type: 'new', text: 'Cross-domain analytics tracking (GitHub Pages, Power Apps Portals)' },
+                    { type: 'new', text: 'Session-based domain usage metrics (unique widget loads)' },
+                    { type: 'new', text: 'Favicon support across all pages' },
+                    { type: 'new', text: 'Custom logo in admin header' },
+                    { type: 'improve', text: 'Migrated from KV JSON to D1 SQL for better scalability' },
+                    { type: 'improve', text: 'Domain usage now counts sessions instead of total events' },
+                    { type: 'improve', text: 'Analytics dashboard renamed to "Chat Widget Studio Analytics"' },
+                    { type: 'improve', text: 'Video camera icon for Voice/Video Calls metric' }
+                ]
+            },
+            {
                 version: 'v1.4.0',
                 date: 'Dec 18, 2025',
-                latest: true,
+                latest: false,
                 items: [
                     { type: 'new', text: 'Separate toggle for user message bubble gradient' },
                     { type: 'improve', text: 'Independent control: header gradient vs bubble gradient' }
