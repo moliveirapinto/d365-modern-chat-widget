@@ -1,0 +1,8 @@
+name = "d365-widget-analytics"
+main = "cloudflare-worker/analytics-worker-d1.js"
+compatibility_date = "2024-12-19"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "d365-analytics"
+database_id = "c2cd8620-c619-49c3-879d-81281b053e3f"  # Replace this after running: npx wrangler d1 create d365-analytics
