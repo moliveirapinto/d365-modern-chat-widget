@@ -2898,6 +2898,10 @@
                             <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg>
                             Generate Embed Code
                         </button>
+                        <button class="btn btn-primary" onclick="generateTamperMonkeyCode()" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-color: #16213e;">
+                            <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                            Generate TamperMonkey Code
+                        </button>
                         <button class="btn btn-secondary" onclick="copyGeneratedEmbedCode()">
                             <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
                             Copy to Clipboard
@@ -7264,6 +7268,104 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             URL.revokeObjectURL(url);
             
             showToast('Embed code downloaded as HTML file!');
+        }
+
+        function generateTamperMonkeyCode() {
+            updateSettingsFromForm();
+            
+            // Validate required D365 settings
+            if (!settings.orgId || !settings.orgUrl || !settings.widgetId) {
+                showToast('Please configure D365 Connection settings first (Org ID, Org URL, Widget ID)');
+                document.getElementById('embedCodeOutput').value = '⚠️ Please configure D365 Connection settings first.\n\nGo to the "D365 Connection" tab and enter your Org ID, Org URL, and Widget ID.';
+                hideCharCount();
+                return;
+            }
+            
+            // Build config for TamperMonkey
+            const config = buildCompactConfig();
+            let configJson = JSON.stringify(config, null, 2);
+            
+            // Get target URL from user or use default
+            const targetUrl = prompt('Enter the website URL where you want the widget to appear:\n\nExamples:\n- https://example.com/*\n- https://*.mycompany.com/*\n- *://*/*', 'https://*/*');
+            
+            if (!targetUrl) {
+                showToast('TamperMonkey code generation cancelled');
+                return;
+            }
+            
+            const tamperMonkeyCode = generateTamperMonkeyScript(config, configJson, targetUrl);
+            
+            document.getElementById('embedCodeOutput').value = tamperMonkeyCode;
+            showCharCount(tamperMonkeyCode.length);
+            showToast('🐒 TamperMonkey script generated! Copy and paste into TamperMonkey.');
+        }
+        
+        function generateTamperMonkeyScript(config, configJson, targetUrl) {
+            const scriptName = settings.headerTitle || 'D365 Chat Widget';
+            const today = new Date().toLocaleDateString();
+            
+            return `// ==UserScript==
+// @name         ${scriptName}
+// @namespace    https://moliveirapinto.github.io/d365-modern-chat-widget/
+// @version      1.0
+// @description  D365 Modern Chat Widget - Injected via TamperMonkey
+// @author       D365 Chat Widget Generator
+// @match        ${targetUrl}
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=microsoft.com
+// @grant        GM_addStyle
+// @grant        GM_xmlhttpRequest
+// @connect      moliveirapinto.github.io
+// @connect      raw.githubusercontent.com
+// @connect      cdn.jsdelivr.net
+// @connect      unpkg.com
+// @connect      *.dynamics.com
+// @connect      *
+// @run-at       document-end
+// ==/UserScript==
+
+(function() {
+    'use strict';
+    
+    // Widget Configuration - Generated: ${today}
+    window.D365WidgetConfig = ${configJson};
+    
+    console.log('[D365 Chat Widget] TamperMonkey script loaded');
+    console.log('[D365 Chat Widget] Config:', window.D365WidgetConfig);
+    
+    // Load the widget core from GitHub Pages
+    function loadWidget() {
+        var script = document.createElement('script');
+        script.src = 'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js';
+        script.onload = function() {
+            console.log('[D365 Chat Widget] Widget core loaded successfully');
+        };
+        script.onerror = function() {
+            console.error('[D365 Chat Widget] Failed to load widget core, trying fallback...');
+            loadWidgetFallback();
+        };
+        document.head.appendChild(script);
+    }
+    
+    // Fallback: Load from CDN
+    function loadWidgetFallback() {
+        var script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/gh/moliveirapinto/d365-modern-chat-widget@main/dist/widget-core.js';
+        script.onload = function() {
+            console.log('[D365 Chat Widget] Widget core loaded from fallback CDN');
+        };
+        script.onerror = function() {
+            console.error('[D365 Chat Widget] All sources failed. Widget cannot load.');
+        };
+        document.head.appendChild(script);
+    }
+    
+    // Wait for page to be ready, then load widget
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadWidget);
+    } else {
+        loadWidget();
+    }
+})();`;
         }
 
         // ============ USER MANAGEMENT ============
