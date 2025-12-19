@@ -350,10 +350,13 @@
                         'call': '📞 Call initiated'
                     };
                     
+                    // Show source (index.html vs widget-core)
+                    const sourceLabel = event.source ? ` <span style="color:#94a3b8;font-size:11px;">(${event.source})</span>` : '';
+                    
                     return `
                         <li class="timeline-item">
                             <div class="timeline-time">${new Date(event.timestamp).toLocaleTimeString()}</div>
-                            <div class="timeline-event">${eventLabels[event.type] || event.type}</div>
+                            <div class="timeline-event">${eventLabels[event.type] || event.type}${sourceLabel}</div>
                             <div class="timeline-domain">${event.domain}</div>
                         </li>
                     `;
