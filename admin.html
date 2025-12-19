@@ -1598,7 +1598,7 @@
 
         /* User Bar (shown when logged in) */
         .user-bar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
             padding: 10px 32px;
             display: none;
             align-items: center;
@@ -1714,13 +1714,27 @@
             gap: 6px;
             font-size: 12px;
             color: rgba(255,255,255,0.8);
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: all 0.2s;
+        }
+        .cloud-sync-status:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-1px);
         }
         .cloud-sync-status svg {
             width: 14px;
             height: 14px;
             fill: currentColor;
         }
-        .cloud-sync-status.synced { color: #86efac; }
+        .cloud-sync-status.synced { 
+            color: white;
+        }
+        .cloud-sync-status.synced svg { 
+            fill: #4ade80;
+        }
         .cloud-sync-status.syncing { color: #fde68a; }
         .cloud-sync-status.pending { color: #fbbf24; }
         .cloud-sync-status.error { color: #f87171; }
@@ -3031,7 +3045,7 @@
         <!-- Live Preview -->
         <div class="preview-panel">
             <div class="preview-card">
-                <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 10px 16px;">
+                <div class="card-header" style="background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%); padding: 10px 16px;">
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <div style="display: flex; align-items: center; gap: 6px; background: rgba(239,68,68,0.9); padding: 4px 10px; border-radius: 4px;">
                             <span style="width: 8px; height: 8px; background: white; border-radius: 50%; animation: pulse 1.5s infinite;"></span>
@@ -3041,7 +3055,6 @@
                     <div style="flex: 1; margin-left: 10px;">
                         <h2 style="color: white; font-size: 14px; margin: 0;">Live Preview</h2>
                     </div>
-                    <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: rgba(255,255,255,0.7);"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
                 </div>
                 
                 <!-- Preview Tabs -->
