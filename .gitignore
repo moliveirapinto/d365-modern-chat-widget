@@ -18,6 +18,9 @@ Thumbs.db
 npm-debug.log*
 
 # Environment
+
+# Private analytics dashboard (keep local only)
+analytics.html
 .env
 .env.local
 node_modules

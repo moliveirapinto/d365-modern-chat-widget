@@ -65,10 +65,11 @@ export default {
           FROM events
         `).first();
 
-        // Get counts by domain
+        // Get counts by domain (only load events = sessions)
         const domainResults = await env.DB.prepare(`
           SELECT domain, COUNT(*) as count
           FROM events
+          WHERE type = 'load'
           GROUP BY domain
           ORDER BY count DESC
         `).all();
