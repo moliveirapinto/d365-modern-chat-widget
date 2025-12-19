@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D365 Chat Widget Analytics Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            color: #1a202c;
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            color: #64748b;
+            font-size: 16px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+        .stat-label {
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .stat-value {
+            color: #1a202c;
+            font-size: 36px;
+            font-weight: 700;
+        }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        .stat-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+        .chart-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 24px;
+        }
+        .chart-header {
+            margin-bottom: 24px;
+        }
+        .chart-header h2 {
+            color: #1a202c;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .chart-header p {
+            color: #64748b;
+            font-size: 14px;
+        }
+        .domains-list {
+            list-style: none;
+        }
+        .domain-item {
+            padding: 16px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .domain-item:last-child {
+            border-bottom: none;
+        }
+        .domain-name {
+            font-weight: 500;
+            color: #1a202c;
+        }
+        .domain-count {
+            background: #f1f5f9;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+        }
+        .refresh-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+        .last-updated {
+            color: #94a3b8;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+        .no-data svg {
+            width: 64px;
+            height: 64px;
+            fill: #cbd5e1;
+            margin-bottom: 16px;
+        }
+        .timeline {
+            list-style: none;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .timeline-item {
+            padding: 16px;
+            border-left: 3px solid #e2e8f0;
+            margin-bottom: 12px;
+            position: relative;
+        }
+        .timeline-item:before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: #667eea;
+            border-radius: 50%;
+            position: absolute;
+            left: -7.5px;
+            top: 20px;
+        }
+        .timeline-time {
+            color: #667eea;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .timeline-event {
+            color: #1a202c;
+            font-size: 14px;
+        }
+        .timeline-domain {
+            color: #64748b;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Widget Analytics Dashboard</h1>
+            <p>Real-time usage statistics for your D365 Modern Chat Widget</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C10.3817 22 8.81782 21.6146 7.41286 20.888L3.58704 21.9553C2.92212 22.141 2.23258 21.7525 2.04691 21.0876C1.98546 20.8676 1.98549 20.6349 2.04695 20.4151L3.11461 16.5922C2.38637 15.186 2 13.6203 2 12C2 6.47715 6.47715 2 12 2Z"/></svg>
+                </div>
+                <div class="stat-label">Total Widget Loads</div>
+                <div class="stat-value" id="totalLoads">0</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24"><path d="M17.7534 13.9994C18.9961 13.9994 20.0034 15.0068 20.0034 16.2494V17.1545C20.0034 18.2482 19.526 19.2874 18.6961 19.9998C17.1307 21.3437 14.8904 22.0006 12.0004 22.0006C9.11087 22.0006 6.87205 21.344 5.30918 20.0003C4.48056 19.2879 4.00391 18.2495 4.00391 17.1567V16.2494C4.00391 15.0068 5.01127 13.9994 6.25391 13.9994H17.7534Z"/></svg>
+                </div>
+                <div class="stat-label">Chats Started</div>
+                <div class="stat-value" id="totalChats">0</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg>
+                </div>
+                <div class="stat-label">Calls Made</div>
+                <div class="stat-value" id="totalCalls">0</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                </div>
+                <div class="stat-label">Active Domains</div>
+                <div class="stat-value" id="activeDomains">0</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-header">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2>Domain Usage</h2>
+                        <p>Which websites are using your widget</p>
+                    </div>
+                    <button class="refresh-btn" onclick="loadAnalytics()">
+                        <svg style="width: 16px; height: 16px; fill: white; margin-right: 8px; display: inline-block; vertical-align: middle;" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                        Refresh Data
+                    </button>
+                </div>
+                <div class="last-updated" id="lastUpdated">Last updated: Never</div>
+            </div>
+            <ul class="domains-list" id="domainsList">
+                <div class="no-data">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                    <div>No data yet. Widget analytics will appear here once deployed.</div>
+                </div>
+            </ul>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-header">
+                <h2>Recent Activity</h2>
+                <p>Live feed of widget events</p>
+            </div>
+            <ul class="timeline" id="recentActivity">
+                <div class="no-data">
+                    <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                    <div>Activity log will appear here as events occur.</div>
+                </div>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Load analytics data
+        async function loadAnalytics() {
+            try {
+                // Check if we're using localStorage (demo mode) or actual endpoint
+                const storageData = localStorage.getItem('d365WidgetAnalytics');
+                
+                if (storageData) {
+                    // Demo mode - load from localStorage
+                    const data = JSON.parse(storageData);
+                    updateDashboard(data);
+                } else {
+                    // Production mode - fetch from Cloudflare Worker
+                    // Uncomment when Cloudflare Worker is deployed:
+                    /*
+                    const response = await fetch('YOUR_CLOUDFLARE_WORKER_URL/analytics');
+                    const data = await response.json();
+                    updateDashboard(data);
+                    */
+                    
+                    // For now, show demo data
+                    const demoData = {
+                        totalLoads: 0,
+                        totalChats: 0,
+                        totalCalls: 0,
+                        domains: {},
+                        events: []
+                    };
+                    updateDashboard(demoData);
+                }
+                
+                document.getElementById('lastUpdated').textContent = 
+                    'Last updated: ' + new Date().toLocaleString();
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+            }
+        }
+
+        function updateDashboard(data) {
+            // Update stats
+            document.getElementById('totalLoads').textContent = data.totalLoads || 0;
+            document.getElementById('totalChats').textContent = data.totalChats || 0;
+            document.getElementById('totalCalls').textContent = data.totalCalls || 0;
+            document.getElementById('activeDomains').textContent = 
+                Object.keys(data.domains || {}).length;
+
+            // Update domains list
+            const domainsList = document.getElementById('domainsList');
+            const domains = data.domains || {};
+            
+            if (Object.keys(domains).length === 0) {
+                domainsList.innerHTML = `
+                    <div class="no-data">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                        <div>No domain data available yet.</div>
+                    </div>
+                `;
+            } else {
+                const sortedDomains = Object.entries(domains)
+                    .sort((a, b) => b[1] - a[1]);
+                
+                domainsList.innerHTML = sortedDomains.map(([domain, count]) => `
+                    <li class="domain-item">
+                        <span class="domain-name">${domain}</span>
+                        <span class="domain-count">${count} loads</span>
+                    </li>
+                `).join('');
+            }
+
+            // Update recent activity
+            const activityList = document.getElementById('recentActivity');
+            const events = data.events || [];
+            
+            if (events.length === 0) {
+                activityList.innerHTML = `
+                    <div class="no-data">
+                        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                        <div>Activity log is empty.</div>
+                    </div>
+                `;
+            } else {
+                activityList.innerHTML = events.slice(0, 20).map(event => {
+                    const eventLabels = {
+                        'load': '🚀 Widget loaded',
+                        'chat': '💬 Chat started',
+                        'call': '📞 Call initiated'
+                    };
+                    
+                    return `
+                        <li class="timeline-item">
+                            <div class="timeline-time">${new Date(event.timestamp).toLocaleTimeString()}</div>
+                            <div class="timeline-event">${eventLabels[event.type] || event.type}</div>
+                            <div class="timeline-domain">${event.domain}</div>
+                        </li>
+                    `;
+                }).join('');
+            }
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(loadAnalytics, 30000);
+
+        // Initial load
+        loadAnalytics();
+    </script>
+</body>
+</html>

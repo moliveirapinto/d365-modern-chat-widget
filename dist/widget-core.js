@@ -22,6 +22,44 @@
     return window.D365WidgetConfig || {};
   }
 
+  // Analytics tracking - sends anonymous usage data (NO user messages!)
+  function trackEvent(eventType) {
+    try {
+      var domain = window.location.hostname || 'unknown';
+      var event = {
+        type: eventType, // 'load', 'chat', 'call'
+        domain: domain,
+        timestamp: new Date().toISOString()
+      };
+
+      // Store locally for demo purposes
+      var analytics = JSON.parse(localStorage.getItem('d365WidgetAnalytics') || '{"totalLoads":0,"totalChats":0,"totalCalls":0,"domains":{},"events":[]}');
+      
+      // Update counters
+      if (eventType === 'load') analytics.totalLoads++;
+      if (eventType === 'chat') analytics.totalChats++;
+      if (eventType === 'call') analytics.totalCalls++;
+      
+      // Track domains
+      analytics.domains[domain] = (analytics.domains[domain] || 0) + 1;
+      
+      // Add event to timeline (keep last 100)
+      analytics.events.unshift(event);
+      if (analytics.events.length > 100) analytics.events = analytics.events.slice(0, 100);
+      
+      localStorage.setItem('d365WidgetAnalytics', JSON.stringify(analytics));
+
+      // TODO: Send to Cloudflare Worker endpoint when configured
+      // fetch('YOUR_CLOUDFLARE_WORKER_URL/analytics', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(event)
+      // }).catch(function() { /* silently fail */ });
+    } catch (e) {
+      // Silent fail - analytics should never break the widget
+    }
+  }
+
   // Icon SVG paths
   var iconPaths = {
     chat_multiple: 'M9.56158 3C5.41944 3 2.06158 6.35786 2.06158 10.5C2.06158 11.6329 2.31325 12.7088 2.76423 13.6734C2.5102 14.6714 2.22638 15.7842 2.03999 16.5147C1.80697 17.428 2.6294 18.2588 3.54374 18.039C4.29396 17.8587 5.44699 17.5819 6.47447 17.337C7.41678 17.7631 8.46241 18 9.56158 18C13.7037 18 17.0616 14.6421 17.0616 10.5C17.0616 6.35786 13.7037 3 9.56158 3ZM3.56158 10.5C3.56158 7.18629 6.24787 4.5 9.56158 4.5C12.8753 4.5 15.5616 7.18629 15.5616 10.5C15.5616 13.8137 12.8753 16.5 9.56158 16.5C8.60084 16.5 7.69487 16.2748 6.89161 15.8749L6.6482 15.7537L6.38368 15.8167C5.46095 16.0363 4.39489 16.2919 3.59592 16.4838C3.79467 15.7047 4.05784 14.6724 4.28601 13.7757L4.35619 13.4998L4.22568 13.2468C3.80145 12.4246 3.56158 11.4914 3.56158 10.5ZM14.5616 21.0001C12.5922 21.0001 10.8001 20.241 9.46191 18.9995C9.49511 18.9999 9.52835 19.0001 9.56163 19.0001C10.2796 19.0001 10.9768 18.911 11.6427 18.7434C12.5067 19.2254 13.5021 19.5001 14.5616 19.5001C15.5223 19.5001 16.4283 19.2748 17.2316 18.8749L17.475 18.7537L17.7395 18.8167C18.6611 19.0361 19.7046 19.2625 20.4162 19.4262C20.2412 18.6757 20.0025 17.6711 19.7747 16.7757L19.7045 16.4999L19.835 16.2469C20.2592 15.4247 20.4991 14.4915 20.4991 13.5001C20.4991 11.3853 19.4051 9.52617 17.7521 8.45761C17.5738 7.73435 17.3028 7.04756 16.9525 6.41052C19.8898 7.42684 21.9991 10.2171 21.9991 13.5001C21.9991 14.6332 21.7473 15.7094 21.2961 16.6741C21.5492 17.6821 21.8054 18.774 21.9679 19.4773C22.1723 20.3623 21.3929 21.1633 20.5005 20.9768C19.7733 20.8248 18.6308 20.581 17.587 20.3367C16.6445 20.763 15.5986 21.0001 14.5616 21.0001Z',
@@ -93,6 +131,9 @@
     
     // Inject HTML
     injectHTML(config, launcherIcon, gradient);
+    
+    // Track widget load
+    trackEvent('load');
     
     // Load dependencies then init widget
     loadDependencies(function() {
@@ -640,6 +681,10 @@
     
     async function acceptCall(withVideo) {
       console.log('📞 Accepting call, withVideo:', withVideo);
+      
+      // Track call initiated
+      trackEvent('call');
+      
       if (incomingCall) incomingCall.classList.remove('show');
       if (callContainer) callContainer.classList.add('active');
       if (callConnecting) callConnecting.style.display = 'flex';
@@ -1374,6 +1419,9 @@
           }
         });
 
+        // Track chat started
+        trackEvent('chat');
+        
         chatStarted = true;
         showView('chat');
         
