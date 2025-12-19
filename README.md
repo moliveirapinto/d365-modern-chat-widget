@@ -4,7 +4,7 @@
 
 [![D365 Compatible](https://img.shields.io/badge/D365-Omnichannel-0078D4?style=flat-square&logo=microsoft)](https://dynamics.microsoft.com)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.0.0-blue?style=flat-square)](package.json)
+[![Version](https://img.shields.io/badge/version-v1.5.0-blue?style=flat-square)](package.json)
 
 ![Chat Widget Preview](preview.png)
 
@@ -56,19 +56,21 @@
 </td>
 <td width="50%">
 
-#### Admin Panel
+#### Admin Panel (Chat Widget Studio Analytics)
 - 🎭 **Demo Profiles** - Save and switch between multiple customer configurations
 - 🔄 **Widget Mode Selector** - Choose between Standard (native D365 LCW) or Custom (styled widget)
 - 🔤 **Font Library** - 30 professional fonts in 4 categories (Sans-Serif, Serif, Monospace, Display)
 - 🔌 **D365 Configuration** - Easy setup with connection validation
 - 👤 **Contact Authentication** - Configure default contact info for D365
 - 👁️ **Live Theme Preview** - See changes in real-time
-- 🎨 **Color Customization** - Full control with 3 tabs (Primary, Messages, UI Elements)
-- 🏷️ **Branding** - Custom header titles, subtitles, and logos
+- 🎨 **Color Customization** - Full control with 4 tabs (Primary, Messages, UI Elements, Launcher) with blue-cyan gradient theme
+- 🏷️ **Branding** - Custom header titles, subtitles, and logos with custom icon support
 - 📋 **Pre-chat Form Toggle** - Enable/disable with customizable fields
 - 👥 **Avatar Management** - Upload custom agent and customer avatars
 - 💾 **Import/Export** - Share configurations or backup settings
 - 📋 **Quick Embed Code** - Copy integration code with one click
+- 📚 **Quick Start Guide** - Interactive tutorial for new users with 3 deployment methods (Go To Widget, TamperMonkey, Embed)
+- 📊 **Analytics Dashboard** - Track widget usage with Cloudflare D1 SQL backend (sessions, chats, calls by domain)
 
 </td>
 </tr>
@@ -116,7 +118,7 @@ Switch between **Standard mode** (native D365 LCW) and **Custom mode** (fully st
 |---------|----------------------|----------------------|
 | **Customization** | Limited styling options | Full control over colors, fonts, and branding |
 | **Session Persistence** | ❌ Lost on refresh | ✅ Reconnects to same D365 conversation |
-| **Admin Panel** | ❌ None | ✅ Comprehensive configuration interface |
+| **Admin Panel** | ❌ None | ✅ Comprehensive configuration interface with Quick Start Guide |
 | **Font Options** | ❌ Default only | ✅ 30 professional fonts in 4 categories |
 | **Multi-Config Support** | ❌ Single config | ✅ Demo profiles for multiple customers |
 | **Contact Auth** | Basic | ✅ Advanced with default contact support |
@@ -124,6 +126,7 @@ Switch between **Standard mode** (native D365 LCW) and **Custom mode** (fully st
 | **Mobile Support** | Basic | ✅ Fully responsive with touch-friendly controls |
 | **Demo Mode** | ❌ None | ✅ Full demo without D365 connection |
 | **Widget Modes** | Single mode | ✅ Standard or Custom mode selector |
+| **Analytics** | ❌ None | ✅ Cloudflare D1 SQL backend tracking (100K writes/day, 5M reads/day) |
 
 ---
 
@@ -242,7 +245,8 @@ window.chatWidget = new ModernChatWidget({
 ```
 d365-modern-chat-widget/
 ├── 📄 index.html                    # Main chat widget UI
-├── 🎨 admin.html                    # Admin configuration panel
+├── 🎨 admin.html                    # Admin configuration panel (Chat Widget Studio Analytics)
+├── 📊 analytics.html                # Analytics dashboard (private, in .gitignore)
 ├── 📘 D365-CHAT-SDK-GUIDE.md        # SDK implementation guide
 ├── 📦 package.json                  # NPM dependencies
 ├── ⚙️ webpack.config.js             # Build configuration
@@ -250,6 +254,13 @@ d365-modern-chat-widget/
 │   ├── chat-widget.js               # Widget core logic (892 lines)
 │   └── sdk-entry.js                 # SDK entry point
 ├── 📁 dist/                         # Built bundles (generated)
+├── 📁 cloudflare-worker/            # Analytics backend (Cloudflare Workers + D1)
+│   ├── analytics-worker-d1.js       # Worker script with SQL queries
+│   ├── schema.sql                   # D1 database schema
+│   └── wrangler.toml                # Cloudflare Worker configuration
+├── 📁 img/
+│   ├── icon/                        # Custom section icons (form.png, typography.png, etc.)
+│   └── Logo/                        # Branding assets (logo.png, tampermonkey.png)
 └── 📖 README.md                     # This file
 ```
 
@@ -268,12 +279,17 @@ The main chat widget interface containing:
 Comprehensive admin configuration panel featuring:
 - 🎭 **Demo Profiles** section for saving/loading configurations
 - 🔀 **Widget Mode Selector** (Standard vs Custom)
+- � **Quick Start Guide** - Interactive tutorial modal with 3 deployment methods:
+  - 🌐 **Go To Widget** - Direct link to the hosted widget
+  - 🛠️ **TamperMonkey** - Browser extension installation with Edge store link
+  - 📦 **Embed** - Copy/paste integration code
 - 🔤 **Font Library** with 30 professional fonts in 4 categories
 - 🔌 **D365 Connection** settings with real-time status indicator
 - 👤 **Contact Authentication** with default name/email
-- 🏷️ **Header & Branding** customization
-- 🎨 **Colors** tabs (Primary, Messages, UI Elements)
-- 📋 **Pre-chat Form** toggle and field customization
+- 🏷️ **Header & Branding** customization with custom logo support
+- 🎨 **Colors** tabs (Primary, Messages, UI Elements, Launcher) with blue-cyan gradient theme
+- 📋 **Pre-chat Form** toggle and field customization with custom icons (form.png)
+- 🔧 **Section Icons** - Custom branded PNG/SVG icons for all sections (office.png, world-wide-web.png, dynamics.png, review.png, typography.png, etc.)
 - 👥 **Avatars** upload for agent and customer
 - 💾 **Import/Export** functionality and embed code generator
 - 👁️ **Live Preview** panel showing real-time changes
@@ -515,12 +531,12 @@ Store and validate your **Dynamics 365 Omnichannel** connection details.
 
 ### 🎨 Color Customization
 
-**Three tabs** for comprehensive theming:
+**Four tabs** for comprehensive theming with modern **blue-cyan gradient** as the default theme:
 
 #### 1️⃣ Primary Colors Tab
 
 - 🎨 **Toggle** between **Gradient** and **Solid Color** modes
-- **Gradient Mode**: Set start and end colors (used for headers, buttons, user bubbles)
+- **Gradient Mode**: Set start and end colors - default is blue-cyan (#4f46e5 to #06b6d4) for headers, buttons, user bubbles
 - **Solid Mode**: Choose a single primary color
 - 👁️ Live preview updates in real-time
 
@@ -543,8 +559,13 @@ Store and validate your **Dynamics 365 Omnichannel** connection details.
 | **Input background** | Message input field background |
 | **Input border** | Input field border color |
 | **Send button** | Send message button color |
-| **Launcher button** | Chat widget launcher button |
-| **Notification badge** | Unread message counter |
+
+#### 4️⃣ Launcher Tab
+
+| Element | Description |
+|---------|-------------|
+| **Launcher button** | Chat widget launcher button color |
+| **Notification badge** | Unread message counter background |
 
 ---
 
@@ -634,7 +655,81 @@ Share configurations or backup your settings.
 
 ---
 
-## 🔧 SDK Integration
+## � Analytics Dashboard
+
+**Track widget usage across all domains** with the Cloudflare D1 SQL-powered analytics backend.
+
+### Features
+
+- 📈 **Real-time Metrics**
+  - Total widget loads (sessions)
+  - Total chat interactions
+  - Total voice/video calls
+- 🌐 **Domain Breakdown** - Sessions grouped by domain
+- 📊 **Event Timeline** - Chronological event history with source tracking
+- 🎯 **Cross-domain Tracking** - Works across multiple websites
+
+### Cloudflare D1 Backend
+
+The analytics system uses **Cloudflare D1** (SQL database) for scalable, cost-effective tracking:
+
+| Metric | Free Tier Limit |
+|--------|----------------|
+| **Daily Writes** | 100,000 operations |
+| **Daily Reads** | 5,000,000 operations |
+| **Storage** | 500 MB |
+| **Databases** | 10 |
+
+#### Database Schema
+
+```sql
+CREATE TABLE events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    type TEXT NOT NULL,        -- 'load', 'chat', 'call'
+    domain TEXT NOT NULL,      -- originating domain
+    source TEXT,               -- referrer/source
+    timestamp TEXT NOT NULL    -- ISO 8601 format
+);
+```
+
+#### Deployment
+
+The analytics worker is deployed as a Cloudflare Worker:
+
+```bash
+# Deploy the analytics worker
+npx wrangler deploy
+
+# View the worker endpoint
+# https://d365-widget-analytics.YOUR-USERNAME.workers.dev/analytics
+```
+
+#### API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/track` | POST | Record widget event (load, chat, call) |
+| `/analytics` | GET | Retrieve analytics dashboard HTML |
+| `/stats` | GET | Get JSON statistics |
+| `/reset` | POST | Clear all analytics data |
+
+### Analytics Privacy
+
+- The `analytics.html` file is excluded from the public repository (listed in `.gitignore`)
+- Only you can access your analytics dashboard
+- No personally identifiable information (PII) is tracked
+- Analytics track domain-level usage only
+
+### Viewing Analytics
+
+1. **Deploy the worker** to Cloudflare Workers (see cloudflare-worker/ directory)
+2. **Configure your widget** to send tracking events to the worker endpoint
+3. **Access the dashboard** at your worker's `/analytics` endpoint
+4. **View real-time metrics** for all domains using your widget
+
+---
+
+## �🔧 SDK Integration
 
 This widget uses the **@microsoft/omnichannel-chat-sdk** for headless connectivity to Dynamics 365 Omnichannel.
 
@@ -1000,16 +1095,23 @@ The widget **automatically runs in demo mode** if D365 is not configured or SDK 
 
 ## 🗺️ Roadmap
 
+### Completed Features ✅
+
+- [x] 📊 **Analytics dashboard** - Cloudflare D1 SQL backend (v1.5.0)
+- [x] 🎨 **Blue-cyan gradient theme** - Modern color scheme replacing purple (v1.5.0)
+- [x] 📚 **Quick Start Guide** - Interactive tutorial for new users (v1.5.0)
+- [x] 🎨 **Custom icon support** - Branded PNG/SVG icons for admin sections (v1.5.0)
+
 ### Planned Features
 
 - [ ] 🌍 **Multi-language support** with dynamic translations
 - [ ] 🎤 **Voice message recording** (in addition to text)
-- [ ] 📊 **Analytics dashboard** (track engagement metrics)
 - [ ] 🎨 **Theme marketplace** (pre-built color schemes)
 - [ ] 🔔 **Browser notifications** (desktop notifications for new messages)
 - [ ] 💬 **Canned responses** (quick reply templates)
 - [ ] 📷 **Screenshot/screen sharing** integration
 - [ ] 🤖 **Bot builder integration** (Visual bot flow designer)
+- [ ] 📈 **Advanced analytics** (funnel analysis, conversion tracking, A/B testing)
 
 ---
 
