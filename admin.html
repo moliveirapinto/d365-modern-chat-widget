@@ -7302,69 +7302,82 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
         
         function generateTamperMonkeyScript(config, configJson, targetUrl) {
             const scriptName = settings.headerTitle || 'D365 Chat Widget';
-            const today = new Date().toLocaleDateString();
+            
+            // Convert JSON config to clean JavaScript object format (no quoted keys)
+            const configLines = [];
+            for (const [key, value] of Object.entries(config)) {
+                if (typeof value === 'string') {
+                    configLines.push(`    ${key}: "${value.replace(/"/g, '\\"')}"`);
+                } else if (typeof value === 'boolean') {
+                    configLines.push(`    ${key}: ${value}`);
+                } else {
+                    configLines.push(`    ${key}: ${JSON.stringify(value)}`);
+                }
+            }
+            const configObjectStr = `{\n${configLines.join(',\n')}\n  }`;
             
             return `// ==UserScript==
-// @name         ${scriptName}
+// @name         ${scriptName} – D365 Chat Widget Injector
 // @namespace    https://moliveirapinto.github.io/d365-modern-chat-widget/
 // @version      1.0
-// @description  D365 Modern Chat Widget - Injected via TamperMonkey
+// @description  Injects the D365 Modern Chat Widget into target pages.
 // @author       D365 Chat Widget Generator
 // @match        ${targetUrl}
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=microsoft.com
-// @grant        GM_addStyle
-// @grant        GM_xmlhttpRequest
-// @connect      moliveirapinto.github.io
-// @connect      raw.githubusercontent.com
-// @connect      cdn.jsdelivr.net
-// @connect      unpkg.com
-// @connect      *.dynamics.com
-// @connect      *
-// @run-at       document-end
+// @run-at       document-start
+// @grant        none
 // ==/UserScript==
 
-(function() {
-    'use strict';
-    
-    // Widget Configuration - Generated: ${today}
-    window.D365WidgetConfig = ${configJson};
-    
-    console.log('[D365 Chat Widget] TamperMonkey script loaded');
-    console.log('[D365 Chat Widget] Config:', window.D365WidgetConfig);
-    
-    // Load the widget core from GitHub Pages
-    function loadWidget() {
-        var script = document.createElement('script');
-        script.src = 'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js';
-        script.onload = function() {
-            console.log('[D365 Chat Widget] Widget core loaded successfully');
-        };
-        script.onerror = function() {
-            console.error('[D365 Chat Widget] Failed to load widget core, trying fallback...');
-            loadWidgetFallback();
-        };
-        document.head.appendChild(script);
+(function () {
+  'use strict';
+
+  // --- Guard against duplicate injection ---
+  const INJECTION_FLAG = '__d365_widget_injected__';
+  if (window[INJECTION_FLAG]) return;
+  window[INJECTION_FLAG] = true;
+
+  // --- Widget Configuration ---
+  window.D365WidgetConfig = ${configObjectStr};
+
+  // --- Loader injection ---
+  function injectLoader() {
+    // If script is already present, skip
+    if (document.querySelector('script[src*="moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js"]')) {
+      return;
     }
-    
-    // Fallback: Load from CDN
-    function loadWidgetFallback() {
-        var script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/gh/moliveirapinto/d365-modern-chat-widget@main/dist/widget-core.js';
-        script.onload = function() {
-            console.log('[D365 Chat Widget] Widget core loaded from fallback CDN');
-        };
-        script.onerror = function() {
-            console.error('[D365 Chat Widget] All sources failed. Widget cannot load.');
-        };
-        document.head.appendChild(script);
+
+    const s = document.createElement('script');
+    s.src = 'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js';
+    s.async = true;
+    s.crossOrigin = 'anonymous';
+
+    // Prefer head, fallback to documentElement (helps if CSP blocks head modifications)
+    const target = document.head || document.getElementsByTagName('head')[0] || document.documentElement;
+    try {
+      target.appendChild(s);
+    } catch (e) {
+      // Last resort fallback
+      document.documentElement.appendChild(s);
     }
-    
-    // Wait for page to be ready, then load widget
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', loadWidget);
-    } else {
-        loadWidget();
-    }
+  }
+
+  // Inject as early as possible; if DOM not ready, retry shortly
+  if (document.head) {
+    injectLoader();
+  } else {
+    // Early pages sometimes don't have <head> yet at document-start
+    const tryEarly = setInterval(() => {
+      if (document.head || document.getElementsByTagName('head')[0]) {
+        clearInterval(tryEarly);
+        injectLoader();
+      }
+    }, 25);
+
+    // Hard fallback at DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', () => {
+      clearInterval(tryEarly);
+      injectLoader();
+    });
+  }
 })();`;
         }
 
