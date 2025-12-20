@@ -4,7 +4,7 @@
 
 [![D365 Compatible](https://img.shields.io/badge/D365-Omnichannel-0078D4?style=flat-square&logo=microsoft)](https://dynamics.microsoft.com)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v1.5.0-blue?style=flat-square)](package.json)
+[![Version](https://img.shields.io/badge/version-v1.6.0-blue?style=flat-square)](package.json)
 
 ![Chat Widget Preview](preview.png)
 
@@ -1141,6 +1141,35 @@ If this widget helped you, consider:
 - 🐛 **Reporting issues** you encounter
 - 💡 **Suggesting features** you'd like to see
 - 📤 **Sharing** with others who might benefit
+
+---
+
+## 📝 Changelog
+
+### v1.6.0 (December 2025)
+
+#### 🎨 Visual Improvements
+- Updated color scheme to blue-cyan gradient theme throughout admin panel
+- Modernized preview tab menu with clean underline design and gradient borders
+- Improved widget mode cards with consistent blue-cyan styling
+- Enhanced LCW Embed Code textarea with gradient background and better focus states
+- Updated tab buttons (Primary, Messages, UI Elements, Launcher) to blue-cyan theme
+- Refined launcher preview section layout for better spacing
+
+#### 🔧 UI/UX Enhancements
+- Fixed preview send button to match actual widget (transparent background, no gradient override)
+- Aligned all avatar styles in preview with actual widget (gradients, borders, hover effects)
+- Removed JavaScript overrides that were affecting preview accuracy
+- Updated widget mode icons (Standard: git-commit.svg, Custom: loader.svg)
+- Improved "Go to Live Widget" button text for clarity
+- Removed gray background from connection status for cleaner appearance
+- Optimized launcher preview spacing and side-by-side layout
+
+#### 🐛 Bug Fixes
+- Fixed avatar preview colors not matching generated widget
+- Resolved send button purple background showing in preview despite CSS
+- Corrected avatar CSS classes (bot, user, agent) for proper gradient application
+- Fixed scrollbar issue in live preview by adjusting padding
 
 ---
 
