@@ -1091,6 +1091,421 @@
             opacity: 0.3;
             cursor: default;
         }
+
+        /* ==========================================
+           MOBILE RESPONSIVE STYLES
+           ========================================== */
+        
+        /* Tablets and smaller desktops */
+        @media screen and (max-width: 768px) {
+            .chat-container {
+                width: 360px;
+                height: 600px;
+                right: 16px;
+                bottom: 90px;
+            }
+            
+            .chat-launcher {
+                width: 56px;
+                height: 56px;
+                right: 16px;
+                bottom: 16px;
+            }
+            
+            .chat-launcher svg {
+                width: 26px;
+                height: 26px;
+            }
+        }
+        
+        /* Mobile phones */
+        @media screen and (max-width: 480px) {
+            /* Make chat fullscreen on mobile */
+            .chat-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 100%;
+                height: 100%;
+                max-height: 100vh;
+                border-radius: 0;
+                z-index: 9999;
+            }
+            
+            .chat-container.open {
+                transform: none;
+            }
+            
+            /* Adjust launcher for mobile */
+            .chat-launcher {
+                width: 52px;
+                height: 52px;
+                right: 12px;
+                bottom: 12px;
+            }
+            
+            .chat-launcher svg {
+                width: 24px;
+                height: 24px;
+            }
+            
+            /* Header adjustments */
+            .chat-header {
+                padding: 12px 16px;
+                padding-top: max(12px, env(safe-area-inset-top));
+            }
+            
+            .header-avatar {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .header-title {
+                font-size: 15px;
+            }
+            
+            .header-status {
+                font-size: 11px;
+            }
+            
+            .header-btn {
+                width: 36px;
+                height: 36px;
+            }
+            
+            /* Messages area */
+            .chat-messages {
+                padding: 12px;
+                gap: 10px;
+            }
+            
+            .message-wrapper {
+                max-width: 90%;
+            }
+            
+            .message-avatar {
+                width: 32px;
+                height: 32px;
+                margin-top: 16px;
+            }
+            
+            .message {
+                padding: 10px 14px;
+                font-size: 14px;
+                border-radius: 14px;
+            }
+            
+            .message-sender {
+                font-size: 11px;
+            }
+            
+            /* Pre-chat form */
+            .prechat-form {
+                padding: 20px 16px;
+            }
+            
+            .form-title {
+                font-size: 18px;
+            }
+            
+            .form-subtitle {
+                font-size: 13px;
+            }
+            
+            .form-group input,
+            .form-group textarea {
+                padding: 10px 12px;
+                font-size: 16px; /* Prevents iOS zoom on focus */
+            }
+            
+            .start-btn {
+                padding: 12px;
+                font-size: 14px;
+            }
+            
+            /* Input area */
+            .chat-input-area {
+                padding: 10px 12px 16px;
+                padding-bottom: max(16px, env(safe-area-inset-bottom));
+            }
+            
+            .message-input {
+                min-height: 50px;
+                padding: 10px 12px;
+                font-size: 16px; /* Prevents iOS zoom on focus */
+                border-radius: 10px;
+            }
+            
+            .action-btn {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .send-btn {
+                width: 44px;
+                height: 44px;
+            }
+            
+            /* Emoji picker mobile adjustments */
+            .emoji-picker {
+                left: 8px;
+                right: 8px;
+                width: auto;
+                bottom: calc(100% + 8px);
+            }
+            
+            .emoji-grid {
+                grid-template-columns: repeat(7, 1fr);
+            }
+            
+            .emoji-item {
+                width: 36px;
+                height: 36px;
+                font-size: 22px;
+            }
+            
+            /* Voice recording indicator */
+            .voice-recording {
+                left: 16px;
+                right: 16px;
+                transform: none;
+                width: auto;
+            }
+            
+            /* Hero cards */
+            .hero-card {
+                width: 200px;
+            }
+            
+            .hero-card-image {
+                height: 140px;
+            }
+            
+            .hero-card-single {
+                max-width: 100%;
+            }
+            
+            /* Incoming call notification */
+            .incoming-call-notification {
+                padding: 10px 12px;
+            }
+            
+            .incoming-call-icon {
+                width: 40px;
+                height: 40px;
+                min-width: 40px;
+                min-height: 40px;
+            }
+            
+            .incoming-call-title {
+                font-size: 14px;
+            }
+            
+            .incoming-call-subtitle {
+                font-size: 12px;
+            }
+            
+            .accept-call-btn,
+            .accept-video-btn,
+            .decline-call-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            
+            /* Call container */
+            .call-controls {
+                padding: 20px 16px;
+                padding-bottom: max(20px, env(safe-area-inset-bottom));
+            }
+            
+            .call-btn {
+                width: 52px;
+                height: 52px;
+            }
+            
+            .call-btn.end-call {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .local-video {
+                width: 100px;
+                height: 130px;
+                top: 16px;
+                right: 16px;
+            }
+            
+            .call-avatar {
+                width: 100px;
+                height: 100px;
+                font-size: 40px;
+            }
+            
+            /* Confirm modal */
+            .confirm-content {
+                margin: 16px;
+                padding: 20px;
+            }
+            
+            /* Suggested actions */
+            .suggested-actions-container {
+                gap: 6px;
+            }
+            
+            .suggested-action-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            
+            /* Sources section */
+            .source-item {
+                padding: 8px 10px;
+            }
+            
+            .source-title {
+                font-size: 12px;
+            }
+            
+            /* Typing indicator */
+            .typing-dots {
+                padding: 10px 14px;
+                margin-left: 42px;
+            }
+            
+            /* Adaptive cards */
+            .ac-container {
+                padding: 12px;
+            }
+            
+            .ac-container .ac-input {
+                font-size: 16px; /* Prevents iOS zoom */
+            }
+        }
+        
+        /* Very small phones */
+        @media screen and (max-width: 360px) {
+            .chat-header {
+                padding: 10px 12px;
+                gap: 10px;
+            }
+            
+            .header-avatar {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .header-actions {
+                gap: 4px;
+            }
+            
+            .header-btn {
+                width: 32px;
+                height: 32px;
+            }
+            
+            .message {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+            
+            .hero-card {
+                width: 180px;
+            }
+            
+            .hero-card-image {
+                height: 120px;
+            }
+        }
+        
+        /* Landscape mode on mobile */
+        @media screen and (max-height: 500px) and (orientation: landscape) {
+            .chat-container {
+                height: 100%;
+                max-height: 100vh;
+            }
+            
+            .chat-header {
+                padding: 8px 16px;
+            }
+            
+            .header-avatar {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .chat-messages {
+                padding: 8px 12px;
+            }
+            
+            .message {
+                padding: 8px 12px;
+            }
+            
+            .chat-input-area {
+                padding: 8px 12px;
+            }
+            
+            .message-input {
+                min-height: 40px;
+            }
+            
+            .call-controls {
+                padding: 12px 16px;
+            }
+            
+            .call-btn {
+                width: 44px;
+                height: 44px;
+            }
+            
+            .call-btn.end-call {
+                width: 52px;
+                height: 52px;
+            }
+        }
+        
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            /* Larger touch targets */
+            .action-btn {
+                min-width: 44px;
+                min-height: 44px;
+            }
+            
+            .header-btn {
+                min-width: 44px;
+                min-height: 44px;
+            }
+            
+            .send-btn {
+                min-width: 48px;
+                min-height: 48px;
+            }
+            
+            /* Remove hover effects on touch */
+            .chat-launcher:hover {
+                transform: none;
+            }
+            
+            .chat-launcher:active {
+                transform: scale(0.95);
+            }
+            
+            .message-image:hover {
+                transform: none;
+            }
+            
+            .hero-card:hover {
+                transform: none;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+            
+            .hero-card:active {
+                transform: scale(0.98);
+            }
+        }
     </style>
 </head>
 <body>
