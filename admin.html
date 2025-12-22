@@ -3206,7 +3206,7 @@
                             <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
                             Copy to Clipboard
                         </button>
-                        <button class="btn btn-secondary" onclick="downloadEmbedCode()">
+                        <button class="btn btn-secondary" id="downloadHtmlBtn" onclick="downloadEmbedCode()" style="display: none;">
                             <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
                             Download as HTML
                         </button>
@@ -6114,6 +6114,7 @@ window.D365WidgetConfig=${configJson};
             
             document.getElementById('embedCodeOutput').value = embedCode;
             showCharCount(embedCode.length);
+            document.getElementById('downloadHtmlBtn').style.display = 'inline-flex'; // Show download button
             showToast('🚀 Compact embed code generated! Only ' + embedCode.length + ' characters!');
         }
         
@@ -7801,6 +7802,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             
             document.getElementById('embedCodeOutput').value = embedCode;
             showCharCount(embedCode.length);
+            document.getElementById('downloadHtmlBtn').style.display = 'inline-flex'; // Show download button
             showToast('Full embed code generated! ' + embedCode.length.toLocaleString() + ' characters.');
             
             // Return the generated code for use by other functions (like downloadEmbedCode)
@@ -7914,6 +7916,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             
             document.getElementById('embedCodeOutput').value = tamperMonkeyCode;
             showCharCount(tamperMonkeyCode.length);
+            document.getElementById('downloadHtmlBtn').style.display = 'none'; // Hide download button for TamperMonkey
             showToast('🐒 TamperMonkey script generated! Copy and paste into TamperMonkey.');
         }
         
