@@ -5841,83 +5841,62 @@
 
         function resetSettings() {
             if (confirm('Are you sure you want to reset all settings to default?')) {
+                // Reset settings object to defaults
                 settings = { ...defaultSettings };
+                
+                // Clear localStorage
                 localStorage.removeItem('chatWidgetSettings');
                 activeProfileId = null;
                 localStorage.removeItem('chatWidgetActiveProfile');
                 
-                // Reset D365 LCW code
+                // Reset D365 LCW code field and hide extracted values
                 document.getElementById('lcwCode').value = '';
                 document.getElementById('extractedValues').style.display = 'none';
-
-                // Reset form
-                document.getElementById('headerTitle').value = defaultSettings.headerTitle;
-                document.getElementById('headerSubtitle').value = defaultSettings.headerSubtitle;
-                document.getElementById('useGradient').checked = defaultSettings.useGradient;
-                document.getElementById('useBubbleGradient').checked = defaultSettings.useBubbleGradient;
-                document.getElementById('usePrechatGradient').checked = defaultSettings.usePrechatGradient;
-
-                // Reset pre-chat form fields
-                document.getElementById('welcomeTitle').value = defaultSettings.welcomeTitle;
-                document.getElementById('welcomeMessage').value = defaultSettings.welcomeMessage;
-                document.getElementById('nameFieldLabel').value = defaultSettings.nameFieldLabel;
-                document.getElementById('nameFieldPlaceholder').value = defaultSettings.nameFieldPlaceholder;
-                document.getElementById('emailFieldLabel').value = defaultSettings.emailFieldLabel;
-                document.getElementById('emailFieldPlaceholder').value = defaultSettings.emailFieldPlaceholder;
-                document.getElementById('questionFieldLabel').value = defaultSettings.questionFieldLabel;
-                document.getElementById('questionFieldPlaceholder').value = defaultSettings.questionFieldPlaceholder;
-                document.getElementById('startBtnText').value = defaultSettings.startBtnText;
-                
-                // Reset pre-chat form toggle and custom auth
-                document.getElementById('enablePrechatForm').checked = true;
-                document.getElementById('enableCustomAuth').checked = false;
-                document.getElementById('customAuthName').value = '';
-                document.getElementById('customAuthEmail').value = '';
-                togglePrechatForm(true);
-                toggleCustomAuthFields(false);
-                
-                // Reset standard auth
-                document.getElementById('enableStandardAuth').checked = false;
-                document.getElementById('standardAuthName').value = '';
-                document.getElementById('standardAuthEmail').value = '';
-                toggleStandardAuthFields(false);
                 
                 // Clear last saved info
                 document.getElementById('lastSavedInfo').textContent = '';
                 
-                // Reset colors
-                const colorFields = [
-                    'gradientStart', 'gradientEnd', 'primaryColor',
-                    'userBubbleColor', 'userTextColor', 'agentBubbleColor', 'agentTextColor',
-                    'systemMsgColor', 'systemTextColor', 'chatBgColor', 'inputBgColor',
-                    'inputBorderColor', 'sendBtnColor', 'launcherColor', 'badgeColor',
-                    // Pre-chat Hero Colors
-                    'prechatGradientStart', 'prechatGradientEnd', 'prechatSolidColor', 'prechatTitleColor', 
-                    'prechatSubtitleColor', 'prechatBadgeBg', 'prechatBadgeText', 
-                    'prechatStatusDot', 'prechatAvatarBorder'
-                ];
-                colorFields.forEach(field => {
-                    const picker = document.getElementById(field);
-                    const hex = document.getElementById(field + 'Hex');
-                    if (picker && defaultSettings[field]) picker.value = defaultSettings[field];
-                    if (hex && defaultSettings[field]) hex.value = defaultSettings[field];
-                });
-
-                // Reset image areas
+                // Reset all image areas first (before populateForm tries to show them)
                 ['logoUploadArea', 'agentAvatarArea', 'customerAvatarArea', 'botAvatarArea'].forEach(areaId => {
                     const area = document.getElementById(areaId);
-                    if (area.classList.contains('has-image')) {
-                        // Simulate remove
+                    if (area && area.classList.contains('has-image')) {
                         const fakeEvent = { stopPropagation: () => {} };
                         removeImage(fakeEvent, areaId);
                     }
                 });
-
-                toggleGradient();
-                togglePrechatGradient();
+                
+                // Reset launcher icon selection to default
+                const iconButtons = document.querySelectorAll('.launcher-icon-option');
+                iconButtons.forEach(btn => {
+                    if (btn.getAttribute('data-icon') === defaultSettings.launcherIcon) {
+                        btn.classList.add('selected');
+                    } else {
+                        btn.classList.remove('selected');
+                    }
+                });
+                
+                // Reset avatar gallery selections
+                document.querySelectorAll('.avatar-thumb').forEach(thumb => {
+                    thumb.classList.remove('selected');
+                });
+                
+                // Use populateForm to set all form fields from the reset settings object
+                // This ensures ALL fields are properly reset including:
+                // - Header title/subtitle
+                // - All color pickers
+                // - All pre-chat form fields
+                // - Font family
+                // - Widget mode
+                // - Gradient toggles
+                // - Background image URL
+                populateForm();
+                
+                // Force update the preview with fresh default values
                 updatePreview();
+                updateLauncherPreview();
                 updateConnectionStatus();
                 renderProfiles();
+                
                 showToast('Settings reset to default!');
             }
         }
