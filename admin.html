@@ -3344,6 +3344,9 @@
                         Go to Live Widget
                     </a>
                 </div>
+                <p class="form-hint" style="margin-top: 12px; text-align: center; color: #64748b;">
+                    💡 <strong>Tip:</strong> Settings auto-save every 5 seconds, but click <strong>Save Settings</strong> before opening the Live Widget to ensure all changes are applied.
+                </p>
             </div>
         </div>
 
@@ -4343,7 +4346,22 @@
 
         // Auto-save to cloud every 30 seconds if there are changes
         setInterval(async function() {
-            if (!cloudToken || !activeProfileId || !isDirty || isInitializing) return;
+            if (isInitializing) return;
+            
+            // Always auto-save to localStorage
+            updateSettingsFromForm();
+            const settingsToSave = { ...settings };
+            ['headerLogo', 'agentAvatar', 'customerAvatar', 'botAvatar'].forEach(key => {
+                if (!isSafeImageData(settingsToSave[key])) {
+                    settingsToSave[key] = null;
+                }
+                delete settingsToSave[key + '_isBlob'];
+            });
+            settingsToSave.lastSaved = new Date().toISOString();
+            localStorage.setItem('chatWidgetSettings', JSON.stringify(settingsToSave));
+            
+            // Also sync to cloud if logged in and have changes
+            if (!cloudToken || !activeProfileId || !isDirty) return;
             
             const profile = profiles.find(p => p.id === activeProfileId);
             if (!profile) return;
