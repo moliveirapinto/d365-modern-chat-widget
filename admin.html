@@ -5849,55 +5849,13 @@
                 activeProfileId = null;
                 localStorage.removeItem('chatWidgetActiveProfile');
                 
-                // Reset D365 LCW code field and hide extracted values
-                document.getElementById('lcwCode').value = '';
-                document.getElementById('extractedValues').style.display = 'none';
+                // Show toast and auto-refresh the page to ensure clean state
+                showToast('Resetting to defaults...');
                 
-                // Clear last saved info
-                document.getElementById('lastSavedInfo').textContent = '';
-                
-                // Reset all image areas first (before populateForm tries to show them)
-                ['logoUploadArea', 'agentAvatarArea', 'customerAvatarArea', 'botAvatarArea'].forEach(areaId => {
-                    const area = document.getElementById(areaId);
-                    if (area && area.classList.contains('has-image')) {
-                        const fakeEvent = { stopPropagation: () => {} };
-                        removeImage(fakeEvent, areaId);
-                    }
-                });
-                
-                // Reset launcher icon selection to default
-                const iconButtons = document.querySelectorAll('.launcher-icon-option');
-                iconButtons.forEach(btn => {
-                    if (btn.getAttribute('data-icon') === defaultSettings.launcherIcon) {
-                        btn.classList.add('selected');
-                    } else {
-                        btn.classList.remove('selected');
-                    }
-                });
-                
-                // Reset avatar gallery selections
-                document.querySelectorAll('.avatar-thumb').forEach(thumb => {
-                    thumb.classList.remove('selected');
-                });
-                
-                // Use populateForm to set all form fields from the reset settings object
-                // This ensures ALL fields are properly reset including:
-                // - Header title/subtitle
-                // - All color pickers
-                // - All pre-chat form fields
-                // - Font family
-                // - Widget mode
-                // - Gradient toggles
-                // - Background image URL
-                populateForm();
-                
-                // Force update the preview with fresh default values
-                updatePreview();
-                updateLauncherPreview();
-                updateConnectionStatus();
-                renderProfiles();
-                
-                showToast('Settings reset to default!');
+                // Small delay to show toast, then refresh page for clean reset
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
             }
         }
 
