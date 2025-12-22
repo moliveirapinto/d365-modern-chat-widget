@@ -434,28 +434,207 @@
 
         .chat-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
         .prechat-form {
-            padding: 24px; display: flex; flex-direction: column; gap: 16px; flex: 1; justify-content: center;
+            padding: 0; display: flex; flex-direction: column; flex: 1; overflow-y: auto;
         }
         .prechat-form.hidden { display: none; }
-        .form-title { font-size: 20px; font-weight: 600; color: #2d3748; text-align: center; margin-bottom: 8px; }
-        .form-subtitle { font-size: 14px; color: #718096; text-align: center; margin-bottom: 16px; }
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
-        .form-group label { font-size: 13px; font-weight: 500; color: #4a5568; }
+        
+        /* Pre-chat Form Hero Section */
+        .prechat-hero {
+            background: linear-gradient(135deg, var(--prechat-gradient-start, #667eea) 0%, var(--prechat-gradient-end, #764ba2) 100%);
+            padding: 32px 24px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .prechat-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: shimmer 15s infinite linear;
+        }
+        @keyframes shimmer {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .prechat-hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        .prechat-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 3px solid var(--prechat-avatar-border, rgba(255,255,255,0.9));
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 -8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        .prechat-avatar:first-child { z-index: 3; }
+        .prechat-avatar:nth-child(2) { z-index: 2; }
+        .prechat-avatar:nth-child(3) { z-index: 1; }
+        .prechat-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .prechat-avatar svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+        .prechat-hero-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--prechat-title-color, white);
+            margin-bottom: 8px;
+            letter-spacing: -0.3px;
+        }
+        .prechat-hero-subtitle {
+            font-size: 14px;
+            color: var(--prechat-subtitle-color, rgba(255,255,255,0.9));
+            line-height: 1.5;
+        }
+        .prechat-avatar-group {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        .prechat-hero-content {
+            position: relative;
+        }
+        .prechat-status {
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--prechat-badge-bg, rgba(255,255,255,0.2));
+            backdrop-filter: blur(8px);
+            padding: 6px 12px 6px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--prechat-badge-text, white);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .prechat-status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--prechat-status-dot, #10b981);
+            border-radius: 50%;
+            animation: pulse-dot 1.5s ease-in-out infinite;
+            box-shadow: 0 0 0 2px var(--prechat-status-dot-shadow, rgba(16, 185, 129, 0.3));
+        }
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        /* Pre-chat Form Body */
+        .prechat-form-body {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            flex: 1;
+        }
+        .form-title { display: none; } /* Hidden - using hero instead */
+        .form-subtitle { display: none; } /* Hidden - using hero instead */
+        .form-group { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+        .form-group label { 
+            font-size: 13px; 
+            font-weight: 600; 
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .form-group label .required {
+            color: #ef4444;
+        }
         .form-group input, .form-group textarea {
-            padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;
-            transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 14px 16px; 
+            border: 2px solid #e5e7eb; 
+            border-radius: 12px; 
+            font-size: 14px;
+            transition: all 0.2s ease; 
+            font-family: inherit;
+            background: #f9fafb;
+        }
+        .form-group input:hover, .form-group textarea:hover {
+            border-color: #d1d5db;
+            background: white;
         }
         .form-group input:focus, .form-group textarea:focus {
-            outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none; 
+            border-color: var(--primary-color, #667eea); 
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+        .form-group input::placeholder, .form-group textarea::placeholder {
+            color: #9ca3af;
         }
         .form-group textarea { resize: none; min-height: 80px; }
-        .start-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; border: none; padding: 14px; border-radius: 8px; font-size: 15px;
-            font-weight: 600; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; margin-top: 8px;
+        
+        /* Form field icons */
+        .input-with-icon {
+            position: relative;
+            width: 100%;
         }
-        .start-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
-        .start-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .input-with-icon input {
+            padding-left: 44px;
+            width: 100%;
+        }
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            color: #9ca3af;
+            pointer-events: none;
+        }
+        .input-with-icon input:focus + .input-icon,
+        .input-with-icon input:not(:placeholder-shown) + .input-icon {
+            color: var(--primary-color, #667eea);
+        }
+        
+        .start-btn {
+            background: linear-gradient(135deg, var(--primary-color, #667eea) 0%, var(--gradient-end, #764ba2) 100%);
+            color: white; border: none; padding: 16px; border-radius: 12px; font-size: 15px;
+            font-weight: 600; cursor: pointer; transition: all 0.2s ease; margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(102, 126, 234, 0.35);
+        }
+        .start-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.45); 
+        }
+        .start-btn:active {
+            transform: translateY(0);
+        }
+        .start-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+        .start-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
 
         .connecting-view, .chat-ended {
             display: none; flex-direction: column; align-items: center; justify-content: center;
@@ -522,6 +701,8 @@
             color: white; 
             border-color: rgba(17, 153, 142, 0.3);
         }
+        /* When avatar has an image, make background transparent */
+        .message-avatar:has(img) { background: transparent !important; }
         .message-avatar img { 
             width: 100%; height: 100%; object-fit: cover; 
             border-radius: 50%;
@@ -1608,21 +1789,53 @@
             </div>
             
             <form class="prechat-form" id="prechatForm" onsubmit="return false;">
-                <div class="form-title"> Welcome!</div>
-                <div class="form-subtitle">Please fill in your details to start chatting with us.</div>
-                <div class="form-group">
-                    <label for="userName">Name *</label>
-                    <input type="text" id="userName" placeholder="Enter your name" required>
+                <div class="prechat-hero">
+                    <div class="prechat-hero-content">
+                        <div class="prechat-status">
+                            <div class="prechat-status-dot"></div>
+                            <span>Online</span>
+                        </div>
+                        <div class="prechat-avatar-group">
+                            <div class="prechat-avatar" id="prechatAvatar1">
+                                <img src="img/headshots/headshot_female1.png" alt="Support team member">
+                            </div>
+                            <div class="prechat-avatar" id="prechatAvatar2">
+                                <img src="img/headshots/headshot_male1.png" alt="Support team member">
+                            </div>
+                            <div class="prechat-avatar" id="prechatAvatar3">
+                                <img src="img/headshots/headshot_female2.png" alt="Support team member">
+                            </div>
+                        </div>
+                        <div class="prechat-hero-title" id="prechatHeroTitle">Start a conversation</div>
+                        <div class="prechat-hero-subtitle" id="prechatHeroSubtitle">We're here to help!<br>Fill out the form below to chat with our team.</div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="userEmail">Email *</label>
-                    <input type="email" id="userEmail" placeholder="Enter your email" required>
+                <div class="prechat-form-body">
+                    <div class="form-title">Welcome!</div>
+                    <div class="form-subtitle">Please fill in your details to start chatting with us.</div>
+                    <div class="form-group">
+                        <label for="userName">Name <span class="required">*</span></label>
+                        <div class="input-with-icon">
+                            <input type="text" id="userName" placeholder="Enter your name" required>
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="userEmail">Email <span class="required">*</span></label>
+                        <div class="input-with-icon">
+                            <input type="email" id="userEmail" placeholder="Enter your email" required>
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="userQuestion">How can we help? <span style="font-weight: 400; color: #9ca3af;">(optional)</span></label>
+                        <textarea id="userQuestion" placeholder="Describe your question or issue..."></textarea>
+                    </div>
+                    <button type="button" class="start-btn" id="startBtn">
+                        <span>Start Chat</span>
+                        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                    </button>
                 </div>
-                <div class="form-group">
-                    <label for="userQuestion">How can we help? (optional)</label>
-                    <textarea id="userQuestion" placeholder="Describe your question..."></textarea>
-                </div>
-                <button type="button" class="start-btn" id="startBtn">Start Chat</button>
             </form>
 
             <div class="connecting-view" id="connectingView">
@@ -6020,6 +6233,16 @@
                 
                 /* Badge */
                 .chat-badge { background: ${s.badgeColor || '#ff4757'} !important; }
+                
+                /* Pre-chat Hero */
+                .prechat-hero { background: ${s.usePrechatGradient !== false 
+                    ? `linear-gradient(135deg, ${s.prechatGradientStart || '#667eea'} 0%, ${s.prechatGradientEnd || '#764ba2'} 100%)` 
+                    : (s.prechatSolidColor || '#667eea')} !important; }
+                .prechat-hero-title { color: ${s.prechatTitleColor || '#ffffff'} !important; }
+                .prechat-hero-subtitle { color: ${s.prechatSubtitleColor || 'rgba(255,255,255,0.9)'} !important; }
+                .status-badge { background: ${s.prechatBadgeBg || 'rgba(255,255,255,0.2)'} !important; color: ${s.prechatBadgeText || '#ffffff'} !important; }
+                .status-badge .status-dot { background: ${s.prechatStatusDot || '#10b981'} !important; box-shadow: 0 0 0 2px ${s.prechatStatusDot || '#10b981'}33 !important; }
+                .prechat-avatar { border-color: ${s.prechatAvatarBorder || 'rgba(255,255,255,0.9)'} !important; }
             `;
             document.head.appendChild(styleEl);
 

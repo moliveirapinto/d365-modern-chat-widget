@@ -202,65 +202,103 @@ class ModernChatWidget {
             /* Pre-chat Form */
             .mcw-prechat {
                 flex: 1;
-                padding: 24px;
                 display: flex;
                 flex-direction: column;
                 overflow-y: auto;
             }
 
+            /* Pre-chat Hero Section */
             .mcw-prechat-hero {
+                background: var(--mcw-prechat-gradient, var(--mcw-gradient));
+                padding: 32px 24px 28px;
                 text-align: center;
-                margin-bottom: 24px;
+                position: relative;
+                overflow: hidden;
             }
-
-            .mcw-prechat-icon {
-                width: 64px;
-                height: 64px;
-                background: linear-gradient(135deg, #f0f1ff 0%, #e8e9ff 100%);
-                border-radius: 16px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin: 0 auto 16px;
+            .mcw-prechat-hero::before {
+                content: ''; position: absolute; top: 0; left: -100%; width: 200%; height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+                animation: mcwShimmer 3s infinite;
             }
-            .mcw-prechat-icon svg { width: 32px; height: 32px; color: var(--mcw-primary); }
+            @keyframes mcwShimmer { 0% { left: -100%; } 100% { left: 100%; } }
+            .mcw-prechat-hero-content { position: relative; z-index: 1; }
+            .mcw-prechat-avatar-group { position: relative; display: flex; justify-content: center; margin-bottom: 16px; }
+            .mcw-prechat-avatar {
+                width: 48px; height: 48px; border-radius: 50%; border: 3px solid var(--mcw-prechat-avatar-border, rgba(255,255,255,0.9));
+                background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center;
+                margin: 0 -8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden;
+            }
+            .mcw-prechat-avatar:first-child { z-index: 3; }
+            .mcw-prechat-avatar:nth-child(2) { z-index: 2; }
+            .mcw-prechat-avatar:nth-child(3) { z-index: 1; }
+            .mcw-prechat-avatar img { width: 100%; height: 100%; object-fit: cover; }
+            .mcw-prechat-avatar svg { width: 24px; height: 24px; fill: white; }
+            .mcw-prechat-status {
+                position: absolute; top: 0; right: 0; display: flex; align-items: center; gap: 5px;
+                background: var(--mcw-prechat-badge-bg, rgba(255,255,255,0.2)); padding: 6px 12px 6px 8px;
+                border-radius: 20px; font-size: 12px; color: var(--mcw-prechat-badge-text, white); font-weight: 500; white-space: nowrap;
+            }
+            .mcw-prechat-status-dot {
+                width: 8px; height: 8px; background: var(--mcw-prechat-status-dot, #10b981); border-radius: 50%;
+                animation: mcwPulseDot 1.5s ease-in-out infinite; box-shadow: 0 0 0 2px var(--mcw-prechat-status-dot-shadow, rgba(16, 185, 129, 0.3));
+            }
+            @keyframes mcwPulseDot { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } }
+            .mcw-prechat-hero-title { font-size: 22px; font-weight: 700; color: var(--mcw-prechat-title-color, white); margin-bottom: 8px; letter-spacing: -0.3px; }
+            .mcw-prechat-hero-subtitle { font-size: 14px; color: var(--mcw-prechat-subtitle-color, rgba(255,255,255,0.9)); line-height: 1.5; }
 
-            .mcw-prechat h3 { font-size: 20px; color: var(--mcw-text); margin-bottom: 8px; }
-            .mcw-prechat p { color: var(--mcw-text-light); font-size: 14px; }
+            /* Pre-chat Form Body */
+            .mcw-prechat-form-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; flex: 1; }
+            .mcw-prechat h3 { font-size: 18px; color: var(--mcw-text); margin-bottom: 4px; }
+            .mcw-prechat p { color: var(--mcw-text-light); font-size: 13px; margin-bottom: 8px; }
 
             .mcw-form { display: flex; flex-direction: column; gap: 16px; }
 
-            .mcw-input-group { display: flex; flex-direction: column; gap: 6px; }
-            .mcw-input-group label { font-size: 13px; font-weight: 500; color: var(--mcw-text); }
+            .mcw-input-group { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+            .mcw-input-group label { font-size: 13px; font-weight: 600; color: var(--mcw-text); display: flex; align-items: center; gap: 4px; }
+            .mcw-input-group label .required { color: #ef4444; }
+            .mcw-input-with-icon { position: relative; width: 100%; }
+            .mcw-input-with-icon input { padding-left: 44px; width: 100%; }
+            .mcw-input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: #9ca3af; pointer-events: none; }
 
             .mcw-input {
                 width: 100%;
-                padding: 12px 16px;
-                border: 1px solid var(--mcw-border);
-                border-radius: 10px;
+                box-sizing: border-box;
+                padding: 14px 16px;
+                border: 2px solid var(--mcw-border);
+                border-radius: 12px;
                 font-size: 14px;
-                transition: border-color 0.2s, box-shadow 0.2s;
+                background: #f9fafb;
+                transition: all 0.2s ease;
             }
+            .mcw-input:hover { border-color: #d1d5db; background: white; }
             .mcw-input:focus {
                 outline: none;
                 border-color: var(--mcw-primary);
-                box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+                box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+                background: white;
             }
+            .mcw-input::placeholder { color: #9ca3af; }
 
             .mcw-start-btn {
                 width: 100%;
-                padding: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                padding: 14px 24px;
                 background: var(--mcw-gradient);
                 color: white;
                 border: none;
-                border-radius: 10px;
+                border-radius: 12px;
                 font-size: 15px;
                 font-weight: 600;
                 cursor: pointer;
-                transition: transform 0.2s, box-shadow 0.2s;
+                transition: all 0.2s ease;
                 margin-top: 8px;
+                box-shadow: 0 4px 14px rgba(0,0,0,0.15);
             }
-            .mcw-start-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4); }
+            .mcw-start-btn svg { width: 18px; height: 18px; fill: white; }
+            .mcw-start-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4); }
 
             /* Messages */
             .mcw-messages {
@@ -528,31 +566,54 @@ class ModernChatWidget {
 
                 <div class="mcw-prechat" id="mcw-prechat">
                     <div class="mcw-prechat-hero">
-                        <div class="mcw-prechat-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                                <line x1="12" y1="8" x2="12" y2="12"></line>
-                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                            </svg>
+                        <div class="mcw-prechat-hero-content">
+                            <div class="mcw-prechat-status">
+                                <div class="mcw-prechat-status-dot"></div>
+                                <span>Online</span>
+                            </div>
+                            <div class="mcw-prechat-avatar-group">
+                                <div class="mcw-prechat-avatar">
+                                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                                </div>
+                                <div class="mcw-prechat-avatar">
+                                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                                </div>
+                                <div class="mcw-prechat-avatar">
+                                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                                </div>
+                            </div>
+                            <div class="mcw-prechat-hero-title">Start a conversation</div>
+                            <div class="mcw-prechat-hero-subtitle">We're here to help!<br>Fill out the form below to chat with our team.</div>
                         </div>
-                        <h3>Start a conversation</h3>
-                        <p>Fill in your details to connect with our team</p>
                     </div>
-                    <form class="mcw-form" id="mcw-form">
-                        <div class="mcw-input-group">
-                            <label>Your name</label>
-                            <input type="text" class="mcw-input" id="mcw-name" placeholder="Enter your name" required>
-                        </div>
-                        <div class="mcw-input-group">
-                            <label>Email address</label>
-                            <input type="email" class="mcw-input" id="mcw-email" placeholder="Enter your email" required>
-                        </div>
-                        <div class="mcw-input-group">
-                            <label>How can we help?</label>
-                            <textarea class="mcw-input" id="mcw-question" placeholder="Briefly describe your question..." rows="3"></textarea>
-                        </div>
-                        <button type="submit" class="mcw-start-btn">Start Chat</button>
-                    </form>
+                    <div class="mcw-prechat-form-body">
+                        <h3>Welcome!</h3>
+                        <p>Please fill in your details to start chatting with us.</p>
+                        <form class="mcw-form" id="mcw-form">
+                            <div class="mcw-input-group">
+                                <label>Your Name <span class="required">*</span></label>
+                                <div class="mcw-input-with-icon">
+                                    <input type="text" class="mcw-input" id="mcw-name" placeholder="Enter your name" required>
+                                    <svg class="mcw-input-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                                </div>
+                            </div>
+                            <div class="mcw-input-group">
+                                <label>Email Address <span class="required">*</span></label>
+                                <div class="mcw-input-with-icon">
+                                    <input type="email" class="mcw-input" id="mcw-email" placeholder="Enter your email" required>
+                                    <svg class="mcw-input-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                </div>
+                            </div>
+                            <div class="mcw-input-group">
+                                <label>How can we help? <span style="font-weight: 400; color: #9ca3af;">(optional)</span></label>
+                                <textarea class="mcw-input" id="mcw-question" placeholder="Describe your question or issue..." rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="mcw-start-btn">
+                                <span>Start Chat</span>
+                                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
                 <div class="mcw-loading" id="mcw-loading">
