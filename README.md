@@ -4,7 +4,7 @@
 
 [![D365 Compatible](https://img.shields.io/badge/D365-Omnichannel-0078D4?style=flat-square&logo=microsoft)](https://dynamics.microsoft.com)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v1.6.0-blue?style=flat-square)](package.json)
+[![Version](https://img.shields.io/badge/version-v1.7.0-blue?style=flat-square)](package.json)
 
 ![Chat Widget Preview](preview.png)
 
@@ -1145,6 +1145,36 @@ If this widget helped you, consider:
 ---
 
 ## 📝 Changelog
+
+### v1.7.0 (December 21, 2025)
+
+#### 🎨 Pre-chat Hero Customization
+- **NEW:** Configurable pre-chat hero gradient toggle (gradient vs solid color)
+- **NEW:** Custom gradient start/end colors for pre-chat hero section
+- **NEW:** Solid background color option for pre-chat hero
+- **NEW:** Customizable title, subtitle, badge, and status dot colors
+- **NEW:** Configurable avatar border color
+- **NEW:** Name and email field placeholder settings
+- Updated hero avatars to use GitHub-hosted images with config fallbacks
+
+#### 🚀 Embed Code Improvements
+- **Download HTML button** now only appears after generating embed code
+- TamperMonkey mode hides download button to avoid confusion
+- Download HTML always generates functional full embed code
+- Green gradient styling on Download HTML button for visibility
+- Fixed avatar image paths in embed code (now use GitHub raw URLs)
+
+#### 🐒 TamperMonkey Enhancements
+- Pre-chat hero colors now work in TamperMonkey/Compact mode
+- Field placeholders now configurable and work across all output modes
+- widget-core.js updated with all new customization options
+
+#### 🐛 Bug Fixes
+- Fixed embedded code avatar images using local paths (now GitHub URLs)
+- Fixed Download HTML producing broken pages with TamperMonkey code
+- Fixed placeholders not appearing in downloaded HTML files
+
+---
 
 ### v1.6.0 (December 2025)
 

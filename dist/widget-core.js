@@ -419,9 +419,9 @@
             '</div>',
             // Pre-chat Form Body
             '<div class="d365-prechat-body">',
-              '<div class="d365-form-group"><label>'+c.nameFieldLabel+'</label><input type="text" id="d365Name" required></div>',
-              '<div class="d365-form-group"><label>'+c.emailFieldLabel+'</label><input type="email" id="d365Email" required></div>',
-              '<div class="d365-form-group"><label>'+(c.questionFieldLabel||'How can we help?')+'</label><textarea id="d365Question"></textarea></div>',
+              '<div class="d365-form-group"><label>'+c.nameFieldLabel+'</label><input type="text" id="d365Name" placeholder="'+(c.nameFieldPlaceholder||'Enter your name')+'" required></div>',
+              '<div class="d365-form-group"><label>'+c.emailFieldLabel+'</label><input type="email" id="d365Email" placeholder="'+(c.emailFieldPlaceholder||'Enter your email')+'" required></div>',
+              '<div class="d365-form-group"><label>'+(c.questionFieldLabel||'How can we help?')+'</label><textarea id="d365Question" placeholder="'+(c.questionFieldPlaceholder||'Describe your question...')+'"></textarea></div>',
               '<button type="button" class="d365-start-btn" id="d365StartBtn">'+c.startBtnText+'</button>',
             '</div>',
           '</div>',
