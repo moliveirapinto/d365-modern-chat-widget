@@ -2574,8 +2574,16 @@
                             <input type="text" class="form-input" id="nameFieldLabel" value="Your Name" placeholder="e.g., Your Name">
                         </div>
                         <div class="form-group">
+                            <label class="form-label">Name Field Placeholder</label>
+                            <input type="text" class="form-input" id="nameFieldPlaceholder" value="Enter your name" placeholder="e.g., Enter your name">
+                        </div>
+                        <div class="form-group">
                             <label class="form-label">Email Field Label</label>
                             <input type="text" class="form-input" id="emailFieldLabel" value="Email Address" placeholder="e.g., Email Address">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email Field Placeholder</label>
+                            <input type="text" class="form-input" id="emailFieldPlaceholder" value="Enter your email" placeholder="e.g., Enter your email">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Question Field Label</label>
@@ -4186,7 +4194,9 @@
             welcomeTitle: 'Start a conversation',
             welcomeMessage: "We're here to help! Please fill out the form below to start chatting with our team.",
             nameFieldLabel: 'Your Name',
+            nameFieldPlaceholder: 'Enter your name',
             emailFieldLabel: 'Email Address',
+            emailFieldPlaceholder: 'Enter your email',
             questionFieldLabel: 'How can we help?',
             questionFieldPlaceholder: 'Describe your question...',
             startBtnText: 'Start Chat'
@@ -4712,8 +4722,11 @@
             document.getElementById('welcomeTitle').value = settings.welcomeTitle || defaultSettings.welcomeTitle;
             document.getElementById('welcomeMessage').value = settings.welcomeMessage || defaultSettings.welcomeMessage;
             document.getElementById('nameFieldLabel').value = settings.nameFieldLabel || defaultSettings.nameFieldLabel;
+            document.getElementById('nameFieldPlaceholder').value = settings.nameFieldPlaceholder || defaultSettings.nameFieldPlaceholder;
             document.getElementById('emailFieldLabel').value = settings.emailFieldLabel || defaultSettings.emailFieldLabel;
+            document.getElementById('emailFieldPlaceholder').value = settings.emailFieldPlaceholder || defaultSettings.emailFieldPlaceholder;
             document.getElementById('questionFieldLabel').value = settings.questionFieldLabel || defaultSettings.questionFieldLabel;
+            document.getElementById('questionFieldPlaceholder').value = settings.questionFieldPlaceholder || defaultSettings.questionFieldPlaceholder;
             document.getElementById('startBtnText').value = settings.startBtnText || defaultSettings.startBtnText;
 
             // Color pickers - MUST be set BEFORE toggleGradient() which calls updateSettingsFromForm()
@@ -5544,7 +5557,9 @@
             settings.welcomeTitle = document.getElementById('welcomeTitle').value;
             settings.welcomeMessage = document.getElementById('welcomeMessage').value;
             settings.nameFieldLabel = document.getElementById('nameFieldLabel').value;
+            settings.nameFieldPlaceholder = document.getElementById('nameFieldPlaceholder').value;
             settings.emailFieldLabel = document.getElementById('emailFieldLabel').value;
+            settings.emailFieldPlaceholder = document.getElementById('emailFieldPlaceholder').value;
             settings.questionFieldLabel = document.getElementById('questionFieldLabel').value;
             settings.questionFieldPlaceholder = document.getElementById('questionFieldPlaceholder').value;
             settings.startBtnText = document.getElementById('startBtnText').value;
@@ -5846,8 +5861,11 @@
                 document.getElementById('welcomeTitle').value = defaultSettings.welcomeTitle;
                 document.getElementById('welcomeMessage').value = defaultSettings.welcomeMessage;
                 document.getElementById('nameFieldLabel').value = defaultSettings.nameFieldLabel;
+                document.getElementById('nameFieldPlaceholder').value = defaultSettings.nameFieldPlaceholder;
                 document.getElementById('emailFieldLabel').value = defaultSettings.emailFieldLabel;
+                document.getElementById('emailFieldPlaceholder').value = defaultSettings.emailFieldPlaceholder;
                 document.getElementById('questionFieldLabel').value = defaultSettings.questionFieldLabel;
+                document.getElementById('questionFieldPlaceholder').value = defaultSettings.questionFieldPlaceholder;
                 document.getElementById('startBtnText').value = defaultSettings.startBtnText;
                 
                 // Reset pre-chat form toggle and custom auth
@@ -6164,7 +6182,10 @@ window.D365WidgetConfig=${configJson};
             if (settings.welcomeTitle && settings.welcomeTitle !== 'Welcome!') config.welcomeTitle = settings.welcomeTitle;
             if (settings.welcomeMessage && settings.welcomeMessage !== 'Please fill in your details to start chatting with us.') config.welcomeMessage = settings.welcomeMessage;
             if (settings.nameFieldLabel && settings.nameFieldLabel !== 'Name *') config.nameFieldLabel = settings.nameFieldLabel;
+            if (settings.nameFieldPlaceholder && settings.nameFieldPlaceholder !== 'Enter your name') config.nameFieldPlaceholder = settings.nameFieldPlaceholder;
             if (settings.emailFieldLabel && settings.emailFieldLabel !== 'Email *') config.emailFieldLabel = settings.emailFieldLabel;
+            if (settings.emailFieldPlaceholder && settings.emailFieldPlaceholder !== 'Enter your email') config.emailFieldPlaceholder = settings.emailFieldPlaceholder;
+            if (settings.questionFieldPlaceholder && settings.questionFieldPlaceholder !== 'Describe your question...') config.questionFieldPlaceholder = settings.questionFieldPlaceholder;
             if (settings.startBtnText && settings.startBtnText !== 'Start Chat') config.startBtnText = settings.startBtnText;
             if (settings.enableCustomAuth) {
                 config.enableCustomAuth = true;
@@ -6223,7 +6244,9 @@ window.D365WidgetConfig=${configJson};
                 welcomeTitle: settings.welcomeTitle || 'Welcome!',
                 welcomeMessage: settings.welcomeMessage || 'Please fill in your details to start chatting with us.',
                 nameFieldLabel: settings.nameFieldLabel || 'Name *',
+                nameFieldPlaceholder: settings.nameFieldPlaceholder || 'Enter your name',
                 emailFieldLabel: settings.emailFieldLabel || 'Email *',
+                emailFieldPlaceholder: settings.emailFieldPlaceholder || 'Enter your email',
                 questionFieldLabel: settings.questionFieldLabel || 'How can we help? (optional)',
                 questionFieldPlaceholder: settings.questionFieldPlaceholder || 'Describe your question...',
                 startBtnText: settings.startBtnText || 'Start Chat',
@@ -6757,14 +6780,14 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             <div class="d365-form-group">
               <label>\${config.nameFieldLabel} <span class="required">*</span></label>
               <div class="d365-input-with-icon">
-                <input type="text" id="d365UserName" placeholder="Enter your name" required>
+                <input type="text" id="d365UserName" placeholder="\${config.nameFieldPlaceholder || 'Enter your name'}" required>
                 <svg class="d365-input-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
               </div>
             </div>
             <div class="d365-form-group">
               <label>\${config.emailFieldLabel} <span class="required">*</span></label>
               <div class="d365-input-with-icon">
-                <input type="email" id="d365UserEmail" placeholder="Enter your email" required>
+                <input type="email" id="d365UserEmail" placeholder="\${config.emailFieldPlaceholder || 'Enter your email'}" required>
                 <svg class="d365-input-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
               </div>
             </div>
