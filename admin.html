@@ -6335,7 +6335,7 @@ window.D365WidgetConfig=${configJson};
             return config;
         }
         
-        function generateFullEmbedCode(minified) {
+        function generateFullEmbedCode(minified, skipCharCount) {
             // Build the configuration object with all customizations
             // Use GitHub raw URLs for images so they work when embedded anywhere
             const config = {
@@ -7963,9 +7963,11 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
 <\/script>`;
             
             document.getElementById('embedCodeOutput').value = embedCode;
-            showCharCount(embedCode.length);
+            if (!skipCharCount) {
+                showCharCount(embedCode.length);
+                showToast('Full embed code generated! ' + embedCode.length.toLocaleString() + ' characters.');
+            }
             document.getElementById('downloadHtmlBtn').style.display = 'inline-flex'; // Show download button
-            showToast('Full embed code generated! ' + embedCode.length.toLocaleString() + ' characters.');
             
             // Return the generated code for use by other functions (like downloadEmbedCode)
             return embedCode;
@@ -8010,8 +8012,8 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
                     showToast('Please configure D365 Connection settings first');
                     return;
                 }
-                // Generate full embed code (this updates textarea and returns the code)
-                embedCode = generateFullEmbedCode(true);
+                // Generate full embed code silently (skip char count warning)
+                embedCode = generateFullEmbedCode(true, true);
             }
             
             // Create HTML file with the embed code
