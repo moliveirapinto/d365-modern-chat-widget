@@ -4,7 +4,7 @@
 
 [![D365 Compatible](https://img.shields.io/badge/D365-Omnichannel-0078D4?style=flat-square&logo=microsoft)](https://dynamics.microsoft.com)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v1.7.0-blue?style=flat-square)](package.json)
+[![Version](https://img.shields.io/badge/version-v1.8.0-blue?style=flat-square)](package.json)
 
 ![Chat Widget Preview](preview.png)
 
@@ -1145,6 +1145,23 @@ If this widget helped you, consider:
 ---
 
 ## 📝 Changelog
+
+### v1.8.0 (December 22, 2025)
+
+#### 🎨 Quick Color Palettes
+- **NEW:** Color palette gallery with 24 curated professional color combinations
+- One-click palette application to all widget colors (header, buttons, launcher, pre-chat)
+- "Show All" / "Show Less" toggle to expand/collapse palette gallery
+- Visual selection feedback with highlighted active palette
+- Link to coolors.co for additional color inspiration
+- Styled gradient button for better visibility
+
+#### 🔄 Reset to Default Improvements
+- **FIXED:** Reset to Default now properly clears all settings
+- Auto-refreshes page after reset for guaranteed clean state
+- No manual refresh or cache clearing needed
+
+---
 
 ### v1.7.0 (December 21, 2025)
 

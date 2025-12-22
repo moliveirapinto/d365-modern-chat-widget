@@ -484,6 +484,91 @@
             word-break: break-all;
         }
 
+        /* Color Palette Gallery */
+        .palette-gallery {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--admin-border);
+        }
+        .palette-gallery-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .palette-gallery-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--admin-text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .palette-gallery-title svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--admin-primary);
+        }
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+        }
+        .palette-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .palette-card:hover {
+            border-color: var(--admin-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .palette-card.selected {
+            border-color: var(--admin-primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+        .palette-colors {
+            display: flex;
+            height: 36px;
+        }
+        .palette-colors > div {
+            flex: 1;
+            transition: flex 0.2s ease;
+        }
+        .palette-card:hover .palette-colors > div:first-child,
+        .palette-card:hover .palette-colors > div:last-child {
+            flex: 1.2;
+        }
+        .palette-name {
+            padding: 8px 10px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--admin-text);
+            text-align: center;
+            background: #f8fafc;
+        }
+        .palette-expand-btn {
+            background: linear-gradient(135deg, var(--admin-primary) 0%, #764ba2 100%);
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            padding: 6px 14px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+        }
+        .palette-expand-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
         /* Color Picker Grid - Compact layout */
         .color-grid {
             display: grid;
@@ -2754,6 +2839,23 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    <!-- Color Palette Gallery -->
+                    <div class="palette-gallery">
+                        <div class="palette-gallery-header">
+                            <div class="palette-gallery-title">
+                                <svg viewBox="0 0 24 24"><path d="M12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.04 10 9c0 3.31-2.69 6-6 6h-1.77c-.28 0-.5.22-.5.5 0 .12.05.23.13.33.41.47.64 1.06.64 1.67A2.5 2.5 0 0 1 12 22zm0-18c-4.41 0-8 3.59-8 8s3.59 8 8 8c.28 0 .5-.22.5-.5a.54.54 0 0 0-.14-.35c-.41-.46-.63-1.05-.63-1.65a2.5 2.5 0 0 1 2.5-2.5H16c2.21 0 4-1.79 4-4 0-3.86-3.59-7-8-7zm-5.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm3-4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm3 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>
+                                Quick Palettes
+                            </div>
+                            <button class="palette-expand-btn" onclick="togglePaletteGallery()" id="paletteExpandBtn">Show All</button>
+                        </div>
+                        <div class="palette-grid" id="paletteGrid">
+                            <!-- Palettes will be inserted by JavaScript -->
+                        </div>
+                        <p class="form-hint" style="margin-top: 12px; text-align: center;">
+                            💡 Need more color ideas? Visit <a href="https://coolors.co" target="_blank" rel="noopener noreferrer" style="color: var(--admin-primary); text-decoration: none; font-weight: 500;">coolors.co</a> for endless palette inspiration!
+                        </p>
+                    </div>
+
                     <div class="tabs">
                         <button class="tab-btn active" data-tab="primary">Primary</button>
                         <button class="tab-btn" data-tab="messages">Messages</button>
@@ -4317,6 +4419,7 @@
             updatePreview();
             updateConnectionStatus();
             initCollapsibleCards();
+            renderPaletteGallery(); // Initialize color palette gallery
             // Allow auto-save after initial load is complete
             setTimeout(() => {
                 isInitializing = false;
@@ -5105,6 +5208,105 @@
             document.getElementById('extractedOrgId').textContent = orgId || '-';
             document.getElementById('extractedOrgUrl').textContent = orgUrl || '-';
             extractedContainer.style.display = 'block';
+        }
+
+        // ============ COLOR PALETTE GALLERY ============
+        const colorPalettes = [
+            // Professional & Corporate
+            { name: 'Ocean Blue', colors: ['#0077B6', '#00B4D8', '#90E0EF'], gradient: ['#0077B6', '#00B4D8'] },
+            { name: 'Purple Haze', colors: ['#667eea', '#764ba2', '#f093fb'], gradient: ['#667eea', '#764ba2'] },
+            { name: 'Emerald', colors: ['#059669', '#10B981', '#34D399'], gradient: ['#059669', '#10B981'] },
+            { name: 'Sunset', colors: ['#F97316', '#FB923C', '#FDBA74'], gradient: ['#F97316', '#FB923C'] },
+            { name: 'Royal', colors: ['#4F46E5', '#6366F1', '#818CF8'], gradient: ['#4F46E5', '#6366F1'] },
+            { name: 'Rose', colors: ['#E11D48', '#F43F5E', '#FB7185'], gradient: ['#E11D48', '#F43F5E'] },
+            // Modern & Trendy
+            { name: 'Midnight', colors: ['#1E293B', '#334155', '#475569'], gradient: ['#1E293B', '#475569'] },
+            { name: 'Coral Reef', colors: ['#FF6B6B', '#FFA07A', '#FFD93D'], gradient: ['#FF6B6B', '#FFA07A'] },
+            { name: 'Forest', colors: ['#2D5A27', '#4C9141', '#7EC871'], gradient: ['#2D5A27', '#4C9141'] },
+            { name: 'Berry', colors: ['#9333EA', '#A855F7', '#C084FC'], gradient: ['#9333EA', '#A855F7'] },
+            { name: 'Teal Dream', colors: ['#0D9488', '#14B8A6', '#2DD4BF'], gradient: ['#0D9488', '#14B8A6'] },
+            { name: 'Warm Gray', colors: ['#57534E', '#78716C', '#A8A29E'], gradient: ['#57534E', '#78716C'] },
+            // Vibrant & Playful
+            { name: 'Candy', colors: ['#EC4899', '#F472B6', '#F9A8D4'], gradient: ['#EC4899', '#F472B6'] },
+            { name: 'Citrus', colors: ['#F59E0B', '#FBBF24', '#FCD34D'], gradient: ['#F59E0B', '#FBBF24'] },
+            { name: 'Sky', colors: ['#0EA5E9', '#38BDF8', '#7DD3FC'], gradient: ['#0EA5E9', '#38BDF8'] },
+            { name: 'Lavender', colors: ['#8B5CF6', '#A78BFA', '#C4B5FD'], gradient: ['#8B5CF6', '#A78BFA'] },
+            // Dark & Bold
+            { name: 'Noir', colors: ['#18181B', '#27272A', '#3F3F46'], gradient: ['#18181B', '#3F3F46'] },
+            { name: 'Charcoal', colors: ['#374151', '#4B5563', '#6B7280'], gradient: ['#374151', '#4B5563'] },
+            { name: 'Deep Sea', colors: ['#164E63', '#0E7490', '#06B6D4'], gradient: ['#164E63', '#0E7490'] },
+            { name: 'Wine', colors: ['#7F1D1D', '#991B1B', '#DC2626'], gradient: ['#7F1D1D', '#991B1B'] },
+            // Earthy & Natural
+            { name: 'Terracotta', colors: ['#C2410C', '#EA580C', '#F97316'], gradient: ['#C2410C', '#EA580C'] },
+            { name: 'Sage', colors: ['#4D7C0F', '#65A30D', '#84CC16'], gradient: ['#4D7C0F', '#65A30D'] },
+            { name: 'Sand', colors: ['#92400E', '#B45309', '#D97706'], gradient: ['#92400E', '#B45309'] },
+            { name: 'Stone', colors: ['#64748B', '#94A3B8', '#CBD5E1'], gradient: ['#64748B', '#94A3B8'] }
+        ];
+        
+        let showAllPalettes = false;
+        
+        function renderPaletteGallery() {
+            const grid = document.getElementById('paletteGrid');
+            const palettesToShow = showAllPalettes ? colorPalettes : colorPalettes.slice(0, 6);
+            
+            grid.innerHTML = palettesToShow.map((palette, index) => `
+                <div class="palette-card" onclick="applyPalette(${index})" title="Click to apply ${palette.name}">
+                    <div class="palette-colors">
+                        ${palette.colors.map(color => `<div style="background: ${color}"></div>`).join('')}
+                    </div>
+                    <div class="palette-name">${palette.name}</div>
+                </div>
+            `).join('');
+        }
+        
+        function togglePaletteGallery() {
+            showAllPalettes = !showAllPalettes;
+            document.getElementById('paletteExpandBtn').textContent = showAllPalettes ? 'Show Less' : 'Show All';
+            renderPaletteGallery();
+        }
+        
+        function applyPalette(index) {
+            const palette = colorPalettes[index];
+            const [gradientStart, gradientEnd] = palette.gradient;
+            const primaryColor = palette.colors[0];
+            
+            // Apply to gradient colors
+            document.getElementById('gradientStart').value = gradientStart;
+            document.getElementById('gradientStartHex').value = gradientStart;
+            document.getElementById('gradientEnd').value = gradientEnd;
+            document.getElementById('gradientEndHex').value = gradientEnd;
+            document.getElementById('primaryColor').value = primaryColor;
+            document.getElementById('primaryColorHex').value = primaryColor;
+            
+            // Apply to user bubble colors
+            document.getElementById('userBubbleColor').value = primaryColor;
+            document.getElementById('userBubbleColorHex').value = primaryColor;
+            
+            // Apply to send button and launcher
+            document.getElementById('sendBtnColor').value = primaryColor;
+            document.getElementById('sendBtnColorHex').value = primaryColor;
+            document.getElementById('launcherColor').value = primaryColor;
+            document.getElementById('launcherColorHex').value = primaryColor;
+            
+            // Apply to pre-chat hero colors
+            document.getElementById('prechatGradientStart').value = gradientStart;
+            document.getElementById('prechatGradientStartHex').value = gradientStart;
+            document.getElementById('prechatGradientEnd').value = gradientEnd;
+            document.getElementById('prechatGradientEndHex').value = gradientEnd;
+            document.getElementById('prechatSolidColor').value = primaryColor;
+            document.getElementById('prechatSolidColorHex').value = primaryColor;
+            
+            // Update settings and preview
+            updateSettingsFromForm();
+            updatePreview();
+            updateLauncherPreview();
+            
+            // Mark selected palette
+            document.querySelectorAll('.palette-card').forEach((card, i) => {
+                card.classList.toggle('selected', i === index || (index >= 6 && i === index - 6 * Math.floor(index / 6)));
+            });
+            
+            showToast(`Applied "${palette.name}" palette!`);
         }
 
         function toggleGradient() {
