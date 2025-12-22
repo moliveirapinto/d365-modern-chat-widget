@@ -1161,6 +1161,9 @@ If this widget helped you, consider:
 - Auto-refreshes page after reset for guaranteed clean state
 - No manual refresh or cache clearing needed
 
+#### 🐛 Bug Fixes
+- **FIXED:** Character count warning only shows when generating embed code (not when downloading HTML)
+
 ---
 
 ### v1.7.0 (December 21, 2025)
