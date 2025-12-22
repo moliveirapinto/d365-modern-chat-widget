@@ -7834,6 +7834,22 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
                 return;
             }
             
+            // Check if this is TamperMonkey code (not valid for HTML embedding)
+            if (embedCode.startsWith('// ==UserScript==')) {
+                // For TamperMonkey, download as .user.js file instead
+                const blob = new Blob([embedCode], { type: 'text/javascript' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'd365-chat-widget.user.js';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('TamperMonkey script downloaded as .user.js file! Import it into TamperMonkey.');
+                return;
+            }
+            
             // Create a full HTML file with the embed code
             const htmlContent = `<!DOCTYPE html>
 <html lang="en">
