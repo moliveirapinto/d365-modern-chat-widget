@@ -7802,6 +7802,9 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             document.getElementById('embedCodeOutput').value = embedCode;
             showCharCount(embedCode.length);
             showToast('Full embed code generated! ' + embedCode.length.toLocaleString() + ' characters.');
+            
+            // Return the generated code for use by other functions (like downloadEmbedCode)
+            return embedCode;
         }
         
         function copyGeneratedEmbedCode() {
@@ -7827,28 +7830,18 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
         }
         
         function downloadEmbedCode() {
-            const embedCode = document.getElementById('embedCodeOutput').value;
+            // Update settings from form first
+            updateSettingsFromForm();
             
-            if (!embedCode || embedCode.includes('Click')) {
-                showToast('Please generate the embed code first');
+            // Validate required D365 settings
+            if (!settings.orgId || !settings.orgUrl || !settings.widgetId) {
+                showToast('Please configure D365 Connection settings first (Org ID, Org URL, Widget ID)');
                 return;
             }
             
-            // Check if this is TamperMonkey code (not valid for HTML embedding)
-            if (embedCode.startsWith('// ==UserScript==')) {
-                // For TamperMonkey, download as .user.js file instead
-                const blob = new Blob([embedCode], { type: 'text/javascript' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'd365-chat-widget.user.js';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showToast('TamperMonkey script downloaded as .user.js file! Import it into TamperMonkey.');
-                return;
-            }
+            // Always generate fresh full embed code for HTML download (regardless of what's in textarea)
+            // This ensures the downloaded HTML is always functional
+            const embedCode = generateFullEmbedCode(true); // Generate minified full embed code
             
             // Create a full HTML file with the embed code
             const htmlContent = `<!DOCTYPE html>
@@ -7894,7 +7887,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            showToast('Embed code downloaded as HTML file!');
+            showToast('Functional HTML demo page downloaded!');
         }
 
         function generateTamperMonkeyCode() {
