@@ -7830,58 +7830,49 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
         }
         
         function downloadEmbedCode() {
-            // Update settings from form first
-            updateSettingsFromForm();
+            // Get the code from textarea
+            let embedCode = document.getElementById('embedCodeOutput').value;
             
-            // Validate required D365 settings
-            if (!settings.orgId || !settings.orgUrl || !settings.widgetId) {
-                showToast('Please configure D365 Connection settings first (Org ID, Org URL, Widget ID)');
+            // Check if there's valid embed code (not empty, not placeholder, not TamperMonkey)
+            if (!embedCode || embedCode.includes('Click') || embedCode.includes('⚠️')) {
+                showToast('Please generate embed code first by clicking "Generate Embed Code"');
                 return;
             }
             
-            // Always generate fresh full embed code for HTML download (regardless of what's in textarea)
-            // This ensures the downloaded HTML is always functional
-            const embedCode = generateFullEmbedCode(true); // Generate minified full embed code
-            
-            if (!embedCode) {
-                showToast('Failed to generate embed code. Please try again.');
-                return;
+            // If TamperMonkey code is in textarea, generate fresh Full Embed code instead
+            if (embedCode.startsWith('// ==UserScript==')) {
+                updateSettingsFromForm();
+                if (!settings.orgId || !settings.orgUrl || !settings.widgetId) {
+                    showToast('Please configure D365 Connection settings first');
+                    return;
+                }
+                // Generate full embed code (this updates textarea and returns the code)
+                embedCode = generateFullEmbedCode(true);
             }
             
-            // Create a full HTML file with the embed code
-            // Use string concatenation to avoid any template literal parsing issues
+            // Create HTML file with the embed code
             const htmlContent = '<!DOCTYPE html>\n' +
-'<html lang="en">\n' +
-'<head>\n' +
-'    <meta charset="UTF-8">\n' +
-'    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
-'    <title>Chat Widget Demo</title>\n' +
-'    <style>\n' +
-'        body {\n' +
-'            font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif;\n' +
-'            margin: 0;\n' +
-'            padding: 40px;\n' +
-'            background: #f5f5f5;\n' +
-'            min-height: 100vh;\n' +
-'        }\n' +
-'        .demo-content {\n' +
-'            max-width: 800px;\n' +
-'            margin: 0 auto;\n' +
-'        }\n' +
-'        h1 { color: #333; }\n' +
-'        p { color: #666; line-height: 1.6; }\n' +
-'    </style>\n' +
-'</head>\n' +
-'<body>\n' +
-'    <div class="demo-content">\n' +
-'        <h1>Chat Widget Demo</h1>\n' +
-'        <p>This is a demo page with the embedded chat widget. The widget should appear in the bottom-right corner of the page.</p>\n' +
-'        <p>Click the chat launcher button to open the widget.</p>\n' +
-'    </div>\n' +
-'    \n' +
-embedCode + '\n' +
-'</body>\n' +
-'</html>';
+                '<html lang="en">\n' +
+                '<head>\n' +
+                '    <meta charset="UTF-8">\n' +
+                '    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
+                '    <title>Chat Widget Demo</title>\n' +
+                '    <style>\n' +
+                '        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 40px; background: #f5f5f5; min-height: 100vh; }\n' +
+                '        .demo-content { max-width: 800px; margin: 0 auto; }\n' +
+                '        h1 { color: #333; }\n' +
+                '        p { color: #666; line-height: 1.6; }\n' +
+                '    </style>\n' +
+                '</head>\n' +
+                '<body>\n' +
+                '    <div class="demo-content">\n' +
+                '        <h1>Chat Widget Demo</h1>\n' +
+                '        <p>This is a demo page with the embedded chat widget. The widget should appear in the bottom-right corner of the page.</p>\n' +
+                '        <p>Click the chat launcher button to open the widget.</p>\n' +
+                '    </div>\n' +
+                '    ' + embedCode + '\n' +
+                '</body>\n' +
+                '</html>';
             
             const blob = new Blob([htmlContent], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
@@ -7893,7 +7884,7 @@ embedCode + '\n' +
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            showToast('Functional HTML demo page downloaded!');
+            showToast('HTML demo page downloaded!');
         }
 
         function generateTamperMonkeyCode() {
