@@ -3492,14 +3492,44 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v1.6.0';
-        const APP_LAST_UPDATED = 'Dec 19, 2025, 09:45 PM';
+        const APP_VERSION = 'v1.8.0';
+        const APP_LAST_UPDATED = 'Dec 22, 2025, 02:30 PM';
         
         const CHANGELOG = [
             {
+                version: 'v1.8.0',
+                date: 'Dec 22, 2025',
+                latest: true,
+                items: [
+                    { type: 'new', text: 'Quick Color Palettes gallery with 24 curated professional combinations' },
+                    { type: 'new', text: 'One-click palette application to all widget colors' },
+                    { type: 'new', text: 'Show All / Show Less toggle for palette gallery' },
+                    { type: 'new', text: 'Link to coolors.co for additional color inspiration' },
+                    { type: 'improve', text: 'Styled gradient button for palette visibility' },
+                    { type: 'fix', text: 'Reset to Default now auto-refreshes page for clean state' },
+                    { type: 'fix', text: 'Character count warning only shows when generating embed code' }
+                ]
+            },
+            {
+                version: 'v1.7.0',
+                date: 'Dec 21, 2025',
+                latest: false,
+                items: [
+                    { type: 'new', text: 'Pre-chat hero gradient toggle (gradient vs solid color)' },
+                    { type: 'new', text: 'Custom gradient start/end colors for pre-chat hero' },
+                    { type: 'new', text: 'Customizable title, subtitle, badge, and status dot colors' },
+                    { type: 'new', text: 'Name and email field placeholder settings' },
+                    { type: 'improve', text: 'Download HTML button only appears after generating embed code' },
+                    { type: 'improve', text: 'Green gradient styling on Download HTML button' },
+                    { type: 'fix', text: 'Avatar image paths now use GitHub raw URLs' },
+                    { type: 'fix', text: 'Download HTML no longer produces broken pages with TamperMonkey code' },
+                    { type: 'fix', text: 'Placeholders now work in all output modes (embed, TamperMonkey)' }
+                ]
+            },
+            {
                 version: 'v1.6.0',
                 date: 'Dec 19, 2025',
-                latest: true,
+                latest: false,
                 items: [
                     { type: 'new', text: 'Cloudflare D1 SQL database for analytics (100K writes/day)' },
                     { type: 'new', text: 'Analytics dashboard with real-time tracking' },
