@@ -8,7 +8,7 @@
  * 1. Create a Cloudflare account (free)
  * 2. Create a KV namespace called "ANALYTICS"
  * 3. Deploy this worker
- * 4. Update widget-core.js and index.html with your worker URL
+ * 4. Update widget-core.js and live.html with your worker URL
  */
 
 export default {

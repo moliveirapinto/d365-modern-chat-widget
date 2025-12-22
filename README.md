@@ -149,7 +149,7 @@ Switch between **Standard mode** (native D365 LCW) and **Custom mode** (fully st
    ```
 
 2. **Open the Admin Panel**:
-   - Open `admin.html` in your browser
+   - Open `index.html` in your browser (or visit the hosted version)
    - Configure your D365 connection details
    - Customize appearance and branding
    - Copy the embed code
@@ -177,7 +177,7 @@ Switch between **Standard mode** (native D365 LCW) and **Custom mode** (fully st
    npm run build
    ```
 
-4. **Configure and deploy** using `admin.html`
+4. **Configure and deploy** using `index.html`
 
 ---
 
@@ -198,7 +198,7 @@ Find these values in **Dynamics 365 Admin Center**:
 
 #### 2️⃣ Configure via Admin Panel (Recommended)
 
-1. **Open `admin.html`** in your browser
+1. **Open `index.html`** in your browser
 2. **Set D365 Connection**:
    - Enter your Organization ID
    - Enter your Organization URL  
@@ -244,8 +244,8 @@ window.chatWidget = new ModernChatWidget({
 
 ```
 d365-modern-chat-widget/
-├── 📄 index.html                    # Main chat widget UI
-├── 🎨 admin.html                    # Admin configuration panel (Chat Widget Studio Analytics)
+├── 📄 index.html                    # Admin configuration panel (Chat Widget Studio)
+├── 🎬 live.html                     # Live chat widget UI
 ├── 📊 analytics.html                # Analytics dashboard (private, in .gitignore)
 ├── 📘 D365-CHAT-SDK-GUIDE.md        # SDK implementation guide
 ├── 📦 package.json                  # NPM dependencies
@@ -267,19 +267,10 @@ d365-modern-chat-widget/
 ### File Descriptions
 
 #### [`index.html`](index.html)
-The main chat widget interface containing:
-- 🎨 Chat widget UI and layout with customizable styling
-- 📝 Pre-chat form with dynamic field labels
-- 💬 Message area with typing indicators and file support
-- 🎮 Input controls with emoji, file, and voice options
-- ⏳ Loading states and connection indicators
-- 🔄 **Automatically loads and applies admin settings from localStorage**
-
-#### [`admin.html`](admin.html)
-Comprehensive admin configuration panel featuring:
+Comprehensive admin configuration panel (formerly admin.html) featuring:
 - 🎭 **Demo Profiles** section for saving/loading configurations
 - 🔀 **Widget Mode Selector** (Standard vs Custom)
-- � **Quick Start Guide** - Interactive tutorial modal with 3 deployment methods:
+- 📚 **Quick Start Guide** - Interactive tutorial modal with 3 deployment methods:
   - 🌐 **Go To Widget** - Direct link to the hosted widget
   - 🛠️ **TamperMonkey** - Browser extension installation with Edge store link
   - 📦 **Embed** - Copy/paste integration code
@@ -289,10 +280,19 @@ Comprehensive admin configuration panel featuring:
 - 🏷️ **Header & Branding** customization with custom logo support
 - 🎨 **Colors** tabs (Primary, Messages, UI Elements, Launcher) with blue-cyan gradient theme
 - 📋 **Pre-chat Form** toggle and field customization with custom icons (form.png)
-- 🔧 **Section Icons** - Custom branded PNG/SVG icons for all sections (office.png, world-wide-web.png, dynamics.png, review.png, typography.png, etc.)
+- 🔧 **Section Icons** - Custom branded PNG/SVG icons for all sections
 - 👥 **Avatars** upload for agent and customer
 - 💾 **Import/Export** functionality and embed code generator
 - 👁️ **Live Preview** panel showing real-time changes
+
+#### [`live.html`](live.html)
+The main chat widget interface (formerly index.html) containing:
+- 🎨 Chat widget UI and layout with customizable styling
+- 📝 Pre-chat form with dynamic field labels
+- 💬 Message area with typing indicators and file support
+- 🎮 Input controls with emoji, file, and voice options
+- ⏳ Loading states and connection indicators
+- 🔄 **Automatically loads and applies admin settings from localStorage**
 
 #### [`src/chat-widget.js`](src/chat-widget.js)
 The widget core logic (892 lines) including:
@@ -361,7 +361,7 @@ Comprehensive SDK implementation guide covering:
 
 #### Configuration
 
-**Via Admin Panel** ([admin.html](admin.html)):
+**Via Admin Panel** ([index.html](index.html)):
 
 1. Navigate to **"Pre-chat Form Settings"**
 2. **Toggle** "Enable Pre-chat Form":
@@ -474,7 +474,7 @@ Choose from a professional font library to match your brand identity.
 
 ## 🎨 Admin Panel Guide
 
-The admin panel ([admin.html](admin.html)) provides a comprehensive interface for configuring every aspect of the chat widget.
+The admin panel ([index.html](index.html)) provides a comprehensive interface for configuring every aspect of the chat widget.
 
 ### 🎭 Demo Profiles
 
@@ -862,7 +862,7 @@ The widget **automatically runs in demo mode** if D365 is not configured or SDK 
 
 ### How to Use Demo Mode
 
-1. Open [index.html](index.html) without configuring D365
+1. Open [live.html](live.html) without configuring D365
 2. Widget automatically detects missing config
 3. Chat functions with simulated responses
 4. Perfect for:
@@ -1082,8 +1082,8 @@ The widget **automatically runs in demo mode** if D365 is not configured or SDK 
 
 | Metric | Value |
 |--------|-------|
-| 📄 **Main Widget** | index.html (full-featured UI) |
-| 🎨 **Admin Panel** | admin.html (comprehensive config) |
+| 📄 **Admin Panel** | index.html (comprehensive config) |
+| 🎬 **Live Widget** | live.html (full-featured UI) |
 | 💻 **Core Logic** | src/chat-widget.js (892 lines) |
 | 🔤 **Font Options** | 30 professional fonts |
 | 🎨 **Color Options** | Unlimited (gradients + solid) |
@@ -1227,7 +1227,7 @@ If this widget helped you, consider:
 
 **Built with ❤️ for a better customer service experience**
 
-🚀 **[Get Started](#-quick-start)** | 📖 **[Read Docs](#-documentation)** | 🎨 **[View Demo](index.html)**
+🚀 **[Get Started](#-quick-start)** | 📖 **[Read Docs](#-documentation)** | 🎨 **[View Demo](live.html)**
 
 ---
 

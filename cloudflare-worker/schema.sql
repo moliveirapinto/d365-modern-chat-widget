@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS events (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   type TEXT NOT NULL,           -- 'load', 'chat', 'call'
   domain TEXT NOT NULL,          -- Website domain where event occurred
-  source TEXT,                   -- 'index.html', 'widget-core', etc.
+  source TEXT,                   -- 'live.html', 'widget-core', etc.
   timestamp TEXT NOT NULL        -- ISO 8601 timestamp
 );
 

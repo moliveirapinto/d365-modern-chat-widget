@@ -82,9 +82,9 @@ fetch('https://d365-widget-analytics.YOUR-USERNAME.workers.dev/analytics', {
 
 **Uncomment** those lines (remove the `//`).
 
-#### Update `index.html`
+#### Update `live.html`
 
-Find the same section in index.html (around line 1315) and make the same change.
+Find the same section in live.html (around line 1315) and make the same change.
 
 #### Update `analytics.html`
 
