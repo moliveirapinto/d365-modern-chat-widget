@@ -9701,5 +9701,40 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
     </script>
+    
+    <!-- Feedback Button -->
+    <a href="https://forms.office.com/r/ye88A0WkPp" target="_blank" class="feedback-button" title="Send Feedback">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12zM7 9h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"/>
+        </svg>
+        <span>Feedback</span>
+    </a>
+    <style>
+        .feedback-button {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s ease;
+            z-index: 9999;
+        }
+        .feedback-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+        }
+        .feedback-button svg {
+            flex-shrink: 0;
+        }
+    </style>
 </body>
 </html>
