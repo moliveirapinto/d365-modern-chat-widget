@@ -3834,10 +3834,69 @@
                 </div>
                 
                 <!-- Preview Tabs -->
-                <div class="preview-tabs">
+                <div class="preview-tabs" id="customPreviewTabs">
                     <button class="preview-tab active" onclick="switchPreviewTab('prechat')">Pre-chat</button>
                     <button class="preview-tab" onclick="switchPreviewTab('chat')">Chat Preview</button>
                     <button class="preview-tab" onclick="switchPreviewTab('launcher')">Launcher</button>
+                </div>
+                
+                <!-- Standard Widget Preview Tab (shown when standard mode selected) -->
+                <div class="preview-tabs hidden" id="standardPreviewTabs">
+                    <button class="preview-tab active" onclick="switchPreviewTab('standard')">Standard Widget</button>
+                </div>
+                
+                <!-- Standard Widget Preview -->
+                <div class="preview-content" id="standardPreview">
+                    <div class="preview-widget-container" style="background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); min-height: 400px; display: flex; align-items: center; justify-content: center; padding: 20px;">
+                        <div style="width: 100%; max-width: 320px;">
+                            <!-- Standard D365 Widget Mock -->
+                            <div style="background: white; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); overflow: hidden;">
+                                <!-- Header -->
+                                <div style="background: linear-gradient(135deg, #0078d4 0%, #00a2ed 100%); padding: 16px; display: flex; align-items: center; gap: 12px;">
+                                    <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/></svg>
+                                    </div>
+                                    <div>
+                                        <div style="color: white; font-weight: 600; font-size: 15px;">Dynamics 365</div>
+                                        <div style="color: rgba(255,255,255,0.85); font-size: 12px;">Customer Service</div>
+                                    </div>
+                                </div>
+                                <!-- Chat Area -->
+                                <div style="padding: 16px; min-height: 180px; background: #fafafa;">
+                                    <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                                        <div style="width: 32px; height: 32px; background: #0078d4; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                                        </div>
+                                        <div style="background: white; padding: 10px 14px; border-radius: 0 12px 12px 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-size: 13px; color: #333; max-width: 200px;">
+                                            Welcome! How can I help you today?
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                                        <div style="background: #0078d4; padding: 10px 14px; border-radius: 12px 0 12px 12px; font-size: 13px; color: white; max-width: 200px;">
+                                            Hi, I need assistance
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Input Area -->
+                                <div style="padding: 12px 16px; border-top: 1px solid #e5e7eb; display: flex; gap: 8px; align-items: center;">
+                                    <div style="flex: 1; background: #f3f4f6; border-radius: 20px; padding: 10px 16px; font-size: 13px; color: #9ca3af;">
+                                        Type a message...
+                                    </div>
+                                    <button style="width: 36px; height: 36px; background: #0078d4; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Info Badge -->
+                            <div style="margin-top: 16px; padding: 12px 16px; background: rgba(0,120,212,0.1); border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="#0078d4"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                                <div style="font-size: 12px; color: #0078d4; line-height: 1.4;">
+                                    <strong>Standard Widget</strong><br>
+                                    <span style="color: #64748b;">Uses default D365 styling</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Pre-chat Form Preview -->
@@ -5545,17 +5604,35 @@
 
         // Tab switching
         function switchPreviewTab(tab) {
-            // Update tab buttons
-            document.querySelectorAll('.preview-tab').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
+            // Update tab buttons - only within the visible tab group
+            const customTabs = document.getElementById('customPreviewTabs');
+            const standardTabs = document.getElementById('standardPreviewTabs');
+            const activeTabs = (tab === 'standard') ? standardTabs : customTabs;
+            
+            if (activeTabs) {
+                activeTabs.querySelectorAll('.preview-tab').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                // Find and activate the correct tab button
+                activeTabs.querySelectorAll('.preview-tab').forEach(btn => {
+                    if (btn.textContent.toLowerCase().includes(tab) || 
+                        (tab === 'prechat' && btn.textContent.includes('Pre-chat')) ||
+                        (tab === 'chat' && btn.textContent.includes('Chat Preview')) ||
+                        (tab === 'launcher' && btn.textContent.includes('Launcher')) ||
+                        (tab === 'standard' && btn.textContent.includes('Standard'))) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
             
             // Update content
             document.querySelectorAll('.preview-content').forEach(content => {
                 content.classList.remove('active');
             });
-            document.getElementById(tab + 'Preview').classList.add('active');
+            const previewEl = document.getElementById(tab + 'Preview');
+            if (previewEl) {
+                previewEl.classList.add('active');
+            }
         }
 
         const MAX_IMAGE_DATA_LENGTH = 120 * 1024; // ~120KB limit for stored image data URLs
@@ -6534,6 +6611,8 @@
             const customSettings = document.getElementById('customWidgetSettings');
             const standardSettings = document.getElementById('standardWidgetSettings');
             const previewPanel = document.querySelector('.preview-panel');
+            const customPreviewTabs = document.getElementById('customPreviewTabs');
+            const standardPreviewTabs = document.getElementById('standardPreviewTabs');
             
             console.log('customSettings:', customSettings);
             console.log('standardSettings:', standardSettings);
@@ -6541,11 +6620,19 @@
             if (mode === 'standard') {
                 customSettings.classList.add('hidden');
                 standardSettings.classList.remove('hidden');
-                if (previewPanel) previewPanel.classList.add('hidden');
+                // Show standard preview tabs and content
+                if (customPreviewTabs) customPreviewTabs.classList.add('hidden');
+                if (standardPreviewTabs) standardPreviewTabs.classList.remove('hidden');
+                // Switch to standard preview
+                switchPreviewTab('standard');
             } else {
                 customSettings.classList.remove('hidden');
                 standardSettings.classList.add('hidden');
-                if (previewPanel) previewPanel.classList.remove('hidden');
+                // Show custom preview tabs and content
+                if (customPreviewTabs) customPreviewTabs.classList.remove('hidden');
+                if (standardPreviewTabs) standardPreviewTabs.classList.add('hidden');
+                // Switch to prechat preview
+                switchPreviewTab('prechat');
             }
             
             console.log('After toggle - customSettings.classList:', customSettings.classList.toString());
