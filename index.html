@@ -9703,12 +9703,24 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     </script>
     
     <!-- Feedback Button -->
-    <a href="https://forms.office.com/r/ye88A0WkPp" target="_blank" class="feedback-button" title="Send Feedback">
+    <button class="feedback-button" onclick="openFeedbackModal()" title="Send Feedback">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
             <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12zM7 9h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"/>
         </svg>
         <span>Feedback</span>
-    </a>
+    </button>
+    
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" class="feedback-modal-overlay" onclick="if(event.target === this) closeFeedbackModal()">
+        <div class="feedback-modal-content">
+            <div class="feedback-modal-header">
+                <h3>📝 Send Feedback</h3>
+                <button class="feedback-modal-close" onclick="closeFeedbackModal()">&times;</button>
+            </div>
+            <iframe id="feedbackIframe" src="" frameborder="0" allowfullscreen></iframe>
+        </div>
+    </div>
+    
     <style>
         .feedback-button {
             position: fixed;
@@ -9720,7 +9732,8 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             padding: 12px 20px;
             background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
             color: white;
-            text-decoration: none;
+            border: none;
+            cursor: pointer;
             border-radius: 50px;
             font-size: 14px;
             font-weight: 500;
@@ -9735,6 +9748,94 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
         .feedback-button svg {
             flex-shrink: 0;
         }
+        .feedback-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+        .feedback-modal-overlay.show {
+            display: flex;
+        }
+        .feedback-modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 640px;
+            height: 85vh;
+            max-height: 700px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: feedbackModalIn 0.3s ease;
+        }
+        @keyframes feedbackModalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .feedback-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .feedback-modal-header h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #1f2937;
+        }
+        .feedback-modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        .feedback-modal-close:hover {
+            color: #1f2937;
+        }
+        .feedback-modal-content iframe {
+            flex: 1;
+            width: 100%;
+            border-radius: 0 0 16px 16px;
+        }
     </style>
+    
+    <script>
+        function openFeedbackModal() {
+            const modal = document.getElementById('feedbackModal');
+            const iframe = document.getElementById('feedbackIframe');
+            iframe.src = 'https://forms.office.com/r/ye88A0WkPp';
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeFeedbackModal() {
+            const modal = document.getElementById('feedbackModal');
+            const iframe = document.getElementById('feedbackIframe');
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+            // Clear iframe to stop any ongoing processes
+            setTimeout(() => { iframe.src = ''; }, 300);
+        }
+        
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('feedbackModal').classList.contains('show')) {
+                closeFeedbackModal();
+            }
+        });
+    </script>
 </body>
 </html>
