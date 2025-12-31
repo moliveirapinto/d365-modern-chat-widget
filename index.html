@@ -6468,6 +6468,12 @@
             document.getElementById('prechatSolidColor').value = primaryColor;
             document.getElementById('prechatSolidColorHex').value = primaryColor;
             
+            // Apply to header text colors (white/light for contrast with colored header)
+            document.getElementById('headerTitleColor').value = '#ffffff';
+            document.getElementById('headerTitleColorHex').value = '#ffffff';
+            document.getElementById('headerSubtitleColor').value = '#e0e7ff';
+            document.getElementById('headerSubtitleColorHex').value = '#e0e7ff';
+            
             // Update settings and preview
             updateSettingsFromForm();
             updatePreview();
