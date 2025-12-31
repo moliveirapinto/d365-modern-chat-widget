@@ -2757,6 +2757,22 @@
                         <label class="form-label">Header Subtitle</label>
                         <input type="text" class="form-input" id="headerSubtitle" value="We're here to help" placeholder="e.g., We're here to help">
                     </div>
+                    <div class="color-grid" style="margin-top: 16px;">
+                        <div class="color-item">
+                            <label>Title Text Color</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" id="headerTitleColor" value="#ffffff">
+                                <input type="text" class="color-hex-input" id="headerTitleColorHex" value="#ffffff">
+                            </div>
+                        </div>
+                        <div class="color-item">
+                            <label>Subtitle Text Color</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" id="headerSubtitleColor" value="#e0e7ff">
+                                <input type="text" class="color-hex-input" id="headerSubtitleColorHex" value="#e0e7ff">
+                            </div>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label class="form-label">Company Logo / Header Icon</label>
                         <div class="image-upload-area" id="logoUploadArea">
@@ -3508,14 +3524,28 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v1.8.0';
-        const APP_LAST_UPDATED = 'Dec 22, 2025, 12:31 AM';
+        const APP_VERSION = 'v1.9.0';
+        const APP_LAST_UPDATED = 'Dec 31, 2025';
         
         const CHANGELOG = [
             {
+                version: 'v1.9.0',
+                date: 'Dec 31, 2025',
+                latest: true,
+                items: [
+                    { type: 'new', text: 'Image preview with caption before sending - add context to your images' },
+                    { type: 'new', text: 'Drag-and-drop file upload support across all deployment modes' },
+                    { type: 'new', text: 'Edge browser compatibility fix for file attachments (Chromium bug workaround)' },
+                    { type: 'improve', text: 'Label-based file input for better cross-browser reliability' },
+                    { type: 'improve', text: 'Visual drop zone overlay when dragging files' },
+                    { type: 'fix', text: 'Fixed Edge 143+ crash when clicking attach button' },
+                    { type: 'fix', text: 'Image attachments no longer auto-send without user confirmation' }
+                ]
+            },
+            {
                 version: 'v1.8.0',
                 date: 'Dec 22, 2025',
-                latest: true,
+                latest: false,
                 items: [
                     { type: 'new', text: 'Quick Color Palettes gallery with 24 curated professional combinations' },
                     { type: 'new', text: 'One-click palette application to all widget colors' },
@@ -4295,6 +4325,8 @@
             // Header & Branding
             headerTitle: 'Support Chat',
             headerSubtitle: "We're here to help",
+            headerTitleColor: '#ffffff',
+            headerSubtitleColor: '#e0e7ff',
             headerLogo: null,
             // Fonts
             fontFamily: 'system',
@@ -4899,6 +4931,7 @@
                 'userBubbleColor', 'userTextColor', 'agentBubbleColor', 'agentTextColor',
                 'systemMsgColor', 'systemTextColor', 'chatBgColor', 'inputBgColor',
                 'inputBorderColor', 'sendBtnColor', 'launcherColor', 'badgeColor',
+                'headerTitleColor', 'headerSubtitleColor',
                 'prechatGradientStart', 'prechatGradientEnd', 'prechatSolidColor', 'prechatTitleColor', 
                 'prechatSubtitleColor', 'prechatBadgeBg', 'prechatBadgeText',
                 'prechatStatusDot', 'prechatAvatarBorder'
@@ -5780,6 +5813,8 @@
             // Header & Branding
             settings.headerTitle = document.getElementById('headerTitle').value;
             settings.headerSubtitle = document.getElementById('headerSubtitle').value;
+            settings.headerTitleColor = document.getElementById('headerTitleColor').value;
+            settings.headerSubtitleColor = document.getElementById('headerSubtitleColor').value;
             // Note: headerLogo is already in settings from handleImageUpload
 
             // Fonts
@@ -5856,10 +5891,16 @@
                 if (previewHeader) previewHeader.style.background = gradient;
                 
                 const previewTitle = document.getElementById('previewTitle');
-                if (previewTitle) previewTitle.textContent = settings.headerTitle;
+                if (previewTitle) {
+                    previewTitle.textContent = settings.headerTitle;
+                    previewTitle.style.color = settings.headerTitleColor || '#ffffff';
+                }
                 
                 const previewStatus = document.getElementById('previewStatus');
-                if (previewStatus) previewStatus.textContent = settings.headerSubtitle;
+                if (previewStatus) {
+                    previewStatus.textContent = settings.headerSubtitle;
+                    previewStatus.style.color = settings.headerSubtitleColor || '#e0e7ff';
+                }
 
                 const headerAvatar = document.getElementById('previewHeaderAvatar');
                 console.log('Updating header logo, settings.headerLogo:', settings.headerLogo, 'isSafe:', isSafeImageData(settings.headerLogo));
@@ -5942,10 +5983,16 @@
                 if (previewPrechatHeader) previewPrechatHeader.style.background = gradient;
                 
                 const previewPrechatTitle = document.getElementById('previewPrechatTitle');
-                if (previewPrechatTitle) previewPrechatTitle.textContent = settings.headerTitle;
+                if (previewPrechatTitle) {
+                    previewPrechatTitle.textContent = settings.headerTitle;
+                    previewPrechatTitle.style.color = settings.headerTitleColor || '#ffffff';
+                }
                 
                 const previewPrechatStatus = document.getElementById('previewPrechatStatus');
-                if (previewPrechatStatus) previewPrechatStatus.textContent = settings.headerSubtitle;
+                if (previewPrechatStatus) {
+                    previewPrechatStatus.textContent = settings.headerSubtitle;
+                    previewPrechatStatus.style.color = settings.headerSubtitleColor || '#e0e7ff';
+                }
                 
                 const prechatHeaderAvatar = document.getElementById('previewPrechatHeaderAvatar');
                 if (prechatHeaderAvatar) {
@@ -6196,6 +6243,8 @@
     theme: {
       headerTitle: settings.headerTitle,
       headerSubtitle: settings.headerSubtitle,
+      headerTitleColor: settings.headerTitleColor,
+      headerSubtitleColor: settings.headerSubtitleColor,
       useGradient: settings.useGradient,
       gradientStart: settings.gradientStart,
       gradientEnd: settings.gradientEnd,
@@ -6349,6 +6398,8 @@ window.D365WidgetConfig=${configJson};
             // DO NOT include lcwCode/lcwScript - it's too large and contains script tags that break embedding
             if (settings.headerTitle && settings.headerTitle !== 'Support Chat') config.headerTitle = settings.headerTitle;
             if (settings.headerSubtitle && settings.headerSubtitle !== "We're here to help") config.headerSubtitle = settings.headerSubtitle;
+            if (settings.headerTitleColor && settings.headerTitleColor !== '#ffffff') config.headerTitleColor = settings.headerTitleColor;
+            if (settings.headerSubtitleColor && settings.headerSubtitleColor !== '#e0e7ff') config.headerSubtitleColor = settings.headerSubtitleColor;
             if (settings.headerLogo) config.headerLogo = toGitHubRawUrl(settings.headerLogo);
             if (settings.fontFamily && settings.fontFamily !== 'system') config.fontFamily = settings.fontFamily;
             if (settings.useGradient === false) config.useGradient = false;
@@ -6407,6 +6458,8 @@ window.D365WidgetConfig=${configJson};
                 widgetMode: 'custom',
                 headerTitle: settings.headerTitle || 'Support Chat',
                 headerSubtitle: settings.headerSubtitle || "We're here to help",
+                headerTitleColor: settings.headerTitleColor || '#ffffff',
+                headerSubtitleColor: settings.headerSubtitleColor || '#e0e7ff',
                 headerLogo: toGitHubRawUrl(settings.headerLogo) || '',
                 fontFamily: settings.fontFamily || 'system',
                 useGradient: settings.useGradient !== false,
@@ -6859,6 +6912,26 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     }
     .d365-action-btn:hover { background: #e2e8f0; }
     .d365-action-btn svg { width: 20px; height: 20px; fill: #64748b; }
+    
+    /* Visually hidden file input (Edge-safe approach) */
+    .d365-visually-hidden-input {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+    }
+    /* File label styled as action button */
+    .d365-file-label { display: flex !important; }
+    .d365-file-label:focus-within { outline: 2px solid #667eea; outline-offset: 2px; }
+    
+    /* Drag and drop overlay */
+    .d365-drop-zone-overlay {
+      display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(102, 126, 234, 0.95); border-radius: 0 0 16px 16px;
+      z-index: 100; align-items: center; justify-content: center; pointer-events: none;
+    }
+    .d365-drop-zone-overlay.active { display: flex; }
+    .d365-drop-zone-content { text-align: center; color: white; }
+    .d365-drop-zone-content svg { margin-bottom: 8px; opacity: 0.9; }
+    .d365-drop-zone-content p { font-size: 16px; font-weight: 500; margin: 0; }
     .d365-send-btn {
       width: 36px; height: 36px; border-radius: 50%; background: \${config.sendBtnColor};
       border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
@@ -6916,6 +6989,50 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     .d365-confirm-btn.cancel:hover { background: #cbd5e1; }
     .d365-confirm-btn.end { background: #ef4444; color: white; }
     .d365-confirm-btn.end:hover { background: #dc2626; }
+    
+    /* Image Preview Modal */
+    .d365-image-preview-modal {
+      position: absolute; inset: 0; background: rgba(0,0,0,0.7); display: none;
+      flex-direction: column; z-index: 250;
+    }
+    .d365-image-preview-modal.show { display: flex; }
+    .d365-image-preview-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px; background: rgba(0,0,0,0.3);
+    }
+    .d365-image-preview-title { color: white; font-size: 14px; font-weight: 500; }
+    .d365-image-preview-close {
+      background: rgba(255,255,255,0.2); border: none; border-radius: 50%;
+      width: 36px; height: 36px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; transition: background 0.2s;
+    }
+    .d365-image-preview-close:hover { background: rgba(255,255,255,0.3); }
+    .d365-image-preview-close svg { width: 20px; height: 20px; fill: white; }
+    .d365-image-preview-body {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: 20px; overflow: hidden;
+    }
+    .d365-image-preview-img {
+      max-width: 100%; max-height: 100%; object-fit: contain;
+      border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .d365-image-preview-footer { padding: 16px 20px; background: white; border-radius: 16px 16px 0 0; }
+    .d365-image-preview-caption {
+      width: 100%; padding: 12px 16px; border: 1px solid #e2e8f0;
+      border-radius: 8px; font-size: 14px; resize: none; margin-bottom: 12px;
+      font-family: inherit; box-sizing: border-box;
+    }
+    .d365-image-preview-caption:focus { outline: none; border-color: #667eea; }
+    .d365-image-preview-actions { display: flex; gap: 12px; justify-content: flex-end; }
+    .d365-image-preview-btn {
+      padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s; border: none;
+    }
+    .d365-image-preview-btn.cancel { background: #e2e8f0; color: #4a5568; }
+    .d365-image-preview-btn.cancel:hover { background: #cbd5e1; }
+    .d365-image-preview-btn.send { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    .d365-image-preview-btn.send:hover { opacity: 0.9; transform: translateY(-1px); }
+    
     .d365-new-chat-btn {
       color: white; border: none; padding: 12px 24px; border-radius: 8px;
       font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px;
@@ -7014,6 +7131,13 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
           <div class="d365-emoji-picker" id="d365EmojiPicker">
             <div class="d365-emoji-grid" id="d365EmojiGrid"></div>
           </div>
+          <!-- Drag and Drop Overlay (Edge-safe workaround) -->
+          <div class="d365-drop-zone-overlay" id="d365DropZoneOverlay">
+            <div class="d365-drop-zone-content">
+              <svg viewBox="0 0 24 24" width="48" height="48"><path fill="currentColor" d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+              <p>Drop your file here</p>
+            </div>
+          </div>
           <div class="d365-voice-recording" id="d365VoiceRecording">
             <div class="d365-voice-dot"></div>
             <div class="d365-voice-waveform"><span></span><span></span><span></span><span></span><span></span></div>
@@ -7024,10 +7148,11 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             <textarea class="d365-message-input" id="d365MessageInput" placeholder="Type your message..." rows="3"></textarea>
             <div class="d365-input-bottom-row">
               <div class="d365-input-actions">
-                <input type="file" id="d365FileInput" style="display:none;">
-                <button type="button" class="d365-action-btn" id="d365AttachBtn" title="Attach file">
+                <!-- Label-based file input (Edge-safe - no programmatic click) -->
+                <input type="file" id="d365FileInput" class="d365-visually-hidden-input" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt">
+                <label for="d365FileInput" class="d365-action-btn d365-file-label" id="d365AttachLabel" title="Attach file (or drag & drop)">
                   <svg viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/></svg>
-                </button>
+                </label>
                 <button type="button" class="d365-action-btn" id="d365EmojiBtn" title="Emoji">
                   <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
                 </button>
@@ -7055,6 +7180,26 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
           <div class="d365-confirm-buttons">
             <button class="d365-confirm-btn cancel" id="d365ConfirmNo">Cancel</button>
             <button class="d365-confirm-btn end" id="d365ConfirmYes">End Chat</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Image Preview Modal -->
+      <div class="d365-image-preview-modal" id="d365ImagePreviewModal">
+        <div class="d365-image-preview-header">
+          <span class="d365-image-preview-title" id="d365ImagePreviewTitle">Preview</span>
+          <button class="d365-image-preview-close" id="d365ImagePreviewClose" title="Cancel">
+            <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+          </button>
+        </div>
+        <div class="d365-image-preview-body">
+          <img class="d365-image-preview-img" id="d365ImagePreviewImg" src="" alt="Preview">
+        </div>
+        <div class="d365-image-preview-footer">
+          <textarea class="d365-image-preview-caption" id="d365ImagePreviewCaption" placeholder="Add a caption (optional)..." rows="2"></textarea>
+          <div class="d365-image-preview-actions">
+            <button class="d365-image-preview-btn cancel" id="d365ImagePreviewCancel">Cancel</button>
+            <button class="d365-image-preview-btn send" id="d365ImagePreviewSend">Send</button>
           </div>
         </div>
       </div>
@@ -7395,15 +7540,153 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
     });
     
-    // File attachment
+    // File attachment with image preview
     var attachBtn = document.getElementById('d365AttachBtn');
     var fileInput = document.getElementById('d365FileInput');
-    if (attachBtn && fileInput) {
-      attachBtn.addEventListener('click', function() { fileInput.click(); });
-      fileInput.addEventListener('change', function(e) {
-        var file = e.target.files[0];
-        if (!file) return;
-        if (file.size > 25000000) { alert('File too large. Maximum size is 25MB.'); fileInput.value = ''; return; }
+    var pendingImageFile = null;
+    // Create a resized preview using canvas (works reliably across all browsers including Edge)
+    function createImagePreview(file, callback) {
+      var img = new Image();
+      var reader = new FileReader();
+      
+      reader.onload = function(e) {
+        img.onload = function() {
+          // Create canvas for resized preview (max 400px for preview)
+          var canvas = document.createElement('canvas');
+          var ctx = canvas.getContext('2d');
+          var maxSize = 400;
+          var width = img.width;
+          var height = img.height;
+          
+          // Calculate new dimensions maintaining aspect ratio
+          if (width > height) {
+            if (width > maxSize) {
+              height = Math.round(height * maxSize / width);
+              width = maxSize;
+            }
+          } else {
+            if (height > maxSize) {
+              width = Math.round(width * maxSize / height);
+              height = maxSize;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Get preview as data URL (small enough to not cause issues)
+          var previewUrl = canvas.toDataURL('image/jpeg', 0.7);
+          callback(null, previewUrl);
+        };
+        img.onerror = function() {
+          callback(new Error('Failed to load image'));
+        };
+        img.src = e.target.result;
+      };
+      reader.onerror = function() {
+        callback(new Error('Failed to read file'));
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    function showImagePreview(file, previewUrl) {
+      pendingImageFile = file;
+      var modal = document.getElementById('d365ImagePreviewModal');
+      var img = document.getElementById('d365ImagePreviewImg');
+      var title = document.getElementById('d365ImagePreviewTitle');
+      var caption = document.getElementById('d365ImagePreviewCaption');
+      
+      title.textContent = file.name;
+      caption.value = '';
+      img.src = previewUrl;
+      modal.classList.add('show');
+      caption.focus();
+    }
+    
+    function hideImagePreview() {
+      var modal = document.getElementById('d365ImagePreviewModal');
+      var img = document.getElementById('d365ImagePreviewImg');
+      modal.classList.remove('show');
+      img.src = '';
+      pendingImageFile = null;
+      fileInput.value = '';
+    }
+    
+    async function sendImageWithCaption() {
+      if (!pendingImageFile || !chatSDK || !chatStarted) {
+        hideImagePreview();
+        return;
+      }
+      var caption = document.getElementById('d365ImagePreviewCaption').value.trim();
+      var file = pendingImageFile;
+      var fileName = file.name;
+      
+      // Clear state
+      var modal = document.getElementById('d365ImagePreviewModal');
+      modal.classList.remove('show');
+      pendingImageFile = null;
+      fileInput.value = '';
+      
+      try {
+        // Send caption first if provided
+        if (caption) {
+          addMessage(caption, true);
+          await chatSDK.sendMessage({ content: caption });
+        }
+        // Then send the image - create a fresh blob URL for display
+        if (file.type.startsWith('image/')) {
+          var displayUrl = URL.createObjectURL(file);
+          addImageMessage({ name: fileName, url: displayUrl }, true);
+        }
+        // Upload the actual file (SDK handles the file object directly)
+        await chatSDK.uploadFileAttachment(file);
+      } catch (err) {
+        console.error('File upload error:', err);
+        if (err.message === 'FeatureDisabled') {
+          alert('File attachments are disabled. Please enable file attachments in your D365 Omnichannel widget configuration.');
+        } else {
+          alert('Failed to upload file: ' + (err.message || 'Unknown error'));
+        }
+      }
+    }
+    
+    // Helper function to add image messages in index.html preview
+    function addImageMessage(fileInfo, isUser) {
+      var wrapper = document.createElement('div');
+      wrapper.className = 'd365-message ' + (isUser ? 'user' : 'agent');
+      wrapper.innerHTML = '<div class="d365-message-content"><img src="' + fileInfo.url + '" style="max-width: 200px; max-height: 200px; border-radius: 8px; cursor: pointer;" onclick="window.open(\'' + fileInfo.url + '\', \'_blank\')" alt="' + fileInfo.name + '"><div style="font-size: 11px; color: #64748b; margin-top: 4px;">' + fileInfo.name + '</div></div>';
+      d365MessagesContainer.appendChild(wrapper);
+      d365MessagesContainer.scrollTop = d365MessagesContainer.scrollHeight;
+    }
+    
+    // ============================================
+    // FILE ATTACHMENT HANDLING (Edge-safe approach)
+    // Uses drag-and-drop + label-based input instead of programmatic click()
+    // ============================================
+    var dropZoneOverlay = document.getElementById('d365DropZoneOverlay');
+    var inputArea = document.getElementById('d365ChatInputArea');
+    var dragCounter = 0;
+    
+    // Unified file handler function (deferred to avoid browser crashes)
+    function handleFileDeferred(file) {
+      if (!file) return;
+      if (file.size > 25000000) { alert('File too large. Maximum size is 25MB.'); return; }
+      
+      console.log('[FILE] Processing:', file.name, file.type);
+      
+      // Check if it's an image - create resized preview
+      if (file.type.startsWith('image/')) {
+        createImagePreview(file, function(err, previewUrl) {
+          if (err) {
+            console.error('Preview error:', err);
+            alert('Failed to preview image. Please try a different image.');
+            return;
+          }
+          showImagePreview(file, previewUrl);
+        });
+      } else {
+        // Non-image files: upload directly
         var reader = new FileReader();
         reader.onload = function(evt) {
           var fileName = file.name;
@@ -7422,9 +7705,99 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
               }
             });
           }
-          fileInput.value = '';
         };
         reader.readAsDataURL(file);
+      }
+    }
+    
+    // DRAG AND DROP FILE UPLOAD (Edge-safe method)
+    if (inputArea && dropZoneOverlay) {
+      // Prevent default drag behaviors on the whole document
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(function(eventName) {
+        document.body.addEventListener(eventName, function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }, false);
+      });
+      
+      // Drag enter - show overlay
+      inputArea.addEventListener('dragenter', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dragCounter++;
+        if (chatStarted && e.dataTransfer.types.indexOf('Files') !== -1) {
+          dropZoneOverlay.classList.add('active');
+          console.log('[DRAG] Enter - showing overlay');
+        }
+      });
+      
+      // Drag over - keep showing overlay
+      inputArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (chatStarted) {
+          dropZoneOverlay.classList.add('active');
+        }
+      });
+      
+      // Drag leave - hide overlay when fully leaving
+      inputArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dragCounter--;
+        if (dragCounter === 0) {
+          dropZoneOverlay.classList.remove('active');
+          console.log('[DRAG] Leave - hiding overlay');
+        }
+      });
+      
+      // Drop - handle the file
+      inputArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dragCounter = 0;
+        dropZoneOverlay.classList.remove('active');
+        console.log('[DROP] File dropped');
+        
+        if (!chatStarted) {
+          console.log('[DROP] Chat not started, ignoring');
+          return;
+        }
+        
+        var files = e.dataTransfer.files;
+        if (files && files.length > 0) {
+          var file = files[0];
+          console.log('[DROP] Processing file:', file.name, file.type, file.size);
+          setTimeout(function() { handleFileDeferred(file); }, 50);
+        }
+      });
+    }
+    
+    // LABEL-BASED FILE INPUT (for click selection - Edge-safe)
+    if (fileInput) {
+      fileInput.addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        console.log('[FILE INPUT] File selected via label click:', file.name);
+        
+        // Small delay to let the file dialog close
+        setTimeout(function() {
+          handleFileDeferred(file);
+        }, 50);
+        
+        // Reset input for next selection
+        fileInput.value = '';
+      });
+      
+      // Image preview modal event handlers
+      document.getElementById('d365ImagePreviewClose').addEventListener('click', hideImagePreview);
+      document.getElementById('d365ImagePreviewCancel').addEventListener('click', hideImagePreview);
+      document.getElementById('d365ImagePreviewSend').addEventListener('click', sendImageWithCaption);
+      document.getElementById('d365ImagePreviewCaption').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendImageWithCaption();
+        }
       });
     }
     

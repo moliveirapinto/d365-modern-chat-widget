@@ -276,6 +276,14 @@
       '.d365-action-btn:hover{background:#f1f5f9;color:'+c.primaryColor+'}',
       '.d365-action-btn:hover svg{fill:'+c.primaryColor+'}',
       '.d365-action-btn svg{width:20px;height:20px;fill:currentColor}',
+      '.d365-visually-hidden-input{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}',
+      '.d365-file-label{display:flex!important}',
+      '.d365-file-label:focus-within{outline:2px solid '+c.primaryColor+';outline-offset:2px}',
+      '.d365-drop-zone-overlay{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(102,126,234,.95);border-radius:0 0 16px 16px;z-index:100;align-items:center;justify-content:center;pointer-events:none}',
+      '.d365-drop-zone-overlay.active{display:flex}',
+      '.d365-drop-zone-content{text-align:center;color:#fff}',
+      '.d365-drop-zone-content svg{margin-bottom:8px;opacity:.9}',
+      '.d365-drop-zone-content p{font-size:16px;font-weight:500;margin:0}',
       '.d365-action-btn.recording{background:#fee2e2;color:#ef4444}',
       '.d365-action-btn.recording svg{fill:#ef4444;animation:d365pulseMic 1s infinite}',
       '@keyframes d365pulseMic{0%,100%{opacity:1}50%{opacity:.5}}',
@@ -433,6 +441,7 @@
             '<div class="d365-typing" id="d365Typing"><div class="d365-typing-dots"><span></span><span></span><span></span></div></div>',
           '</div>',
           '<div class="d365-input-area" id="d365InputArea">',
+            '<div class="d365-drop-zone-overlay" id="d365DropZone"><div class="d365-drop-zone-content"><svg viewBox="0 0 24 24" width="48" height="48"><path fill="currentColor" d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg><p>Drop your file here</p></div></div>',
             '<div class="d365-voice-recording" id="d365VoiceRec">',
               '<div class="d365-voice-dot"></div>',
               '<div class="d365-voice-wave"><span></span><span></span><span></span><span></span><span></span></div>',
@@ -443,8 +452,8 @@
               '<textarea class="d365-input" id="d365Input" placeholder="Type your message..." rows="3"></textarea>',
               '<div class="d365-input-row">',
                 '<div class="d365-input-actions">',
-                  '<input type="file" id="d365File" style="display:none">',
-                  '<button type="button" class="d365-action-btn" id="d365AttachBtn" title="Attach"><svg viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/></svg></button>',
+                  '<input type="file" id="d365File" class="d365-visually-hidden-input" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt">',
+                  '<label for="d365File" class="d365-action-btn d365-file-label" id="d365AttachLabel" title="Attach (or drag & drop)"><svg viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/></svg></label>',
                   '<button type="button" class="d365-action-btn" id="d365EmojiBtn" title="Emoji"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg></button>',
                   '<button type="button" class="d365-action-btn" id="d365VoiceBtn" title="Voice input"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg></button>',
                 '</div>',
@@ -1533,9 +1542,14 @@
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
     };
 
-    $('d365AttachBtn').onclick = function() { $('d365File').click(); };
-    $('d365File').onchange = function(e) {
-      var file = e.target.files[0];
+    // File attachment handling (Edge-safe approach - no programmatic click)
+    var fileInput = $('d365File');
+    var inputArea = $('d365InputArea');
+    var dropZone = $('d365DropZone');
+    var dragCounter = 0;
+
+    // Unified file handler
+    function handleFileDeferred(file) {
       if (!file || !chatSDK || !chatStarted) return;
       if (file.size > 25000000) { alert('File too large (max 25MB)'); return; }
       var reader = new FileReader();
@@ -1545,8 +1559,42 @@
           .catch(function(err) { alert('Upload failed: ' + err.message); });
       };
       reader.readAsDataURL(file);
-      this.value = '';
-    };
+    }
+
+    // Drag and drop handlers
+    if (inputArea && dropZone) {
+      ['dragenter','dragover','dragleave','drop'].forEach(function(evt) {
+        document.body.addEventListener(evt, function(e) { e.preventDefault(); e.stopPropagation(); }, false);
+      });
+      inputArea.addEventListener('dragenter', function(e) {
+        e.preventDefault(); e.stopPropagation(); dragCounter++;
+        if (chatStarted && e.dataTransfer.types.indexOf('Files') !== -1) dropZone.classList.add('active');
+      });
+      inputArea.addEventListener('dragover', function(e) {
+        e.preventDefault(); e.stopPropagation();
+        if (chatStarted) dropZone.classList.add('active');
+      });
+      inputArea.addEventListener('dragleave', function(e) {
+        e.preventDefault(); e.stopPropagation(); dragCounter--;
+        if (dragCounter === 0) dropZone.classList.remove('active');
+      });
+      inputArea.addEventListener('drop', function(e) {
+        e.preventDefault(); e.stopPropagation(); dragCounter = 0; dropZone.classList.remove('active');
+        if (!chatStarted) return;
+        var files = e.dataTransfer.files;
+        if (files && files.length > 0) setTimeout(function() { handleFileDeferred(files[0]); }, 50);
+      });
+    }
+
+    // Label-based file input change handler
+    if (fileInput) {
+      fileInput.onchange = function(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        setTimeout(function() { handleFileDeferred(file); }, 50);
+        fileInput.value = '';
+      };
+    }
 
     $('d365NewBtn').onclick = function() {
       chatStarted = false;

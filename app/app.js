@@ -368,6 +368,8 @@
     $('widgetId').value = c.widgetId || '';
     $('headerTitle').value = c.headerTitle || 'Support Chat';
     $('headerSubtitle').value = c.headerSubtitle || "We're here to help";
+    $('headerTitleColor').value = c.headerTitleColor || '#ffffff';
+    $('headerSubtitleColor').value = c.headerSubtitleColor || '#e0e7ff';
     $('useGradient').checked = c.useGradient !== false;
     $('gradientStart').value = c.gradientStart || '#667eea';
     $('gradientEnd').value = c.gradientEnd || '#764ba2';
@@ -402,6 +404,8 @@
       widgetId: $('widgetId').value.trim(),
       headerTitle: $('headerTitle').value,
       headerSubtitle: $('headerSubtitle').value,
+      headerTitleColor: $('headerTitleColor').value,
+      headerSubtitleColor: $('headerSubtitleColor').value,
       useGradient: $('useGradient').checked,
       gradientStart: $('gradientStart').value,
       gradientEnd: $('gradientEnd').value,
@@ -429,6 +433,8 @@
       widgetId: '',
       headerTitle: 'Support Chat',
       headerSubtitle: "We're here to help",
+      headerTitleColor: '#ffffff',
+      headerSubtitleColor: '#e0e7ff',
       useGradient: true,
       gradientStart: '#667eea',
       gradientEnd: '#764ba2',
@@ -472,9 +478,9 @@
         <svg viewBox="0 0 24 24" width="28" height="28" fill="white"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
       </div>
       <div class="preview-widget" style="position:absolute;bottom:70px;right:0;width:340px;background:white;border-radius:16px;box-shadow:0 10px 50px rgba(0,0,0,0.3);overflow:hidden;transform:scale(0);opacity:0;transition:all 0.3s;transform-origin:bottom right">
-        <div style="padding:16px;background:${gradient};color:white">
-          <div style="font-weight:600;font-size:14px">${escapeHtml(config.headerTitle)}</div>
-          <div style="font-size:12px;opacity:0.8">${escapeHtml(config.headerSubtitle)}</div>
+        <div style="padding:16px;background:${gradient}">
+          <div style="font-weight:600;font-size:14px;color:${config.headerTitleColor || '#ffffff'}">${escapeHtml(config.headerTitle)}</div>
+          <div style="font-size:12px;color:${config.headerSubtitleColor || '#e0e7ff'}">${escapeHtml(config.headerSubtitle)}</div>
         </div>
         <div style="padding:20px;background:${config.chatBgColor};min-height:200px">
           <div style="text-align:center;padding:20px">

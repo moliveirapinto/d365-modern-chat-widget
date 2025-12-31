@@ -4,7 +4,7 @@
 
 [![D365 Compatible](https://img.shields.io/badge/D365-Omnichannel-0078D4?style=flat-square&logo=microsoft)](https://dynamics.microsoft.com)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v1.8.0-blue?style=flat-square)](package.json)
+[![Version](https://img.shields.io/badge/version-v1.9.0-blue?style=flat-square)](package.json)
 
 ![Chat Widget Preview](preview.png)
 
@@ -43,15 +43,17 @@
 - 📝 **Pre-Chat Form** - Collects user information with customizable fields
 - 💬 **Real-time Messaging** - Full integration with D365 Omnichannel Chat SDK
 - ⌨️ **Typing Indicators** - Shows when agent is typing
-- 📎 **File Attachments** - Upload and download files
+- 📎 **File Attachments** - Upload and download files with drag-and-drop support
+- 🖼️ **Image Preview** - Preview images with optional caption before sending
 - 😊 **Emoji Support** - Native OS emoji picker with helpful tooltips
-- � **Voice/Video Calling** - Agent-initiated calls with accept/decline UI
+- 📞 **Voice/Video Calling** - Agent-initiated calls with accept/decline UI
 - 🎥 **Video Conferencing** - Full WebRTC support with call controls
 - 🔢 **Queue Position** - Displays queue status with animated UI
 - 📄 **Chat Transcript** - Download conversation history
 - 🔔 **Toast Notifications** - User-friendly feedback messages
 - 🔴 **Notification Badge** - Unread message counter
 - 🎴 **Adaptive Cards** - Full support for Copilot Studio interactive cards
+- 🌐 **Cross-Browser** - Works on Chrome, Edge, Firefox, Safari (Edge 143+ crash fix included)
 
 </td>
 <td width="50%">
@@ -1145,6 +1147,33 @@ If this widget helped you, consider:
 ---
 
 ## 📝 Changelog
+
+### v1.9.0 (December 31, 2025)
+
+#### 🖼️ Image Preview Before Sending
+- **NEW:** Preview modal when attaching images - see your image before sending
+- **NEW:** Optional caption input - add context to your images
+- **NEW:** Send with Enter key or click Send button
+- Cancel option to choose a different image
+
+#### 📁 Drag-and-Drop File Upload
+- **NEW:** Drag files directly onto the chat input area
+- Visual drop zone overlay with upload icon
+- Works across all deployment modes (live.html, embedded, Tampermonkey)
+
+#### 🌐 Edge Browser Compatibility Fix
+- **FIXED:** Critical crash in Microsoft Edge 143+ when clicking attach button
+- Implemented label-based file input (avoids programmatic `click()` bug)
+- Uses native `<label for="input">` which triggers file picker without JavaScript
+- Drag-and-drop uses separate browser code path unaffected by the bug
+- Workaround for [Chromium bug #466331742](https://issues.chromium.org/issues/466331742)
+
+#### 🔧 Technical Improvements
+- Unified file handling with deferred processing for browser stability
+- Small timeout after file selection to ensure dialog closes properly
+- Consistent fix applied to: live.html, index.html preview, dist/widget-core.js
+
+---
 
 ### v1.8.0 (December 22, 2025)
 

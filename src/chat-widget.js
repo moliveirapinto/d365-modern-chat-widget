@@ -66,6 +66,8 @@ class ModernChatWidget {
                 --mcw-text-light: #6b7280;
                 --mcw-border: #e5e7eb;
                 --mcw-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                --mcw-header-title-color: #ffffff;
+                --mcw-header-subtitle-color: rgba(255,255,255,0.8);
             }
 
             .mcw-container * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -179,8 +181,8 @@ class ModernChatWidget {
             .mcw-avatar svg { width: 24px; height: 24px; }
 
             .mcw-header-info { flex: 1; }
-            .mcw-header-title { font-size: 18px; font-weight: 600; }
-            .mcw-header-status { font-size: 13px; opacity: 0.9; }
+            .mcw-header-title { font-size: 18px; font-weight: 600; color: var(--mcw-header-title-color, #ffffff); }
+            .mcw-header-status { font-size: 13px; opacity: 0.9; color: var(--mcw-header-subtitle-color, rgba(255,255,255,0.8)); }
 
             .mcw-header-actions { display: flex; gap: 8px; }
             .mcw-header-btn {
