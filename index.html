@@ -3847,54 +3847,28 @@
                 
                 <!-- Standard Widget Preview -->
                 <div class="preview-content" id="standardPreview">
-                    <div class="preview-widget-container" style="background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); min-height: 400px; display: flex; align-items: center; justify-content: center; padding: 20px;">
-                        <div style="width: 100%; max-width: 320px;">
-                            <!-- Standard D365 Widget Mock -->
-                            <div style="background: white; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); overflow: hidden;">
-                                <!-- Header -->
-                                <div style="background: linear-gradient(135deg, #0078d4 0%, #00a2ed 100%); padding: 16px; display: flex; align-items: center; gap: 12px;">
-                                    <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/></svg>
-                                    </div>
-                                    <div>
-                                        <div style="color: white; font-weight: 600; font-size: 15px;">Dynamics 365</div>
-                                        <div style="color: rgba(255,255,255,0.85); font-size: 12px;">Customer Service</div>
-                                    </div>
-                                </div>
-                                <!-- Chat Area -->
-                                <div style="padding: 16px; min-height: 180px; background: #fafafa;">
-                                    <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                                        <div style="width: 32px; height: 32px; background: #0078d4; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-                                        </div>
-                                        <div style="background: white; padding: 10px 14px; border-radius: 0 12px 12px 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-size: 13px; color: #333; max-width: 200px;">
-                                            Welcome! How can I help you today?
-                                        </div>
-                                    </div>
-                                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                                        <div style="background: #0078d4; padding: 10px 14px; border-radius: 12px 0 12px 12px; font-size: 13px; color: white; max-width: 200px;">
-                                            Hi, I need assistance
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Input Area -->
-                                <div style="padding: 12px 16px; border-top: 1px solid #e5e7eb; display: flex; gap: 8px; align-items: center;">
-                                    <div style="flex: 1; background: #f3f4f6; border-radius: 20px; padding: 10px 16px; font-size: 13px; color: #9ca3af;">
-                                        Type a message...
-                                    </div>
-                                    <button style="width: 36px; height: 36px; background: #0078d4; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-                                    </button>
-                                </div>
+                    <div class="preview-widget-container" style="background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); min-height: 450px; display: flex; flex-direction: column; padding: 16px;">
+                        <!-- Preview Header -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <div style="font-size: 12px; color: #64748b; display: flex; align-items: center; gap: 6px;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="#64748b"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                                Your D365 Live Chat Widget will appear here
                             </div>
-                            <!-- Info Badge -->
-                            <div style="margin-top: 16px; padding: 12px 16px; background: rgba(0,120,212,0.1); border-radius: 8px; display: flex; align-items: center; gap: 10px;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="#0078d4"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                                <div style="font-size: 12px; color: #0078d4; line-height: 1.4;">
-                                    <strong>Standard Widget</strong><br>
-                                    <span style="color: #64748b;">Uses default D365 styling</span>
-                                </div>
+                            <button onclick="refreshStandardPreview()" style="background: #0078d4; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                                Refresh
+                            </button>
+                        </div>
+                        <!-- IFrame Container -->
+                        <div id="standardPreviewContainer" style="flex: 1; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; position: relative; min-height: 380px;">
+                            <!-- Placeholder when no LCW code -->
+                            <div id="standardPreviewPlaceholder" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center;">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="#cbd5e1" style="margin-bottom: 16px;"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/></svg>
+                                <div style="font-size: 14px; font-weight: 600; color: #475569; margin-bottom: 8px;">No LCW Code Configured</div>
+                                <div style="font-size: 12px; color: #94a3b8; line-height: 1.5; max-width: 260px;">Paste your D365 Live Chat Widget embed code in the "LCW Embed Code" field above to see a live preview.</div>
                             </div>
+                            <!-- IFrame for actual preview -->
+                            <iframe id="standardPreviewIframe" style="width: 100%; height: 100%; border: none; display: none;" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
                         </div>
                     </div>
                 </div>
@@ -6374,6 +6348,10 @@
                 settings.lcwCode = code;
                 parseLCWCode(code);
                 updateConnectionStatus();
+                // Update standard preview if in standard mode
+                if (settings.widgetMode === 'standard') {
+                    updateStandardPreview();
+                }
                 // Auto-save to active profile if one is selected
                 if (!isInitializing && activeProfileId) {
                     const profile = profiles.find(p => p.id === activeProfileId);
@@ -6625,6 +6603,8 @@
                 if (standardPreviewTabs) standardPreviewTabs.classList.remove('hidden');
                 // Switch to standard preview
                 switchPreviewTab('standard');
+                // Load the LCW preview
+                updateStandardPreview();
             } else {
                 customSettings.classList.remove('hidden');
                 standardSettings.classList.add('hidden');
@@ -6640,6 +6620,59 @@
             
             settings.widgetMode = mode;
             console.log('Widget mode changed to:', mode);
+        }
+        
+        function updateStandardPreview() {
+            const lcwCode = document.getElementById('lcwCode').value.trim();
+            const placeholder = document.getElementById('standardPreviewPlaceholder');
+            const iframe = document.getElementById('standardPreviewIframe');
+            
+            if (!lcwCode) {
+                // Show placeholder if no LCW code
+                placeholder.style.display = 'flex';
+                iframe.style.display = 'none';
+                return;
+            }
+            
+            // Hide placeholder, show iframe
+            placeholder.style.display = 'none';
+            iframe.style.display = 'block';
+            
+            // Create HTML document with the LCW code
+            const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+        /* Force the chat widget to be visible and positioned for preview */
+        #Microsoft_Omnichannel_LCWidget_Chat_Iframe_Window,
+        [id*="lcw-"] { 
+            position: relative !important; 
+            bottom: auto !important; 
+            right: auto !important;
+        }
+    </style>
+</head>
+<body>
+    ${lcwCode}
+</body>
+</html>`;
+            
+            // Write to iframe
+            iframe.srcdoc = htmlContent;
+        }
+        
+        function refreshStandardPreview() {
+            updateStandardPreview();
+            showToast('Preview refreshed');
         }
 
         function updateFontPreview(fontFamily) {
