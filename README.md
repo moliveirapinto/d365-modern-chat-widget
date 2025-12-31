@@ -4,7 +4,7 @@
 
 [![D365 Compatible](https://img.shields.io/badge/D365-Omnichannel-0078D4?style=flat-square&logo=microsoft)](https://dynamics.microsoft.com)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v1.9.0-blue?style=flat-square)](package.json)
+[![Version](https://img.shields.io/badge/version-v2.0.0-blue?style=flat-square)](package.json)
 
 ![Chat Widget Preview](preview.png)
 
@@ -59,7 +59,8 @@
 <td width="50%">
 
 #### Admin Panel (Chat Widget Studio Analytics)
-- 🎭 **Demo Profiles** - Save and switch between multiple customer configurations
+- 🎭 **Widget Profiles** - Save and switch between multiple customer configurations
+- 👥 **Team Mode** - Collaborate with teammates using shared GitHub repository
 - 🔄 **Widget Mode Selector** - Choose between Standard (native D365 LCW) or Custom (styled widget)
 - 🔤 **Font Library** - 30 professional fonts in 4 categories (Sans-Serif, Serif, Monospace, Display)
 - 🔌 **D365 Configuration** - Easy setup with connection validation
@@ -1147,6 +1148,28 @@ If this widget helped you, consider:
 ---
 
 ## 📝 Changelog
+
+### v2.0.0 (December 31, 2025)
+
+#### 👥 Team Mode - Multi-User Collaboration
+- **NEW:** Team Mode for sharing widget configurations with teammates
+- **NEW:** GitHub repository-based team storage (separate from personal Gists)
+- **NEW:** One-click "Create Team Repository" with automatic setup
+- **NEW:** "Join Existing Repository" by pasting URL
+- **NEW:** Personal vs Team tabs in Widget Profiles section
+- **NEW:** Profile badges (Personal / Team) for clear organization
+
+#### 🔧 Token Scope Detection
+- Automatic detection of GitHub token permissions
+- Clear prompts to upgrade token if repo scope is needed
+- Direct link to create new token with all required scopes
+
+#### 📝 UI Improvements
+- Renamed "Demo Profiles" to "Widget Profiles" for clarity
+- Team connected state shows repository name with disconnect option
+- Empty state guidance for team setup
+
+---
 
 ### v1.9.0 (December 31, 2025)
 

@@ -1270,6 +1270,286 @@
             flex: 1;
         }
 
+        /* Profile Tabs (Personal/Team toggle) */
+        .profile-tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--admin-border);
+            padding: 4px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        .profile-tab {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: var(--admin-text-muted);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+        .profile-tab:hover {
+            color: var(--admin-text);
+        }
+        .profile-tab.active {
+            background: var(--admin-bg);
+            color: var(--admin-primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .profile-tab svg {
+            width: 16px;
+            height: 16px;
+        }
+        .profile-tab-count {
+            background: var(--admin-primary);
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 20px;
+            text-align: center;
+        }
+        .profile-tab:not(.active) .profile-tab-count {
+            background: var(--admin-text-muted);
+        }
+
+        /* Profile sections */
+        .profile-section {
+            display: none;
+        }
+        .profile-section.active {
+            display: block;
+        }
+
+        /* Team empty state */
+        .team-empty-state {
+            text-align: center;
+            padding: 32px 20px;
+            background: var(--admin-border);
+            border-radius: 12px;
+            border: 2px dashed var(--admin-text-muted);
+        }
+        .team-empty-state svg {
+            width: 48px;
+            height: 48px;
+            fill: var(--admin-text-muted);
+            margin-bottom: 12px;
+        }
+        .team-empty-state h4 {
+            margin: 0 0 8px 0;
+            color: var(--admin-text);
+        }
+        .team-empty-state p {
+            margin: 0 0 16px 0;
+            color: var(--admin-text-muted);
+            font-size: 13px;
+        }
+        .team-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+        .team-btn {
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        .team-btn-primary {
+            background: var(--admin-primary);
+            color: white;
+            border: none;
+        }
+        .team-btn-primary:hover {
+            background: #4338ca;
+        }
+        .team-btn-secondary {
+            background: var(--admin-bg);
+            color: var(--admin-text);
+            border: 1px solid var(--admin-border);
+        }
+        .team-btn-secondary:hover {
+            background: var(--admin-border);
+        }
+        .team-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Team connected state */
+        .team-connected {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .team-connected svg {
+            width: 20px;
+            height: 20px;
+            fill: #059669;
+            flex-shrink: 0;
+        }
+        .team-connected-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .team-connected-label {
+            font-size: 11px;
+            color: #059669;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .team-connected-repo {
+            font-size: 13px;
+            color: #047857;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .team-disconnect-btn {
+            background: none;
+            border: none;
+            padding: 6px;
+            cursor: pointer;
+            color: #6b7280;
+            border-radius: 4px;
+        }
+        .team-disconnect-btn:hover {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        /* Team badge on profile items */
+        .profile-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .profile-badge.personal {
+            background: #e0e7ff;
+            color: #4f46e5;
+        }
+        .profile-badge.team {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        /* Team Modal */
+        .team-modal-content {
+            max-width: 480px;
+        }
+        .team-modal-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin: 20px 0;
+        }
+        .team-step {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            background: var(--admin-border);
+            border-radius: 8px;
+        }
+        .team-step-number {
+            width: 28px;
+            height: 28px;
+            background: var(--admin-primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .team-step-content h4 {
+            margin: 0 0 4px 0;
+            font-size: 14px;
+        }
+        .team-step-content p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--admin-text-muted);
+        }
+        .team-repo-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--admin-border);
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 16px;
+        }
+        .team-repo-input:focus {
+            outline: none;
+            border-color: var(--admin-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Save location choice */
+        .save-location-choice {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .save-location-option {
+            flex: 1;
+            padding: 16px;
+            border: 2px solid var(--admin-border);
+            border-radius: 12px;
+            background: var(--admin-bg);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        .save-location-option:hover {
+            border-color: var(--admin-primary);
+        }
+        .save-location-option.selected {
+            border-color: var(--admin-primary);
+            background: #f5f3ff;
+        }
+        .save-location-option svg {
+            width: 32px;
+            height: 32px;
+            fill: var(--admin-text-muted);
+            margin-bottom: 8px;
+        }
+        .save-location-option.selected svg {
+            fill: var(--admin-primary);
+        }
+        .save-location-option h4 {
+            margin: 0 0 4px 0;
+            font-size: 14px;
+        }
+        .save-location-option p {
+            margin: 0;
+            font-size: 12px;
+            color: var(--admin-text-muted);
+        }
+
         /* Config code block */
         .config-code {
             background: #1e293b;
@@ -2270,6 +2550,100 @@
         </div>
     </div>
 
+    <!-- Create Team Repository Modal -->
+    <div id="createTeamRepoModal" class="save-modal-overlay" onclick="if(event.target === this) closeCreateTeamRepoModal()">
+        <div class="save-modal team-modal-content">
+            <h3>🚀 Create Team Repository</h3>
+            <p style="color: var(--admin-text-muted); margin-bottom: 20px;">
+                This will create a new GitHub repository to share widget configurations with your team.
+            </p>
+            <div class="team-modal-steps">
+                <div class="team-step">
+                    <div class="team-step-number">1</div>
+                    <div class="team-step-content">
+                        <h4>Repository Created</h4>
+                        <p>A new repo <strong>d365-widget-configs</strong> will be created in your GitHub account</p>
+                    </div>
+                </div>
+                <div class="team-step">
+                    <div class="team-step-number">2</div>
+                    <div class="team-step-content">
+                        <h4>Share with Team</h4>
+                        <p>Invite teammates as collaborators, or make the repo public</p>
+                    </div>
+                </div>
+                <div class="team-step">
+                    <div class="team-step-number">3</div>
+                    <div class="team-step-content">
+                        <h4>Collaborate</h4>
+                        <p>Everyone can save and load shared widget configurations</p>
+                    </div>
+                </div>
+            </div>
+            <div id="createTeamRepoStatus" style="display:none; padding: 12px; border-radius: 8px; margin-bottom: 16px;"></div>
+            <div id="createTeamNeedRepoScope" style="display:none; background: #fef3c7; border: 1px solid #f59e0b; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                <p style="margin: 0 0 12px 0; color: #92400e; font-weight: 500;">⚠️ Repository access required</p>
+                <p style="margin: 0 0 12px 0; color: #92400e; font-size: 13px;">Your current token doesn't have repository access. Create a new token with the <strong>repo</strong> scope:</p>
+                <a href="https://github.com/settings/tokens/new?description=D365%20Widget%20Studio%20(Team)&scopes=repo,gist,read:user" 
+                   target="_blank" 
+                   style="display: inline-block; background: #f59e0b; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500;">
+                    Create Token with Repo Access →
+                </a>
+            </div>
+            <div class="save-modal-actions">
+                <button class="save-modal-cancel" onclick="closeCreateTeamRepoModal()">Cancel</button>
+                <button class="save-modal-save" id="createTeamRepoBtn" onclick="createTeamRepository()">
+                    <span id="createTeamRepoBtnText">Create Repository</span>
+                    <span id="createTeamRepoSpinner" style="display:none;">Creating...</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Join Team Repository Modal -->
+    <div id="joinTeamRepoModal" class="save-modal-overlay" onclick="if(event.target === this) closeJoinTeamRepoModal()">
+        <div class="save-modal team-modal-content">
+            <h3>🔗 Join Team Repository</h3>
+            <p style="color: var(--admin-text-muted); margin-bottom: 20px;">
+                Connect to a shared GitHub repository to collaborate on widget configurations.
+            </p>
+            <div class="team-modal-steps">
+                <div class="team-step">
+                    <div class="team-step-number">1</div>
+                    <div class="team-step-content">
+                        <h4>Get the Repository URL</h4>
+                        <p>Ask your team lead for the widget configs repository URL</p>
+                    </div>
+                </div>
+                <div class="team-step">
+                    <div class="team-step-number">2</div>
+                    <div class="team-step-content">
+                        <h4>Ensure Access</h4>
+                        <p>Make sure you've been added as a collaborator, or the repo is public</p>
+                    </div>
+                </div>
+            </div>
+            <input type="text" class="team-repo-input" id="joinTeamRepoUrl" placeholder="https://github.com/username/d365-widget-configs">
+            <div id="joinTeamRepoStatus" style="display:none; padding: 12px; border-radius: 8px; margin-top: 12px;"></div>
+            <div id="joinTeamNeedRepoScope" style="display:none; background: #fef3c7; border: 1px solid #f59e0b; padding: 16px; border-radius: 8px; margin-top: 12px;">
+                <p style="margin: 0 0 12px 0; color: #92400e; font-weight: 500;">⚠️ Repository access required</p>
+                <p style="margin: 0 0 12px 0; color: #92400e; font-size: 13px;">Your current token doesn't have repository access. Create a new token with the <strong>repo</strong> scope:</p>
+                <a href="https://github.com/settings/tokens/new?description=D365%20Widget%20Studio%20(Team)&scopes=repo,gist,read:user" 
+                   target="_blank" 
+                   style="display: inline-block; background: #f59e0b; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500;">
+                    Create Token with Repo Access →
+                </a>
+            </div>
+            <div class="save-modal-actions" style="margin-top: 20px;">
+                <button class="save-modal-cancel" onclick="closeJoinTeamRepoModal()">Cancel</button>
+                <button class="save-modal-save" id="joinTeamRepoBtn" onclick="joinTeamRepository()">
+                    <span id="joinTeamRepoBtnText">Connect</span>
+                    <span id="joinTeamRepoSpinner" style="display:none;">Connecting...</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Tutorial Modal -->
     <div id="tutorialOverlay" class="changelog-overlay" onclick="if(event.target === this) hideTutorial()">
         <div class="changelog-modal" style="max-width: 700px;">
@@ -2455,8 +2829,8 @@
                         <img src="img/icon/office.png" alt="Demo Profiles" style="width: 24px; height: 24px; object-fit: contain;">
                     </div>
                     <div style="flex:1;">
-                        <h2>Demo Profiles</h2>
-                        <p>Save and switch between customer configurations</p>
+                        <h2>Widget Profiles</h2>
+                        <p>Save and share widget configurations</p>
                     </div>
                     <button class="btn btn-sm" style="display:none;background:#667eea;color:white;white-space:nowrap;" onclick="syncAllProfilesToCloud()" id="syncAllBtn" title="Sync all profiles to cloud">
                         <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:white;vertical-align:middle;margin-right:4px;"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
@@ -2464,15 +2838,78 @@
                     </button>
                 </div>
                 <div class="card-body">
-                    <div class="profile-list" id="profileList">
-                        <!-- Profiles will be loaded dynamically -->
-                    </div>
-                    <div class="new-profile-row">
-                        <input type="text" class="form-input" id="newProfileName" placeholder="New profile name (e.g., Contoso Demo)">
-                        <button class="btn btn-primary btn-sm" onclick="saveAsProfile()">
-                            <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                            Save
+                    <!-- Profile Tabs -->
+                    <div class="profile-tabs" id="profileTabs">
+                        <button class="profile-tab active" data-tab="personal" onclick="switchProfileTab('personal')">
+                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            Personal
+                            <span class="profile-tab-count" id="personalCount">0</span>
                         </button>
+                        <button class="profile-tab" data-tab="team" onclick="switchProfileTab('team')">
+                            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                            Team
+                            <span class="profile-tab-count" id="teamCount">0</span>
+                        </button>
+                    </div>
+
+                    <!-- Personal Profiles Section -->
+                    <div class="profile-section active" id="personalSection">
+                        <div class="profile-list" id="profileList">
+                            <!-- Profiles will be loaded dynamically -->
+                        </div>
+                        <div class="new-profile-row">
+                            <input type="text" class="form-input" id="newProfileName" placeholder="New profile name (e.g., Contoso Demo)">
+                            <button class="btn btn-primary btn-sm" onclick="saveAsProfile()">
+                                <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                Save
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Team Profiles Section -->
+                    <div class="profile-section" id="teamSection">
+                        <!-- Team Connected State (hidden by default) -->
+                        <div class="team-connected" id="teamConnectedState" style="display:none;">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                            <div class="team-connected-info">
+                                <div class="team-connected-label">Connected Team Repo</div>
+                                <div class="team-connected-repo" id="teamRepoName">owner/repo</div>
+                            </div>
+                            <button class="team-disconnect-btn" onclick="disconnectTeamRepo()" title="Disconnect team repository">
+                                <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                            </button>
+                        </div>
+                        
+                        <!-- Team Profile List -->
+                        <div class="profile-list" id="teamProfileList" style="display:none;">
+                            <!-- Team profiles will be loaded dynamically -->
+                        </div>
+                        
+                        <!-- Team Save Row (shown when connected) -->
+                        <div class="new-profile-row" id="teamSaveRow" style="display:none;">
+                            <input type="text" class="form-input" id="newTeamProfileName" placeholder="New team profile name">
+                            <button class="btn btn-primary btn-sm" onclick="saveAsTeamProfile()">
+                                <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                Save
+                            </button>
+                        </div>
+
+                        <!-- Team Empty State -->
+                        <div class="team-empty-state" id="teamEmptyState">
+                            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                            <h4>Collaborate with your team</h4>
+                            <p>Share widget configurations with teammates using a GitHub repository</p>
+                            <div class="team-actions">
+                                <button class="team-btn team-btn-primary" onclick="showCreateTeamRepoModal()">
+                                    <svg viewBox="0 0 24 24" style="fill:white;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                    Create Team Repository
+                                </button>
+                                <button class="team-btn team-btn-secondary" onclick="showJoinTeamRepoModal()">
+                                    <svg viewBox="0 0 24 24" style="fill:currentColor;"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+                                    Join Existing Repository
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3524,14 +3961,29 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v1.9.0';
+        const APP_VERSION = 'v2.0.0';
         const APP_LAST_UPDATED = 'Dec 31, 2025';
         
         const CHANGELOG = [
             {
-                version: 'v1.9.0',
+                version: 'v2.0.0',
                 date: 'Dec 31, 2025',
                 latest: true,
+                items: [
+                    { type: 'new', text: '🚀 Team Mode - collaborate with teammates on shared widget configurations' },
+                    { type: 'new', text: 'GitHub repository-based team storage for multi-user collaboration' },
+                    { type: 'new', text: 'One-click team repository creation with automatic setup' },
+                    { type: 'new', text: 'Personal vs Team tabs for organized widget management' },
+                    { type: 'new', text: 'Join existing team repository by URL' },
+                    { type: 'improve', text: 'Renamed "Demo Profiles" to "Widget Profiles" for clarity' },
+                    { type: 'improve', text: 'Profile badge indicators (Personal/Team)' },
+                    { type: 'improve', text: 'Token scope detection for seamless team mode setup' }
+                ]
+            },
+            {
+                version: 'v1.9.0',
+                date: 'Dec 31, 2025',
+                latest: false,
                 items: [
                     { type: 'new', text: 'Image preview with caption before sending - add context to your images' },
                     { type: 'new', text: 'Drag-and-drop file upload support across all deployment modes' },
@@ -3713,6 +4165,604 @@
         let savedWidgets = [];
         let currentLoadedWidgetId = null;
 
+        // ============================================
+        // Team Mode - Repository-based collaboration
+        // ============================================
+        const TEAM_REPO_NAME = 'd365-widget-configs';
+        const TEAM_CONFIG_FOLDER = 'widgets';
+        let teamRepoOwner = null;
+        let teamRepoName = null;
+        let teamWidgets = [];
+        let hasRepoScope = false; // Will be checked on login
+
+        // Check if token has repo scope
+        async function checkRepoScope() {
+            if (!cloudToken) return false;
+            try {
+                // Try to access repos endpoint - if it fails with 403, no repo scope
+                const response = await fetch('https://api.github.com/user/repos?per_page=1', {
+                    headers: { 'Authorization': `token ${cloudToken}` }
+                });
+                hasRepoScope = response.ok;
+                return hasRepoScope;
+            } catch (e) {
+                hasRepoScope = false;
+                return false;
+            }
+        }
+
+        // Load team repo config from localStorage
+        function loadTeamRepoConfig() {
+            const saved = localStorage.getItem('d365_team_repo');
+            if (saved) {
+                try {
+                    const config = JSON.parse(saved);
+                    teamRepoOwner = config.owner;
+                    teamRepoName = config.repo;
+                    return true;
+                } catch (e) {
+                    localStorage.removeItem('d365_team_repo');
+                }
+            }
+            return false;
+        }
+
+        // Save team repo config to localStorage
+        function saveTeamRepoConfig(owner, repo) {
+            teamRepoOwner = owner;
+            teamRepoName = repo;
+            localStorage.setItem('d365_team_repo', JSON.stringify({ owner, repo }));
+        }
+
+        // Clear team repo config
+        function clearTeamRepoConfig() {
+            teamRepoOwner = null;
+            teamRepoName = null;
+            teamWidgets = [];
+            localStorage.removeItem('d365_team_repo');
+        }
+
+        // Switch between Personal and Team tabs
+        function switchProfileTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.profile-tab').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tab);
+            });
+            
+            // Update sections
+            document.getElementById('personalSection').classList.toggle('active', tab === 'personal');
+            document.getElementById('teamSection').classList.toggle('active', tab === 'team');
+            
+            // Load team widgets if switching to team tab
+            if (tab === 'team' && teamRepoOwner && teamRepoName) {
+                loadTeamWidgets();
+            }
+        }
+
+        // Update team UI based on connection state
+        function updateTeamUI() {
+            const emptyState = document.getElementById('teamEmptyState');
+            const connectedState = document.getElementById('teamConnectedState');
+            const profileList = document.getElementById('teamProfileList');
+            const saveRow = document.getElementById('teamSaveRow');
+            const teamCount = document.getElementById('teamCount');
+            
+            if (teamRepoOwner && teamRepoName) {
+                // Connected state
+                emptyState.style.display = 'none';
+                connectedState.style.display = 'flex';
+                profileList.style.display = 'block';
+                saveRow.style.display = 'flex';
+                document.getElementById('teamRepoName').textContent = `${teamRepoOwner}/${teamRepoName}`;
+                teamCount.textContent = teamWidgets.length;
+            } else {
+                // Not connected
+                emptyState.style.display = 'block';
+                connectedState.style.display = 'none';
+                profileList.style.display = 'none';
+                saveRow.style.display = 'none';
+                teamCount.textContent = '0';
+            }
+        }
+
+        // Show Create Team Repo modal
+        function showCreateTeamRepoModal() {
+            const modal = document.getElementById('createTeamRepoModal');
+            const needScope = document.getElementById('createTeamNeedRepoScope');
+            const status = document.getElementById('createTeamRepoStatus');
+            const btn = document.getElementById('createTeamRepoBtn');
+            
+            status.style.display = 'none';
+            
+            if (!hasRepoScope) {
+                needScope.style.display = 'block';
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+            } else {
+                needScope.style.display = 'none';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
+            
+            modal.classList.add('show');
+        }
+
+        function closeCreateTeamRepoModal() {
+            document.getElementById('createTeamRepoModal').classList.remove('show');
+        }
+
+        // Show Join Team Repo modal
+        function showJoinTeamRepoModal() {
+            const modal = document.getElementById('joinTeamRepoModal');
+            const needScope = document.getElementById('joinTeamNeedRepoScope');
+            const status = document.getElementById('joinTeamRepoStatus');
+            const btn = document.getElementById('joinTeamRepoBtn');
+            
+            status.style.display = 'none';
+            document.getElementById('joinTeamRepoUrl').value = '';
+            
+            if (!hasRepoScope) {
+                needScope.style.display = 'block';
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+            } else {
+                needScope.style.display = 'none';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
+            
+            modal.classList.add('show');
+        }
+
+        function closeJoinTeamRepoModal() {
+            document.getElementById('joinTeamRepoModal').classList.remove('show');
+        }
+
+        // Create a new team repository
+        async function createTeamRepository() {
+            const btn = document.getElementById('createTeamRepoBtn');
+            const btnText = document.getElementById('createTeamRepoBtnText');
+            const spinner = document.getElementById('createTeamRepoSpinner');
+            const status = document.getElementById('createTeamRepoStatus');
+            
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            spinner.style.display = 'inline';
+            
+            try {
+                // Check if repo already exists
+                const checkResponse = await fetch(`https://api.github.com/repos/${cloudUser.login}/${TEAM_REPO_NAME}`, {
+                    headers: { 'Authorization': `token ${cloudToken}` }
+                });
+                
+                if (checkResponse.ok) {
+                    // Repo exists, just connect to it
+                    saveTeamRepoConfig(cloudUser.login, TEAM_REPO_NAME);
+                    await ensureWidgetsFolder();
+                    await loadTeamWidgets();
+                    updateTeamUI();
+                    closeCreateTeamRepoModal();
+                    showToast(`Connected to existing repository: ${TEAM_REPO_NAME}`);
+                    return;
+                }
+                
+                // Create new repository
+                const createResponse = await fetch('https://api.github.com/user/repos', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `token ${cloudToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: TEAM_REPO_NAME,
+                        description: 'Shared D365 Widget Studio configurations for team collaboration',
+                        private: false, // Public by default for easy sharing
+                        auto_init: true
+                    })
+                });
+                
+                if (!createResponse.ok) {
+                    throw new Error('Failed to create repository');
+                }
+                
+                // Wait a moment for GitHub to initialize the repo
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Save config and create widgets folder
+                saveTeamRepoConfig(cloudUser.login, TEAM_REPO_NAME);
+                await ensureWidgetsFolder();
+                
+                status.style.display = 'block';
+                status.style.background = '#d1fae5';
+                status.style.color = '#065f46';
+                status.innerHTML = `
+                    ✅ Repository created successfully!<br>
+                    <small>Repository URL: <a href="https://github.com/${cloudUser.login}/${TEAM_REPO_NAME}" target="_blank">github.com/${cloudUser.login}/${TEAM_REPO_NAME}</a></small><br>
+                    <small>Share this URL with your teammates to collaborate.</small>
+                `;
+                
+                updateTeamUI();
+                showToast('Team repository created successfully!');
+                
+                // Close modal after 3 seconds
+                setTimeout(() => {
+                    closeCreateTeamRepoModal();
+                }, 3000);
+                
+            } catch (error) {
+                status.style.display = 'block';
+                status.style.background = '#fee2e2';
+                status.style.color = '#991b1b';
+                status.textContent = `Error: ${error.message}`;
+            } finally {
+                btn.disabled = false;
+                btnText.style.display = 'inline';
+                spinner.style.display = 'none';
+            }
+        }
+
+        // Ensure widgets folder exists in repo
+        async function ensureWidgetsFolder() {
+            if (!teamRepoOwner || !teamRepoName) return;
+            
+            try {
+                // Check if folder exists
+                const response = await fetch(`https://api.github.com/repos/${teamRepoOwner}/${teamRepoName}/contents/${TEAM_CONFIG_FOLDER}`, {
+                    headers: { 'Authorization': `token ${cloudToken}` }
+                });
+                
+                if (response.status === 404) {
+                    // Create a .gitkeep file to create the folder
+                    await fetch(`https://api.github.com/repos/${teamRepoOwner}/${teamRepoName}/contents/${TEAM_CONFIG_FOLDER}/.gitkeep`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${cloudToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: 'Initialize widgets folder',
+                            content: btoa('# Widget configurations folder\n')
+                        })
+                    });
+                }
+            } catch (e) {
+                console.error('Error ensuring widgets folder:', e);
+            }
+        }
+
+        // Join an existing team repository
+        async function joinTeamRepository() {
+            const urlInput = document.getElementById('joinTeamRepoUrl');
+            const btn = document.getElementById('joinTeamRepoBtn');
+            const btnText = document.getElementById('joinTeamRepoBtnText');
+            const spinner = document.getElementById('joinTeamRepoSpinner');
+            const status = document.getElementById('joinTeamRepoStatus');
+            
+            const url = urlInput.value.trim();
+            
+            // Parse GitHub URL
+            const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+            if (!match) {
+                status.style.display = 'block';
+                status.style.background = '#fee2e2';
+                status.style.color = '#991b1b';
+                status.textContent = 'Please enter a valid GitHub repository URL';
+                return;
+            }
+            
+            const [, owner, repo] = match;
+            const repoName = repo.replace(/\.git$/, '');
+            
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            spinner.style.display = 'inline';
+            
+            try {
+                // Verify repo exists and is accessible
+                const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}`, {
+                    headers: { 'Authorization': `token ${cloudToken}` }
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error('Repository not found or you don\'t have access');
+                    }
+                    throw new Error('Failed to access repository');
+                }
+                
+                // Save config
+                saveTeamRepoConfig(owner, repoName);
+                await loadTeamWidgets();
+                updateTeamUI();
+                closeJoinTeamRepoModal();
+                showToast(`Connected to team repository: ${owner}/${repoName}`);
+                
+            } catch (error) {
+                status.style.display = 'block';
+                status.style.background = '#fee2e2';
+                status.style.color = '#991b1b';
+                status.textContent = error.message;
+            } finally {
+                btn.disabled = false;
+                btnText.style.display = 'inline';
+                spinner.style.display = 'none';
+            }
+        }
+
+        // Disconnect from team repository
+        function disconnectTeamRepo() {
+            if (confirm('Disconnect from team repository? You can reconnect anytime.')) {
+                clearTeamRepoConfig();
+                document.getElementById('teamProfileList').innerHTML = '';
+                updateTeamUI();
+                showToast('Disconnected from team repository');
+            }
+        }
+
+        // Load team widgets from repository
+        async function loadTeamWidgets() {
+            if (!teamRepoOwner || !teamRepoName || !cloudToken) {
+                teamWidgets = [];
+                renderTeamWidgets();
+                return;
+            }
+            
+            try {
+                const response = await fetch(`https://api.github.com/repos/${teamRepoOwner}/${teamRepoName}/contents/${TEAM_CONFIG_FOLDER}`, {
+                    headers: { 'Authorization': `token ${cloudToken}` }
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        teamWidgets = [];
+                        renderTeamWidgets();
+                        return;
+                    }
+                    throw new Error('Failed to load team widgets');
+                }
+                
+                const files = await response.json();
+                teamWidgets = files
+                    .filter(f => f.type === 'file' && f.name.endsWith('.json'))
+                    .map(f => ({
+                        name: f.name.replace('.json', '').replace(/_/g, ' '),
+                        filename: f.name,
+                        path: f.path,
+                        sha: f.sha,
+                        url: f.download_url
+                    }));
+                
+                document.getElementById('teamCount').textContent = teamWidgets.length;
+                renderTeamWidgets();
+                
+            } catch (error) {
+                console.error('Error loading team widgets:', error);
+                teamWidgets = [];
+                renderTeamWidgets();
+            }
+        }
+
+        // Render team widgets list
+        function renderTeamWidgets() {
+            const container = document.getElementById('teamProfileList');
+            
+            if (teamWidgets.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--admin-text-muted);">
+                        <p>No shared widgets yet</p>
+                        <small>Save a widget to share it with your team</small>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = teamWidgets.map(widget => `
+                <div class="profile-item">
+                    <div class="profile-info" onclick="loadTeamWidget('${widget.filename}')" style="cursor:pointer;">
+                        <span class="profile-name">${widget.name}</span>
+                        <span class="profile-badge team">Team</span>
+                    </div>
+                    <div class="profile-actions">
+                        <button class="profile-btn" onclick="loadTeamWidget('${widget.filename}')" title="Load">
+                            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                        </button>
+                        <button class="profile-btn delete" onclick="deleteTeamWidget('${widget.filename}', '${widget.sha}')" title="Delete">
+                            <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load a team widget
+        async function loadTeamWidget(filename) {
+            if (!teamRepoOwner || !teamRepoName || !cloudToken) return;
+            
+            try {
+                showToast('Loading team widget...');
+                
+                const response = await fetch(`https://api.github.com/repos/${teamRepoOwner}/${teamRepoName}/contents/${TEAM_CONFIG_FOLDER}/${filename}`, {
+                    headers: { 'Authorization': `token ${cloudToken}` }
+                });
+                
+                if (!response.ok) throw new Error('Failed to load widget');
+                
+                const fileData = await response.json();
+                const content = JSON.parse(atob(fileData.content));
+                
+                // Apply the configuration
+                applyWidgetConfig(content);
+                
+                const widgetName = filename.replace('.json', '').replace(/_/g, ' ');
+                showToast(`Loaded team widget: ${widgetName}`);
+                
+            } catch (error) {
+                console.error('Error loading team widget:', error);
+                showToast('Failed to load team widget', 'error');
+            }
+        }
+
+        // Save a widget to team repository
+        async function saveAsTeamProfile() {
+            const nameInput = document.getElementById('newTeamProfileName');
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                showToast('Please enter a profile name', 'error');
+                return;
+            }
+            
+            if (!teamRepoOwner || !teamRepoName) {
+                showToast('No team repository connected', 'error');
+                return;
+            }
+            
+            try {
+                showToast('Saving to team repository...');
+                
+                const config = collectCurrentConfig();
+                const filename = name.replace(/[^a-zA-Z0-9-_ ]/g, '').replace(/ /g, '_') + '.json';
+                const content = btoa(JSON.stringify(config, null, 2));
+                
+                // Check if file exists (to get SHA for update)
+                let sha = null;
+                const existingWidget = teamWidgets.find(w => w.filename === filename);
+                if (existingWidget) {
+                    sha = existingWidget.sha;
+                }
+                
+                const body = {
+                    message: `${sha ? 'Update' : 'Add'} widget: ${name}`,
+                    content: content
+                };
+                if (sha) body.sha = sha;
+                
+                const response = await fetch(`https://api.github.com/repos/${teamRepoOwner}/${teamRepoName}/contents/${TEAM_CONFIG_FOLDER}/${filename}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${cloudToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+                
+                if (!response.ok) throw new Error('Failed to save widget');
+                
+                nameInput.value = '';
+                await loadTeamWidgets();
+                showToast(`Widget saved to team: ${name}`);
+                
+            } catch (error) {
+                console.error('Error saving team widget:', error);
+                showToast('Failed to save to team repository', 'error');
+            }
+        }
+
+        // Delete a team widget
+        async function deleteTeamWidget(filename, sha) {
+            const name = filename.replace('.json', '').replace(/_/g, ' ');
+            
+            if (!confirm(`Delete team widget "${name}"? This cannot be undone.`)) {
+                return;
+            }
+            
+            try {
+                showToast('Deleting widget...');
+                
+                const response = await fetch(`https://api.github.com/repos/${teamRepoOwner}/${teamRepoName}/contents/${TEAM_CONFIG_FOLDER}/${filename}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `token ${cloudToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Delete widget: ${name}`,
+                        sha: sha
+                    })
+                });
+                
+                if (!response.ok) throw new Error('Failed to delete widget');
+                
+                await loadTeamWidgets();
+                showToast(`Deleted team widget: ${name}`);
+                
+            } catch (error) {
+                console.error('Error deleting team widget:', error);
+                showToast('Failed to delete widget', 'error');
+            }
+        }
+
+        // Apply widget config (shared function for both personal and team)
+        function applyWidgetConfig(config) {
+            // Apply LCW code
+            if (config.lcwCode) {
+                document.getElementById('lcwCode').value = config.lcwCode;
+                parseLCWCode();
+            }
+            
+            // Apply all other settings
+            if (config.brandName) document.getElementById('brandName').value = config.brandName;
+            if (config.brandLogoUrl) document.getElementById('brandLogoUrl').value = config.brandLogoUrl;
+            if (config.welcomeTitle) document.getElementById('welcomeTitle').value = config.welcomeTitle;
+            if (config.welcomeSubtitle) document.getElementById('welcomeSubtitle').value = config.welcomeSubtitle;
+            if (config.themeColor) {
+                document.getElementById('themeColor').value = config.themeColor;
+                document.getElementById('themeColorText').value = config.themeColor;
+            }
+            if (config.agentName) document.getElementById('agentName').value = config.agentName;
+            if (config.agentTitle) document.getElementById('agentTitle').value = config.agentTitle;
+            if (config.agentAvatarUrl) document.getElementById('agentAvatarUrl').value = config.agentAvatarUrl;
+            if (config.customerAvatarUrl) document.getElementById('customerAvatarUrl').value = config.customerAvatarUrl;
+            if (config.quickReplies) document.getElementById('quickReplies').value = config.quickReplies;
+            if (config.backgroundImageUrl) document.getElementById('backgroundImageUrl').value = config.backgroundImageUrl;
+            if (config.targetWebsite !== undefined) {
+                document.getElementById('targetWebsite').value = config.targetWebsite || '';
+                // Update hidden state
+                if (!config.targetWebsite) {
+                    document.getElementById('targetWebsiteRow').style.display = 'none';
+                    document.getElementById('showTargetWebsiteBtn').style.display = 'block';
+                }
+            }
+            
+            // Apply toggle settings
+            if (config.hasOwnProperty('showQuickReplies')) {
+                document.getElementById('showQuickReplies').checked = config.showQuickReplies;
+            }
+            if (config.hasOwnProperty('showReadReceipts')) {
+                document.getElementById('showReadReceipts').checked = config.showReadReceipts;
+            }
+            if (config.hasOwnProperty('showTypingIndicator')) {
+                document.getElementById('showTypingIndicator').checked = config.showTypingIndicator;
+            }
+            
+            // Update preview
+            if (typeof updatePreviewFromInputs === 'function') {
+                updatePreviewFromInputs();
+            }
+        }
+
+        // Collect current config (shared function)
+        function collectCurrentConfig() {
+            return {
+                lcwCode: document.getElementById('lcwCode').value,
+                brandName: document.getElementById('brandName').value,
+                brandLogoUrl: document.getElementById('brandLogoUrl').value,
+                welcomeTitle: document.getElementById('welcomeTitle').value,
+                welcomeSubtitle: document.getElementById('welcomeSubtitle').value,
+                themeColor: document.getElementById('themeColor').value,
+                agentName: document.getElementById('agentName').value,
+                agentTitle: document.getElementById('agentTitle').value,
+                agentAvatarUrl: document.getElementById('agentAvatarUrl').value,
+                customerAvatarUrl: document.getElementById('customerAvatarUrl').value,
+                quickReplies: document.getElementById('quickReplies').value,
+                showQuickReplies: document.getElementById('showQuickReplies').checked,
+                showReadReceipts: document.getElementById('showReadReceipts').checked,
+                showTypingIndicator: document.getElementById('showTypingIndicator').checked,
+                backgroundImageUrl: document.getElementById('backgroundImageUrl').value,
+                targetWebsite: document.getElementById('targetWebsite').value
+            };
+        }
+
         // Check for existing login on page load
         function checkExistingLogin() {
             const savedUser = localStorage.getItem('d365_user');
@@ -3837,6 +4887,23 @@
             if (syncAllBtn) syncAllBtn.style.display = 'inline-flex';
             
             loadSavedWidgets();
+            
+            // Initialize team mode
+            initializeTeamMode();
+        }
+        
+        // Initialize team mode after login
+        async function initializeTeamMode() {
+            // Check if token has repo scope
+            await checkRepoScope();
+            
+            // Load saved team repo config
+            if (loadTeamRepoConfig()) {
+                await loadTeamWidgets();
+            }
+            
+            // Update team UI
+            updateTeamUI();
         }
 
         // Skip login
@@ -3857,8 +4924,15 @@
                     cloudUser = null;
                     cloudToken = null;
                     currentLoadedWidgetId = null;
+                    hasRepoScope = false;
                     localStorage.removeItem('d365_user');
                     localStorage.removeItem('d365_github_token');
+                    // Clear team data on logout
+                    clearTeamRepoConfig();
+                    document.getElementById('teamProfileList').innerHTML = '';
+                    updateTeamUI();
+                    // Reset to personal tab
+                    switchProfileTab('personal');
                     document.getElementById('userBar').classList.remove('show');
                     // Show login button in header
                     const loginBtn = document.getElementById('loginBtn');
@@ -3910,6 +4984,10 @@
                         updated: g.updated_at,
                         files: g.files
                     }));
+                
+                // Update personal count in tab
+                const personalCount = document.getElementById('personalCount');
+                if (personalCount) personalCount.textContent = savedWidgets.length;
                 
                 renderSavedWidgets();
                 
