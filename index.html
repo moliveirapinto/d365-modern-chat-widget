@@ -3847,31 +3847,26 @@
                 
                 <!-- Standard Widget Preview -->
                 <div class="preview-content" id="standardPreview">
-                    <div class="preview-widget-container" style="background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); min-height: 450px; display: flex; flex-direction: column; padding: 16px;">
-                        <!-- IFrame Container -->
-                        <div id="standardPreviewContainer" style="flex: 1; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; position: relative; min-height: 400px;">
-                            <!-- Placeholder when no LCW code -->
-                            <div id="standardPreviewPlaceholder" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center;">
-                                <svg width="48" height="48" viewBox="0 0 24 24" fill="#cbd5e1" style="margin-bottom: 16px;"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/></svg>
-                                <div style="font-size: 14px; font-weight: 600; color: #475569; margin-bottom: 8px;">No LCW Code Configured</div>
-                                <div style="font-size: 12px; color: #94a3b8; line-height: 1.5; max-width: 260px;">Paste your D365 Live Chat Widget embed code in the "LCW Embed Code" field above to see a live preview.</div>
-                            </div>
-                            <!-- IFrame for actual preview -->
-                            <iframe id="standardPreviewIframe" style="width: 100%; height: 100%; border: none; display: none;" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+                    <div class="preview-widget-container" style="background: #e2e8f0; padding: 0; overflow: hidden;">
+                        <!-- Placeholder when no LCW code -->
+                        <div id="standardPreviewPlaceholder" style="height: 450px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center;">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="#94a3b8" style="margin-bottom: 16px;"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/></svg>
+                            <div style="font-size: 14px; font-weight: 600; color: #475569; margin-bottom: 8px;">No LCW Code Configured</div>
+                            <div style="font-size: 12px; color: #94a3b8; line-height: 1.5; max-width: 260px;">Paste your D365 Live Chat Widget embed code in the "LCW Embed Code" field above to see a live preview.</div>
                         </div>
-                        <!-- Footer with refresh -->
-                        <div id="standardPreviewFooter" style="display: none; margin-top: 12px; padding: 10px 14px; background: rgba(0,120,212,0.08); border-radius: 8px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#0078d4"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                                    <span style="font-size: 12px; color: #0078d4; font-weight: 500;">Widget loaded from your LCW code</span>
-                                </div>
-                                <button onclick="refreshStandardPreview()" style="background: #0078d4; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-                                    Refresh
-                                </button>
-                            </div>
+                        <!-- IFrame for actual preview -->
+                        <iframe id="standardPreviewIframe" style="width: 100%; height: 450px; border: none; display: none; background: #e2e8f0;" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+                    </div>
+                    <!-- Footer with refresh -->
+                    <div id="standardPreviewFooter" style="display: none; margin-top: 12px; padding: 12px 16px; text-align: center;">
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="#16a34a"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span style="font-size: 12px; color: #16a34a; font-weight: 500;">Widget loaded from your LCW code</span>
                         </div>
+                        <button onclick="refreshStandardPreview()" style="background: #0078d4; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                            Refresh Preview
+                        </button>
                     </div>
                 </div>
                 
@@ -3998,14 +3993,28 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v2.0.0';
+        const APP_VERSION = 'v2.1.0';
         const APP_LAST_UPDATED = 'Dec 31, 2025';
         
         const CHANGELOG = [
             {
-                version: 'v2.0.0',
+                version: 'v2.1.0',
                 date: 'Dec 31, 2025',
                 latest: true,
+                items: [
+                    { type: 'new', text: 'Standard Widget live preview - see your actual D365 widget in the admin panel' },
+                    { type: 'new', text: 'In-app feedback modal - send feedback without leaving the page' },
+                    { type: 'new', text: 'Power Pages CSP documentation with navigation path and screenshot' },
+                    { type: 'improve', text: 'Color palettes now update title and subtitle text colors' },
+                    { type: 'improve', text: 'Team repository modal uses Fluent UI People Team Add icon' },
+                    { type: 'improve', text: 'Cleaner Standard Widget preview with uniform background' },
+                    { type: 'fix', text: 'Standard preview no longer shows split gray/white areas' }
+                ]
+            },
+            {
+                version: 'v2.0.0',
+                date: 'Dec 31, 2025',
+                latest: false,
                 items: [
                     { type: 'new', text: '🚀 Team Mode - collaborate with teammates on shared widget configurations' },
                     { type: 'new', text: 'GitHub repository-based team storage for multi-user collaboration' },
@@ -6643,55 +6652,8 @@
             iframe.style.display = 'block';
             if (footer) footer.style.display = 'block';
             
-            // Create HTML document with the LCW code - position widget in bottom-right naturally
-            const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            min-height: 100%;
-            height: 100%;
-            width: 100%;
-            position: relative;
-        }
-        /* Style for the simulated page content */
-        .page-simulation {
-            padding: 20px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .page-hint {
-            text-align: center;
-            color: #94a3b8;
-            font-size: 12px;
-            line-height: 1.6;
-        }
-        .page-hint svg {
-            display: block;
-            margin: 0 auto 12px;
-            opacity: 0.5;
-        }
-    </style>
-</head>
-<body>
-    <div class="page-simulation">
-        <div class="page-hint">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="#94a3b8"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-            Look for the chat widget launcher<br>in the bottom-right corner →
-        </div>
-    </div>
-    ${lcwCode}
-</body>
-</html>`;
+            // Create HTML document with the LCW code - simple clean background
+            const htmlContent = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>*{margin:0;padding:0}html,body{height:100%;background:#e2e8f0;}</style></head><body>${lcwCode}</body></html>`;
             
             // Write to iframe
             iframe.srcdoc = htmlContent;
@@ -9861,7 +9823,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     <div id="feedbackModal" class="feedback-modal-overlay" onclick="if(event.target === this) closeFeedbackModal()">
         <div class="feedback-modal-content">
             <div class="feedback-modal-header">
-                <h3>📝 Send Feedback</h3>
+                <h3>Send Feedback</h3>
                 <button class="feedback-modal-close" onclick="closeFeedbackModal()">&times;</button>
             </div>
             <iframe id="feedbackIframe" src="" frameborder="0" allowfullscreen></iframe>
