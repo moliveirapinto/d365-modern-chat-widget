@@ -4371,9 +4371,39 @@
             const spinner = document.getElementById('createTeamRepoSpinner');
             const status = document.getElementById('createTeamRepoStatus');
             
+            // Pre-check: ensure we have token and user info
+            if (!cloudToken) {
+                status.style.display = 'block';
+                status.style.background = '#fee2e2';
+                status.style.color = '#991b1b';
+                status.textContent = 'Error: Please log in with GitHub first.';
+                return;
+            }
+            
+            if (!cloudUser || !cloudUser.login) {
+                status.style.display = 'block';
+                status.style.background = '#fee2e2';
+                status.style.color = '#991b1b';
+                status.textContent = 'Error: User information not loaded. Please refresh and try again.';
+                return;
+            }
+            
+            // Check repo scope again before attempting
+            if (!hasRepoScope) {
+                const scopeCheck = await checkRepoScope();
+                if (!scopeCheck) {
+                    status.style.display = 'block';
+                    status.style.background = '#fef3c7';
+                    status.style.color = '#92400e';
+                    status.innerHTML = '⚠️ Your token needs the <strong>repo</strong> scope. Please create a new token with repository access using the link above.';
+                    return;
+                }
+            }
+            
             btn.disabled = true;
             btnText.style.display = 'none';
             spinner.style.display = 'inline';
+            status.style.display = 'none';
             
             try {
                 // Check if repo already exists
@@ -4408,15 +4438,49 @@
                 });
                 
                 if (!createResponse.ok) {
-                    throw new Error('Failed to create repository');
+                    const errorData = await createResponse.json().catch(() => ({}));
+                    let errorMessage = 'Failed to create repository';
+                    
+                    if (createResponse.status === 401) {
+                        errorMessage = 'Authentication failed. Please log out and log in again with a valid token.';
+                    } else if (createResponse.status === 403) {
+                        if (errorData.message && errorData.message.includes('rate limit')) {
+                            errorMessage = 'GitHub API rate limit exceeded. Please wait a few minutes and try again.';
+                        } else {
+                            errorMessage = 'Permission denied. Your token may not have the "repo" scope. Please create a new token with repository access.';
+                        }
+                    } else if (createResponse.status === 422) {
+                        if (errorData.errors && errorData.errors.some(e => e.message && e.message.includes('name already exists'))) {
+                            errorMessage = `A repository named "${TEAM_REPO_NAME}" already exists but could not be accessed. Check if it\'s in a different account or organization.`;
+                        } else {
+                            errorMessage = errorData.message || 'Repository validation failed. The name may be invalid or already taken.';
+                        }
+                    } else if (createResponse.status === 404) {
+                        errorMessage = 'GitHub API endpoint not found. This may be a temporary issue - please try again.';
+                    } else if (errorData.message) {
+                        errorMessage = errorData.message;
+                    }
+                    
+                    throw new Error(errorMessage);
                 }
                 
                 // Wait a moment for GitHub to initialize the repo
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                status.style.display = 'block';
+                status.style.background = '#e0f2fe';
+                status.style.color = '#0369a1';
+                status.textContent = 'Repository created! Initializing...';
+                
+                await new Promise(resolve => setTimeout(resolve, 2500));
                 
                 // Save config and create widgets folder
                 saveTeamRepoConfig(cloudUser.login, TEAM_REPO_NAME);
-                await ensureWidgetsFolder();
+                
+                try {
+                    await ensureWidgetsFolder();
+                } catch (folderError) {
+                    console.warn('Could not create widgets folder immediately, will retry later:', folderError);
+                    // Continue anyway - folder will be created on first save
+                }
                 
                 status.style.display = 'block';
                 status.style.background = '#d1fae5';
@@ -4436,10 +4500,11 @@
                 }, 3000);
                 
             } catch (error) {
+                console.error('Team repo creation error:', error);
                 status.style.display = 'block';
                 status.style.background = '#fee2e2';
                 status.style.color = '#991b1b';
-                status.textContent = `Error: ${error.message}`;
+                status.innerHTML = `<strong>Error:</strong> ${error.message}`;
             } finally {
                 btn.disabled = false;
                 btnText.style.display = 'inline';
@@ -4486,22 +4551,49 @@
             
             const url = urlInput.value.trim();
             
-            // Parse GitHub URL
-            const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
-            if (!match) {
+            if (!url) {
                 status.style.display = 'block';
                 status.style.background = '#fee2e2';
                 status.style.color = '#991b1b';
-                status.textContent = 'Please enter a valid GitHub repository URL';
+                status.textContent = 'Please enter a GitHub repository URL';
                 return;
             }
             
-            const [, owner, repo] = match;
-            const repoName = repo.replace(/\.git$/, '');
+            // Pre-check: ensure we have token
+            if (!cloudToken) {
+                status.style.display = 'block';
+                status.style.background = '#fee2e2';
+                status.style.color = '#991b1b';
+                status.textContent = 'Error: Please log in with GitHub first.';
+                return;
+            }
+            
+            // Parse GitHub URL - support multiple formats
+            let owner, repoName;
+            
+            // Format: https://github.com/owner/repo or github.com/owner/repo
+            const urlMatch = url.match(/github\.com\/([^\/]+)\/([^\/\s]+)/);
+            // Format: owner/repo
+            const shortMatch = url.match(/^([^\/\s]+)\/([^\/\s]+)$/);
+            
+            if (urlMatch) {
+                owner = urlMatch[1];
+                repoName = urlMatch[2].replace(/\.git$/, '').replace(/\/$/, '');
+            } else if (shortMatch) {
+                owner = shortMatch[1];
+                repoName = shortMatch[2];
+            } else {
+                status.style.display = 'block';
+                status.style.background = '#fee2e2';
+                status.style.color = '#991b1b';
+                status.innerHTML = 'Please enter a valid GitHub repository URL<br><small>Examples: https://github.com/owner/repo or owner/repo</small>';
+                return;
+            }
             
             btn.disabled = true;
             btnText.style.display = 'none';
             spinner.style.display = 'inline';
+            status.style.display = 'none';
             
             try {
                 // Verify repo exists and is accessible
@@ -4510,24 +4602,60 @@
                 });
                 
                 if (!response.ok) {
-                    if (response.status === 404) {
-                        throw new Error('Repository not found or you don\'t have access');
+                    const errorData = await response.json().catch(() => ({}));
+                    let errorMessage = 'Failed to access repository';
+                    
+                    if (response.status === 401) {
+                        errorMessage = 'Authentication failed. Please log out and log in again.';
+                    } else if (response.status === 403) {
+                        if (errorData.message && errorData.message.includes('rate limit')) {
+                            errorMessage = 'GitHub API rate limit exceeded. Please wait a few minutes and try again.';
+                        } else {
+                            errorMessage = 'You don\'t have permission to access this repository. Ask the owner to add you as a collaborator.';
+                        }
+                    } else if (response.status === 404) {
+                        errorMessage = 'Repository not found. Please check the URL and make sure you have access to this repository.';
+                    } else if (errorData.message) {
+                        errorMessage = errorData.message;
                     }
-                    throw new Error('Failed to access repository');
+                    
+                    throw new Error(errorMessage);
+                }
+                
+                // Check repo scope for write access (needed to save widgets)
+                if (!hasRepoScope) {
+                    status.style.display = 'block';
+                    status.style.background = '#fef3c7';
+                    status.style.color = '#92400e';
+                    status.innerHTML = `
+                        <strong>⚠️ Limited access:</strong> Connected in read-only mode.<br>
+                        <small>To save widgets to this repo, create a token with the <strong>repo</strong> scope.</small>
+                    `;
+                    // Still connect, but warn about read-only
                 }
                 
                 // Save config
                 saveTeamRepoConfig(owner, repoName);
                 await loadTeamWidgets();
                 updateTeamUI();
-                closeJoinTeamRepoModal();
-                showToast(`Connected to team repository: ${owner}/${repoName}`);
+                
+                if (hasRepoScope) {
+                    closeJoinTeamRepoModal();
+                    showToast(`Connected to team repository: ${owner}/${repoName}`);
+                } else {
+                    // Don't close modal if read-only warning shown
+                    setTimeout(() => {
+                        closeJoinTeamRepoModal();
+                    }, 3000);
+                    showToast(`Connected (read-only) to: ${owner}/${repoName}`);
+                }
                 
             } catch (error) {
+                console.error('Join team repo error:', error);
                 status.style.display = 'block';
                 status.style.background = '#fee2e2';
                 status.style.color = '#991b1b';
-                status.textContent = error.message;
+                status.innerHTML = `<strong>Error:</strong> ${error.message}`;
             } finally {
                 btn.disabled = false;
                 btnText.style.display = 'inline';
