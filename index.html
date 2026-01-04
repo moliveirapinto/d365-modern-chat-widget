@@ -4095,14 +4095,29 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v2.1.0';
-        const APP_LAST_UPDATED = 'Dec 31, 2025';
+        const APP_VERSION = 'v2.2.0';
+        const APP_LAST_UPDATED = 'Jan 3, 2026';
         
         const CHANGELOG = [
             {
+                version: 'v2.2.0',
+                date: 'Jan 3, 2026',
+                latest: true,
+                items: [
+                    { type: 'improve', text: 'User-friendly team repository modals with plain-language explanations' },
+                    { type: 'improve', text: 'Step-by-step token creation instructions for non-technical users' },
+                    { type: 'improve', text: 'Expandable troubleshooting help section with common issues and solutions' },
+                    { type: 'improve', text: 'Detailed error messages for team repository creation/joining' },
+                    { type: 'improve', text: 'Support for short format repository URLs (owner/repo)' },
+                    { type: 'improve', text: 'Instructions for adding collaborators to team repositories' },
+                    { type: 'fix', text: 'Personal profiles count now displays correctly in tab badge' },
+                    { type: 'fix', text: 'Cloud widgets no longer overwrite personal profile count' }
+                ]
+            },
+            {
                 version: 'v2.1.0',
                 date: 'Dec 31, 2025',
-                latest: true,
+                latest: false,
                 items: [
                     { type: 'new', text: 'Standard Widget live preview - see your actual D365 widget in the admin panel' },
                     { type: 'new', text: 'In-app feedback modal - send feedback without leaving the page' },
