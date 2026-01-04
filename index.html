@@ -5031,10 +5031,6 @@
                         files: g.files
                     }));
                 
-                // Update personal count in tab
-                const personalCount = document.getElementById('personalCount');
-                if (personalCount) personalCount.textContent = savedWidgets.length;
-                
                 renderSavedWidgets();
                 
             } catch (e) {
@@ -5763,6 +5759,11 @@
 
         function renderProfiles() {
             const container = document.getElementById('profileList');
+            
+            // Update personal count in tab
+            const personalCount = document.getElementById('personalCount');
+            if (personalCount) personalCount.textContent = profiles.length;
+            
             if (profiles.length === 0) {
                 container.innerHTML = '<p style="color: var(--admin-text-light); font-size: 13px; text-align: center; padding: 12px;">No saved profiles. Create one to quickly switch between customer demos.</p>';
                 return;
