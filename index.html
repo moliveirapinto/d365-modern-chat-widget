@@ -1270,6 +1270,12 @@
             flex: 1;
         }
 
+        /* Spinner animation */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
         /* Profile Tabs (Personal/Team toggle) */
         .profile-tabs {
             display: flex;
@@ -2552,49 +2558,88 @@
 
     <!-- Create Team Repository Modal -->
     <div id="createTeamRepoModal" class="save-modal-overlay" onclick="if(event.target === this) closeCreateTeamRepoModal()">
-        <div class="save-modal team-modal-content">
+        <div class="save-modal team-modal-content" style="max-width: 520px;">
             <h3 style="display:flex;align-items:center;gap:8px;"><img src="https://raw.githubusercontent.com/microsoft/fluentui-system-icons/main/assets/People%20Team%20Add/SVG/ic_fluent_people_team_add_24_regular.svg" width="24" height="24" alt="Team"> Create Team Repository</h3>
-            <p style="color: var(--admin-text-muted); margin-bottom: 20px;">
-                This will create a new GitHub repository to share widget configurations with your team.
-            </p>
-            <div class="team-modal-steps">
-                <div class="team-step">
+            
+            <!-- Friendly intro -->
+            <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 14px; margin-bottom: 20px;">
+                <p style="margin: 0; color: #0369a1; font-size: 13px; line-height: 1.5;">
+                    💡 <strong>What is this?</strong> A team repository is a shared space on GitHub where your team can store and access widget configurations together. Think of it like a shared folder in the cloud.
+                </p>
+            </div>
+            
+            <!-- Progress steps -->
+            <div id="createTeamProgress" class="team-modal-steps">
+                <div class="team-step" id="createStep1">
                     <div class="team-step-number">1</div>
                     <div class="team-step-content">
-                        <h4>Repository Created</h4>
-                        <p>A new repo <strong>d365-widget-configs</strong> will be created in your GitHub account</p>
+                        <h4>Create Shared Space</h4>
+                        <p>We'll create a folder called <strong>d365-widget-configs</strong> in your GitHub account</p>
                     </div>
                 </div>
-                <div class="team-step">
+                <div class="team-step" id="createStep2">
                     <div class="team-step-number">2</div>
                     <div class="team-step-content">
-                        <h4>Share with Team</h4>
-                        <p>Invite teammates as collaborators, or make the repo public</p>
+                        <h4>Share with Your Team</h4>
+                        <p>You'll get a link to share. Teammates can use it to connect</p>
                     </div>
                 </div>
-                <div class="team-step">
+                <div class="team-step" id="createStep3">
                     <div class="team-step-number">3</div>
                     <div class="team-step-content">
-                        <h4>Collaborate</h4>
-                        <p>Everyone can save and load shared widget configurations</p>
+                        <h4>Work Together</h4>
+                        <p>Everyone can save and load widget designs from the same place</p>
                     </div>
                 </div>
             </div>
-            <div id="createTeamRepoStatus" style="display:none; padding: 12px; border-radius: 8px; margin-bottom: 16px;"></div>
+            
+            <!-- Status/Progress area -->
+            <div id="createTeamRepoStatus" style="display:none; padding: 14px; border-radius: 8px; margin-bottom: 16px;"></div>
+            
+            <!-- Need repo scope warning -->
             <div id="createTeamNeedRepoScope" style="display:none; background: #fef3c7; border: 1px solid #f59e0b; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
-                <p style="margin: 0 0 12px 0; color: #92400e; font-weight: 500;">⚠️ Repository access required</p>
-                <p style="margin: 0 0 12px 0; color: #92400e; font-size: 13px;">Your current token doesn't have repository access. Create a new token with the <strong>repo</strong> scope:</p>
+                <p style="margin: 0 0 10px 0; color: #92400e; font-weight: 600; font-size: 14px;">🔑 One More Step Needed</p>
+                <p style="margin: 0 0 12px 0; color: #92400e; font-size: 13px; line-height: 1.5;">
+                    Your current login doesn't have permission to create repositories. This is easy to fix:
+                </p>
+                <ol style="margin: 0 0 14px 0; padding-left: 20px; color: #92400e; font-size: 13px; line-height: 1.8;">
+                    <li>Click the button below to open GitHub</li>
+                    <li>Scroll down and click <strong>"Generate token"</strong></li>
+                    <li>Copy the new token</li>
+                    <li>Come back here, log out, and log in with the new token</li>
+                </ol>
                 <a href="https://github.com/settings/tokens/new?description=D365%20Widget%20Studio%20(Team)&scopes=repo,gist,read:user" 
                    target="_blank" 
-                   style="display: inline-block; background: #f59e0b; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500;">
-                    Create Token with Repo Access →
+                   style="display: inline-block; background: #f59e0b; color: white; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500;">
+                    Open GitHub to Create Token →
                 </a>
             </div>
+            
+            <!-- Help section -->
+            <details style="margin-bottom: 16px; background: #f8fafc; border-radius: 8px; padding: 2px;">
+                <summary style="cursor: pointer; padding: 12px; font-size: 13px; color: #64748b; font-weight: 500;">
+                    ❓ Having trouble? Click here for help
+                </summary>
+                <div style="padding: 0 12px 12px 12px; font-size: 12px; color: #64748b; line-height: 1.6;">
+                    <p style="margin: 8px 0;"><strong>Common issues:</strong></p>
+                    <ul style="margin: 8px 0; padding-left: 18px;">
+                        <li><strong>"Permission denied"</strong> - You need to create a new token with repository access (see yellow box above)</li>
+                        <li><strong>"Repository already exists"</strong> - Good news! We'll connect you to it automatically</li>
+                        <li><strong>"Rate limit exceeded"</strong> - GitHub limits requests. Wait 5 minutes and try again</li>
+                        <li><strong>"Authentication failed"</strong> - Your token may have expired. Log out and log in again</li>
+                    </ul>
+                    <p style="margin: 8px 0;">Still stuck? Contact your IT administrator or <a href="#" onclick="openFeedbackModal(); return false;" style="color: #0078d4;">send us feedback</a>.</p>
+                </div>
+            </details>
+            
             <div class="save-modal-actions">
                 <button class="save-modal-cancel" onclick="closeCreateTeamRepoModal()">Cancel</button>
                 <button class="save-modal-save" id="createTeamRepoBtn" onclick="createTeamRepository()">
-                    <span id="createTeamRepoBtnText">Create Repository</span>
-                    <span id="createTeamRepoSpinner" style="display:none;">Creating...</span>
+                    <span id="createTeamRepoBtnText">Create Team Space</span>
+                    <span id="createTeamRepoSpinner" style="display:none;">
+                        <svg style="width:16px;height:16px;animation:spin 1s linear infinite;margin-right:6px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="32" stroke-linecap="round"/></svg>
+                        Creating...
+                    </span>
                 </button>
             </div>
         </div>
@@ -2602,43 +2647,100 @@
 
     <!-- Join Team Repository Modal -->
     <div id="joinTeamRepoModal" class="save-modal-overlay" onclick="if(event.target === this) closeJoinTeamRepoModal()">
-        <div class="save-modal team-modal-content">
-            <h3>🔗 Join Team Repository</h3>
-            <p style="color: var(--admin-text-muted); margin-bottom: 20px;">
-                Connect to a shared GitHub repository to collaborate on widget configurations.
-            </p>
+        <div class="save-modal team-modal-content" style="max-width: 520px;">
+            <h3>🔗 Join Your Team</h3>
+            
+            <!-- Friendly intro -->
+            <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 14px; margin-bottom: 20px;">
+                <p style="margin: 0; color: #0369a1; font-size: 13px; line-height: 1.5;">
+                    💡 <strong>What is this?</strong> Connect to your team's shared widget repository to access configurations your colleagues have saved.
+                </p>
+            </div>
+            
             <div class="team-modal-steps">
                 <div class="team-step">
                     <div class="team-step-number">1</div>
                     <div class="team-step-content">
-                        <h4>Get the Repository URL</h4>
-                        <p>Ask your team lead for the widget configs repository URL</p>
+                        <h4>Get the Link from Your Team</h4>
+                        <p>Ask a colleague who already has access for the repository link</p>
                     </div>
                 </div>
                 <div class="team-step">
                     <div class="team-step-number">2</div>
                     <div class="team-step-content">
-                        <h4>Ensure Access</h4>
-                        <p>Make sure you've been added as a collaborator, or the repo is public</p>
+                        <h4>Make Sure You Have Access</h4>
+                        <p>If it's a private repository, ask the owner to add you as a collaborator</p>
                     </div>
                 </div>
             </div>
-            <input type="text" class="team-repo-input" id="joinTeamRepoUrl" placeholder="https://github.com/username/d365-widget-configs">
-            <div id="joinTeamRepoStatus" style="display:none; padding: 12px; border-radius: 8px; margin-top: 12px;"></div>
+            
+            <!-- Input with better label -->
+            <div style="margin-bottom: 8px;">
+                <label style="display: block; font-size: 13px; color: #475569; font-weight: 500; margin-bottom: 6px;">
+                    Paste the repository link here:
+                </label>
+                <input type="text" class="team-repo-input" id="joinTeamRepoUrl" placeholder="Example: https://github.com/yourteam/d365-widget-configs" style="font-size: 14px;">
+                <p style="margin: 6px 0 0 0; font-size: 11px; color: #94a3b8;">
+                    You can also use the short format: <code style="background:#f1f5f9;padding:2px 4px;border-radius:3px;">username/repository-name</code>
+                </p>
+            </div>
+            
+            <!-- Status area -->
+            <div id="joinTeamRepoStatus" style="display:none; padding: 14px; border-radius: 8px; margin-top: 12px;"></div>
+            
+            <!-- Need repo scope warning -->
             <div id="joinTeamNeedRepoScope" style="display:none; background: #fef3c7; border: 1px solid #f59e0b; padding: 16px; border-radius: 8px; margin-top: 12px;">
-                <p style="margin: 0 0 12px 0; color: #92400e; font-weight: 500;">⚠️ Repository access required</p>
-                <p style="margin: 0 0 12px 0; color: #92400e; font-size: 13px;">Your current token doesn't have repository access. Create a new token with the <strong>repo</strong> scope:</p>
+                <p style="margin: 0 0 10px 0; color: #92400e; font-weight: 600; font-size: 14px;">🔑 One More Step Needed</p>
+                <p style="margin: 0 0 12px 0; color: #92400e; font-size: 13px; line-height: 1.5;">
+                    To save widgets to the team repository, you'll need a token with repository access:
+                </p>
+                <ol style="margin: 0 0 14px 0; padding-left: 20px; color: #92400e; font-size: 13px; line-height: 1.8;">
+                    <li>Click the button below to open GitHub</li>
+                    <li>Scroll down and click <strong>"Generate token"</strong></li>
+                    <li>Copy the new token</li>
+                    <li>Come back here, log out, and log in with the new token</li>
+                </ol>
                 <a href="https://github.com/settings/tokens/new?description=D365%20Widget%20Studio%20(Team)&scopes=repo,gist,read:user" 
                    target="_blank" 
-                   style="display: inline-block; background: #f59e0b; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500;">
-                    Create Token with Repo Access →
+                   style="display: inline-block; background: #f59e0b; color: white; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500;">
+                    Open GitHub to Create Token →
                 </a>
+                <p style="margin: 10px 0 0 0; font-size: 12px; color: #92400e;">
+                    <em>Note: You can still view team widgets without this, but won't be able to save new ones.</em>
+                </p>
             </div>
+            
+            <!-- Help section -->
+            <details style="margin-top: 16px; background: #f8fafc; border-radius: 8px; padding: 2px;">
+                <summary style="cursor: pointer; padding: 12px; font-size: 13px; color: #64748b; font-weight: 500;">
+                    ❓ Having trouble? Click here for help
+                </summary>
+                <div style="padding: 0 12px 12px 12px; font-size: 12px; color: #64748b; line-height: 1.6;">
+                    <p style="margin: 8px 0;"><strong>Common issues:</strong></p>
+                    <ul style="margin: 8px 0; padding-left: 18px;">
+                        <li><strong>"Repository not found"</strong> - Double-check the link. If it's a private repo, ask the owner to add you</li>
+                        <li><strong>"You don't have permission"</strong> - The repository owner needs to invite you as a collaborator</li>
+                        <li><strong>"Invalid URL"</strong> - Make sure you're using the full GitHub link (starts with https://github.com/)</li>
+                    </ul>
+                    <p style="margin: 8px 0;"><strong>How to get added as a collaborator:</strong></p>
+                    <ol style="margin: 8px 0; padding-left: 18px;">
+                        <li>Ask the repository owner to go to the repo on GitHub</li>
+                        <li>They click <strong>Settings</strong> → <strong>Collaborators</strong></li>
+                        <li>They add your GitHub username</li>
+                        <li>You'll get an email invitation - accept it</li>
+                    </ol>
+                    <p style="margin: 8px 0;">Still stuck? Contact your IT administrator or <a href="#" onclick="openFeedbackModal(); return false;" style="color: #0078d4;">send us feedback</a>.</p>
+                </div>
+            </details>
+            
             <div class="save-modal-actions" style="margin-top: 20px;">
                 <button class="save-modal-cancel" onclick="closeJoinTeamRepoModal()">Cancel</button>
                 <button class="save-modal-save" id="joinTeamRepoBtn" onclick="joinTeamRepository()">
-                    <span id="joinTeamRepoBtnText">Connect</span>
-                    <span id="joinTeamRepoSpinner" style="display:none;">Connecting...</span>
+                    <span id="joinTeamRepoBtnText">Connect to Team</span>
+                    <span id="joinTeamRepoSpinner" style="display:none;">
+                        <svg style="width:16px;height:16px;animation:spin 1s linear infinite;margin-right:6px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="32" stroke-linecap="round"/></svg>
+                        Connecting...
+                    </span>
                 </button>
             </div>
         </div>
