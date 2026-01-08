@@ -21,11 +21,76 @@ class ModernChatWidget {
             isConnecting: false,
             unreadMessages: 0,
             agentName: 'Support Agent',
-            messages: []
+            messages: [],
+            processedMessageIds: new Set()
         };
+
+        // Message queue for batching and sorting messages
+        this.messageQueue = [];
+        this.messageQueueTimer = null;
+        this.MESSAGE_BATCH_DELAY = 150; // ms to wait for batching messages
 
         this.elements = {};
         this.init();
+    }
+
+    // Get timestamp from a message for sorting
+    getMessageTimestamp(msg) {
+        // First try explicit timestamp fields
+        if (msg.timestamp) return new Date(msg.timestamp).getTime();
+        if (msg.createdOn) return new Date(msg.createdOn).getTime();
+        if (msg.sentOn) return new Date(msg.sentOn).getTime();
+        // Fall back to messageId which appears to be a timestamp
+        const id = msg.messageId || msg.id || msg.clientmessageid || msg.messageid;
+        if (id && !isNaN(Number(id))) return Number(id);
+        return Date.now();
+    }
+
+    // Queue a message for batched processing
+    queueMessage(message) {
+        // Get message ID for deduplication
+        const messageId = message.messageId || message.id || message.clientmessageid || message.messageid;
+        
+        // Skip if already processed
+        if (messageId && this.state.processedMessageIds.has(messageId)) {
+            return;
+        }
+        
+        // Mark as processed
+        if (messageId) {
+            this.state.processedMessageIds.add(messageId);
+        }
+        
+        this.messageQueue.push(message);
+        
+        // Clear existing timer
+        if (this.messageQueueTimer) {
+            clearTimeout(this.messageQueueTimer);
+        }
+        
+        // Set timer to process batch
+        this.messageQueueTimer = setTimeout(() => this.processMessageQueue(), this.MESSAGE_BATCH_DELAY);
+    }
+
+    // Process queued messages in sorted order
+    processMessageQueue() {
+        if (this.messageQueue.length === 0) return;
+        
+        // Sort messages by timestamp (oldest first)
+        const sortedMessages = [...this.messageQueue].sort((a, b) => {
+            return this.getMessageTimestamp(a) - this.getMessageTimestamp(b);
+        });
+        
+        console.log('📬 Processing message queue:', sortedMessages.length, 'messages');
+        
+        // Clear queue before processing
+        this.messageQueue = [];
+        this.messageQueueTimer = null;
+        
+        // Process each message in sorted order
+        sortedMessages.forEach(msg => {
+            this.handleIncomingMessageImmediate(msg);
+        });
     }
 
     async init() {
@@ -765,10 +830,25 @@ class ModernChatWidget {
     }
 
     handleIncomingMessage(message) {
+        // Queue messages for batched, sorted processing
+        this.queueMessage(message);
+    }
+
+    handleIncomingMessageImmediate(message) {
         this.hideTyping();
         
-        if (message.sender?.type === 'Agent') {
-            this.state.agentName = message.sender.displayName || 'Agent';
+        // Handle system messages
+        const role = message.role || message.senderRole;
+        if (role === 'system' || role === 'System') {
+            const content = message.content || message.text || message.body;
+            if (content) {
+                this.addSystemMessage(content);
+            }
+            return;
+        }
+        
+        if (message.sender?.type === 'Agent' || role === 'bot' || role === 'Bot' || role === 'agent' || role === 'Agent') {
+            this.state.agentName = message.sender?.displayName || message.senderDisplayName || 'Agent';
             this.addAgentMessage(message.content || message.text);
             
             if (!this.state.isOpen) {
