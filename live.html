@@ -751,12 +751,31 @@
         }
         
         .message.agent ul, .message.agent ol {
-            margin: 8px 0; padding-left: 20px;
+            margin: 4px 0; padding-left: 20px;
         }
         .message.agent li {
-            margin: 4px 0; line-height: 1.5;
+            margin: 2px 0; line-height: 1.4; padding: 0;
         }
         .message.agent li::marker { color: #667eea; }
+        
+        /* Tighter spacing for lists within messages */
+        .message.agent p + ul,
+        .message.agent p + ol {
+            margin-top: 4px;
+        }
+        .message.agent ul + p,
+        .message.agent ol + p {
+            margin-top: 8px;
+        }
+        .message.agent p {
+            margin: 4px 0;
+        }
+        .message.agent p:first-child {
+            margin-top: 0;
+        }
+        .message.agent p:last-child {
+            margin-bottom: 0;
+        }
         
         .message.agent hr {
             border: none; border-top: 1px solid #e2e8f0; margin: 16px 0;

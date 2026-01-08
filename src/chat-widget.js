@@ -421,6 +421,30 @@ class ModernChatWidget {
                 border-bottom-left-radius: 4px;
             }
 
+            /* List styling for agent messages */
+            .mcw-message.agent .mcw-msg-bubble ul,
+            .mcw-message.agent .mcw-msg-bubble ol {
+                margin: 4px 0;
+                padding-left: 20px;
+            }
+            .mcw-message.agent .mcw-msg-bubble li {
+                margin: 2px 0;
+                line-height: 1.4;
+                padding: 0;
+            }
+            .mcw-message.agent .mcw-msg-bubble li::marker {
+                color: var(--mcw-primary);
+            }
+            .mcw-message.agent .mcw-msg-bubble p {
+                margin: 4px 0;
+            }
+            .mcw-message.agent .mcw-msg-bubble p:first-child {
+                margin-top: 0;
+            }
+            .mcw-message.agent .mcw-msg-bubble p:last-child {
+                margin-bottom: 0;
+            }
+
             .mcw-message.system .mcw-msg-bubble {
                 background: transparent;
                 color: var(--mcw-text-light);
