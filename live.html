@@ -2195,6 +2195,57 @@
         let chatSDK = null, chatStarted = false, unreadCount = 0, isMinimized = false, userName = '', userEmail = '', chatMessages = [];
         let processedMessageIds = new Set(); // Track processed message IDs to avoid duplicates
         
+        // Message queue for batching and sorting messages
+        let messageQueue = [];
+        let messageQueueTimer = null;
+        const MESSAGE_BATCH_DELAY = 150; // ms to wait for batching messages
+        
+        // Get timestamp from a message for sorting
+        function getMessageTimestamp(msg) {
+            // First try explicit timestamp fields
+            if (msg.timestamp) return new Date(msg.timestamp).getTime();
+            if (msg.createdOn) return new Date(msg.createdOn).getTime();
+            if (msg.sentOn) return new Date(msg.sentOn).getTime();
+            // Fall back to messageId which appears to be a timestamp
+            const id = msg.messageId || msg.id || msg.clientmessageid || msg.messageid;
+            if (id && !isNaN(Number(id))) return Number(id);
+            return Date.now();
+        }
+        
+        // Queue a message for batched processing
+        function queueMessage(message) {
+            messageQueue.push(message);
+            
+            // Clear existing timer
+            if (messageQueueTimer) {
+                clearTimeout(messageQueueTimer);
+            }
+            
+            // Set timer to process batch
+            messageQueueTimer = setTimeout(processMessageQueue, MESSAGE_BATCH_DELAY);
+        }
+        
+        // Process queued messages in sorted order
+        function processMessageQueue() {
+            if (messageQueue.length === 0) return;
+            
+            // Sort messages by timestamp (oldest first)
+            const sortedMessages = [...messageQueue].sort((a, b) => {
+                return getMessageTimestamp(a) - getMessageTimestamp(b);
+            });
+            
+            console.log('📬 Processing message queue:', sortedMessages.length, 'messages');
+            
+            // Clear queue before processing
+            messageQueue = [];
+            messageQueueTimer = null;
+            
+            // Process each message in sorted order
+            sortedMessages.forEach(msg => {
+                processMessageImmediate(msg);
+            });
+        }
+        
         // Initialize Adaptive Cards
         let adaptiveCardRenderer = null;
         if (typeof AdaptiveCards !== 'undefined') {
@@ -3341,6 +3392,7 @@
             }
         }
 
+        // Queue messages for batched, sorted processing
         function processMessage(message) {
             if (!message) return;
             
@@ -3353,10 +3405,21 @@
                 return;
             }
             
-            // Mark as processed
+            // Mark as processed immediately to prevent duplicates
             if (messageId) {
                 processedMessageIds.add(messageId);
             }
+            
+            // Queue for batched, sorted processing
+            queueMessage(message);
+        }
+
+        // Process a message immediately (called from queue processor)
+        function processMessageImmediate(message) {
+            if (!message) return;
+            
+            // Get message ID for logging
+            const messageId = message.messageId || message.id || message.clientmessageid || message.messageid;
             
             // 🎯 CHECK FOR INCOMING VOICE/VIDEO CALL
             // Check if message contains call invitation tags or metadata
@@ -3556,6 +3619,7 @@
                 const messages = await chatSDK.getMessages();
                 console.log('Polled messages:', messages);
                 if (messages && messages.length) {
+                    // Add all messages to queue - they will be sorted before display
                     messages.forEach(msg => {
                         processMessage(msg);
                     });
