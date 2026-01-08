@@ -2977,7 +2977,7 @@
             
             wrapper.appendChild(avatar);
             wrapper.appendChild(contentDiv);
-            messagesContainer.appendChild(wrapper);
+            typingIndicator.parentNode.insertBefore(wrapper, typingIndicator);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
             
             // Store in chat history
@@ -2987,6 +2987,11 @@
                 senderName,
                 timestamp: now
             });
+            
+            // Play notification sound for incoming hero card messages
+            if (!isUser) {
+                playNotificationSound();
+            }
         }
         
         function createHeroCardElement(cardData) {
