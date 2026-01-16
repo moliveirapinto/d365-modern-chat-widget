@@ -86,9 +86,7 @@ export default {
           version: 1
         };
         
-        await env.ROOMS.put(`room:${roomCode}`, JSON.stringify(roomData), {
-          expirationTtl: 60 * 60 * 24 * 7 // 7 days
-        });
+        await env.ROOMS.put(`room:${roomCode}`, JSON.stringify(roomData));
         
         return new Response(JSON.stringify({ 
           success: true, 
@@ -171,9 +169,7 @@ export default {
           version: existing.version + 1
         };
         
-        await env.ROOMS.put(`room:${roomCode}`, JSON.stringify(updatedRoom), {
-          expirationTtl: 60 * 60 * 24 * 7 // Refresh 7-day expiry
-        });
+        await env.ROOMS.put(`room:${roomCode}`, JSON.stringify(updatedRoom));
         
         return new Response(JSON.stringify({ 
           success: true, 

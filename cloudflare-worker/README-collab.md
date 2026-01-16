@@ -8,7 +8,7 @@ A simple Cloudflare Worker that enables real-time collaboration on widget config
 - 🔗 **Join Room** - Enter a code to sync with teammates
 - 🔄 **Sync/Push** - Pull latest changes or push your updates
 - ⚡ **Conflict Detection** - Prevents accidental overwrites
-- ⏰ **Auto-expiry** - Rooms expire after 7 days of inactivity
+- ♾️ **Persistent** - Rooms never expire
 
 ## Setup
 
@@ -71,5 +71,4 @@ const COLLAB_API_URL = 'https://d365-widget-collab.YOUR-SUBDOMAIN.workers.dev';
 ## Storage
 
 - Uses Cloudflare KV for persistent storage
-- Rooms expire after 7 days of inactivity
-- Each push refreshes the 7-day timer
+- Rooms never expire (delete manually if needed)
