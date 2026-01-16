@@ -1,7 +1,7 @@
 /**
  * D365 Modern Chat Widget - Core
  * This is the main widget code that gets loaded via the loader
- * Version: 2.0.0
+ * Version: 2.3.0
  */
 (function() {
   'use strict';
@@ -13,7 +13,7 @@
   }
   
   window.D365ModernChatWidget = {
-    version: '2.0.0',
+    version: '2.3.0',
     initialized: false
   };
 
@@ -575,6 +575,17 @@
     var processedMsgs = {};
     var unreadCount = 0;
     
+    // Message queue for batching and sorting (like live.html)
+    var messageQueue = [];
+    var messageQueueTimer = null;
+    var MESSAGE_BATCH_DELAY = 150;
+    var messageArrivalCounter = 0;
+    var DEBUG_MSG_SORTING = false;
+    
+    // Session persistence
+    var chatMessages = [];
+    var liveChatContext = null;
+    
     // Voice/Video calling state
     var VoiceVideoCallingSDK = null;
     var isInCall = false;
@@ -584,6 +595,14 @@
     var callStartTime = null;
     var pendingCallData = null;
     var currentAgentName = 'Agent';
+    
+    // VoiceVideo keepalive state
+    var voiceVideoKeepaliveInterval = null;
+    var lastTokenRefresh = Date.now();
+    var TOKEN_REFRESH_INTERVAL = 4 * 60 * 1000;  // 4 minutes
+    var KEEPALIVE_CHECK_INTERVAL = 30 * 1000;    // 30 seconds
+    var voiceVideoVisibilityHandler = null;
+    var currentChatSDKForVisibility = null;
 
     // DOM refs
     var $ = function(id) { return document.getElementById(id); };
@@ -912,6 +931,292 @@
 
     function isBotRole(role) {
       return role === 'bot' || role === 'Bot' || role === 2;
+    }
+
+    // Get timestamp from a message for sorting (priority: messageId > sequenceId > timestamp)
+    function getMessageTimestamp(msg, logResult) {
+      var ts = null;
+      var source = '';
+      
+      // FIRST: Check messageId - this is a millisecond timestamp and most reliable
+      var msgId = msg.messageId || msg.id || msg.clientmessageid || msg.messageid;
+      if (msgId && !isNaN(Number(msgId)) && Number(msgId) > 1000000000000) {
+        ts = Number(msgId);
+        source = 'messageId';
+      }
+      // SECOND: Check for sequence number
+      else if (msg.sequenceId !== undefined && !isNaN(Number(msg.sequenceId))) {
+        ts = Number(msg.sequenceId);
+        source = 'sequenceId';
+      } else if (msg.sequence !== undefined && !isNaN(Number(msg.sequence))) {
+        ts = Number(msg.sequence);
+        source = 'sequence';
+      } else if (msg.order !== undefined && !isNaN(Number(msg.order))) {
+        ts = Number(msg.order);
+        source = 'order';
+      }
+      // THIRD: Try explicit timestamp fields
+      else if (msg.timestamp) {
+        ts = new Date(msg.timestamp).getTime();
+        source = 'timestamp';
+      } else if (msg.createdOn) {
+        ts = new Date(msg.createdOn).getTime();
+        source = 'createdOn';
+      } else if (msg.sentOn) {
+        ts = new Date(msg.sentOn).getTime();
+        source = 'sentOn';
+      } else {
+        ts = Date.now();
+        source = 'fallback-now';
+      }
+      
+      if (logResult && DEBUG_MSG_SORTING) {
+        var content = (msg.content || msg.text || '').substring(0, 25);
+        console.log('⏱️ Timestamp for "' + content + '...": ' + ts + ' (from ' + source + ')');
+      }
+      
+      return ts;
+    }
+
+    // Queue a message for batched processing
+    function queueMessage(message) {
+      message._arrivalOrder = messageArrivalCounter++;
+      messageQueue.push(message);
+      
+      if (messageQueueTimer) {
+        clearTimeout(messageQueueTimer);
+      }
+      
+      messageQueueTimer = setTimeout(processMessageQueue, MESSAGE_BATCH_DELAY);
+    }
+
+    // Process queued messages in sorted order
+    function processMessageQueue() {
+      if (messageQueue.length === 0) return;
+      
+      var sortedMessages = messageQueue.slice().sort(function(a, b) {
+        var tsA = getMessageTimestamp(a);
+        var tsB = getMessageTimestamp(b);
+        
+        if (tsA !== tsB) return tsA - tsB;
+        
+        var idA = Number(a.messageId || a.id || 0);
+        var idB = Number(b.messageId || b.id || 0);
+        if (idA !== idB) return idA - idB;
+        
+        return (a._arrivalOrder || 0) - (b._arrivalOrder || 0);
+      });
+      
+      if (DEBUG_MSG_SORTING) {
+        console.log('📬 Processing message queue:', sortedMessages.length, 'messages');
+      }
+      
+      messageQueue = [];
+      messageQueueTimer = null;
+      
+      sortedMessages.forEach(function(msg) {
+        processMessageImmediate(msg);
+      });
+    }
+
+    // Session persistence functions
+    async function saveChatSession() {
+      if (!chatStarted || !chatSDK) {
+        localStorage.removeItem('d365ChatSession');
+        return;
+      }
+      
+      try {
+        liveChatContext = await chatSDK.getCurrentLiveChatContext();
+        console.log('📍 Got live chat context');
+      } catch (e) {
+        console.log('⚠️ Could not get live chat context:', e.message);
+      }
+      
+      var session = {
+        userName: userName,
+        userEmail: userEmail,
+        chatStarted: chatStarted,
+        messages: chatMessages,
+        processedIds: Object.keys(processedMsgs),
+        liveChatContext: liveChatContext,
+        timestamp: Date.now()
+      };
+      
+      localStorage.setItem('d365ChatSession', JSON.stringify(session));
+      console.log('💾 Chat session saved');
+    }
+
+    async function restoreChatSession() {
+      var saved = localStorage.getItem('d365ChatSession');
+      if (!saved) return false;
+      
+      try {
+        var session = JSON.parse(saved);
+        
+        // Check if session is recent (less than 1 hour old)
+        var oneHour = 60 * 60 * 1000;
+        if (Date.now() - session.timestamp > oneHour) {
+          console.log('⏰ Session expired - clearing');
+          localStorage.removeItem('d365ChatSession');
+          return false;
+        }
+        
+        if (!session.liveChatContext) {
+          console.log('⚠️ No live chat context - cannot reconnect');
+          localStorage.removeItem('d365ChatSession');
+          return false;
+        }
+        
+        userName = session.userName || '';
+        userEmail = session.userEmail || '';
+        liveChatContext = session.liveChatContext;
+        chatMessages = session.messages || [];
+        session.processedIds.forEach(function(id) { processedMsgs[id] = true; });
+        
+        console.log('🔄 Attempting to reconnect to existing chat...');
+        showView('connecting');
+        
+        var SDKClass = typeof OmnichannelChatSDK !== 'undefined' ?
+          (typeof OmnichannelChatSDK === 'function' ? OmnichannelChatSDK : OmnichannelChatSDK.default || OmnichannelChatSDK.OmnichannelChatSDK) :
+          (typeof Microsoft !== 'undefined' && Microsoft.OmnichannelChatSDK ? Microsoft.OmnichannelChatSDK : null);
+
+        if (!SDKClass) throw new Error('Chat SDK not loaded');
+
+        chatSDK = new SDKClass({ orgId: config.orgId, orgUrl: config.orgUrl, widgetId: config.widgetId });
+        await chatSDK.initialize();
+        
+        chatSDK.onNewMessage(function(m) {
+          if (m) queueMessage(m);
+          if (m && m.sender && m.sender.displayName && !isBot(m.sender.displayName)) {
+            currentAgentName = m.sender.displayName;
+          }
+        });
+        chatSDK.onTypingEvent(function() {
+          typing.classList.add('active');
+          setTimeout(function() { typing.classList.remove('active'); }, 3000);
+        });
+        chatSDK.onAgentEndSession(function() {
+          if (isInCall) endCall();
+          stopVoiceVideoKeepalive();
+          localStorage.removeItem('d365ChatSession');
+          showView('ended');
+        });
+        
+        await chatSDK.startChat({ liveChatContext: session.liveChatContext });
+        console.log('✅ Reconnected to existing chat session!');
+        
+        await initializeVoiceVideoCallingSDK(chatSDK);
+        
+        chatStarted = true;
+        showView('chat');
+        
+        // Restore messages to UI
+        chatMessages.forEach(function(msg) {
+          if (msg.content) {
+            if (msg.isAdaptiveCard) {
+              addAdaptiveCard(msg.content, msg.senderName, msg.isBotMsg);
+            } else {
+              addMessage(msg.content, msg.isUser, msg.senderName, msg.isBotMsg);
+            }
+          }
+        });
+        
+        setInterval(pollMessages, 3000);
+        return true;
+        
+      } catch (e) {
+        console.error('❌ Session restore failed:', e);
+        localStorage.removeItem('d365ChatSession');
+        showView('prechat');
+        return false;
+      }
+    }
+
+    // VoiceVideo keepalive mechanism
+    async function startVoiceVideoKeepalive(sdk) {
+      if (voiceVideoKeepaliveInterval) {
+        clearInterval(voiceVideoKeepaliveInterval);
+      }
+      
+      lastTokenRefresh = Date.now();
+      console.log('📞 Starting VoiceVideo keepalive mechanism');
+      
+      voiceVideoKeepaliveInterval = setInterval(async function() {
+        if (!VoiceVideoCallingSDK || !chatStarted) return;
+        
+        var timeSinceRefresh = Date.now() - lastTokenRefresh;
+        
+        if (timeSinceRefresh >= TOKEN_REFRESH_INTERVAL) {
+          console.log('📞 Refreshing VoiceVideo token...');
+          try {
+            var freshToken = await sdk.getChatToken();
+            if (freshToken) {
+              await VoiceVideoCallingSDK.initialize({
+                chatToken: freshToken,
+                selfVideoHTMLElementId: 'd365LocalVideo',
+                remoteVideoHTMLElementId: 'd365RemoteVideo',
+                OCClient: sdk.OCClient
+              });
+              lastTokenRefresh = Date.now();
+              console.log('✅ VoiceVideo token refreshed');
+            }
+          } catch (err) {
+            console.warn('⚠️ VoiceVideo token refresh failed:', err.message);
+            try {
+              await initializeVoiceVideoCallingSDK(sdk);
+              lastTokenRefresh = Date.now();
+            } catch (reinitErr) {
+              console.error('❌ VoiceVideo re-init failed:', reinitErr);
+            }
+          }
+        }
+      }, KEEPALIVE_CHECK_INTERVAL);
+    }
+
+    function stopVoiceVideoKeepalive() {
+      if (voiceVideoKeepaliveInterval) {
+        clearInterval(voiceVideoKeepaliveInterval);
+        voiceVideoKeepaliveInterval = null;
+        console.log('📞 VoiceVideo keepalive stopped');
+      }
+    }
+
+    // Visibility change handler for ACS endpoint maintenance
+    function setupVisibilityHandler(sdk) {
+      currentChatSDKForVisibility = sdk;
+      
+      if (voiceVideoVisibilityHandler) {
+        document.removeEventListener('visibilitychange', voiceVideoVisibilityHandler);
+      }
+      
+      voiceVideoVisibilityHandler = async function() {
+        if (document.visibilityState === 'visible' && VoiceVideoCallingSDK && chatStarted) {
+          console.log('📞 Tab became visible - checking ACS endpoint...');
+          
+          var timeSinceRefresh = Date.now() - lastTokenRefresh;
+          if (timeSinceRefresh > 60000) {
+            try {
+              var freshToken = await currentChatSDKForVisibility.getChatToken();
+              if (freshToken) {
+                await VoiceVideoCallingSDK.initialize({
+                  chatToken: freshToken,
+                  selfVideoHTMLElementId: 'd365LocalVideo',
+                  remoteVideoHTMLElementId: 'd365RemoteVideo',
+                  OCClient: currentChatSDKForVisibility.OCClient
+                });
+                lastTokenRefresh = Date.now();
+                console.log('✅ ACS endpoint re-registered');
+              }
+            } catch (err) {
+              console.warn('⚠️ ACS re-register failed:', err.message);
+            }
+          }
+        }
+      };
+      
+      document.addEventListener('visibilitychange', voiceVideoVisibilityHandler);
+      console.log('📞 Visibility handler registered');
     }
 
     // Markdown parser for bot messages
@@ -1422,7 +1727,8 @@
       }
     }
 
-    function processMessage(msg) {
+    // Process message immediately (called from queue)
+    function processMessageImmediate(msg) {
       if (!msg) return;
       var id = msg.messageId || msg.id || msg.clientmessageid;
       if (id && processedMsgs[id]) return;
@@ -1457,10 +1763,26 @@
       // Detect bot by role OR by sender name
       var isBotMsg = isBotRole(role) || isBot(senderName);
 
+      // Save to chat messages for session persistence
+      chatMessages.push({
+        content: content,
+        isUser: false,
+        senderName: senderName,
+        isBotMsg: isBotMsg,
+        isAdaptiveCard: isAdaptiveCard(content),
+        timestamp: Date.now()
+      });
+      saveChatSession();
+
       if (isAdaptiveCard(content)) addAdaptiveCard(content, senderName, isBotMsg);
       else if (isHeroCard(content)) addHeroCard(content, senderName, isBotMsg);
       else if (isSuggestedActions(content)) addSuggestedActions(content, senderName, isBotMsg);
       else addMessage(content, false, senderName, isBotMsg);
+    }
+
+    // Queue message for batched processing (public interface)
+    function processMessage(msg) {
+      queueMessage(msg);
     }
 
     function addSystemMessage(text) {
@@ -1536,6 +1858,8 @@
         });
         chatSDK.onAgentEndSession(function() { 
           if (isInCall) endCall();
+          stopVoiceVideoKeepalive();
+          localStorage.removeItem('d365ChatSession');
           showView('ended'); 
         });
 
@@ -1555,9 +1879,16 @@
         // Initialize voice/video calling SDK AFTER startChat (chat token now valid)
         await initializeVoiceVideoCallingSDK(chatSDK);
         
+        // Start keepalive and visibility handlers for video calls
+        startVoiceVideoKeepalive(chatSDK);
+        setupVisibilityHandler(chatSDK);
+        
         if (question) {
           addMessage(question, true, name);
           await chatSDK.sendMessage({ content: question });
+          // Save user message to session
+          chatMessages.push({ content: question, isUser: true, senderName: name, timestamp: Date.now() });
+          saveChatSession();
         }
         setInterval(pollMessages, 3000);
       } catch(e) {
@@ -1574,6 +1905,9 @@
       if (!text || !chatSDK || !chatStarted) return;
       input.value = '';
       addMessage(text, true, userName);
+      // Save user message to session
+      chatMessages.push({ content: text, isUser: true, senderName: userName, timestamp: Date.now() });
+      saveChatSession();
       try { await chatSDK.sendMessage({ content: text }); } catch(e) {
         addMessage('Failed to send. Try again.', false, 'System');
       }
@@ -1686,6 +2020,10 @@
       chatStarted = false;
       chatSDK = null;
       processedMsgs = {};
+      chatMessages = [];
+      liveChatContext = null;
+      stopVoiceVideoKeepalive();
+      localStorage.removeItem('d365ChatSession');
       $('d365StartBtn').disabled = false;
       $('d365StartBtn').textContent = config.startBtnText;
       $('d365Name').value = '';
@@ -1782,6 +2120,15 @@
     }
 
     if (!config.enablePrechatForm) prechat.classList.add('hidden');
+    
+    // Try to restore existing chat session
+    restoreChatSession().then(function(restored) {
+      if (restored) {
+        console.log('✅ Chat session restored successfully');
+      }
+    }).catch(function(e) {
+      console.log('ℹ️ No session to restore');
+    });
   }
 
   // Auto-init when DOM ready
