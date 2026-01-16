@@ -4,7 +4,7 @@
 
 [![D365 Compatible](https://img.shields.io/badge/D365-Omnichannel-0078D4?style=flat-square&logo=microsoft)](https://dynamics.microsoft.com)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.2.0-blue?style=flat-square)](package.json)
+[![Version](https://img.shields.io/badge/version-v2.3.0-blue?style=flat-square)](package.json)
 
 ![Chat Widget Preview](preview.png)
 
@@ -1148,6 +1148,28 @@ If this widget helped you, consider:
 ---
 
 ## 📝 Changelog
+
+### v2.3.0 (January 16, 2026)
+
+#### ⚡ Performance & Stability Improvements
+- **OPTIMIZED:** Content Security Policy (CSP) simplified with broad wildcards (`*.microsoft.com`, `*.azure.com`, `*.skype.com`)
+- **FIXED:** Eliminated CSP-related connection delays during chat startup
+- **IMPROVED:** Faster initial connection to D365 Omnichannel services
+
+#### 🔧 Message Ordering Fix
+- **FIXED:** Messages now display in correct chronological order using `messageId` (millisecond precision) instead of `timestamp` field (second precision only)
+- **IMPROVED:** 3-tier fallback system: `messageId` → `timestamp` → `createdOn` for reliable sorting
+
+#### 📹 Video Calling Enhancements
+- **NEW:** ACS (Azure Communication Services) keepalive mechanism during tab visibility changes
+- **FIXED:** Default bot avatar path corrected (`bot1.png`)
+- **IMPROVED:** Video call stability with proper endpoint maintenance
+
+#### 🛡️ CSP Configuration
+- Simplified CSP rules prevent future connectivity issues with Microsoft services
+- Broad wildcards ensure compatibility with SDK updates and new service endpoints
+
+---
 
 ### v2.0.0 (December 31, 2025)
 
