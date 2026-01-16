@@ -222,9 +222,26 @@
       '.d365-msg-content{display:flex;flex-direction:column;gap:4px;min-width:0}',
       '.d365-msg-sender{font-size:12px;font-weight:600;color:#64748b;padding:0 4px}',
       '.d365-msg-wrap.user .d365-msg-sender{text-align:right}',
-      '.d365-msg{padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.5;word-wrap:break-word;white-space:pre-wrap}',
+      '.d365-msg{padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.5;word-wrap:break-word}',
       '.d365-msg.agent{background:'+c.agentBubbleColor+';color:'+c.agentTextColor+';border-bottom-left-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.08)}',
-      '.d365-msg.user{background:'+c.userBubbleColor+';color:'+c.userTextColor+';border-bottom-right-radius:4px}',
+      '.d365-msg.user{background:'+c.userBubbleColor+';color:'+c.userTextColor+';border-bottom-right-radius:4px;white-space:pre-wrap}',
+      // Markdown styles for bot messages
+      '.d365-msg.agent h1,.d365-msg.agent h2,.d365-msg.agent h3,.d365-msg.agent h4{margin:0.5em 0 0.3em;font-weight:600;line-height:1.3}',
+      '.d365-msg.agent h1{font-size:1.3em}',
+      '.d365-msg.agent h2{font-size:1.2em}',
+      '.d365-msg.agent h3{font-size:1.1em}',
+      '.d365-msg.agent h4{font-size:1em}',
+      '.d365-msg.agent p{margin:0.5em 0}',
+      '.d365-msg.agent ul,.d365-msg.agent ol{margin:0.5em 0;padding-left:1.5em}',
+      '.d365-msg.agent li{margin:0.25em 0}',
+      '.d365-msg.agent code{background:rgba(0,0,0,0.06);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:0.9em}',
+      '.d365-msg.agent pre{background:rgba(0,0,0,0.06);padding:12px;border-radius:8px;overflow-x:auto;margin:0.5em 0}',
+      '.d365-msg.agent pre code{background:none;padding:0}',
+      '.d365-msg.agent strong{font-weight:600}',
+      '.d365-msg.agent em{font-style:italic}',
+      '.d365-msg.agent hr{border:none;border-top:1px solid rgba(0,0,0,0.1);margin:0.75em 0}',
+      '.d365-msg.agent a{color:#0078d4;text-decoration:none}',
+      '.d365-msg.agent a:hover{text-decoration:underline}',
       '.d365-msg-time{font-size:10px;color:#94a3b8;padding:0 4px}',
       '.d365-msg-wrap.user .d365-msg-time{text-align:right}',
       '.d365-adaptive-card{background:#fff!important;padding:0!important;overflow:hidden;border-radius:12px}',
@@ -897,6 +914,72 @@
       return role === 'bot' || role === 'Bot' || role === 2;
     }
 
+    // Markdown parser for bot messages
+    function formatBotMessage(text) {
+      if (!text) return '';
+      
+      // Extract references [n]: url "title" at the end
+      var references = [];
+      var refRegex = /\[(\d+)\]:\s*(https?:\/\/[^\s]+)\s*"([^"]+)"/g;
+      var match;
+      var mainContent = text;
+      
+      while ((match = refRegex.exec(text)) !== null) {
+        references.push({ num: match[1], url: match[2], title: match[3] });
+      }
+      
+      if (references.length > 0) {
+        mainContent = text.replace(/\n?\[(\d+)\]:\s*https?:\/\/[^\s]+\s*"[^"]+"/g, '');
+      }
+      
+      // Convert markdown to HTML
+      var html = mainContent
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/```(\w*)\n?([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/^####\s+(.+)$/gm, '<h4>$1</h4>')
+        .replace(/^###\s+(.+)$/gm, '<h3>$1</h3>')
+        .replace(/^##\s+(.+)$/gm, '<h2>$1</h2>')
+        .replace(/^#\s+(.+)$/gm, '<h1>$1</h1>')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+        .replace(/^---+$/gm, '<hr>')
+        .replace(/^[-*]\s+(.+)$/gm, '<li>$1</li>')
+        .replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>');
+      
+      // Handle reference citations
+      references.forEach(function(ref) {
+        html = html.replace(new RegExp('\\[' + ref.num + '\\]', 'g'), 
+          '<a href="' + ref.url + '" target="_blank" title="' + ref.title + '" style="color:#0078d4;text-decoration:none;font-size:0.75em;vertical-align:super;">' + ref.num + '</a>');
+      });
+      
+      html = html
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color:#0078d4;">$1</a>')
+        .replace(/\n\n+/g, '</p><p>')
+        .replace(/\n/g, '<br>');
+      
+      // Wrap lists
+      html = html.replace(/(<li>[\s\S]*?<\/li>)(\s*<li>)/g, '$1$2');
+      html = html.replace(/(<li>[\s\S]*?<\/li>)(?!\s*<li>)/g, '<ul style="margin:0.5em 0;padding-left:1.5em;">$1</ul>');
+      html = html.replace(/<\/ul>\s*<ul[^>]*>/g, '');
+      
+      // Add sources section if references exist
+      if (references.length > 0) {
+        var sourcesHtml = '<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,0,0,0.1);font-size:0.85em;">';
+        sourcesHtml += '<div style="color:#666;margin-bottom:4px;">Sources:</div>';
+        references.forEach(function(ref) {
+          var domain = ref.url.replace(/https?:\/\/(www\.)?/, '').split('/')[0];
+          sourcesHtml += '<div style="margin:2px 0;"><a href="' + ref.url + '" target="_blank" style="color:#0078d4;text-decoration:none;">[' + ref.num + '] ' + ref.title + '</a> <span style="color:#999;font-size:0.9em;">(' + domain + ')</span></div>';
+        });
+        sourcesHtml += '</div>';
+        html += sourcesHtml;
+      }
+      
+      return html;
+    }
+
     function addMessage(text, isUser, senderName, isBotMsg) {
       var wrap = document.createElement('div');
       wrap.className = 'd365-msg-wrap ' + (isUser ? 'user' : 'agent');
@@ -911,10 +994,13 @@
       else if (!isUser && !isBotAvatar && config.agentAvatar) avatar.innerHTML = '<img src="'+config.agentAvatar+'">';
       else avatar.textContent = getInitials(isUser ? userName : senderName);
 
+      // Format bot/agent messages with markdown, user messages as plain text
+      var formattedText = isUser ? text : formatBotMessage(text);
+
       var content = document.createElement('div');
       content.className = 'd365-msg-content';
       content.innerHTML = '<div class="d365-msg-sender">'+(isUser?userName:(senderName||'Agent'))+'</div>'+
-        '<div class="d365-msg '+(isUser?'user':'agent')+'">'+text+'</div>'+
+        '<div class="d365-msg '+(isUser?'user':'agent')+'">'+formattedText+'</div>'+
         '<div class="d365-msg-time">'+formatTime(new Date())+'</div>';
 
       wrap.appendChild(avatar);
