@@ -16,6 +16,7 @@
 // Allowed origins
 const ALLOWED_ORIGINS = [
   'https://moliveirapinto.github.io',
+  'https://lemon-water-0adbcca0f.1.azurestaticapps.net',
   'https://d365-modern-chat-widget.azurewebsites.net',
   'http://localhost:8080',
   'http://127.0.0.1:8080',
@@ -23,7 +24,8 @@ const ALLOWED_ORIGINS = [
 ];
 
 function corsHeaders(origin) {
-  const allowed = ALLOWED_ORIGINS.find(o => origin?.startsWith(o.replace(/:\d+$/, '')));
+  // Check if origin matches any allowed origin
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : null;
   return {
     'Access-Control-Allow-Origin': allowed || ALLOWED_ORIGINS[0],
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
