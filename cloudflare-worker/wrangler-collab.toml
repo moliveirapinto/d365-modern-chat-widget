@@ -8,4 +8,4 @@ compatibility_date = "2024-12-19"
 
 [[kv_namespaces]]
 binding = "ROOMS"
-id = "YOUR_KV_NAMESPACE_ID"  # Replace after running: npx wrangler kv:namespace create "ROOMS"
+id = "43c05060066549f7a4408d7d02befc73"
