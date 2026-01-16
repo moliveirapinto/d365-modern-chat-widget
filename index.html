@@ -4816,18 +4816,18 @@
                                 <span>Joined ${new Date(room.joinedAt).toLocaleDateString()}</span>
                             </div>
                         </div>
-                        <div class="profile-item-actions" onclick="event.stopPropagation();">
-                            <button class="profile-action-btn" onclick="copyRoomCode('${room.code}')" title="Copy room code">
-                                <img src="https://github.com/microsoft/fluentui-system-icons/raw/main/assets/Clipboard%20Text/SVG/ic_fluent_clipboard_text_32_regular.svg?raw=true" style="width:16px;height:16px;opacity:0.7;">
+                        <div class="profile-item-actions" onclick="event.stopPropagation();" style="display:flex; gap:4px;">
+                            <button onclick="copyRoomCode('${room.code}')" title="Copy room code" style="background:transparent; border:none; padding:6px; cursor:pointer; border-radius:4px;">
+                                <img src="https://github.com/microsoft/fluentui-system-icons/raw/main/assets/Clipboard%20Text/SVG/ic_fluent_clipboard_text_32_regular.svg?raw=true" style="width:18px;height:18px;">
                             </button>
-                            <button class="profile-action-btn" onclick="syncFromRoom('${room.code}')" title="Sync from room">
-                                <img src="https://github.com/microsoft/fluentui-system-icons/raw/main/assets/Cloud%20Sync/SVG/ic_fluent_cloud_sync_48_regular.svg?raw=true" style="width:16px;height:16px;opacity:0.7;">
+                            <button onclick="syncFromRoom('${room.code}')" title="Sync from room" style="background:transparent; border:none; padding:6px; cursor:pointer; border-radius:4px;">
+                                <img src="https://github.com/microsoft/fluentui-system-icons/raw/main/assets/Cloud%20Sync/SVG/ic_fluent_cloud_sync_48_regular.svg?raw=true" style="width:18px;height:18px;">
                             </button>
-                            <button class="profile-action-btn" onclick="pushToRoom('${room.code}')" title="Push to room">
-                                <img src="https://github.com/microsoft/fluentui-system-icons/raw/main/assets/Cloud%20Arrow%20Up/SVG/ic_fluent_cloud_arrow_up_48_regular.svg?raw=true" style="width:16px;height:16px;opacity:0.7;">
+                            <button onclick="pushToRoom('${room.code}')" title="Push to room" style="background:transparent; border:none; padding:6px; cursor:pointer; border-radius:4px;">
+                                <img src="https://github.com/microsoft/fluentui-system-icons/raw/main/assets/Cloud%20Arrow%20Up/SVG/ic_fluent_cloud_arrow_up_48_regular.svg?raw=true" style="width:18px;height:18px;">
                             </button>
-                            <button class="profile-action-btn delete" onclick="leaveCollabRoom('${room.code}')" title="Remove room">
-                                <img src="https://github.com/microsoft/fluentui-system-icons/raw/main/assets/Delete/SVG/ic_fluent_delete_48_regular.svg?raw=true" style="width:16px;height:16px;opacity:0.7;">
+                            <button onclick="leaveCollabRoom('${room.code}')" title="Remove room" style="background:transparent; border:none; padding:6px; cursor:pointer; border-radius:4px;">
+                                <img src="https://github.com/microsoft/fluentui-system-icons/raw/main/assets/Delete/SVG/ic_fluent_delete_48_regular.svg?raw=true" style="width:18px;height:18px;">
                             </button>
                         </div>
                     </div>
