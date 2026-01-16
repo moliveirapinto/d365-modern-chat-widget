@@ -2,6 +2,16 @@
  * D365 Modern Chat Widget - Core
  * This is the main widget code that gets loaded via the loader
  * Version: 2.3.0
+ * 
+ * ╔═══════════════════════════════════════════════════════════════════════════╗
+ * ║  ⚠️  FEATURE PARITY REQUIRED - READ CONTRIBUTING.md                       ║
+ * ║                                                                           ║
+ * ║  This file MUST stay in sync with live.html                               ║
+ * ║  Any feature/fix here → also apply to live.html                           ║
+ * ║  Any feature/fix in live.html → also apply here                           ║
+ * ║                                                                           ║
+ * ║  Users on embedded sites (TamperMonkey) deserve the same experience!      ║
+ * ╚═══════════════════════════════════════════════════════════════════════════╝
  */
 (function() {
   'use strict';

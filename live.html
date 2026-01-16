@@ -2203,6 +2203,16 @@
             throw new Error('Standard mode - stopping custom widget initialization');
         }
 
+        // ╔═══════════════════════════════════════════════════════════════════════════╗
+        // ║  ⚠️  FEATURE PARITY REQUIRED - READ CONTRIBUTING.md                       ║
+        // ║                                                                           ║
+        // ║  This file MUST stay in sync with dist/widget-core.js                     ║
+        // ║  Any feature/fix here → also apply to widget-core.js                      ║
+        // ║  Any feature/fix in widget-core.js → also apply here                      ║
+        // ║                                                                           ║
+        // ║  Users on embedded sites (TamperMonkey) deserve the same experience!      ║
+        // ╚═══════════════════════════════════════════════════════════════════════════╝
+        
         // ============ MICROSOFT D365 CONFIGURATION ============
         // D365 Configuration - use admin settings if available
         const omnichannelConfig = {

@@ -25,6 +25,7 @@
 - [🛠️ Troubleshooting](#️-troubleshooting)
 - [📚 Documentation](#-documentation)
 - [🤝 Support](#-support)
+- [👥 Contributing](#-contributing)
 
 ---
 
@@ -1147,6 +1148,24 @@ If this widget helped you, consider:
 
 ---
 
+## � Contributing
+
+> ⚠️ **IMPORTANT: This project has TWO implementations that MUST stay in sync!**
+
+| File | Purpose |
+|------|---------|
+| `live.html` | Direct website widget |
+| `dist/widget-core.js` | TamperMonkey / Embedded widget |
+
+**Any feature or fix in one file MUST also be applied to the other.**
+
+See **[CONTRIBUTING.md](CONTRIBUTING.md)** for:
+- Complete sync checklist
+- Feature mapping between files
+- Testing requirements
+
+---
+
 ## 📝 Changelog
 
 ### v2.3.0 (January 16, 2026)
@@ -1168,6 +1187,13 @@ If this widget helped you, consider:
 #### 🛡️ CSP Configuration
 - Simplified CSP rules prevent future connectivity issues with Microsoft services
 - Broad wildcards ensure compatibility with SDK updates and new service endpoints
+
+#### 🔄 Feature Parity (widget-core.js sync)
+- **NEW:** Session persistence - chat survives page refresh (1 hour expiry)
+- **NEW:** Message queue system with proper sorting
+- **NEW:** VoiceVideo keepalive - prevents call failures after 5 min
+- **NEW:** Visibility handler - fixes 480/10077 errors
+- **NEW:** Full markdown rendering with citation support
 
 ---
 
