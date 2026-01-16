@@ -2583,7 +2583,7 @@
             
             <!-- Success state with room code -->
             <div id="createRoomSuccess" style="display:none; text-align: center; padding: 20px; background: #ecfdf5; border-radius: 12px; margin-bottom: 16px;">
-                <div style="font-size: 14px; color: #065f46; margin-bottom: 8px;">Your room code is:</div>
+                <div style="font-size: 14px; color: #065f46; margin-bottom: 8px;">🎉 Room created! Your room code is:</div>
                 <div id="newRoomCode" style="font-size: 36px; font-weight: bold; font-family: monospace; letter-spacing: 4px; color: #059669; margin-bottom: 12px;">------</div>
                 <button onclick="copyRoomCode()" style="background: #059669; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer;">
                     📋 Copy Room Code
@@ -2592,13 +2592,16 @@
             </div>
             
             <div class="save-modal-actions">
-                <button class="save-modal-cancel" onclick="closeCreateRoomModal()">Cancel</button>
+                <button class="save-modal-cancel" onclick="closeCreateRoomModal()" id="createRoomCancelBtn">Cancel</button>
                 <button class="save-modal-save" id="createRoomBtn" onclick="createCollabRoom()">
                     <span id="createRoomBtnText">Create Room</span>
                     <span id="createRoomSpinner" style="display:none;">
                         <svg style="width:16px;height:16px;animation:spin 1s linear infinite;margin-right:6px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="32" stroke-linecap="round"/></svg>
                         Creating...
                     </span>
+                </button>
+                <button class="save-modal-save" id="createRoomDoneBtn" onclick="closeCreateRoomModal()" style="display:none;">
+                    Done
                 </button>
             </div>
         </div>
@@ -4440,6 +4443,8 @@
             document.getElementById('createRoomSuccess').style.display = 'none';
             document.getElementById('createRoomUserName').value = collabUserName;
             document.getElementById('createRoomBtn').style.display = 'inline-flex';
+            document.getElementById('createRoomDoneBtn').style.display = 'none';
+            document.getElementById('createRoomCancelBtn').style.display = 'inline-flex';
             modal.classList.add('show');
         }
         
@@ -4517,6 +4522,10 @@
                 document.getElementById('newRoomCode').textContent = data.roomCode;
                 success.style.display = 'block';
                 btn.style.display = 'none';
+                
+                // Show Done button, hide Cancel
+                document.getElementById('createRoomDoneBtn').style.display = 'inline-flex';
+                document.getElementById('createRoomCancelBtn').style.display = 'none';
                 
                 renderRoomList();
                 showToast(`Room ${data.roomCode} created! Share this code with your team.`);
