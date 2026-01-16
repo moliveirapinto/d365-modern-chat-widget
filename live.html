@@ -2218,21 +2218,63 @@
         let messageQueue = [];
         let messageQueueTimer = null;
         const MESSAGE_BATCH_DELAY = 150; // ms to wait for batching messages
+        let messageArrivalCounter = 0; // Track arrival order for stable sorting
+        const DEBUG_MSG_SORTING = true; // Set to true to debug message ordering issues
         
         // Get timestamp from a message for sorting
-        function getMessageTimestamp(msg) {
-            // First try explicit timestamp fields
-            if (msg.timestamp) return new Date(msg.timestamp).getTime();
-            if (msg.createdOn) return new Date(msg.createdOn).getTime();
-            if (msg.sentOn) return new Date(msg.sentOn).getTime();
-            // Fall back to messageId which appears to be a timestamp
-            const id = msg.messageId || msg.id || msg.clientmessageid || msg.messageid;
-            if (id && !isNaN(Number(id))) return Number(id);
-            return Date.now();
+        function getMessageTimestamp(msg, logResult = false) {
+            let ts = null;
+            let source = '';
+            
+            // First check for sequence number (most reliable for ordering)
+            if (msg.sequenceId !== undefined && !isNaN(Number(msg.sequenceId))) {
+                ts = Number(msg.sequenceId);
+                source = 'sequenceId';
+            } else if (msg.sequence !== undefined && !isNaN(Number(msg.sequence))) {
+                ts = Number(msg.sequence);
+                source = 'sequence';
+            } else if (msg.order !== undefined && !isNaN(Number(msg.order))) {
+                ts = Number(msg.order);
+                source = 'order';
+            }
+            // Try explicit timestamp fields
+            else if (msg.timestamp) {
+                ts = new Date(msg.timestamp).getTime();
+                source = 'timestamp';
+            } else if (msg.createdOn) {
+                ts = new Date(msg.createdOn).getTime();
+                source = 'createdOn';
+            } else if (msg.sentOn) {
+                ts = new Date(msg.sentOn).getTime();
+                source = 'sentOn';
+            } else if (msg.originalArrivalTime) {
+                ts = new Date(msg.originalArrivalTime).getTime();
+                source = 'originalArrivalTime';
+            } else {
+                // Fall back to messageId which appears to be a timestamp
+                const id = msg.messageId || msg.id || msg.clientmessageid || msg.messageid;
+                if (id && !isNaN(Number(id))) {
+                    ts = Number(id);
+                    source = 'messageId';
+                } else {
+                    ts = Date.now();
+                    source = 'fallback-now';
+                }
+            }
+            
+            // Log what we found for debugging (only when explicitly requested)
+            if (logResult && DEBUG_MSG_SORTING) {
+                const content = (msg.content || msg.text || '').substring(0, 25);
+                console.log(`⏱️ Timestamp for "${content}...": ${ts} (from ${source})`);
+            }
+            
+            return ts;
         }
         
         // Queue a message for batched processing
         function queueMessage(message) {
+            // Assign arrival order for stable sorting
+            message._arrivalOrder = messageArrivalCounter++;
             messageQueue.push(message);
             
             // Clear existing timer
@@ -2248,12 +2290,36 @@
         function processMessageQueue() {
             if (messageQueue.length === 0) return;
             
-            // Sort messages by timestamp (oldest first)
+            // Sort messages by timestamp (oldest first), with messageId and arrival order as tiebreakers
             const sortedMessages = [...messageQueue].sort((a, b) => {
-                return getMessageTimestamp(a) - getMessageTimestamp(b);
+                const tsA = getMessageTimestamp(a);
+                const tsB = getMessageTimestamp(b);
+                
+                // Primary sort by timestamp
+                if (tsA !== tsB) {
+                    return tsA - tsB;
+                }
+                
+                // Secondary sort by messageId if timestamps are equal
+                const idA = Number(a.messageId || a.id || 0);
+                const idB = Number(b.messageId || b.id || 0);
+                if (idA !== idB) {
+                    return idA - idB;
+                }
+                
+                // Tertiary sort by arrival order (preserves SDK order for identical timestamps/IDs)
+                return (a._arrivalOrder || 0) - (b._arrivalOrder || 0);
             });
             
-            console.log('📬 Processing message queue:', sortedMessages.length, 'messages');
+            // Debug: Log the sort order with timestamp sources
+            if (DEBUG_MSG_SORTING) {
+                console.log('📬 Processing message queue:', sortedMessages.length, 'messages');
+                console.log('📬 Message order after sorting:');
+                sortedMessages.forEach(m => {
+                    const ts = getMessageTimestamp(m, true); // Log with source info
+                    console.log(`  → ID: ${m.messageId || m.id}, arrival: ${m._arrivalOrder}, content: "${(m.content || m.text || '').substring(0, 40)}..."`);
+                });
+            }
             
             // Clear queue before processing
             messageQueue = [];
@@ -2481,6 +2547,13 @@
             // End any active call first
             if (isInCall) {
                 await endCall();
+            }
+            
+            // Stop the VoiceVideo keepalive and visibility handler
+            stopVoiceVideoKeepalive();
+            if (voiceVideoVisibilityHandler) {
+                document.removeEventListener('visibilitychange', voiceVideoVisibilityHandler);
+                voiceVideoVisibilityHandler = null;
             }
             
             // Close VoiceVideoCallingSDK
@@ -3643,8 +3716,22 @@
                 const messages = await chatSDK.getMessages();
                 console.log('Polled messages:', messages);
                 if (messages && messages.length) {
-                    // Add all messages to queue - they will be sorted before display
-                    messages.forEach(msg => {
+                    // Sort messages by timestamp/ID before processing to ensure correct order
+                    // SDK may return messages in reverse chronological order (newest first)
+                    const sortedMessages = [...messages].sort((a, b) => {
+                        const tsA = getMessageTimestamp(a);
+                        const tsB = getMessageTimestamp(b);
+                        return tsA - tsB; // Ascending order (oldest first)
+                    });
+                    
+                    console.log('📬 Sorted poll results:', sortedMessages.map(m => ({
+                        id: m.messageId || m.id,
+                        ts: getMessageTimestamp(m),
+                        content: (m.content || m.text || '').substring(0, 30)
+                    })));
+                    
+                    // Add all messages to queue - they will be further sorted before display
+                    sortedMessages.forEach(msg => {
                         processMessage(msg);
                     });
                 }
@@ -4090,6 +4177,118 @@
         
         // Global VoiceVideoCallingSDK instance
         let VoiceVideoCallingSDK = null;
+        let voiceVideoKeepaliveInterval = null;
+        let lastTokenRefresh = 0;
+        const TOKEN_REFRESH_INTERVAL = 4 * 60 * 1000; // Refresh token every 4 minutes (before 5-min expiry)
+        const KEEPALIVE_CHECK_INTERVAL = 30 * 1000;   // Check connection every 30 seconds
+        
+        // Keep the ACS endpoint registered by refreshing token before expiry
+        async function startVoiceVideoKeepalive(sdk) {
+            if (voiceVideoKeepaliveInterval) {
+                clearInterval(voiceVideoKeepaliveInterval);
+            }
+            
+            lastTokenRefresh = Date.now();
+            console.log('📞 Starting VoiceVideo keepalive mechanism');
+            
+            voiceVideoKeepaliveInterval = setInterval(async () => {
+                if (!VoiceVideoCallingSDK || !chatStarted) {
+                    console.log('📞 Keepalive skipped - SDK not ready or chat not started');
+                    return;
+                }
+                
+                const timeSinceRefresh = Date.now() - lastTokenRefresh;
+                
+                // Check if we need to refresh the token
+                if (timeSinceRefresh >= TOKEN_REFRESH_INTERVAL) {
+                    console.log('📞 Refreshing VoiceVideo token to maintain ACS endpoint registration...');
+                    try {
+                        // Get fresh chat token
+                        const freshToken = await sdk.getChatToken();
+                        if (freshToken) {
+                            // Re-initialize with fresh token
+                            await VoiceVideoCallingSDK.initialize({
+                                chatToken: freshToken,
+                                selfVideoHTMLElementId: 'localVideo',
+                                remoteVideoHTMLElementId: 'remoteVideo',
+                                OCClient: sdk.OCClient
+                            });
+                            lastTokenRefresh = Date.now();
+                            console.log('✅ VoiceVideo token refreshed successfully');
+                        }
+                    } catch (err) {
+                        console.warn('⚠️ VoiceVideo token refresh failed:', err.message);
+                        // Try full re-initialization
+                        try {
+                            await initializeVoiceVideoCallingSDK(sdk);
+                            lastTokenRefresh = Date.now();
+                            console.log('✅ VoiceVideo SDK re-initialized after token refresh failure');
+                        } catch (reinitErr) {
+                            console.error('❌ VoiceVideo SDK re-initialization failed:', reinitErr);
+                        }
+                    }
+                }
+                
+                // Log ACS connection status for debugging
+                if (VoiceVideoCallingSDK.isInitialized) {
+                    try {
+                        const isInit = VoiceVideoCallingSDK.isInitialized();
+                        console.log('📞 VoiceVideo SDK status:', isInit ? 'Active' : 'Inactive');
+                    } catch (e) {}
+                }
+            }, KEEPALIVE_CHECK_INTERVAL);
+        }
+        
+        // Stop keepalive when chat ends
+        function stopVoiceVideoKeepalive() {
+            if (voiceVideoKeepaliveInterval) {
+                clearInterval(voiceVideoKeepaliveInterval);
+                voiceVideoKeepaliveInterval = null;
+                console.log('📞 VoiceVideo keepalive stopped');
+            }
+        }
+        
+        // Handle visibility changes - re-register ACS endpoint when tab becomes visible
+        // This fixes the 480/10077 error when agent calls after tab was in background
+        let voiceVideoVisibilityHandler = null;
+        let currentChatSDKForVisibility = null;
+        
+        function setupVisibilityHandler(sdk) {
+            currentChatSDKForVisibility = sdk;
+            
+            if (voiceVideoVisibilityHandler) {
+                document.removeEventListener('visibilitychange', voiceVideoVisibilityHandler);
+            }
+            
+            voiceVideoVisibilityHandler = async () => {
+                if (document.visibilityState === 'visible' && VoiceVideoCallingSDK && chatStarted) {
+                    console.log('📞 Tab became visible - refreshing ACS endpoint registration...');
+                    
+                    // Force immediate token refresh when tab comes back to foreground
+                    const timeSinceRefresh = Date.now() - lastTokenRefresh;
+                    if (timeSinceRefresh > 60000) { // If more than 1 minute since last refresh
+                        try {
+                            const freshToken = await currentChatSDKForVisibility.getChatToken();
+                            if (freshToken) {
+                                await VoiceVideoCallingSDK.initialize({
+                                    chatToken: freshToken,
+                                    selfVideoHTMLElementId: 'localVideo',
+                                    remoteVideoHTMLElementId: 'remoteVideo',
+                                    OCClient: currentChatSDKForVisibility.OCClient
+                                });
+                                lastTokenRefresh = Date.now();
+                                console.log('✅ ACS endpoint re-registered after tab visibility change');
+                            }
+                        } catch (err) {
+                            console.warn('⚠️ Failed to re-register ACS endpoint:', err.message);
+                        }
+                    }
+                }
+            };
+            
+            document.addEventListener('visibilitychange', voiceVideoVisibilityHandler);
+            console.log('📞 Visibility change handler registered for ACS endpoint maintenance');
+        }
         
         // Step 1: Pre-load the SDK before startChat (but don't initialize)
         async function preloadVoiceVideoCallingSDK(sdk) {
@@ -4143,6 +4342,13 @@
                     OCClient: sdk.OCClient
                 });
                 console.log('✅ VoiceVideoCallingSDK initialized successfully');
+                
+                // Start keepalive to maintain ACS endpoint registration
+                // This prevents error 480/10077 "Target user not online"
+                startVoiceVideoKeepalive(sdk);
+                
+                // Set up visibility handler to refresh ACS when tab comes back to foreground
+                setupVisibilityHandler(sdk);
                 
                 // IMPORTANT: Also set element IDs on proxyInstance directly
                 if (VoiceVideoCallingSDK.proxyInstance) {

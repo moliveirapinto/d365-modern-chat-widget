@@ -29,21 +29,61 @@ class ModernChatWidget {
         this.messageQueue = [];
         this.messageQueueTimer = null;
         this.MESSAGE_BATCH_DELAY = 150; // ms to wait for batching messages
+        this.messageArrivalCounter = 0; // Track arrival order for stable sorting
+        this.DEBUG_MSG_SORTING = true; // Set to false to disable debug logs
 
         this.elements = {};
         this.init();
     }
 
     // Get timestamp from a message for sorting
-    getMessageTimestamp(msg) {
-        // First try explicit timestamp fields
-        if (msg.timestamp) return new Date(msg.timestamp).getTime();
-        if (msg.createdOn) return new Date(msg.createdOn).getTime();
-        if (msg.sentOn) return new Date(msg.sentOn).getTime();
-        // Fall back to messageId which appears to be a timestamp
-        const id = msg.messageId || msg.id || msg.clientmessageid || msg.messageid;
-        if (id && !isNaN(Number(id))) return Number(id);
-        return Date.now();
+    getMessageTimestamp(msg, logResult = false) {
+        let ts = null;
+        let source = '';
+        
+        // First check for sequence number (most reliable for ordering)
+        if (msg.sequenceId !== undefined && !isNaN(Number(msg.sequenceId))) {
+            ts = Number(msg.sequenceId);
+            source = 'sequenceId';
+        } else if (msg.sequence !== undefined && !isNaN(Number(msg.sequence))) {
+            ts = Number(msg.sequence);
+            source = 'sequence';
+        } else if (msg.order !== undefined && !isNaN(Number(msg.order))) {
+            ts = Number(msg.order);
+            source = 'order';
+        }
+        // Try explicit timestamp fields
+        else if (msg.timestamp) {
+            ts = new Date(msg.timestamp).getTime();
+            source = 'timestamp';
+        } else if (msg.createdOn) {
+            ts = new Date(msg.createdOn).getTime();
+            source = 'createdOn';
+        } else if (msg.sentOn) {
+            ts = new Date(msg.sentOn).getTime();
+            source = 'sentOn';
+        } else if (msg.originalArrivalTime) {
+            ts = new Date(msg.originalArrivalTime).getTime();
+            source = 'originalArrivalTime';
+        } else {
+            // Fall back to messageId which appears to be a timestamp
+            const id = msg.messageId || msg.id || msg.clientmessageid || msg.messageid;
+            if (id && !isNaN(Number(id))) {
+                ts = Number(id);
+                source = 'messageId';
+            } else {
+                ts = Date.now();
+                source = 'fallback-now';
+            }
+        }
+        
+        // Log what we found for debugging (only when explicitly requested)
+        if (logResult && this.DEBUG_MSG_SORTING) {
+            const content = (msg.content || msg.text || '').substring(0, 25);
+            console.log(`⏱️ Timestamp for "${content}...": ${ts} (from ${source})`);
+        }
+        
+        return ts;
     }
 
     // Queue a message for batched processing
@@ -61,6 +101,8 @@ class ModernChatWidget {
             this.state.processedMessageIds.add(messageId);
         }
         
+        // Assign arrival order for stable sorting
+        message._arrivalOrder = this.messageArrivalCounter++;
         this.messageQueue.push(message);
         
         // Clear existing timer
@@ -76,12 +118,36 @@ class ModernChatWidget {
     processMessageQueue() {
         if (this.messageQueue.length === 0) return;
         
-        // Sort messages by timestamp (oldest first)
+        // Sort messages by timestamp (oldest first), with messageId and arrival order as tiebreakers
         const sortedMessages = [...this.messageQueue].sort((a, b) => {
-            return this.getMessageTimestamp(a) - this.getMessageTimestamp(b);
+            const tsA = this.getMessageTimestamp(a);
+            const tsB = this.getMessageTimestamp(b);
+            
+            // Primary sort by timestamp
+            if (tsA !== tsB) {
+                return tsA - tsB;
+            }
+            
+            // Secondary sort by messageId if timestamps are equal
+            const idA = Number(a.messageId || a.id || 0);
+            const idB = Number(b.messageId || b.id || 0);
+            if (idA !== idB) {
+                return idA - idB;
+            }
+            
+            // Tertiary sort by arrival order (preserves SDK order for identical timestamps/IDs)
+            return (a._arrivalOrder || 0) - (b._arrivalOrder || 0);
         });
         
-        console.log('📬 Processing message queue:', sortedMessages.length, 'messages');
+        // Debug: Log the sort order with timestamp sources
+        if (this.DEBUG_MSG_SORTING) {
+            console.log('📬 Processing message queue:', sortedMessages.length, 'messages');
+            console.log('📬 Message order after sorting:');
+            sortedMessages.forEach(m => {
+                this.getMessageTimestamp(m, true); // Log with source info
+                console.log(`  → ID: ${m.messageId || m.id}, arrival: ${m._arrivalOrder}, content: "${(m.content || m.text || '').substring(0, 40)}..."`);
+            });
+        }
         
         // Clear queue before processing
         this.messageQueue = [];

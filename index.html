@@ -8769,6 +8769,137 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     var soundEnabled = true;
     var processedMessageIds = {}; // Track processed message IDs to avoid duplicates
     
+    // Message queue for batching and sorting messages
+    var messageQueue = [];
+    var messageQueueTimer = null;
+    var MESSAGE_BATCH_DELAY = 150; // ms to wait for batching messages
+    var messageArrivalCounter = 0; // Track arrival order for stable sorting
+    var DEBUG_MSG_SORTING = true; // Set to false to disable debug logs
+    
+    // Get timestamp from a message for sorting
+    function getMessageTimestamp(msg, logResult) {
+        var ts = null;
+        var source = '';
+        
+        // First check for sequence number (most reliable for ordering)
+        if (msg.sequenceId !== undefined && !isNaN(Number(msg.sequenceId))) {
+            ts = Number(msg.sequenceId);
+            source = 'sequenceId';
+        } else if (msg.sequence !== undefined && !isNaN(Number(msg.sequence))) {
+            ts = Number(msg.sequence);
+            source = 'sequence';
+        } else if (msg.order !== undefined && !isNaN(Number(msg.order))) {
+            ts = Number(msg.order);
+            source = 'order';
+        }
+        // Try explicit timestamp fields
+        else if (msg.timestamp) {
+            ts = new Date(msg.timestamp).getTime();
+            source = 'timestamp';
+        } else if (msg.createdOn) {
+            ts = new Date(msg.createdOn).getTime();
+            source = 'createdOn';
+        } else if (msg.sentOn) {
+            ts = new Date(msg.sentOn).getTime();
+            source = 'sentOn';
+        } else if (msg.originalArrivalTime) {
+            ts = new Date(msg.originalArrivalTime).getTime();
+            source = 'originalArrivalTime';
+        } else {
+            // Fall back to messageId which appears to be a timestamp
+            var id = msg.messageId || msg.id || msg.clientmessageid || msg.messageid;
+            if (id && !isNaN(Number(id))) {
+                ts = Number(id);
+                source = 'messageId';
+            } else {
+                ts = Date.now();
+                source = 'fallback-now';
+            }
+        }
+        
+        // Log what we found for debugging (only when explicitly requested)
+        if (logResult && DEBUG_MSG_SORTING) {
+            var content = (msg.content || msg.text || '').substring(0, 25);
+            console.log('⏱️ Timestamp for "' + content + '...": ' + ts + ' (from ' + source + ')');
+        }
+        
+        return ts;
+    }
+    
+    // Queue a message for batched processing
+    function queueMessage(message) {
+        // Get message ID for deduplication
+        var messageId = message.messageId || message.id || message.clientmessageid || message.messageid;
+        
+        // Skip if already processed
+        if (messageId && processedMessageIds[messageId]) {
+            console.log('Skipping already processed message:', messageId);
+            return;
+        }
+        
+        // Mark as processed
+        if (messageId) {
+            processedMessageIds[messageId] = true;
+        }
+        
+        // Assign arrival order for stable sorting
+        message._arrivalOrder = messageArrivalCounter++;
+        messageQueue.push(message);
+        
+        // Clear existing timer
+        if (messageQueueTimer) {
+            clearTimeout(messageQueueTimer);
+        }
+        
+        // Set timer to process batch
+        messageQueueTimer = setTimeout(processMessageQueue, MESSAGE_BATCH_DELAY);
+    }
+    
+    // Process queued messages in sorted order
+    function processMessageQueue() {
+        if (messageQueue.length === 0) return;
+        
+        // Sort messages by timestamp (oldest first), with messageId and arrival order as tiebreakers
+        var sortedMessages = messageQueue.slice().sort(function(a, b) {
+            var tsA = getMessageTimestamp(a);
+            var tsB = getMessageTimestamp(b);
+            
+            // Primary sort by timestamp
+            if (tsA !== tsB) {
+                return tsA - tsB;
+            }
+            
+            // Secondary sort by messageId if timestamps are equal
+            var idA = Number(a.messageId || a.id || 0);
+            var idB = Number(b.messageId || b.id || 0);
+            if (idA !== idB) {
+                return idA - idB;
+            }
+            
+            // Tertiary sort by arrival order (preserves SDK order for identical timestamps/IDs)
+            return (a._arrivalOrder || 0) - (b._arrivalOrder || 0);
+        });
+        
+        // Debug: Log the sort order with timestamp sources
+        if (DEBUG_MSG_SORTING) {
+            console.log('📬 Processing message queue:', sortedMessages.length, 'messages');
+            console.log('📬 Message order after sorting:');
+            sortedMessages.forEach(function(m) {
+                getMessageTimestamp(m, true); // Log with source info
+                console.log('  → ID: ' + (m.messageId || m.id) + ', arrival: ' + m._arrivalOrder + ', content: "' + (m.content || m.text || '').substring(0, 40) + '..."');
+            });
+        }
+        
+        // Clear queue before processing
+        messageQueue = [];
+        messageQueueTimer = null;
+        
+        // Process each message in sorted order
+        sortedMessages.forEach(function(msg) {
+            processMessageImmediate(msg);
+        });
+    }
+    
     // DOM Elements
     var launcher = document.getElementById('d365ChatLauncher');
     var chatContainer = document.getElementById('d365ChatContainer');
@@ -9756,22 +9887,15 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       }
     }
     
+    // Queue messages for batched, sorted processing
     function processMessage(message) {
       if (!message) return;
-      
-      // Get message ID - try various possible ID fields
-      var messageId = message.messageId || message.id || message.clientmessageid || message.messageid;
-      
-      // Skip if already processed
-      if (messageId && processedMessageIds[messageId]) {
-        console.log('Skipping already processed message:', messageId);
-        return;
-      }
-      
-      // Mark as processed
-      if (messageId) {
-        processedMessageIds[messageId] = true;
-      }
+      queueMessage(message);
+    }
+    
+    // Process a message immediately (called from queue processor)
+    function processMessageImmediate(message) {
+      if (!message) return;
       
       // Get message content - try various possible content fields
       var content = message.content || message.text || message.body;
@@ -9831,7 +9955,23 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
         var messages = await chatSDK.getMessages();
         console.log('Polled messages:', messages);
         if (messages && messages.length) {
-          messages.forEach(function(msg) {
+          // Sort messages by timestamp/ID before processing to ensure correct order
+          // SDK may return messages in reverse chronological order (newest first)
+          var sortedMessages = messages.slice().sort(function(a, b) {
+            return getMessageTimestamp(a) - getMessageTimestamp(b);
+          });
+          
+          if (DEBUG_MSG_SORTING) {
+            console.log('📬 Sorted poll results:', sortedMessages.map(function(m) {
+              return {
+                id: m.messageId || m.id,
+                ts: getMessageTimestamp(m),
+                content: (m.content || m.text || '').substring(0, 30)
+              };
+            }));
+          }
+          
+          sortedMessages.forEach(function(msg) {
             processMessage(msg);
           });
         }
