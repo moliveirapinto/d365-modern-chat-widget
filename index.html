@@ -2556,87 +2556,46 @@
         </div>
     </div>
 
-    <!-- Create Team Repository Modal -->
-    <div id="createTeamRepoModal" class="save-modal-overlay" onclick="if(event.target === this) closeCreateTeamRepoModal()">
-        <div class="save-modal team-modal-content" style="max-width: 520px;">
-            <h3 style="display:flex;align-items:center;gap:8px;"><img src="https://raw.githubusercontent.com/microsoft/fluentui-system-icons/main/assets/People%20Team%20Add/SVG/ic_fluent_people_team_add_24_regular.svg" width="24" height="24" alt="Team"> Create Team Repository</h3>
+    <!-- Create Collaboration Room Modal -->
+    <div id="createRoomModal" class="save-modal-overlay" onclick="if(event.target === this) closeCreateRoomModal()">
+        <div class="save-modal team-modal-content" style="max-width: 480px;">
+            <h3 style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size: 24px;">🚀</span> Create Collaboration Room
+            </h3>
             
             <!-- Friendly intro -->
             <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 14px; margin-bottom: 20px;">
                 <p style="margin: 0; color: #0369a1; font-size: 13px; line-height: 1.5;">
-                    💡 <strong>What is this?</strong> A team repository is a shared space on GitHub where your team can store and access widget configurations together. Think of it like a shared folder in the cloud.
+                    💡 <strong>No accounts needed!</strong> Create a room, get a 6-character code, share it with your team. That's it!
                 </p>
             </div>
             
-            <!-- Progress steps -->
-            <div id="createTeamProgress" class="team-modal-steps">
-                <div class="team-step" id="createStep1">
-                    <div class="team-step-number">1</div>
-                    <div class="team-step-content">
-                        <h4>Create Shared Space</h4>
-                        <p>We'll create a folder called <strong>d365-widget-configs</strong> in your GitHub account</p>
-                    </div>
-                </div>
-                <div class="team-step" id="createStep2">
-                    <div class="team-step-number">2</div>
-                    <div class="team-step-content">
-                        <h4>Share with Your Team</h4>
-                        <p>You'll get a link to share. Teammates can use it to connect</p>
-                    </div>
-                </div>
-                <div class="team-step" id="createStep3">
-                    <div class="team-step-number">3</div>
-                    <div class="team-step-content">
-                        <h4>Work Together</h4>
-                        <p>Everyone can save and load widget designs from the same place</p>
-                    </div>
-                </div>
+            <!-- Your name input -->
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 13px; color: #475569; font-weight: 500; margin-bottom: 6px;">
+                    Your name (so teammates know who's editing):
+                </label>
+                <input type="text" class="form-input" id="createRoomUserName" placeholder="e.g., John" style="font-size: 14px;">
             </div>
             
-            <!-- Status/Progress area -->
-            <div id="createTeamRepoStatus" style="display:none; padding: 14px; border-radius: 8px; margin-bottom: 16px;"></div>
+            <!-- Status area -->
+            <div id="createRoomStatus" style="display:none; padding: 14px; border-radius: 8px; margin-bottom: 16px;"></div>
             
-            <!-- Need repo scope warning -->
-            <div id="createTeamNeedRepoScope" style="display:none; background: #fef3c7; border: 1px solid #f59e0b; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
-                <p style="margin: 0 0 10px 0; color: #92400e; font-weight: 600; font-size: 14px;">🔑 One More Step Needed</p>
-                <p style="margin: 0 0 12px 0; color: #92400e; font-size: 13px; line-height: 1.5;">
-                    Your current login doesn't have permission to create repositories. This is easy to fix:
-                </p>
-                <ol style="margin: 0 0 14px 0; padding-left: 20px; color: #92400e; font-size: 13px; line-height: 1.8;">
-                    <li>Click the button below to open GitHub</li>
-                    <li>Scroll down and click <strong>"Generate token"</strong></li>
-                    <li>Copy the new token</li>
-                    <li>Come back here, log out, and log in with the new token</li>
-                </ol>
-                <a href="https://github.com/settings/tokens/new?description=D365%20Widget%20Studio%20(Team)&scopes=repo,gist,read:user" 
-                   target="_blank" 
-                   style="display: inline-block; background: #f59e0b; color: white; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500;">
-                    Open GitHub to Create Token →
-                </a>
+            <!-- Success state with room code -->
+            <div id="createRoomSuccess" style="display:none; text-align: center; padding: 20px; background: #ecfdf5; border-radius: 12px; margin-bottom: 16px;">
+                <div style="font-size: 14px; color: #065f46; margin-bottom: 8px;">Your room code is:</div>
+                <div id="newRoomCode" style="font-size: 36px; font-weight: bold; font-family: monospace; letter-spacing: 4px; color: #059669; margin-bottom: 12px;">------</div>
+                <button onclick="copyRoomCode()" style="background: #059669; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer;">
+                    📋 Copy Room Code
+                </button>
+                <p style="margin: 12px 0 0 0; font-size: 12px; color: #065f46;">Share this code with your team. Room expires in 7 days.</p>
             </div>
-            
-            <!-- Help section -->
-            <details style="margin-bottom: 16px; background: #f8fafc; border-radius: 8px; padding: 2px;">
-                <summary style="cursor: pointer; padding: 12px; font-size: 13px; color: #64748b; font-weight: 500;">
-                    ❓ Having trouble? Click here for help
-                </summary>
-                <div style="padding: 0 12px 12px 12px; font-size: 12px; color: #64748b; line-height: 1.6;">
-                    <p style="margin: 8px 0;"><strong>Common issues:</strong></p>
-                    <ul style="margin: 8px 0; padding-left: 18px;">
-                        <li><strong>"Permission denied"</strong> - You need to create a new token with repository access (see yellow box above)</li>
-                        <li><strong>"Repository already exists"</strong> - Good news! We'll connect you to it automatically</li>
-                        <li><strong>"Rate limit exceeded"</strong> - GitHub limits requests. Wait 5 minutes and try again</li>
-                        <li><strong>"Authentication failed"</strong> - Your token may have expired. Log out and log in again</li>
-                    </ul>
-                    <p style="margin: 8px 0;">Still stuck? Contact your IT administrator or <a href="#" onclick="openFeedbackModal(); return false;" style="color: #0078d4;">send us feedback</a>.</p>
-                </div>
-            </details>
             
             <div class="save-modal-actions">
-                <button class="save-modal-cancel" onclick="closeCreateTeamRepoModal()">Cancel</button>
-                <button class="save-modal-save" id="createTeamRepoBtn" onclick="createTeamRepository()">
-                    <span id="createTeamRepoBtnText">Create Team Space</span>
-                    <span id="createTeamRepoSpinner" style="display:none;">
+                <button class="save-modal-cancel" onclick="closeCreateRoomModal()">Cancel</button>
+                <button class="save-modal-save" id="createRoomBtn" onclick="createCollabRoom()">
+                    <span id="createRoomBtnText">Create Room</span>
+                    <span id="createRoomSpinner" style="display:none;">
                         <svg style="width:16px;height:16px;animation:spin 1s linear infinite;margin-right:6px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="32" stroke-linecap="round"/></svg>
                         Creating...
                     </span>
@@ -2645,101 +2604,44 @@
         </div>
     </div>
 
-    <!-- Join Team Repository Modal -->
-    <div id="joinTeamRepoModal" class="save-modal-overlay" onclick="if(event.target === this) closeJoinTeamRepoModal()">
-        <div class="save-modal team-modal-content" style="max-width: 520px;">
-            <h3>🔗 Join Your Team</h3>
+    <!-- Join Collaboration Room Modal -->
+    <div id="joinRoomModal" class="save-modal-overlay" onclick="if(event.target === this) closeJoinRoomModal()">
+        <div class="save-modal team-modal-content" style="max-width: 480px;">
+            <h3>🔗 Join Collaboration Room</h3>
             
             <!-- Friendly intro -->
             <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 14px; margin-bottom: 20px;">
                 <p style="margin: 0; color: #0369a1; font-size: 13px; line-height: 1.5;">
-                    💡 <strong>What is this?</strong> Connect to your team's shared widget repository to access configurations your colleagues have saved.
+                    💡 Enter the 6-character room code your teammate shared with you.
                 </p>
             </div>
             
-            <div class="team-modal-steps">
-                <div class="team-step">
-                    <div class="team-step-number">1</div>
-                    <div class="team-step-content">
-                        <h4>Get the Link from Your Team</h4>
-                        <p>Ask a colleague who already has access for the repository link</p>
-                    </div>
-                </div>
-                <div class="team-step">
-                    <div class="team-step-number">2</div>
-                    <div class="team-step-content">
-                        <h4>Make Sure You Have Access</h4>
-                        <p>If it's a private repository, ask the owner to add you as a collaborator</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Input with better label -->
-            <div style="margin-bottom: 8px;">
+            <!-- Room code input -->
+            <div style="margin-bottom: 16px;">
                 <label style="display: block; font-size: 13px; color: #475569; font-weight: 500; margin-bottom: 6px;">
-                    Paste the repository link here:
+                    Room Code:
                 </label>
-                <input type="text" class="team-repo-input" id="joinTeamRepoUrl" placeholder="Example: https://github.com/yourteam/d365-widget-configs" style="font-size: 14px;">
-                <p style="margin: 6px 0 0 0; font-size: 11px; color: #94a3b8;">
-                    You can also use the short format: <code style="background:#f1f5f9;padding:2px 4px;border-radius:3px;">username/repository-name</code>
-                </p>
+                <input type="text" class="form-input" id="joinRoomCode" placeholder="ABC123" maxlength="6" style="font-size: 24px; text-align: center; letter-spacing: 4px; font-family: monospace; text-transform: uppercase;">
+            </div>
+            
+            <!-- Your name input -->
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 13px; color: #475569; font-weight: 500; margin-bottom: 6px;">
+                    Your name:
+                </label>
+                <input type="text" class="form-input" id="joinRoomUserName" placeholder="e.g., Sarah" style="font-size: 14px;">
             </div>
             
             <!-- Status area -->
-            <div id="joinTeamRepoStatus" style="display:none; padding: 14px; border-radius: 8px; margin-top: 12px;"></div>
+            <div id="joinRoomStatus" style="display:none; padding: 14px; border-radius: 8px; margin-bottom: 16px;"></div>
             
-            <!-- Need repo scope warning -->
-            <div id="joinTeamNeedRepoScope" style="display:none; background: #fef3c7; border: 1px solid #f59e0b; padding: 16px; border-radius: 8px; margin-top: 12px;">
-                <p style="margin: 0 0 10px 0; color: #92400e; font-weight: 600; font-size: 14px;">🔑 One More Step Needed</p>
-                <p style="margin: 0 0 12px 0; color: #92400e; font-size: 13px; line-height: 1.5;">
-                    To save widgets to the team repository, you'll need a token with repository access:
-                </p>
-                <ol style="margin: 0 0 14px 0; padding-left: 20px; color: #92400e; font-size: 13px; line-height: 1.8;">
-                    <li>Click the button below to open GitHub</li>
-                    <li>Scroll down and click <strong>"Generate token"</strong></li>
-                    <li>Copy the new token</li>
-                    <li>Come back here, log out, and log in with the new token</li>
-                </ol>
-                <a href="https://github.com/settings/tokens/new?description=D365%20Widget%20Studio%20(Team)&scopes=repo,gist,read:user" 
-                   target="_blank" 
-                   style="display: inline-block; background: #f59e0b; color: white; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500;">
-                    Open GitHub to Create Token →
-                </a>
-                <p style="margin: 10px 0 0 0; font-size: 12px; color: #92400e;">
-                    <em>Note: You can still view team widgets without this, but won't be able to save new ones.</em>
-                </p>
-            </div>
-            
-            <!-- Help section -->
-            <details style="margin-top: 16px; background: #f8fafc; border-radius: 8px; padding: 2px;">
-                <summary style="cursor: pointer; padding: 12px; font-size: 13px; color: #64748b; font-weight: 500;">
-                    ❓ Having trouble? Click here for help
-                </summary>
-                <div style="padding: 0 12px 12px 12px; font-size: 12px; color: #64748b; line-height: 1.6;">
-                    <p style="margin: 8px 0;"><strong>Common issues:</strong></p>
-                    <ul style="margin: 8px 0; padding-left: 18px;">
-                        <li><strong>"Repository not found"</strong> - Double-check the link. If it's a private repo, ask the owner to add you</li>
-                        <li><strong>"You don't have permission"</strong> - The repository owner needs to invite you as a collaborator</li>
-                        <li><strong>"Invalid URL"</strong> - Make sure you're using the full GitHub link (starts with https://github.com/)</li>
-                    </ul>
-                    <p style="margin: 8px 0;"><strong>How to get added as a collaborator:</strong></p>
-                    <ol style="margin: 8px 0; padding-left: 18px;">
-                        <li>Ask the repository owner to go to the repo on GitHub</li>
-                        <li>They click <strong>Settings</strong> → <strong>Collaborators</strong></li>
-                        <li>They add your GitHub username</li>
-                        <li>You'll get an email invitation - accept it</li>
-                    </ol>
-                    <p style="margin: 8px 0;">Still stuck? Contact your IT administrator or <a href="#" onclick="openFeedbackModal(); return false;" style="color: #0078d4;">send us feedback</a>.</p>
-                </div>
-            </details>
-            
-            <div class="save-modal-actions" style="margin-top: 20px;">
-                <button class="save-modal-cancel" onclick="closeJoinTeamRepoModal()">Cancel</button>
-                <button class="save-modal-save" id="joinTeamRepoBtn" onclick="joinTeamRepository()">
-                    <span id="joinTeamRepoBtnText">Connect to Team</span>
-                    <span id="joinTeamRepoSpinner" style="display:none;">
+            <div class="save-modal-actions">
+                <button class="save-modal-cancel" onclick="closeJoinRoomModal()">Cancel</button>
+                <button class="save-modal-save" id="joinRoomBtn" onclick="joinCollabRoom()">
+                    <span id="joinRoomBtnText">Join Room</span>
+                    <span id="joinRoomSpinner" style="display:none;">
                         <svg style="width:16px;height:16px;animation:spin 1s linear infinite;margin-right:6px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="32" stroke-linecap="round"/></svg>
-                        Connecting...
+                        Joining...
                     </span>
                 </button>
             </div>
@@ -2988,47 +2890,57 @@
                         </div>
                     </div>
 
-                    <!-- Team Profiles Section -->
+                    <!-- Collaboration Room Section -->
                     <div class="profile-section" id="teamSection">
-                        <!-- Team Connected State (hidden by default) -->
-                        <div class="team-connected" id="teamConnectedState" style="display:none;">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        <!-- Room Connected State (hidden by default) -->
+                        <div class="team-connected" id="roomConnectedState" style="display:none;">
+                            <svg viewBox="0 0 24 24" style="fill: #10b981;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                             <div class="team-connected-info">
-                                <div class="team-connected-label">Connected Team Repo</div>
-                                <div class="team-connected-repo" id="teamRepoName">owner/repo</div>
+                                <div class="team-connected-label">Connected to Room</div>
+                                <div class="team-connected-repo" id="roomCodeDisplay" style="font-family: monospace; letter-spacing: 2px;">------</div>
                             </div>
-                            <button class="team-disconnect-btn" onclick="disconnectTeamRepo()" title="Disconnect team repository">
-                                <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-                            </button>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <button class="team-btn team-btn-secondary" onclick="syncFromRoom()" title="Pull latest from room" style="padding: 6px 12px; font-size: 12px;">
+                                    🔄 Sync
+                                </button>
+                                <button class="team-btn team-btn-secondary" onclick="pushToRoom()" title="Push your changes to room" style="padding: 6px 12px; font-size: 12px;">
+                                    ⬆️ Push
+                                </button>
+                                <button class="team-disconnect-btn" onclick="leaveCollabRoom()" title="Leave room">
+                                    <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                                </button>
+                            </div>
                         </div>
                         
-                        <!-- Team Profile List -->
-                        <div class="profile-list" id="teamProfileList" style="display:none;">
-                            <!-- Team profiles will be loaded dynamically -->
-                        </div>
-                        
-                        <!-- Team Save Row (shown when connected) -->
-                        <div class="new-profile-row" id="teamSaveRow" style="display:none;">
-                            <input type="text" class="form-input" id="newTeamProfileName" placeholder="New team profile name">
-                            <button class="btn btn-primary btn-sm" onclick="saveAsTeamProfile()">
-                                <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                                Save
-                            </button>
+                        <!-- Room Info (shown when connected) -->
+                        <div id="roomInfo" style="display:none; background: #f8fafc; border-radius: 8px; padding: 12px; margin-top: 8px; font-size: 12px; color: #64748b;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                <span>Created by:</span>
+                                <span id="roomCreatedBy">-</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                <span>Last updated:</span>
+                                <span id="roomLastUpdated">-</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Updated by:</span>
+                                <span id="roomUpdatedBy">-</span>
+                            </div>
                         </div>
 
-                        <!-- Team Empty State -->
-                        <div class="team-empty-state" id="teamEmptyState">
+                        <!-- Room Empty State -->
+                        <div class="team-empty-state" id="roomEmptyState">
                             <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
                             <h4>Collaborate with your team</h4>
-                            <p>Share widget configurations with teammates using a GitHub repository</p>
+                            <p>Create a room and share a 6-character code. No accounts needed!</p>
                             <div class="team-actions">
-                                <button class="team-btn team-btn-primary" onclick="showCreateTeamRepoModal()">
+                                <button class="team-btn team-btn-primary" onclick="showCreateRoomModal()">
                                     <svg viewBox="0 0 24 24" style="fill:white;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                                    Create Team Repository
+                                    Create Room
                                 </button>
-                                <button class="team-btn team-btn-secondary" onclick="showJoinTeamRepoModal()">
+                                <button class="team-btn team-btn-secondary" onclick="showJoinRoomModal()">
                                     <svg viewBox="0 0 24 24" style="fill:currentColor;"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
-                                    Join Existing Repository
+                                    Join Room
                                 </button>
                             </div>
                         </div>
@@ -5135,6 +5047,326 @@
                 targetWebsite: document.getElementById('targetWebsite').value
             };
         }
+
+        // ============ COLLABORATION ROOMS (No GitHub Required!) ============
+        
+        const COLLAB_API_URL = 'https://d365-widget-collab.moliveirapinto.workers.dev'; // Update after deploying worker
+        let currentRoomCode = localStorage.getItem('d365_collab_room') || null;
+        let currentRoomVersion = null;
+        let collabUserName = localStorage.getItem('d365_collab_user') || '';
+        
+        // Show Create Room modal
+        function showCreateRoomModal() {
+            const modal = document.getElementById('createRoomModal');
+            document.getElementById('createRoomStatus').style.display = 'none';
+            document.getElementById('createRoomSuccess').style.display = 'none';
+            document.getElementById('createRoomUserName').value = collabUserName;
+            document.getElementById('createRoomBtn').style.display = 'inline-flex';
+            modal.classList.add('show');
+        }
+        
+        function closeCreateRoomModal() {
+            document.getElementById('createRoomModal').classList.remove('show');
+        }
+        
+        // Show Join Room modal
+        function showJoinRoomModal() {
+            const modal = document.getElementById('joinRoomModal');
+            document.getElementById('joinRoomStatus').style.display = 'none';
+            document.getElementById('joinRoomCode').value = '';
+            document.getElementById('joinRoomUserName').value = collabUserName;
+            modal.classList.add('show');
+        }
+        
+        function closeJoinRoomModal() {
+            document.getElementById('joinRoomModal').classList.remove('show');
+        }
+        
+        // Create a new collaboration room
+        async function createCollabRoom() {
+            const btn = document.getElementById('createRoomBtn');
+            const btnText = document.getElementById('createRoomBtnText');
+            const spinner = document.getElementById('createRoomSpinner');
+            const status = document.getElementById('createRoomStatus');
+            const success = document.getElementById('createRoomSuccess');
+            const userName = document.getElementById('createRoomUserName').value.trim() || 'Anonymous';
+            
+            // Save username for future use
+            collabUserName = userName;
+            localStorage.setItem('d365_collab_user', userName);
+            
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            spinner.style.display = 'inline';
+            status.style.display = 'none';
+            
+            try {
+                const config = collectCurrentConfig();
+                
+                const response = await fetch(`${COLLAB_API_URL}/room/create`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        config: config,
+                        creatorName: userName
+                    })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to create room');
+                }
+                
+                const data = await response.json();
+                
+                // Save room code
+                currentRoomCode = data.roomCode;
+                currentRoomVersion = 1;
+                localStorage.setItem('d365_collab_room', data.roomCode);
+                
+                // Show success
+                document.getElementById('newRoomCode').textContent = data.roomCode;
+                success.style.display = 'block';
+                btn.style.display = 'none';
+                
+                updateRoomUI();
+                showToast(`Room ${data.roomCode} created! Share this code with your team.`);
+                
+            } catch (error) {
+                console.error('Create room error:', error);
+                status.style.display = 'block';
+                status.style.background = '#fee2e2';
+                status.style.color = '#991b1b';
+                status.textContent = error.message;
+            } finally {
+                btn.disabled = false;
+                btnText.style.display = 'inline';
+                spinner.style.display = 'none';
+            }
+        }
+        
+        // Copy room code to clipboard
+        function copyRoomCode() {
+            const code = document.getElementById('newRoomCode').textContent || currentRoomCode;
+            navigator.clipboard.writeText(code).then(() => {
+                showToast('📋 Room code copied!');
+            });
+        }
+        
+        // Join an existing room
+        async function joinCollabRoom() {
+            const btn = document.getElementById('joinRoomBtn');
+            const btnText = document.getElementById('joinRoomBtnText');
+            const spinner = document.getElementById('joinRoomSpinner');
+            const status = document.getElementById('joinRoomStatus');
+            const codeInput = document.getElementById('joinRoomCode');
+            const userName = document.getElementById('joinRoomUserName').value.trim() || 'Anonymous';
+            
+            const roomCode = codeInput.value.trim().toUpperCase();
+            
+            if (!roomCode || roomCode.length !== 6) {
+                status.style.display = 'block';
+                status.style.background = '#fee2e2';
+                status.style.color = '#991b1b';
+                status.textContent = 'Please enter a valid 6-character room code';
+                return;
+            }
+            
+            // Save username
+            collabUserName = userName;
+            localStorage.setItem('d365_collab_user', userName);
+            
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            spinner.style.display = 'inline';
+            status.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${COLLAB_API_URL}/room/${roomCode}`);
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Room not found');
+                }
+                
+                const roomData = await response.json();
+                
+                // Save room
+                currentRoomCode = roomCode;
+                currentRoomVersion = roomData.version;
+                localStorage.setItem('d365_collab_room', roomCode);
+                
+                // Apply the config
+                if (roomData.config) {
+                    applyWidgetConfig(roomData.config);
+                }
+                
+                closeJoinRoomModal();
+                updateRoomUI();
+                showToast(`Joined room ${roomCode}! Config loaded from ${roomData.createdBy}.`);
+                
+            } catch (error) {
+                console.error('Join room error:', error);
+                status.style.display = 'block';
+                status.style.background = '#fee2e2';
+                status.style.color = '#991b1b';
+                status.textContent = error.message;
+            } finally {
+                btn.disabled = false;
+                btnText.style.display = 'inline';
+                spinner.style.display = 'none';
+            }
+        }
+        
+        // Leave the current room
+        function leaveCollabRoom() {
+            if (confirm('Leave this collaboration room?')) {
+                currentRoomCode = null;
+                currentRoomVersion = null;
+                localStorage.removeItem('d365_collab_room');
+                updateRoomUI();
+                showToast('Left collaboration room');
+            }
+        }
+        
+        // Sync (pull) latest config from room
+        async function syncFromRoom() {
+            if (!currentRoomCode) return;
+            
+            try {
+                showToast('Syncing from room...');
+                
+                const response = await fetch(`${COLLAB_API_URL}/room/${currentRoomCode}`);
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to sync');
+                }
+                
+                const roomData = await response.json();
+                currentRoomVersion = roomData.version;
+                
+                // Apply the config
+                if (roomData.config) {
+                    applyWidgetConfig(roomData.config);
+                }
+                
+                // Update room info display
+                updateRoomInfo(roomData);
+                
+                showToast(`✅ Synced! Latest changes from ${roomData.updatedBy}`);
+                
+            } catch (error) {
+                console.error('Sync error:', error);
+                showToast('Failed to sync: ' + error.message, 'error');
+            }
+        }
+        
+        // Push changes to room
+        async function pushToRoom() {
+            if (!currentRoomCode) return;
+            
+            try {
+                showToast('Pushing changes...');
+                
+                const config = collectCurrentConfig();
+                
+                const response = await fetch(`${COLLAB_API_URL}/room/${currentRoomCode}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        config: config,
+                        updaterName: collabUserName || 'Anonymous',
+                        expectedVersion: currentRoomVersion
+                    })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    if (response.status === 409) {
+                        // Conflict - someone else updated
+                        if (confirm(`${error.updatedBy} updated the room. Do you want to overwrite their changes?`)) {
+                            // Retry without version check
+                            currentRoomVersion = error.currentVersion;
+                            await pushToRoom();
+                            return;
+                        } else {
+                            // Sync instead
+                            await syncFromRoom();
+                            return;
+                        }
+                    }
+                    throw new Error(error.error || 'Failed to push');
+                }
+                
+                const data = await response.json();
+                currentRoomVersion = data.version;
+                
+                showToast('✅ Changes pushed to room!');
+                
+            } catch (error) {
+                console.error('Push error:', error);
+                showToast('Failed to push: ' + error.message, 'error');
+            }
+        }
+        
+        // Update room info display
+        function updateRoomInfo(roomData) {
+            const infoEl = document.getElementById('roomInfo');
+            if (infoEl && roomData) {
+                document.getElementById('roomCreatedBy').textContent = roomData.createdBy || '-';
+                document.getElementById('roomLastUpdated').textContent = roomData.lastUpdated ? 
+                    new Date(roomData.lastUpdated).toLocaleString() : '-';
+                document.getElementById('roomUpdatedBy').textContent = roomData.updatedBy || '-';
+            }
+        }
+        
+        // Update the Room UI state
+        function updateRoomUI() {
+            const emptyState = document.getElementById('roomEmptyState');
+            const connectedState = document.getElementById('roomConnectedState');
+            const roomInfo = document.getElementById('roomInfo');
+            const codeDisplay = document.getElementById('roomCodeDisplay');
+            
+            if (currentRoomCode) {
+                emptyState.style.display = 'none';
+                connectedState.style.display = 'flex';
+                roomInfo.style.display = 'block';
+                codeDisplay.textContent = currentRoomCode;
+                
+                // Fetch room info
+                fetch(`${COLLAB_API_URL}/room/${currentRoomCode}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.config) {
+                            currentRoomVersion = data.version;
+                            updateRoomInfo(data);
+                        }
+                    })
+                    .catch(err => {
+                        console.warn('Could not fetch room info:', err);
+                        // Room might have expired
+                        if (err.message && err.message.includes('not found')) {
+                            currentRoomCode = null;
+                            localStorage.removeItem('d365_collab_room');
+                            updateRoomUI();
+                            showToast('Room expired or was deleted');
+                        }
+                    });
+            } else {
+                emptyState.style.display = 'block';
+                connectedState.style.display = 'none';
+                roomInfo.style.display = 'none';
+            }
+        }
+        
+        // Initialize room UI on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if we have a saved room
+            if (currentRoomCode) {
+                updateRoomUI();
+            }
+        });
 
         // Check for existing login on page load
         function checkExistingLogin() {

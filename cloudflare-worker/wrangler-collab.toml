@@ -1,0 +1,11 @@
+name = "d365-widget-collab"
+main = "collab-worker.js"
+compatibility_date = "2024-12-19"
+
+# Create KV namespace first:
+# npx wrangler kv:namespace create "ROOMS"
+# Then paste the id below
+
+[[kv_namespaces]]
+binding = "ROOMS"
+id = "YOUR_KV_NAMESPACE_ID"  # Replace after running: npx wrangler kv:namespace create "ROOMS"
