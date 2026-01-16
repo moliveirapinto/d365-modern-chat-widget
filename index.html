@@ -2905,13 +2905,33 @@
                 <svg viewBox="0 0 24 24" style="fill: white;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
                 Guide
             </button>
+            
+            <!-- Simple Share Dropdown -->
+            <div class="share-dropdown" style="position: relative; display: inline-block;">
+                <button class="btn-header-action" onclick="toggleShareMenu()" title="Share your config" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none;">
+                    <svg viewBox="0 0 24 24" style="fill: white;"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
+                    Share ▾
+                </button>
+                <div id="shareMenu" class="share-menu" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 4px; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); min-width: 200px; z-index: 1000; overflow: hidden;">
+                    <button onclick="copyShareLink(); toggleShareMenu();" style="display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 16px; border: none; background: none; cursor: pointer; text-align: left; font-size: 14px; transition: background 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='none'">
+                        🔗 <span><strong>Copy Share Link</strong><br><small style="color: #666;">One-click import for anyone</small></span>
+                    </button>
+                    <button onclick="copyConfigToClipboard(); toggleShareMenu();" style="display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 16px; border: none; background: none; cursor: pointer; text-align: left; font-size: 14px; transition: background 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='none'">
+                        📋 <span><strong>Copy Config JSON</strong><br><small style="color: #666;">Paste in email, Teams, Slack</small></span>
+                    </button>
+                    <button onclick="showQRCode(); toggleShareMenu();" style="display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 16px; border: none; background: none; cursor: pointer; text-align: left; font-size: 14px; transition: background 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='none'">
+                        📱 <span><strong>Show QR Code</strong><br><small style="color: #666;">Scan to import on mobile</small></span>
+                    </button>
+                    <div style="border-top: 1px solid #e5e7eb; margin: 4px 0;"></div>
+                    <button onclick="exportSettings(); toggleShareMenu();" style="display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 16px; border: none; background: none; cursor: pointer; text-align: left; font-size: 14px; transition: background 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='none'">
+                        💾 <span><strong>Download JSON File</strong><br><small style="color: #666;">Full backup with profiles</small></span>
+                    </button>
+                </div>
+            </div>
+            
             <button class="btn-header-action" id="loginBtn" onclick="showLoginOverlay()" title="Sign in with GitHub">
                 <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
                 Sign in
-            </button>
-            <button class="btn-header-action" onclick="exportSettings()" title="Export settings as JSON">
-                <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                Export
             </button>
             <button class="btn-header-action" onclick="document.getElementById('importFile').click()" title="Import settings from JSON">
                 <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
@@ -5994,6 +6014,7 @@
             updateConnectionStatus();
             initCollapsibleCards();
             renderPaletteGallery(); // Initialize color palette gallery
+            loadConfigFromUrl(); // Check for shared config in URL
             // Allow auto-save after initial load is complete
             setTimeout(() => {
                 isInitializing = false;
@@ -7768,6 +7789,133 @@
             };
             reader.readAsText(file);
             event.target.value = ''; // Reset input
+        }
+
+        // ===== SIMPLE SHARING (No GitHub Required!) =====
+        
+        function copyConfigToClipboard() {
+            updateSettingsFromForm();
+            const exportData = {
+                version: '1.0',
+                settings: settings,
+                profiles: profiles
+            };
+            const configJson = JSON.stringify(exportData, null, 2);
+            navigator.clipboard.writeText(configJson).then(() => {
+                showToast('📋 Config copied! Paste it in an email, Teams, or Slack');
+            }).catch(err => {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = configJson;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast('📋 Config copied!');
+            });
+        }
+
+        function generateShareLink() {
+            updateSettingsFromForm();
+            const shareData = {
+                v: '1',
+                s: {
+                    orgId: settings.orgId,
+                    orgUrl: settings.orgUrl,
+                    widgetColor: settings.widgetColor,
+                    widgetPosition: settings.widgetPosition,
+                    widgetSize: settings.widgetSize,
+                    enableVoiceVideo: settings.enableVoiceVideo,
+                    autoOpen: settings.autoOpen,
+                    draggable: settings.draggable,
+                    agentName: settings.agentName || '',
+                    botIcon: settings.botIcon || '',
+                    welcomeMessage: settings.welcomeMessage || ''
+                }
+            };
+            
+            // Compress: base64 encode the config
+            const encoded = btoa(encodeURIComponent(JSON.stringify(shareData)));
+            const shareUrl = `${window.location.origin}${window.location.pathname}?config=${encoded}`;
+            
+            // Check URL length (browsers typically support ~2000 chars)
+            if (shareUrl.length > 2000) {
+                showToast('⚠️ Config too large for URL. Use "Copy Config" instead.', 'warning');
+                return null;
+            }
+            
+            return shareUrl;
+        }
+
+        function copyShareLink() {
+            const shareUrl = generateShareLink();
+            if (!shareUrl) return;
+            
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                showToast('🔗 Share link copied! Anyone with this link can import your config');
+            }).catch(err => {
+                // Fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = shareUrl;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast('🔗 Share link copied!');
+            });
+        }
+
+        function showQRCode() {
+            const shareUrl = generateShareLink();
+            if (!shareUrl) return;
+            
+            // Use QR code API (no library needed)
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareUrl)}`;
+            
+            // Create modal
+            const modal = document.createElement('div');
+            modal.className = 'save-modal-overlay';
+            modal.id = 'qrModal';
+            modal.innerHTML = `
+                <div class="save-modal" style="max-width: 320px; text-align: center;">
+                    <h3>📱 Scan to Import Config</h3>
+                    <p style="color: #666; font-size: 13px; margin-bottom: 16px;">Scan this QR code on another device to import your widget settings</p>
+                    <img src="${qrUrl}" alt="QR Code" style="width: 200px; height: 200px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                    <div style="margin-top: 16px;">
+                        <button class="save-modal-cancel" onclick="document.getElementById('qrModal').remove()">Close</button>
+                    </div>
+                </div>
+            `;
+            modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+            document.body.appendChild(modal);
+            modal.style.display = 'flex';
+        }
+
+        // Load config from URL on page load
+        function loadConfigFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const configParam = urlParams.get('config');
+            
+            if (configParam) {
+                try {
+                    const decoded = JSON.parse(decodeURIComponent(atob(configParam)));
+                    if (decoded.s) {
+                        // Apply settings
+                        Object.assign(settings, decoded.s);
+                        localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+                        populateForm();
+                        updatePreview();
+                        updateConnectionStatus();
+                        
+                        // Clean URL
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                        
+                        showToast('✅ Config imported from share link!');
+                    }
+                } catch (err) {
+                    console.error('Failed to load config from URL:', err);
+                }
+            }
         }
 
         function copyEmbedCode() {
@@ -10294,6 +10442,29 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             document.getElementById('toastMessage').textContent = message;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Share dropdown menu toggle
+        function toggleShareMenu() {
+            const menu = document.getElementById('shareMenu');
+            if (menu.style.display === 'none') {
+                menu.style.display = 'block';
+                // Close on outside click
+                setTimeout(() => {
+                    document.addEventListener('click', closeShareMenuOnOutsideClick);
+                }, 0);
+            } else {
+                menu.style.display = 'none';
+                document.removeEventListener('click', closeShareMenuOnOutsideClick);
+            }
+        }
+        
+        function closeShareMenuOnOutsideClick(e) {
+            const dropdown = document.querySelector('.share-dropdown');
+            if (!dropdown.contains(e.target)) {
+                document.getElementById('shareMenu').style.display = 'none';
+                document.removeEventListener('click', closeShareMenuOnOutsideClick);
+            }
         }
     </script>
     
