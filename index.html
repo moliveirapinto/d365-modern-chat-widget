@@ -4782,8 +4782,14 @@
         function renderRoomList() {
             const listEl = document.getElementById('roomList');
             const emptyState = document.getElementById('roomEmptyState');
+            const teamCountEl = document.getElementById('teamCount');
             
             if (!listEl) return;
+            
+            // Update team count badge
+            if (teamCountEl) {
+                teamCountEl.textContent = savedRooms.length;
+            }
             
             if (savedRooms.length === 0) {
                 listEl.innerHTML = '';
