@@ -4095,14 +4095,28 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v2.2.0';
-        const APP_LAST_UPDATED = 'Jan 3, 2026';
+        const APP_VERSION = 'v2.3.0';
+        const APP_LAST_UPDATED = 'Jan 16, 2026';
         
         const CHANGELOG = [
             {
+                version: 'v2.3.0',
+                date: 'Jan 16, 2026',
+                latest: true,
+                items: [
+                    { type: 'new', text: 'Session persistence - chat survives page refresh (1 hour expiry)' },
+                    { type: 'new', text: 'VoiceVideo keepalive - prevents call failures after 5 minutes' },
+                    { type: 'new', text: 'Visibility handler - fixes 480/10077 errors when tab in background' },
+                    { type: 'improve', text: 'Message ordering uses messageId (millisecond precision) for correct order' },
+                    { type: 'improve', text: 'CSP simplified with broad wildcards for faster connections' },
+                    { type: 'improve', text: 'Full markdown rendering with citation/reference support' },
+                    { type: 'fix', text: 'TamperMonkey/embedded widget now has feature parity with live.html' },
+                    { type: 'fix', text: 'Bot avatar path corrected' }
+                ]
+            },
+            {
                 version: 'v2.2.0',
                 date: 'Jan 3, 2026',
-                latest: true,
                 items: [
                     { type: 'improve', text: 'User-friendly team repository modals with plain-language explanations' },
                     { type: 'improve', text: 'Step-by-step token creation instructions for non-technical users' },
