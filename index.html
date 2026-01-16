@@ -4380,8 +4380,13 @@
             try {
                 // Try to access repos endpoint - if it fails with 403, no repo scope
                 const response = await fetch('https://api.github.com/user/repos?per_page=1', {
-                    headers: { 'Authorization': `token ${cloudToken}` }
+                    headers: { 
+                        'Authorization': `token ${cloudToken}`,
+                        'Accept': 'application/vnd.github+json',
+                        'X-GitHub-Api-Version': '2022-11-28'
+                    }
                 });
+                console.log('Repo scope check response:', response.status, response.headers.get('x-oauth-scopes'));
                 if (response.status === 401) {
                     handleTokenInvalidation();
                     return false;
@@ -4389,6 +4394,7 @@
                 hasRepoScope = response.ok;
                 return hasRepoScope;
             } catch (e) {
+                console.error('Repo scope check error:', e);
                 hasRepoScope = false;
                 return false;
             }
@@ -4564,9 +4570,15 @@
             
             try {
                 // Check if repo already exists
+                console.log('Checking if repo exists:', `${cloudUser.login}/${TEAM_REPO_NAME}`);
                 const checkResponse = await fetch(`https://api.github.com/repos/${cloudUser.login}/${TEAM_REPO_NAME}`, {
-                    headers: { 'Authorization': `token ${cloudToken}` }
+                    headers: { 
+                        'Authorization': `token ${cloudToken}`,
+                        'Accept': 'application/vnd.github+json',
+                        'X-GitHub-Api-Version': '2022-11-28'
+                    }
                 });
+                console.log('Repo check response:', checkResponse.status);
                 
                 if (checkResponse.ok) {
                     // Repo exists, just connect to it
@@ -4580,11 +4592,16 @@
                 }
                 
                 // Create new repository
+                console.log('Creating new repository...');
+                console.log('Token (first 10 chars):', cloudToken.substring(0, 10) + '...');
+                
                 const createResponse = await fetch('https://api.github.com/user/repos', {
                     method: 'POST',
                     headers: {
                         'Authorization': `token ${cloudToken}`,
-                        'Content-Type': 'application/json'
+                        'Accept': 'application/vnd.github+json',
+                        'Content-Type': 'application/json',
+                        'X-GitHub-Api-Version': '2022-11-28'
                     },
                     body: JSON.stringify({
                         name: TEAM_REPO_NAME,
@@ -4594,8 +4611,11 @@
                     })
                 });
                 
+                console.log('Create response:', createResponse.status, createResponse.headers.get('x-oauth-scopes'));
+                
                 if (!createResponse.ok) {
                     const errorData = await createResponse.json().catch(() => ({}));
+                    console.error('Create repo error data:', errorData);
                     let errorMessage = 'Failed to create repository';
                     
                     if (createResponse.status === 401) {
@@ -4613,7 +4633,9 @@
                             errorMessage = errorData.message || 'Repository validation failed. The name may be invalid or already taken.';
                         }
                     } else if (createResponse.status === 404) {
-                        errorMessage = 'GitHub API endpoint not found. This may be a temporary issue - please try again.';
+                        // 404 on POST /user/repos usually means the token doesn't have proper authentication
+                        // This can happen with fine-grained tokens that don't have the right permissions
+                        errorMessage = 'Unable to create repository. This usually means your token lacks repository creation permissions. Please create a new Classic token (not fine-grained) with the "repo" scope at: https://github.com/settings/tokens/new';
                     } else if (errorData.message) {
                         errorMessage = errorData.message;
                     }
