@@ -1,4 +1,4 @@
-name = "d365-widget-analytics"
+name = "d365-modern-chat-widget"
 main = "cloudflare-worker/analytics-worker-d1.js"
 compatibility_date = "2024-12-19"
 
