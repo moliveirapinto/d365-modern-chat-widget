@@ -4,7 +4,7 @@
 
 [![D365 Compatible](https://img.shields.io/badge/D365-Omnichannel-0078D4?style=flat-square&logo=microsoft)](https://dynamics.microsoft.com)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.3.0-blue?style=flat-square)](package.json)
+[![Version](https://img.shields.io/badge/version-v2.4.0-blue?style=flat-square)](package.json)
 
 ![Chat Widget Preview](preview.png)
 
@@ -61,7 +61,7 @@
 
 #### Admin Panel (Chat Widget Studio Analytics)
 - 🎭 **Widget Profiles** - Save and switch between multiple customer configurations
-- 👥 **Team Mode** - Collaborate with teammates using shared GitHub repository
+- 👥 **Room Collaboration** - Share settings instantly with 6-character room codes (no accounts needed)
 - 🔄 **Widget Mode Selector** - Choose between Standard (native D365 LCW) or Custom (styled widget)
 - 🔤 **Font Library** - 30 professional fonts in 4 categories (Sans-Serif, Serif, Monospace, Display)
 - 🔌 **D365 Configuration** - Easy setup with connection validation
@@ -75,6 +75,7 @@
 - 📋 **Quick Embed Code** - Copy integration code with one click
 - 📚 **Quick Start Guide** - Interactive tutorial for new users with 3 deployment methods (Go To Widget, TamperMonkey, Embed)
 - 📊 **Analytics Dashboard** - Track widget usage with Cloudflare D1 SQL backend (sessions, chats, calls by domain)
+- 🔗 **Room Collaboration** - Share settings with a 6-character code, no accounts needed!
 
 </td>
 </tr>
@@ -1194,6 +1195,34 @@ See **[CONTRIBUTING.md](CONTRIBUTING.md)** for:
 - **NEW:** VoiceVideo keepalive - prevents call failures after 5 min
 - **NEW:** Visibility handler - fixes 480/10077 errors
 - **NEW:** Full markdown rendering with citation support
+
+---
+
+### v2.4.0 (January 16, 2026)
+
+#### 🔗 Room Collaboration - Simplified Team Sharing
+- **NEW:** Room Collaboration - share widget settings with a simple 6-character code
+- **NEW:** Multiple rooms support - create and join unlimited rooms
+- **NEW:** Push/Sync buttons - push your changes or pull latest from teammates
+- **REPLACED:** GitHub Team Repository with simpler Room Code system (no accounts needed!)
+- **IMPROVED:** Fluent UI icons for room actions (Cloud Sync, Cloud Upload, Clipboard, Delete)
+- **IMPROVED:** Team tab shows helpful explanation of what Rooms are for
+- **FIX:** Team count badge now shows correct number of rooms
+- **FIX:** Feedback form CSP updated to allow forms.office.com
+
+---
+
+### v2.3.0 (January 16, 2026)
+
+#### 🔄 Session Persistence & Reliability
+- **NEW:** Session persistence - chat survives page refresh (1 hour expiry)
+- **NEW:** VoiceVideo keepalive - prevents call failures after 5 minutes
+- **NEW:** Visibility handler - fixes 480/10077 errors when tab in background
+- **IMPROVED:** Message ordering uses messageId (millisecond precision)
+- **IMPROVED:** CSP simplified with broad wildcards for faster connections
+- **IMPROVED:** Full markdown rendering with citation/reference support
+- **FIX:** TamperMonkey/embedded widget now has feature parity with live.html
+- **FIX:** Bot avatar path corrected
 
 ---
 

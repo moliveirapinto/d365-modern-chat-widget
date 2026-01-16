@@ -4009,14 +4009,29 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v2.3.0';
+        const APP_VERSION = 'v2.4.0';
         const APP_LAST_UPDATED = 'Jan 16, 2026';
         
         const CHANGELOG = [
             {
-                version: 'v2.3.0',
+                version: 'v2.4.0',
                 date: 'Jan 16, 2026',
                 latest: true,
+                items: [
+                    { type: 'new', text: 'Room Collaboration - share widget settings with a 6-character code (no accounts needed!)' },
+                    { type: 'new', text: 'Multiple rooms support - create/join unlimited rooms, switch between them instantly' },
+                    { type: 'new', text: 'Room sync - push your changes to room or pull latest from teammates' },
+                    { type: 'improve', text: 'Replaced GitHub Team Repository with simpler Room Code system' },
+                    { type: 'improve', text: 'Room action icons updated to Fluent UI (Cloud Sync, Cloud Upload, Clipboard, Delete)' },
+                    { type: 'improve', text: 'Team tab now shows helpful explanation of what Rooms are' },
+                    { type: 'fix', text: 'Team count badge now shows correct number of rooms' },
+                    { type: 'fix', text: 'Feedback form CSP updated to allow forms.office.com' }
+                ]
+            },
+            {
+                version: 'v2.3.0',
+                date: 'Jan 16, 2026',
+                latest: false,
                 items: [
                     { type: 'new', text: 'Session persistence - chat survives page refresh (1 hour expiry)' },
                     { type: 'new', text: 'VoiceVideo keepalive - prevents call failures after 5 minutes' },
