@@ -2892,57 +2892,28 @@
 
                     <!-- Collaboration Room Section -->
                     <div class="profile-section" id="teamSection">
-                        <!-- Room Connected State (hidden by default) -->
-                        <div class="team-connected" id="roomConnectedState" style="display:none;">
-                            <svg viewBox="0 0 24 24" style="fill: #10b981;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                            <div class="team-connected-info">
-                                <div class="team-connected-label">Connected to Room</div>
-                                <div class="team-connected-repo" id="roomCodeDisplay" style="font-family: monospace; letter-spacing: 2px;">------</div>
-                            </div>
-                            <div style="display: flex; gap: 8px; align-items: center;">
-                                <button class="team-btn team-btn-secondary" onclick="syncFromRoom()" title="Pull latest from room" style="padding: 6px 12px; font-size: 12px;">
-                                    🔄 Sync
-                                </button>
-                                <button class="team-btn team-btn-secondary" onclick="pushToRoom()" title="Push your changes to room" style="padding: 6px 12px; font-size: 12px;">
-                                    ⬆️ Push
-                                </button>
-                                <button class="team-disconnect-btn" onclick="leaveCollabRoom()" title="Leave room">
-                                    <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-                                </button>
-                            </div>
+                        <!-- Room Actions (always visible) -->
+                        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                            <button class="team-btn team-btn-primary" onclick="showCreateRoomModal()" style="flex: 1;">
+                                <svg viewBox="0 0 24 24" style="fill:white; width:16px; height:16px;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                Create Room
+                            </button>
+                            <button class="team-btn team-btn-secondary" onclick="showJoinRoomModal()" style="flex: 1;">
+                                <svg viewBox="0 0 24 24" style="fill:currentColor; width:16px; height:16px;"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+                                Join Room
+                            </button>
                         </div>
                         
-                        <!-- Room Info (shown when connected) -->
-                        <div id="roomInfo" style="display:none; background: #f8fafc; border-radius: 8px; padding: 12px; margin-top: 8px; font-size: 12px; color: #64748b;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                                <span>Created by:</span>
-                                <span id="roomCreatedBy">-</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                                <span>Last updated:</span>
-                                <span id="roomLastUpdated">-</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span>Updated by:</span>
-                                <span id="roomUpdatedBy">-</span>
-                            </div>
+                        <!-- Room List -->
+                        <div id="roomList" class="profile-list">
+                            <!-- Rooms will be rendered dynamically -->
                         </div>
-
-                        <!-- Room Empty State -->
-                        <div class="team-empty-state" id="roomEmptyState">
+                        
+                        <!-- Empty State (shown when no rooms) -->
+                        <div class="team-empty-state" id="roomEmptyState" style="padding: 24px;">
                             <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                            <h4>Collaborate with your team</h4>
-                            <p>Create a room and share a 6-character code. No accounts needed!</p>
-                            <div class="team-actions">
-                                <button class="team-btn team-btn-primary" onclick="showCreateRoomModal()">
-                                    <svg viewBox="0 0 24 24" style="fill:white;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                                    Create Room
-                                </button>
-                                <button class="team-btn team-btn-secondary" onclick="showJoinRoomModal()">
-                                    <svg viewBox="0 0 24 24" style="fill:currentColor;"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
-                                    Join Room
-                                </button>
-                            </div>
+                            <h4>No rooms yet</h4>
+                            <p>Create a room to share with your team, or join an existing room with a code.</p>
                         </div>
                     </div>
                 </div>
@@ -4437,9 +4408,22 @@
         // ============ COLLABORATION ROOMS (No GitHub Required!) ============
         
         const COLLAB_API_URL = 'https://d365-widget-collab.mauricio-o-pinto.workers.dev';
-        let currentRoomCode = localStorage.getItem('d365_collab_room') || null;
+        let savedRooms = JSON.parse(localStorage.getItem('d365_collab_rooms') || '[]'); // Array of {code, name, createdBy, joinedAt}
+        let activeRoomCode = localStorage.getItem('d365_collab_active_room') || null;
         let currentRoomVersion = null;
         let collabUserName = localStorage.getItem('d365_collab_user') || '';
+        
+        // Migration from old single-room format
+        (function migrateOldRoomFormat() {
+            const oldRoom = localStorage.getItem('d365_collab_room');
+            if (oldRoom && !savedRooms.find(r => r.code === oldRoom)) {
+                savedRooms.push({ code: oldRoom, name: `Room ${oldRoom}`, joinedAt: new Date().toISOString() });
+                localStorage.setItem('d365_collab_rooms', JSON.stringify(savedRooms));
+                activeRoomCode = oldRoom;
+                localStorage.setItem('d365_collab_active_room', oldRoom);
+            }
+            localStorage.removeItem('d365_collab_room'); // Clean up old key
+        })();
         
         // Show Create Room modal
         function showCreateRoomModal() {
@@ -4505,17 +4489,28 @@
                 
                 const data = await response.json();
                 
-                // Save room code
-                currentRoomCode = data.roomCode;
+                // Add to saved rooms list
+                const newRoom = {
+                    code: data.roomCode,
+                    name: `Room ${data.roomCode}`,
+                    createdBy: userName,
+                    joinedAt: new Date().toISOString(),
+                    isOwner: true
+                };
+                savedRooms.push(newRoom);
+                localStorage.setItem('d365_collab_rooms', JSON.stringify(savedRooms));
+                
+                // Set as active room
+                activeRoomCode = data.roomCode;
                 currentRoomVersion = 1;
-                localStorage.setItem('d365_collab_room', data.roomCode);
+                localStorage.setItem('d365_collab_active_room', data.roomCode);
                 
                 // Show success
                 document.getElementById('newRoomCode').textContent = data.roomCode;
                 success.style.display = 'block';
                 btn.style.display = 'none';
                 
-                updateRoomUI();
+                renderRoomList();
                 showToast(`Room ${data.roomCode} created! Share this code with your team.`);
                 
             } catch (error) {
@@ -4532,9 +4527,9 @@
         }
         
         // Copy room code to clipboard
-        function copyRoomCode() {
-            const code = document.getElementById('newRoomCode').textContent || currentRoomCode;
-            navigator.clipboard.writeText(code).then(() => {
+        function copyRoomCode(code) {
+            const roomCode = code || document.getElementById('newRoomCode')?.textContent || activeRoomCode;
+            navigator.clipboard.writeText(roomCode).then(() => {
                 showToast('📋 Room code copied!');
             });
         }
@@ -4558,6 +4553,15 @@
                 return;
             }
             
+            // Check if already in this room
+            if (savedRooms.find(r => r.code === roomCode)) {
+                status.style.display = 'block';
+                status.style.background = '#fef3c7';
+                status.style.color = '#92400e';
+                status.textContent = 'You already have this room saved!';
+                return;
+            }
+            
             // Save username
             collabUserName = userName;
             localStorage.setItem('d365_collab_user', userName);
@@ -4577,10 +4581,21 @@
                 
                 const roomData = await response.json();
                 
-                // Save room
-                currentRoomCode = roomCode;
+                // Add to saved rooms
+                const newRoom = {
+                    code: roomCode,
+                    name: `Room ${roomCode}`,
+                    createdBy: roomData.createdBy || 'Unknown',
+                    joinedAt: new Date().toISOString(),
+                    isOwner: false
+                };
+                savedRooms.push(newRoom);
+                localStorage.setItem('d365_collab_rooms', JSON.stringify(savedRooms));
+                
+                // Set as active room
+                activeRoomCode = roomCode;
                 currentRoomVersion = roomData.version;
-                localStorage.setItem('d365_collab_room', roomCode);
+                localStorage.setItem('d365_collab_active_room', roomCode);
                 
                 // Apply the config
                 if (roomData.config) {
@@ -4588,8 +4603,8 @@
                 }
                 
                 closeJoinRoomModal();
-                updateRoomUI();
-                showToast(`Joined room ${roomCode}! Config loaded from ${roomData.createdBy}.`);
+                renderRoomList();
+                showToast(`Joined room ${roomCode}! Config loaded from ${roomData.createdBy || 'owner'}.`);
                 
             } catch (error) {
                 console.error('Join room error:', error);
@@ -4604,25 +4619,63 @@
             }
         }
         
-        // Leave the current room
-        function leaveCollabRoom() {
-            if (confirm('Leave this collaboration room?')) {
-                currentRoomCode = null;
-                currentRoomVersion = null;
-                localStorage.removeItem('d365_collab_room');
-                updateRoomUI();
-                showToast('Left collaboration room');
+        // Leave/remove a room from saved list
+        function leaveCollabRoom(roomCode) {
+            const code = roomCode || activeRoomCode;
+            if (!code) return;
+            
+            const room = savedRooms.find(r => r.code === code);
+            if (!room) return;
+            
+            if (confirm(`Remove room ${code} from your list?`)) {
+                savedRooms = savedRooms.filter(r => r.code !== code);
+                localStorage.setItem('d365_collab_rooms', JSON.stringify(savedRooms));
+                
+                // If this was the active room, clear it
+                if (activeRoomCode === code) {
+                    activeRoomCode = savedRooms.length > 0 ? savedRooms[0].code : null;
+                    localStorage.setItem('d365_collab_active_room', activeRoomCode || '');
+                }
+                
+                renderRoomList();
+                showToast(`Removed room ${code}`);
             }
         }
         
+        // Switch to a different room
+        function switchToRoom(roomCode) {
+            if (activeRoomCode === roomCode) return;
+            
+            activeRoomCode = roomCode;
+            localStorage.setItem('d365_collab_active_room', roomCode);
+            
+            // Fetch and apply the room's config
+            fetch(`${COLLAB_API_URL}/room/${roomCode}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.config) {
+                        currentRoomVersion = data.version;
+                        applyWidgetConfig(data.config);
+                        showToast(`Switched to room ${roomCode}`);
+                    }
+                })
+                .catch(err => {
+                    console.error('Error switching room:', err);
+                    showToast('Error loading room config', 'error');
+                });
+            
+            renderRoomList();
+        }
+        
         // Sync (pull) latest config from room
-        async function syncFromRoom() {
-            if (!currentRoomCode) return;
+        async function syncFromRoom(roomCode) {
+            const code = roomCode || activeRoomCode;
+            if (!code) return;
             
             try {
                 showToast('Syncing from room...');
                 
-                const response = await fetch(`${COLLAB_API_URL}/room/${currentRoomCode}`);
+                const response = await fetch(`${COLLAB_API_URL}/room/${code}`);
                 
                 if (!response.ok) {
                     const error = await response.json();
@@ -4649,15 +4702,16 @@
         }
         
         // Push changes to room
-        async function pushToRoom() {
-            if (!currentRoomCode) return;
+        async function pushToRoom(roomCode) {
+            const code = roomCode || activeRoomCode;
+            if (!code) return;
             
             try {
                 showToast('Pushing changes...');
                 
                 const config = collectCurrentConfig();
                 
-                const response = await fetch(`${COLLAB_API_URL}/room/${currentRoomCode}`, {
+                const response = await fetch(`${COLLAB_API_URL}/room/${code}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -4707,51 +4761,66 @@
             }
         }
         
-        // Update the Room UI state
-        function updateRoomUI() {
+        // Render the room list UI
+        function renderRoomList() {
+            const listEl = document.getElementById('roomList');
             const emptyState = document.getElementById('roomEmptyState');
-            const connectedState = document.getElementById('roomConnectedState');
-            const roomInfo = document.getElementById('roomInfo');
-            const codeDisplay = document.getElementById('roomCodeDisplay');
             
-            if (currentRoomCode) {
-                emptyState.style.display = 'none';
-                connectedState.style.display = 'flex';
-                roomInfo.style.display = 'block';
-                codeDisplay.textContent = currentRoomCode;
-                
-                // Fetch room info
-                fetch(`${COLLAB_API_URL}/room/${currentRoomCode}`)
-                    .then(r => r.json())
-                    .then(data => {
-                        if (data.config) {
-                            currentRoomVersion = data.version;
-                            updateRoomInfo(data);
-                        }
-                    })
-                    .catch(err => {
-                        console.warn('Could not fetch room info:', err);
-                        // Room might have expired
-                        if (err.message && err.message.includes('not found')) {
-                            currentRoomCode = null;
-                            localStorage.removeItem('d365_collab_room');
-                            updateRoomUI();
-                            showToast('Room expired or was deleted');
-                        }
-                    });
-            } else {
+            if (!listEl) return;
+            
+            if (savedRooms.length === 0) {
+                listEl.innerHTML = '';
                 emptyState.style.display = 'block';
-                connectedState.style.display = 'none';
-                roomInfo.style.display = 'none';
+                return;
             }
+            
+            emptyState.style.display = 'none';
+            
+            listEl.innerHTML = savedRooms.map(room => {
+                const isActive = room.code === activeRoomCode;
+                return `
+                    <div class="profile-item ${isActive ? 'active' : ''}" onclick="switchToRoom('${room.code}')">
+                        <div class="profile-item-content">
+                            <div class="profile-item-header">
+                                <span class="profile-item-name" style="font-family: monospace; letter-spacing: 1px;">
+                                    ${isActive ? '🟢' : '⚪'} ${room.code}
+                                </span>
+                                ${room.isOwner ? '<span style="font-size: 10px; background: #dbeafe; color: #1e40af; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">Owner</span>' : ''}
+                            </div>
+                            <div class="profile-item-details">
+                                <span>${room.createdBy || 'Unknown'}</span>
+                                <span>•</span>
+                                <span>Joined ${new Date(room.joinedAt).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                        <div class="profile-item-actions" onclick="event.stopPropagation();">
+                            <button class="profile-action-btn" onclick="copyRoomCode('${room.code}')" title="Copy room code">
+                                📋
+                            </button>
+                            <button class="profile-action-btn" onclick="syncFromRoom('${room.code}')" title="Sync from room">
+                                🔄
+                            </button>
+                            <button class="profile-action-btn" onclick="pushToRoom('${room.code}')" title="Push to room">
+                                ⬆️
+                            </button>
+                            <button class="profile-action-btn delete" onclick="leaveCollabRoom('${room.code}')" title="Remove room">
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Legacy function for compatibility
+        function updateRoomUI() {
+            renderRoomList();
         }
         
         // Initialize room UI on page load
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if we have a saved room
-            if (currentRoomCode) {
-                updateRoomUI();
-            }
+            // Render saved rooms
+            renderRoomList();
         });
 
         // Check for existing login on page load
