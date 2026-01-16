@@ -37,12 +37,21 @@ class ModernChatWidget {
     }
 
     // Get timestamp from a message for sorting
+    // Priority: messageId (has millisecond precision) > sequenceId > timestamp (only second precision)
     getMessageTimestamp(msg, logResult = false) {
         let ts = null;
         let source = '';
         
-        // First check for sequence number (most reliable for ordering)
-        if (msg.sequenceId !== undefined && !isNaN(Number(msg.sequenceId))) {
+        // FIRST: Check messageId - this is a millisecond timestamp and most reliable
+        // The D365 SDK uses messageId as the actual creation timestamp with ms precision
+        const msgId = msg.messageId || msg.id || msg.clientmessageid || msg.messageid;
+        if (msgId && !isNaN(Number(msgId)) && Number(msgId) > 1000000000000) {
+            // Looks like a millisecond timestamp (13+ digits starting with 1)
+            ts = Number(msgId);
+            source = 'messageId';
+        }
+        // SECOND: Check for sequence number
+        else if (msg.sequenceId !== undefined && !isNaN(Number(msg.sequenceId))) {
             ts = Number(msg.sequenceId);
             source = 'sequenceId';
         } else if (msg.sequence !== undefined && !isNaN(Number(msg.sequence))) {
@@ -52,7 +61,7 @@ class ModernChatWidget {
             ts = Number(msg.order);
             source = 'order';
         }
-        // Try explicit timestamp fields
+        // THIRD: Try explicit timestamp fields (these often only have second precision)
         else if (msg.timestamp) {
             ts = new Date(msg.timestamp).getTime();
             source = 'timestamp';
@@ -66,15 +75,8 @@ class ModernChatWidget {
             ts = new Date(msg.originalArrivalTime).getTime();
             source = 'originalArrivalTime';
         } else {
-            // Fall back to messageId which appears to be a timestamp
-            const id = msg.messageId || msg.id || msg.clientmessageid || msg.messageid;
-            if (id && !isNaN(Number(id))) {
-                ts = Number(id);
-                source = 'messageId';
-            } else {
-                ts = Date.now();
-                source = 'fallback-now';
-            }
+            ts = Date.now();
+            source = 'fallback-now';
         }
         
         // Log what we found for debugging (only when explicitly requested)
