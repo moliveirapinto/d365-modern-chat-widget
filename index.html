@@ -5287,33 +5287,101 @@
                         <div class="room-widgets" style="display: ${isExpanded ? 'block' : 'none'}; margin-left: 16px; border-left: 2px solid #e2e8f0; padding-left: 12px; margin-top: 4px;">
                             ${hasWidgets ? widgets.map(widget => {
                                 const isActiveWidget = activeRoomCode === room.code && activeRoomWidgetId === widget.id;
+                                const widgetConfig = widget.config || {};
+                                const widgetLcwCode = widgetConfig.lcwCode || '';
+                                const widgetAppId = widgetConfig.widgetId || '';
+                                const widgetOrgId = widgetConfig.orgId || '';
+                                const widgetOrgUrl = widgetConfig.orgUrl || '';
+                                const widgetIsConfigured = widgetAppId && widgetOrgId && widgetOrgUrl;
+                                const widgetHasCode = widgetLcwCode.trim().length > 0;
+                                
+                                let widgetStatusClass = '';
+                                let widgetStatusText = 'Not configured';
+                                if (widgetIsConfigured) {
+                                    widgetStatusClass = 'configured';
+                                    widgetStatusText = 'Ready to connect';
+                                } else if (widgetAppId || widgetOrgId || widgetOrgUrl) {
+                                    widgetStatusClass = 'partial';
+                                    widgetStatusText = 'Partial configuration';
+                                }
+                                
                                 return `
-                                    <div class="profile-item widget-item ${isActiveWidget ? 'active' : ''}" style="margin-bottom: 4px; padding: 10px 12px; background: ${isActiveWidget ? '#eff6ff' : 'white'}; border: 1px solid ${isActiveWidget ? '#3b82f6' : '#e2e8f0'};">
-                                        <div class="profile-item-content" style="flex: 1; cursor: pointer;" onclick="loadRoomWidget('${room.code}', '${widget.id}')">
-                                            <div class="profile-item-header">
-                                                <span class="profile-item-name" style="font-weight: 500;">
-                                                    ${isActiveWidget ? '🟢' : '⚪'} ${widget.name || 'Unnamed Widget'}
-                                                </span>
+                                    <div class="profile-item widget-item ${isActiveWidget ? 'active' : ''}" style="margin-bottom: 4px; padding: 0; background: ${isActiveWidget ? '#eff6ff' : 'white'}; border: 1px solid ${isActiveWidget ? '#3b82f6' : '#e2e8f0'}; overflow: hidden;">
+                                        <div class="profile-item-header" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; cursor: pointer;" onclick="loadRoomWidget('${room.code}', '${widget.id}')">
+                                            <div class="profile-item-content" style="flex: 1;">
+                                                <div style="display: flex; align-items: center; gap: 6px;">
+                                                    <span class="profile-item-name" style="font-weight: 500;">
+                                                        ${isActiveWidget ? '🟢' : '⚪'} ${widget.name || 'Unnamed Widget'}
+                                                    </span>
+                                                </div>
+                                                <div class="profile-item-details" style="font-size: 11px; color: #64748b;">
+                                                    <span>by ${widget.updatedBy || widget.createdBy || 'Unknown'}</span>
+                                                    <span>•</span>
+                                                    <span>${widget.updatedAt ? new Date(widget.updatedAt).toLocaleDateString() : 'Unknown date'}</span>
+                                                </div>
                                             </div>
-                                            <div class="profile-item-details" style="font-size: 11px; color: #64748b;">
-                                                <span>by ${widget.updatedBy || widget.createdBy || 'Unknown'}</span>
-                                                <span>•</span>
-                                                <span>${widget.updatedAt ? new Date(widget.updatedAt).toLocaleDateString() : 'Unknown date'}</span>
+                                            <div class="profile-item-actions" onclick="event.stopPropagation();" style="display:flex; gap:2px;">
+                                                <button onclick="loadRoomWidget('${room.code}', '${widget.id}')" title="Load widget" style="background:transparent; border:none; padding:5px; cursor:pointer; border-radius:4px;">
+                                                    <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#64748b;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                                                </button>
+                                                <button onclick="saveCurrentToRoomWidget('${room.code}', '${widget.id}')" title="Save current settings to this widget" style="background:transparent; border:none; padding:5px; cursor:pointer; border-radius:4px;">
+                                                    <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#64748b;"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+                                                </button>
+                                                <button onclick="copyRoomWidgetToPersonal('${room.code}', '${widget.id}')" title="Copy to Personal" style="background:transparent; border:none; padding:5px; cursor:pointer; border-radius:4px;">
+                                                    <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#64748b;"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                                                </button>
+                                                <button onclick="deleteRoomWidget('${room.code}', '${widget.id}')" title="Delete widget" style="background:transparent; border:none; padding:5px; cursor:pointer; border-radius:4px;">
+                                                    <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#ef4444;"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                                                </button>
                                             </div>
                                         </div>
-                                        <div class="profile-item-actions" onclick="event.stopPropagation();" style="display:flex; gap:2px;">
-                                            <button onclick="loadRoomWidget('${room.code}', '${widget.id}')" title="Load widget" style="background:transparent; border:none; padding:5px; cursor:pointer; border-radius:4px;">
-                                                <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#64748b;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-                                            </button>
-                                            <button onclick="saveCurrentToRoomWidget('${room.code}', '${widget.id}')" title="Save current settings to this widget" style="background:transparent; border:none; padding:5px; cursor:pointer; border-radius:4px;">
-                                                <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#64748b;"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
-                                            </button>
-                                            <button onclick="copyRoomWidgetToPersonal('${room.code}', '${widget.id}')" title="Copy to Personal" style="background:transparent; border:none; padding:5px; cursor:pointer; border-radius:4px;">
-                                                <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#64748b;"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                                            </button>
-                                            <button onclick="deleteRoomWidget('${room.code}', '${widget.id}')" title="Delete widget" style="background:transparent; border:none; padding:5px; cursor:pointer; border-radius:4px;">
-                                                <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#ef4444;"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-                                            </button>
+                                        
+                                        <!-- LCW Section (shown when active) -->
+                                        <div class="profile-embed-section" style="display: ${isActiveWidget ? 'block' : 'none'};">
+                                            <!-- Connection Status -->
+                                            <div class="profile-connection-status ${widgetStatusClass}">
+                                                <span class="profile-status-dot"></span>
+                                                <span class="profile-status-text">${widgetStatusText}</span>
+                                            </div>
+                                            
+                                            <!-- Extracted Values (if configured) -->
+                                            ${widgetIsConfigured ? `
+                                            <div class="profile-extracted-values">
+                                                <div class="profile-extracted-item">
+                                                    <span class="profile-extracted-label">App ID:</span>
+                                                    <span class="profile-extracted-value">${escapeHtml(widgetAppId)}</span>
+                                                </div>
+                                                <div class="profile-extracted-item">
+                                                    <span class="profile-extracted-label">Org ID:</span>
+                                                    <span class="profile-extracted-value">${escapeHtml(widgetOrgId)}</span>
+                                                </div>
+                                                <div class="profile-extracted-item">
+                                                    <span class="profile-extracted-label">Org URL:</span>
+                                                    <span class="profile-extracted-value">${escapeHtml(widgetOrgUrl)}</span>
+                                                </div>
+                                            </div>
+                                            ` : ''}
+                                            
+                                            <!-- LCW Embed Code -->
+                                            <div class="profile-embed-label">
+                                                <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+                                                D365 LCW Embed Code
+                                            </div>
+                                            <textarea class="profile-embed-code" 
+                                                id="roomWidgetEmbedCode_${room.code}_${widget.id}" 
+                                                onclick="event.stopPropagation()" 
+                                                onchange="updateRoomWidgetEmbedCode('${room.code}', '${widget.id}', this.value)"
+                                                placeholder="Paste your D365 Omnichannel LCW embed code here...">${escapeHtml(widgetLcwCode)}</textarea>
+                                            <div class="profile-embed-actions">
+                                                <button class="profile-embed-btn secondary" onclick="event.stopPropagation(); copyRoomWidgetEmbedCode('${room.code}', '${widget.id}')" ${!widgetHasCode ? 'disabled style="opacity: 0.5;"' : ''}>
+                                                    <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                                                    Copy Code
+                                                </button>
+                                                <button class="profile-embed-btn primary" onclick="event.stopPropagation(); parseRoomWidgetEmbedCode('${room.code}', '${widget.id}')">
+                                                    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                                                    Apply to Settings
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 `;
@@ -5524,24 +5592,36 @@
                 modal.id = 'addWidgetToRoomModal';
                 modal.className = 'save-modal-overlay';
                 modal.innerHTML = `
-                    <div class="save-modal">
-                        <h3 style="margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
+                    <div class="save-modal" style="max-width: 440px;">
+                        <h3 style="display:flex;align-items:center;gap:10px;margin:0 0 20px 0;">
                             <span style="font-size: 24px;">📦</span> Add Widget to Room
                         </h3>
-                        <div class="form-group">
-                            <label class="form-label">Widget Name</label>
-                            <input type="text" class="form-input" id="newRoomWidgetName" placeholder="e.g., Contoso Demo">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" style="display: flex; align-items: center; gap: 8px;">
-                                <input type="checkbox" id="useCurrentSettings" checked>
-                                Use current editor settings
+                        
+                        <!-- Widget name input -->
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; font-size: 13px; color: #475569; font-weight: 500; margin-bottom: 6px;">
+                                Widget Name
                             </label>
+                            <input type="text" class="form-input" id="newRoomWidgetName" placeholder="e.g., Contoso Demo" style="font-size: 14px; margin-bottom: 0;">
                         </div>
-                        <div id="addWidgetToRoomStatus" style="display:none; padding: 12px; border-radius: 8px; margin-bottom: 12px;"></div>
-                        <div class="save-modal-buttons">
+                        
+                        <!-- Use current settings checkbox -->
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: #475569; cursor: pointer;">
+                                <input type="checkbox" id="useCurrentSettings" checked style="width: 18px; height: 18px; margin: 0; accent-color: var(--admin-primary); cursor: pointer;">
+                                <span>Use current editor settings</span>
+                            </label>
+                            <p style="margin: 6px 0 0 28px; font-size: 12px; color: #94a3b8;">
+                                When checked, your current customization settings will be copied to this widget.
+                            </p>
+                        </div>
+                        
+                        <!-- Status area -->
+                        <div id="addWidgetToRoomStatus" style="display:none; padding: 12px 14px; border-radius: 8px; margin-bottom: 16px; font-size: 13px;"></div>
+                        
+                        <div class="save-modal-actions">
                             <button class="save-modal-cancel" onclick="closeAddWidgetToRoomModal()">Cancel</button>
-                            <button class="save-modal-save" id="addWidgetToRoomBtn">
+                            <button class="save-modal-save" id="addWidgetToRoomBtn" style="display: flex; align-items: center;">
                                 <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;margin-right:6px;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
                                 Add Widget
                             </button>
@@ -7266,6 +7346,110 @@
             }
             
             return result;
+        }
+        
+        // Room Widget Embed Code Functions
+        async function updateRoomWidgetEmbedCode(roomCode, widgetId, newCode) {
+            const room = savedRooms.find(r => r.code === roomCode);
+            if (!room || !room.widgets) return;
+            
+            const widget = room.widgets.find(w => w.id === widgetId);
+            if (!widget) return;
+            
+            // Update locally
+            if (!widget.config) widget.config = {};
+            widget.config.lcwCode = newCode;
+            
+            // Save to cloud
+            try {
+                const response = await fetch(`${COLLAB_API_URL}/room/${roomCode}/widgets/${widgetId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        config: widget.config,
+                        updaterName: collabUserName || cloudUser?.login || 'Anonymous'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to save embed code');
+                }
+                
+                saveRoomsToLocalStorage();
+            } catch (error) {
+                console.error('Failed to sync embed code:', error);
+            }
+        }
+        
+        function copyRoomWidgetEmbedCode(roomCode, widgetId) {
+            const room = savedRooms.find(r => r.code === roomCode);
+            if (!room || !room.widgets) return;
+            
+            const widget = room.widgets.find(w => w.id === widgetId);
+            if (!widget || !widget.config || !widget.config.lcwCode) return;
+            
+            navigator.clipboard.writeText(widget.config.lcwCode).then(() => {
+                showToast('Embed code copied to clipboard!');
+            });
+        }
+        
+        async function parseRoomWidgetEmbedCode(roomCode, widgetId) {
+            const room = savedRooms.find(r => r.code === roomCode);
+            if (!room || !room.widgets) return;
+            
+            const widget = room.widgets.find(w => w.id === widgetId);
+            if (!widget) return;
+            
+            const embedCode = widget.config?.lcwCode || '';
+            if (!embedCode.trim()) {
+                showToast('No embed code to parse. Paste code first.', 'warning');
+                return;
+            }
+            
+            // Parse the embed code to extract orgId, orgUrl, widgetId
+            const parsed = parseLcwEmbedCode(embedCode);
+            
+            if (parsed.orgId || parsed.orgUrl || parsed.widgetId) {
+                // Update widget config
+                if (!widget.config) widget.config = {};
+                if (parsed.orgId) widget.config.orgId = parsed.orgId;
+                if (parsed.orgUrl) widget.config.orgUrl = parsed.orgUrl;
+                if (parsed.widgetId) widget.config.widgetId = parsed.widgetId;
+                
+                // Save to cloud
+                try {
+                    const response = await fetch(`${COLLAB_API_URL}/room/${roomCode}/widgets/${widgetId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            config: widget.config,
+                            updaterName: collabUserName || cloudUser?.login || 'Anonymous'
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to save parsed settings');
+                    }
+                    
+                    saveRoomsToLocalStorage();
+                    
+                    // If this is the active widget, update the current form
+                    if (activeRoomCode === roomCode && activeRoomWidgetId === widgetId) {
+                        if (parsed.orgId) document.getElementById('orgId').value = parsed.orgId;
+                        if (parsed.orgUrl) document.getElementById('orgUrl').value = parsed.orgUrl;
+                        if (parsed.widgetId) document.getElementById('widgetId').value = parsed.widgetId;
+                        updateSettingsFromForm();
+                    }
+                    
+                    renderRoomList();
+                    showToast('D365 settings extracted and applied!');
+                } catch (error) {
+                    console.error('Failed to sync parsed settings:', error);
+                    showToast('Failed to save changes to cloud', 'error');
+                }
+            } else {
+                showToast('Could not parse embed code. Check format.', 'warning');
+            }
         }
         
         // Show modal to copy a personal profile to a room
