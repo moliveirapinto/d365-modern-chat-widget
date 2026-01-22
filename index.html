@@ -1043,15 +1043,15 @@
             gap: 6px;
         }
         .widget-launch-menu {
-            position: absolute;
-            bottom: calc(100% + 8px);
-            left: 0;
+            position: fixed;
+            bottom: auto;
+            left: auto;
             min-width: 280px;
             background: var(--admin-card);
             border: 1px solid var(--admin-border);
             border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            z-index: 1000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            z-index: 99999;
             opacity: 0;
             visibility: hidden;
             transform: translateY(10px);
@@ -9259,7 +9259,15 @@
         // Widget Launch Dropdown Functions
         function toggleWidgetLaunchMenu() {
             const menu = document.getElementById('widgetLaunchMenu');
-            if (menu) {
+            const btn = document.querySelector('.widget-launch-btn');
+            if (menu && btn) {
+                const isActive = menu.classList.contains('active');
+                if (!isActive) {
+                    // Position the menu above the button
+                    const rect = btn.getBoundingClientRect();
+                    menu.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
+                    menu.style.left = rect.left + 'px';
+                }
                 menu.classList.toggle('active');
             }
         }
