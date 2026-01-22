@@ -1198,7 +1198,7 @@ See **[CONTRIBUTING.md](CONTRIBUTING.md)** for:
 
 ---
 
-### v2.5.0 (January 17, 2026)
+### v2.5.0 (January 22, 2026)
 
 #### 🎯 Multi-Widget Rooms & Cloud Sync
 - **NEW:** Multiple widgets per room - each room can now hold unlimited widget profiles
