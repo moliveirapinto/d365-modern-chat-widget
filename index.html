@@ -5495,7 +5495,14 @@
 
         // Auto-save profile to cloud (called when saving/updating profiles)
         async function saveProfileToCloud(profile) {
-            if (!cloudToken || tokenInvalidated) return;
+            console.log('☁️ saveProfileToCloud called for:', profile?.name);
+            console.log('☁️ cloudToken exists:', !!cloudToken);
+            console.log('☁️ tokenInvalidated:', tokenInvalidated);
+            
+            if (!cloudToken || tokenInvalidated) {
+                console.log('☁️ Aborting save - no token or token invalidated');
+                return;
+            }
             
             updateCloudSyncStatus('syncing');
             
@@ -5512,13 +5519,17 @@
                 }
             };
             
+            console.log('☁️ Gist data prepared:', gistData.description);
+            
             try {
                 // Check if this profile already has a cloud ID
                 const existingGistId = profile.cloudId || null;
+                console.log('☁️ Existing gist ID:', existingGistId);
                 
                 let res;
                 if (existingGistId) {
                     // Update existing gist
+                    console.log('☁️ Updating existing gist...');
                     res = await fetch('https://api.github.com/gists/' + existingGistId, {
                         method: 'PATCH',
                         headers: {
@@ -5529,6 +5540,7 @@
                     });
                 } else {
                     // Create new gist
+                    console.log('☁️ Creating new gist...');
                     res = await fetch('https://api.github.com/gists', {
                         method: 'POST',
                         headers: {
@@ -5539,14 +5551,22 @@
                     });
                 }
                 
+                console.log('☁️ Response status:', res.status);
+                
                 if (res.status === 401) {
+                    console.log('☁️ 401 Unauthorized - invalidating token');
                     handleTokenInvalidation();
                     return;
                 }
                 
-                if (!res.ok) throw new Error('Failed to save');
+                if (!res.ok) {
+                    const errorText = await res.text();
+                    console.error('☁️ Save failed:', res.status, errorText);
+                    throw new Error('Failed to save: ' + res.status);
+                }
                 
                 const gist = await res.json();
+                console.log('☁️ Gist saved successfully! ID:', gist.id);
                 
                 // Store the cloud ID in the profile for future updates
                 profile.cloudId = gist.id;
@@ -5557,7 +5577,7 @@
                 showToast(`Profile "${profile.name}" saved to cloud! ☁️`);
                 
             } catch (e) {
-                console.error('Cloud save error:', e);
+                console.error('☁️ Cloud save error:', e);
                 updateCloudSyncStatus('error');
                 showToast(`Profile saved locally (cloud sync failed)`);
             }
@@ -5565,6 +5585,10 @@
 
         // Sync all profiles to cloud (for existing profiles without cloudId)
         async function syncAllProfilesToCloud() {
+            console.log('☁️ syncAllProfilesToCloud called');
+            console.log('☁️ cloudToken exists:', !!cloudToken);
+            console.log('☁️ profiles count:', profiles.length);
+            
             if (!cloudToken) {
                 showToast('Please sign in with GitHub first');
                 return;
@@ -5583,11 +5607,13 @@
             
             // Sync profiles one at a time to avoid rate limits
             for (const profile of profiles) {
+                console.log('☁️ Syncing profile:', profile.name);
                 try {
                     await saveProfileToCloudSync(profile);
+                    console.log('☁️ Successfully synced:', profile.name, 'cloudId:', profile.cloudId);
                     successCount++;
                 } catch (e) {
-                    console.error(`Failed to sync "${profile.name}":`, e);
+                    console.error(`☁️ Failed to sync "${profile.name}":`, e);
                     errorCount++;
                 }
                 // Small delay to avoid rate limiting
@@ -5608,6 +5634,7 @@
         
         // Sync version that returns promise (for syncAll)
         async function saveProfileToCloudSync(profile) {
+            console.log('☁️ saveProfileToCloudSync called for:', profile.name);
             if (tokenInvalidated) throw new Error('Token invalidated');
             
             const gistData = {
@@ -5626,6 +5653,7 @@
             let res;
             if (profile.cloudId) {
                 // Update existing gist
+                console.log('☁️ Updating existing gist:', profile.cloudId);
                 res = await fetch('https://api.github.com/gists/' + profile.cloudId, {
                     method: 'PATCH',
                     headers: {
@@ -5636,6 +5664,7 @@
                 });
             } else {
                 // Create new gist
+                console.log('☁️ Creating new gist for:', profile.name);
                 res = await fetch('https://api.github.com/gists', {
                     method: 'POST',
                     headers: {
@@ -5646,14 +5675,21 @@
                 });
             }
             
+            console.log('☁️ Response status:', res.status);
+            
             if (res.status === 401) {
                 handleTokenInvalidation();
                 throw new Error('Token expired');
             }
             
-            if (!res.ok) throw new Error('Failed to save');
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.error('☁️ Sync failed:', res.status, errorText);
+                throw new Error('Failed to save: ' + res.status);
+            }
             
             const gist = await res.json();
+            console.log('☁️ Gist created/updated! ID:', gist.id);
             profile.cloudId = gist.id; // Store cloud ID for future updates
         }
 
@@ -6158,6 +6194,8 @@
             }
 
             updateSettingsFromForm();
+            console.log('💾 saveAsProfile called for:', name);
+            console.log('💾 cloudToken exists:', !!cloudToken);
             console.log('💾 Saving new profile with backgroundImageUrl:', settings.backgroundImageUrl);
             
             const profile = {
