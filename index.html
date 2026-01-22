@@ -1231,14 +1231,21 @@
         }
         .profile-item {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
+            flex-direction: column;
+            padding: 0;
             background: var(--admin-bg);
             border-radius: 8px;
             border: 1px solid var(--admin-border);
             cursor: pointer;
             transition: all 0.2s;
+            overflow: hidden;
+        }
+        .profile-item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            width: 100%;
         }
         .profile-item:hover {
             border-color: var(--admin-primary);
@@ -1261,6 +1268,89 @@
         .profile-btn:hover { background: var(--admin-border); color: var(--admin-text); }
         .profile-btn.delete:hover { background: #fee2e2; color: #ef4444; }
         .profile-btn svg { width: 16px; height: 16px; fill: currentColor; }
+        
+        /* Expandable D365 Connection Section */
+        .profile-embed-section {
+            display: none;
+            padding: 0 16px 16px 16px;
+            border-top: 1px solid var(--admin-border);
+            background: #f8fafc;
+        }
+        .profile-item.active .profile-embed-section {
+            display: block;
+        }
+        .profile-embed-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--admin-text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 12px 0 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .profile-embed-label svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--admin-primary);
+        }
+        .profile-embed-code {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px 12px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 11px;
+            line-height: 1.5;
+            border: 1px solid var(--admin-border);
+            border-radius: 6px;
+            background: white;
+            color: var(--admin-text);
+            resize: vertical;
+        }
+        .profile-embed-code:focus {
+            outline: none;
+            border-color: var(--admin-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        .profile-embed-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .profile-embed-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s;
+        }
+        .profile-embed-btn.primary {
+            background: var(--admin-primary);
+            color: white;
+            border: none;
+        }
+        .profile-embed-btn.primary:hover {
+            background: #4f46e5;
+        }
+        .profile-embed-btn.secondary {
+            background: white;
+            color: var(--admin-text);
+            border: 1px solid var(--admin-border);
+        }
+        .profile-embed-btn.secondary:hover {
+            background: var(--admin-bg);
+            border-color: var(--admin-text-light);
+        }
+        .profile-embed-btn svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
 
         .new-profile-row {
             display: flex;
@@ -6958,30 +7048,142 @@
                 } catch (e) {
                     host = 'Invalid org URL';
                 }
+                
+                // Get the embed code from the profile settings
+                const embedCode = p.settings?.lcwEmbedCode || '';
+                const hasEmbedCode = embedCode.trim().length > 0;
 
                 return `
                 <div class="profile-item ${p.id === activeProfileId ? 'active' : ''}" onclick="loadProfile('${p.id}')">
-                    <div class="profile-info">
-                        <div class="profile-name">${escapeHtml(p.name)}</div>
-                        <div class="profile-desc">${host}</div>
+                    <div class="profile-item-header">
+                        <div class="profile-info">
+                            <div class="profile-name">${escapeHtml(p.name)}</div>
+                            <div class="profile-desc">${host}</div>
+                        </div>
+                        <div class="profile-actions">
+                            <button class="profile-btn" onclick="event.stopPropagation(); renameProfile('${p.id}')" title="Rename profile">
+                                <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                            </button>
+                            <button class="profile-btn" onclick="event.stopPropagation(); updateProfile('${p.id}')" title="Update with current settings">
+                                <svg viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+                            </button>
+                            <button class="profile-btn" onclick="event.stopPropagation(); showCopyToRoomModal('${p.id}')" title="Copy to Room" ${savedRooms.length === 0 ? 'disabled style="opacity: 0.4; cursor: not-allowed;"' : ''}>
+                                <img src="https://github.com/microsoft/fluentui-system-icons/raw/main/assets/Breakout%20Room/SVG/ic_fluent_breakout_room_32_regular.svg?raw=true" alt="Copy to Room" style="width: 16px; height: 16px; opacity: 0.7;">
+                            </button>
+                            <button class="profile-btn delete" onclick="event.stopPropagation(); deleteProfile('${p.id}')" title="Delete profile">
+                                <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                            </button>
+                        </div>
                     </div>
-                    <div class="profile-actions">
-                        <button class="profile-btn" onclick="event.stopPropagation(); renameProfile('${p.id}')" title="Rename profile">
-                            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-                        </button>
-                        <button class="profile-btn" onclick="event.stopPropagation(); updateProfile('${p.id}')" title="Update with current settings">
-                            <svg viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
-                        </button>
-                        <button class="profile-btn" onclick="event.stopPropagation(); showCopyToRoomModal('${p.id}')" title="Copy to Room" ${savedRooms.length === 0 ? 'disabled style="opacity: 0.4; cursor: not-allowed;"' : ''}>
-                            <img src="https://github.com/microsoft/fluentui-system-icons/raw/main/assets/Breakout%20Room/SVG/ic_fluent_breakout_room_32_regular.svg?raw=true" alt="Copy to Room" style="width: 16px; height: 16px; opacity: 0.7;">
-                        </button>
-                        <button class="profile-btn delete" onclick="event.stopPropagation(); deleteProfile('${p.id}')" title="Delete profile">
-                            <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-                        </button>
+                    <div class="profile-embed-section">
+                        <div class="profile-embed-label">
+                            <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+                            D365 LCW Embed Code
+                        </div>
+                        <textarea class="profile-embed-code" 
+                            id="profileEmbedCode_${p.id}" 
+                            onclick="event.stopPropagation()" 
+                            onchange="updateProfileEmbedCode('${p.id}', this.value)"
+                            placeholder="Paste your D365 Omnichannel LCW embed code here...">${escapeHtml(embedCode)}</textarea>
+                        <div class="profile-embed-actions">
+                            <button class="profile-embed-btn secondary" onclick="event.stopPropagation(); copyProfileEmbedCode('${p.id}')" ${!hasEmbedCode ? 'disabled style="opacity: 0.5;"' : ''}>
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                                Copy Code
+                            </button>
+                            <button class="profile-embed-btn primary" onclick="event.stopPropagation(); parseProfileEmbedCode('${p.id}')">
+                                <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                                Apply to Settings
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
             }).join('');
+        }
+        
+        // Helper functions for profile embed code
+        function updateProfileEmbedCode(profileId, newCode) {
+            const profile = profiles.find(p => p.id === profileId);
+            if (profile) {
+                profile.settings.lcwEmbedCode = newCode;
+                saveProfiles();
+                // Re-render to update button states
+                renderProfiles();
+            }
+        }
+        
+        function copyProfileEmbedCode(profileId) {
+            const profile = profiles.find(p => p.id === profileId);
+            if (profile && profile.settings.lcwEmbedCode) {
+                navigator.clipboard.writeText(profile.settings.lcwEmbedCode).then(() => {
+                    showToast('Embed code copied to clipboard!');
+                });
+            }
+        }
+        
+        function parseProfileEmbedCode(profileId) {
+            const profile = profiles.find(p => p.id === profileId);
+            if (!profile) return;
+            
+            const embedCode = profile.settings.lcwEmbedCode || '';
+            if (!embedCode.trim()) {
+                showToast('No embed code to parse. Paste code first.', 'warning');
+                return;
+            }
+            
+            // Parse the embed code to extract orgId, orgUrl, widgetId
+            const parsed = parseLcwEmbedCode(embedCode);
+            
+            if (parsed.orgId || parsed.orgUrl || parsed.widgetId) {
+                // Update profile settings
+                if (parsed.orgId) profile.settings.orgId = parsed.orgId;
+                if (parsed.orgUrl) profile.settings.orgUrl = parsed.orgUrl;
+                if (parsed.widgetId) profile.settings.widgetId = parsed.widgetId;
+                
+                saveProfiles();
+                
+                // If this is the active profile, also update the current form
+                if (profileId === activeProfileId) {
+                    if (parsed.orgId) document.getElementById('orgId').value = parsed.orgId;
+                    if (parsed.orgUrl) document.getElementById('orgUrl').value = parsed.orgUrl;
+                    if (parsed.widgetId) document.getElementById('widgetId').value = parsed.widgetId;
+                    updateSettingsFromForm();
+                }
+                
+                renderProfiles();
+                showToast('D365 settings extracted and applied!');
+            } else {
+                showToast('Could not parse embed code. Check format.', 'warning');
+            }
+        }
+        
+        // Parse LCW embed code to extract connection details (handles both data-* and JSON formats)
+        function parseLcwEmbedCode(code) {
+            const result = { orgId: '', orgUrl: '', widgetId: '' };
+            
+            // Try data-* attribute format first (standard D365 embed code)
+            const appIdMatch = code.match(/data-app-id\s*=\s*["']([^"']+)["']/i);
+            if (appIdMatch) result.widgetId = appIdMatch[1];
+            
+            const orgIdDataMatch = code.match(/data-org-id\s*=\s*["']([^"']+)["']/i);
+            if (orgIdDataMatch) result.orgId = orgIdDataMatch[1];
+            
+            const orgUrlDataMatch = code.match(/data-org-url\s*=\s*["']([^"']+)["']/i);
+            if (orgUrlDataMatch) result.orgUrl = orgUrlDataMatch[1];
+            
+            // If data-* format didn't work, try JSON config format
+            if (!result.orgId && !result.orgUrl && !result.widgetId) {
+                const orgIdMatch = code.match(/["']?orgId["']?\s*[:=]\s*["']([^"']+)["']/i);
+                if (orgIdMatch) result.orgId = orgIdMatch[1];
+                
+                const orgUrlMatch = code.match(/["']?orgUrl["']?\s*[:=]\s*["']([^"']+)["']/i);
+                if (orgUrlMatch) result.orgUrl = orgUrlMatch[1];
+                
+                const widgetIdMatch = code.match(/["']?(?:widgetId|appId)["']?\s*[:=]\s*["']([^"']+)["']/i);
+                if (widgetIdMatch) result.widgetId = widgetIdMatch[1];
+            }
+            
+            return result;
         }
         
         // Show modal to copy a personal profile to a room
