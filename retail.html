@@ -1594,42 +1594,101 @@
             }
             
             if (!config) {
-                // Try to load from localStorage (same as live.html)
-                const savedSettings = localStorage.getItem('d365_chat_studio_settings');
+                // Try to load from localStorage (same key as index.html saves to)
+                const savedSettings = localStorage.getItem('chatWidgetSettings');
                 if (savedSettings) {
                     try {
                         config = JSON.parse(savedSettings);
+                        console.log('✅ Loaded widget config from localStorage:', {
+                            widgetId: config.widgetId,
+                            orgId: config.orgId,
+                            orgUrl: config.orgUrl
+                        });
                     } catch (e) {
                         console.error('Failed to parse saved settings:', e);
                     }
                 }
             }
 
-            if (config && config.widgetId && config.orgId && config.orgUrl) {
-                // Show loading indicator
-                const loadingDiv = document.createElement('div');
-                loadingDiv.className = 'widget-loading';
-                loadingDiv.innerHTML = '<div class="spinner"></div><span>Loading chat widget...</span>';
-                document.body.appendChild(loadingDiv);
-
-                // Load the widget
-                const script = document.createElement('script');
-                script.src = 'src/chat-widget.js';
-                script.onload = function() {
-                    if (window.D365ChatWidget) {
-                        window.D365ChatWidget.init({
-                            ...config,
-                            container: '#widget-container'
+            if (config) {
+                // Check for LCW embed code (standard D365 widget)
+                if (config.lcwCode) {
+                    console.log('✅ Loading standard D365 LCW widget from embed code');
+                    
+                    // Parse the lcwCode to extract the script attributes
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(config.lcwCode, 'text/html');
+                    const scriptTag = doc.querySelector('script[id="Microsoft_Omnichannel_LCWidget"]');
+                    
+                    if (scriptTag) {
+                        const lcwScript = document.createElement('script');
+                        lcwScript.id = 'Microsoft_Omnichannel_LCWidget';
+                        lcwScript.src = scriptTag.getAttribute('src');
+                        lcwScript.setAttribute('data-app-id', scriptTag.getAttribute('data-app-id'));
+                        lcwScript.setAttribute('data-org-id', scriptTag.getAttribute('data-org-id'));
+                        lcwScript.setAttribute('data-org-url', scriptTag.getAttribute('data-org-url'));
+                        document.head.appendChild(lcwScript);
+                        console.log('✅ D365 LCW widget script injected');
+                        
+                        // Set up context provider for authentication
+                        window.addEventListener("lcw:ready", function handleLivechatReadyEvent() {
+                            console.log('✅ LCW Ready on retail page');
+                            
+                            if (config.enableStandardAuth === true && typeof Microsoft !== 'undefined') {
+                                Microsoft.Omnichannel.LiveChatWidget.SDK.setContextProvider(function contextProvider() {
+                                    const authName = config.standardAuthName || 'Anonymous User';
+                                    const authEmail = config.standardAuthEmail || 'anonymous@example.com';
+                                    console.log('🔒 Using auto-authentication:', { authName, authEmail });
+                                    
+                                    return {
+                                        'emailaddress1': authEmail,
+                                        'Name': { value: authName, isDisplayable: true },
+                                        'Authenticated': { value: 'Authenticated', isDisplayable: true }
+                                    };
+                                });
+                            }
                         });
+                    } else {
+                        console.error('❌ Could not parse LCW code - invalid format');
                     }
-                    // Remove loading indicator after a delay
-                    setTimeout(() => {
-                        loadingDiv.remove();
-                    }, 2000);
-                };
-                document.body.appendChild(script);
+                } else if (config.widgetId && config.orgId && config.orgUrl) {
+                    // Fallback: Build LCW script from individual values
+                    console.log('✅ Building LCW widget from individual D365 values');
+                    
+                    const lcwScript = document.createElement('script');
+                    lcwScript.id = 'Microsoft_Omnichannel_LCWidget';
+                    lcwScript.src = 'https://oc-cdn-ocprod.azureedge.net/livechatwidget/scripts/LiveChatBootstrapper.js';
+                    lcwScript.setAttribute('data-app-id', config.widgetId);
+                    lcwScript.setAttribute('data-org-id', config.orgId);
+                    lcwScript.setAttribute('data-org-url', config.orgUrl);
+                    document.head.appendChild(lcwScript);
+                    console.log('✅ D365 LCW widget loaded with:', {
+                        appId: config.widgetId,
+                        orgId: config.orgId,
+                        orgUrl: config.orgUrl
+                    });
+                    
+                    // Set up context provider for authentication
+                    window.addEventListener("lcw:ready", function handleLivechatReadyEvent() {
+                        console.log('✅ LCW Ready on retail page');
+                        
+                        if (config.enableStandardAuth === true && typeof Microsoft !== 'undefined') {
+                            Microsoft.Omnichannel.LiveChatWidget.SDK.setContextProvider(function contextProvider() {
+                                const authName = config.standardAuthName || 'Anonymous User';
+                                const authEmail = config.standardAuthEmail || 'anonymous@example.com';
+                                return {
+                                    'emailaddress1': authEmail,
+                                    'Name': { value: authName, isDisplayable: true },
+                                    'Authenticated': { value: 'Authenticated', isDisplayable: true }
+                                };
+                            });
+                        }
+                    });
+                } else {
+                    console.warn('⚠️ No valid widget configuration - need lcwCode OR (widgetId + orgId + orgUrl)');
+                }
             } else {
-                console.log('No valid widget configuration found. Configure in Chat Widget Studio first.');
+                console.log('ℹ️ No widget configuration found. Configure in Chat Widget Studio first and save.');
             }
         }
 
