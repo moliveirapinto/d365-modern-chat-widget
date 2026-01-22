@@ -2504,6 +2504,158 @@
             color: white;
         }
 
+        /* Professional Confirmation Modal */
+        .confirm-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10002;
+            animation: confirmFadeIn 0.2s ease;
+        }
+        .confirm-modal-overlay.show { display: flex; }
+        @keyframes confirmFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes confirmSlideIn {
+            from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .confirm-modal {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: confirmSlideIn 0.25s ease;
+        }
+        .confirm-modal-header {
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .confirm-modal-header.danger {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border-bottom: 1px solid #fecaca;
+        }
+        .confirm-modal-header.warning {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border-bottom: 1px solid #fde68a;
+        }
+        .confirm-modal-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .confirm-modal-header.danger .confirm-modal-icon {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+        .confirm-modal-header.warning .confirm-modal-icon {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+        .confirm-modal-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+        .confirm-modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+        }
+        .confirm-modal-body {
+            padding: 24px;
+        }
+        .confirm-modal-message {
+            font-size: 14px;
+            color: #4b5563;
+            line-height: 1.6;
+            margin: 0;
+        }
+        .confirm-modal-item-name {
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .confirm-modal-item-name svg {
+            width: 20px;
+            height: 20px;
+            fill: #6b7280;
+            flex-shrink: 0;
+        }
+        .confirm-modal-item-name span {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            word-break: break-all;
+        }
+        .confirm-modal-footer {
+            padding: 16px 24px;
+            background: #f9fafb;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        .confirm-modal-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: none;
+        }
+        .confirm-modal-btn.cancel {
+            background: white;
+            border: 1px solid #d1d5db;
+            color: #374151;
+        }
+        .confirm-modal-btn.cancel:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+        .confirm-modal-btn.danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        }
+        .confirm-modal-btn.danger:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+            transform: translateY(-1px);
+        }
+        .confirm-modal-btn.warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+        }
+        .confirm-modal-btn.warning:hover {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+            transform: translateY(-1px);
+        }
+
     </style>
 </head>
 <body>
@@ -2560,7 +2712,7 @@
     <div id="createRoomModal" class="save-modal-overlay" onclick="if(event.target === this) closeCreateRoomModal()">
         <div class="save-modal team-modal-content" style="max-width: 480px;">
             <h3 style="display:flex;align-items:center;gap:8px;">
-                <span style="font-size: 24px;">🚀</span> Create Collaboration Room
+                <img src="https://github.com/microsoft/fluentui-system-icons/raw/main/assets/Breakout%20Room/SVG/ic_fluent_breakout_room_32_regular.svg?raw=true" alt="Room" style="width: 28px; height: 28px;"> Create Collaboration Room
             </h3>
             
             <!-- Friendly intro -->
@@ -2655,6 +2807,28 @@
                         Joining...
                     </span>
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Professional Confirmation Modal -->
+    <div id="studioConfirmModal" class="confirm-modal-overlay" onclick="if(event.target === this) closeConfirmModal()">
+        <div class="confirm-modal">
+            <div class="confirm-modal-header" id="confirmModalHeader">
+                <div class="confirm-modal-icon" id="confirmModalIcon">
+                    <!-- Icon inserted dynamically -->
+                </div>
+                <h3 class="confirm-modal-title" id="confirmModalTitle">Confirm Action</h3>
+            </div>
+            <div class="confirm-modal-body">
+                <p class="confirm-modal-message" id="confirmModalMessage">Are you sure you want to proceed?</p>
+                <div class="confirm-modal-item-name" id="confirmModalItemName" style="display: none;">
+                    <!-- Item info inserted dynamically -->
+                </div>
+            </div>
+            <div class="confirm-modal-footer">
+                <button class="confirm-modal-btn cancel" onclick="closeConfirmModal()">Cancel</button>
+                <button class="confirm-modal-btn" id="confirmModalAction">Confirm</button>
             </div>
         </div>
     </div>
@@ -4513,6 +4687,63 @@
             document.getElementById('joinRoomModal').classList.remove('show');
         }
         
+        // Professional Confirmation Modal functions
+        let confirmModalCallback = null;
+        
+        function showConfirmModal(options) {
+            const modal = document.getElementById('studioConfirmModal');
+            const header = document.getElementById('confirmModalHeader');
+            const icon = document.getElementById('confirmModalIcon');
+            const title = document.getElementById('confirmModalTitle');
+            const message = document.getElementById('confirmModalMessage');
+            const itemName = document.getElementById('confirmModalItemName');
+            const actionBtn = document.getElementById('confirmModalAction');
+            
+            // Set type (danger or warning)
+            const type = options.type || 'danger';
+            header.className = 'confirm-modal-header ' + type;
+            actionBtn.className = 'confirm-modal-btn ' + type;
+            
+            // Set icon based on type
+            if (type === 'danger') {
+                icon.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>';
+            } else {
+                icon.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
+            }
+            
+            // Set content
+            title.textContent = options.title || 'Confirm Action';
+            message.textContent = options.message || 'Are you sure you want to proceed?';
+            actionBtn.textContent = options.actionText || 'Delete';
+            
+            // Show item name if provided
+            if (options.itemName) {
+                const itemIcon = options.itemIcon || '<svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6z"/></svg>';
+                itemName.innerHTML = itemIcon + '<span>' + options.itemName + '</span>';
+                itemName.style.display = 'flex';
+            } else {
+                itemName.style.display = 'none';
+            }
+            
+            // Store callback
+            confirmModalCallback = options.onConfirm;
+            
+            // Set up action button
+            actionBtn.onclick = function() {
+                closeConfirmModal();
+                if (confirmModalCallback) {
+                    confirmModalCallback();
+                }
+            };
+            
+            modal.classList.add('show');
+        }
+        
+        function closeConfirmModal() {
+            document.getElementById('studioConfirmModal').classList.remove('show');
+            confirmModalCallback = null;
+        }
+        
         // Create a new collaboration room
         async function createCollabRoom() {
             const btn = document.getElementById('createRoomBtn');
@@ -4724,25 +4955,35 @@
             const room = savedRooms.find(r => r.code === code);
             if (!room) return;
             
-            if (confirm(`Remove room ${code} from your list?`)) {
-                savedRooms = savedRooms.filter(r => r.code !== code);
-                localStorage.setItem('d365_collab_rooms', JSON.stringify(savedRooms));
-                
-                // If this was the active room, clear it
-                if (activeRoomCode === code) {
-                    activeRoomCode = savedRooms.length > 0 ? savedRooms[0].code : null;
-                    activeRoomWidgetId = null;
-                    localStorage.setItem('d365_collab_active_room', activeRoomCode || '');
-                    localStorage.removeItem('d365_collab_active_widget');
+            const roomDisplayName = room.name || `Room ${code}`;
+            
+            showConfirmModal({
+                type: 'danger',
+                title: 'Remove Room?',
+                message: 'This will remove the room from your list. You can always rejoin using the room code.',
+                itemName: roomDisplayName,
+                itemIcon: '<svg viewBox="0 0 24 24" style="fill: #6b7280;"><path d="M12 3L4 9v12h16V9l-8-6zm0 2.84L18 10v9H6v-9l6-4.16zM11 13h2v4h-2v-4zm0-4h2v2h-2V9z"/></svg>',
+                actionText: 'Remove Room',
+                onConfirm: function() {
+                    savedRooms = savedRooms.filter(r => r.code !== code);
+                    localStorage.setItem('d365_collab_rooms', JSON.stringify(savedRooms));
+                    
+                    // If this was the active room, clear it
+                    if (activeRoomCode === code) {
+                        activeRoomCode = savedRooms.length > 0 ? savedRooms[0].code : null;
+                        activeRoomWidgetId = null;
+                        localStorage.setItem('d365_collab_active_room', activeRoomCode || '');
+                        localStorage.removeItem('d365_collab_active_widget');
+                    }
+                    
+                    // Clean up expanded state
+                    delete expandedRooms[code];
+                    localStorage.setItem('d365_expanded_rooms', JSON.stringify(expandedRooms));
+                    
+                    renderRoomList();
+                    showToast(`Removed room ${code}`);
                 }
-                
-                // Clean up expanded state
-                delete expandedRooms[code];
-                localStorage.setItem('d365_expanded_rooms', JSON.stringify(expandedRooms));
-                
-                renderRoomList();
-                showToast(`Removed room ${code}`);
-            }
+            });
         }
         
         // Switch to a different room (now just toggles expand)
@@ -4885,9 +5126,9 @@
                                     <span class="profile-item-name" style="font-weight: 600; color: #1e293b;">
                                         ${roomDisplayName}
                                     </span>
-                                    <button onclick="event.stopPropagation(); copyRoomCode('${room.code}')" title="Copy room code ${room.code}" style="background: #f1f5f9; border: 1px solid #e2e8f0; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-family: monospace; font-size: 11px; color: #64748b; display: flex; align-items: center; gap: 4px;">
+                                    <button onclick="event.stopPropagation(); copyRoomCode('${room.code}')" title="Click to copy room code" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-family: monospace; font-size: 12px; font-weight: 600; color: white; display: flex; align-items: center; gap: 6px; letter-spacing: 1px; box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3); transition: all 0.15s;">
                                         <span>${room.code}</span>
-                                        <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:#64748b;"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                                        <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:white;"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
                                     </button>
                                     ${room.isOwner ? '<span style="font-size: 10px; background: #dbeafe; color: #1e40af; padding: 2px 6px; border-radius: 4px;">Owner</span>' : ''}
                                     <span style="font-size: 11px; color: #64748b; margin-left: auto;">${widgets.length} widget${widgets.length !== 1 ? 's' : ''}</span>
@@ -5102,34 +5343,45 @@
         
         // Delete a widget from a room
         async function deleteRoomWidget(roomCode, widgetId) {
-            if (!confirm('Delete this widget from the room? This cannot be undone.')) {
-                return;
-            }
+            // Find the widget name for the modal
+            const room = savedRooms.find(r => r.code === roomCode);
+            const widget = room?.widgets?.find(w => w.id === widgetId);
+            const widgetName = widget?.name || 'this widget';
             
-            try {
-                const response = await fetch(`${COLLAB_API_URL}/room/${roomCode}/widgets/${widgetId}?updaterName=${encodeURIComponent(collabUserName || 'Anonymous')}`, {
-                    method: 'DELETE'
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Failed to delete widget');
+            showConfirmModal({
+                type: 'danger',
+                title: 'Delete Widget from Room?',
+                message: 'This will permanently remove this widget from the collaboration room. Other team members will no longer be able to access it.',
+                itemName: widgetName,
+                itemIcon: '<svg viewBox="0 0 24 24" style="fill: #6b7280;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>',
+                actionText: 'Delete Widget',
+                onConfirm: async function() {
+                    try {
+                        const response = await fetch(`${COLLAB_API_URL}/room/${roomCode}/widgets/${widgetId}?updaterName=${encodeURIComponent(collabUserName || 'Anonymous')}`, {
+                            method: 'DELETE'
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error('Failed to delete widget');
+                        }
+                        
+                        // Clear active widget if it was the deleted one
+                        if (activeRoomWidgetId === widgetId) {
+                            activeRoomWidgetId = null;
+                            localStorage.removeItem('d365_collab_active_widget');
+                        }
+                        
+                        // Refresh room data
+                        await refreshRoomWidgets(roomCode);
+                        
+                        showToast('✅ Widget deleted from room');
+                        
+                    } catch (error) {
+                        console.error('Error deleting widget:', error);
+                        showToast('Failed to delete widget: ' + error.message, 'error');
+                    }
                 }
-                
-                // Clear active widget if it was the deleted one
-                if (activeRoomWidgetId === widgetId) {
-                    activeRoomWidgetId = null;
-                    localStorage.removeItem('d365_collab_active_widget');
-                }
-                
-                // Refresh room data
-                await refreshRoomWidgets(roomCode);
-                
-                showToast('✅ Widget deleted from room');
-                
-            } catch (error) {
-                console.error('Error deleting widget:', error);
-                showToast('Failed to delete widget: ' + error.message, 'error');
-            }
+            });
         }
         
         // Show modal to add widget to room
@@ -5891,42 +6143,50 @@
         }
 
         async function deleteWidget(gistId, name) {
-            if (!confirm('Delete widget "' + name + '"?')) return;
-            
-            try {
-                const res = await fetch('https://api.github.com/gists/' + gistId, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': 'token ' + cloudToken }
-                });
-                
-                if (res.status === 401) {
-                    handleTokenInvalidation();
-                    return;
-                }
-                
-                if (!res.ok && res.status !== 204) {
-                    throw new Error('Delete failed: ' + res.status);
-                }
-                
-                // Also remove cloudId from any local profile that was linked to this gist
-                profiles.forEach(p => {
-                    if (p.cloudId === gistId) {
-                        delete p.cloudId;
+            showConfirmModal({
+                type: 'danger',
+                title: 'Delete Cloud Widget?',
+                message: 'This will permanently delete this widget from your GitHub Gists. Any local profile linked to it will be unlinked but preserved locally.',
+                itemName: name,
+                itemIcon: '<svg viewBox="0 0 24 24" style="fill: #6b7280;"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>',
+                actionText: 'Delete Widget',
+                onConfirm: async function() {
+                    try {
+                        const res = await fetch('https://api.github.com/gists/' + gistId, {
+                            method: 'DELETE',
+                            headers: { 'Authorization': 'token ' + cloudToken }
+                        });
+                        
+                        if (res.status === 401) {
+                            handleTokenInvalidation();
+                            return;
+                        }
+                        
+                        if (!res.ok && res.status !== 204) {
+                            throw new Error('Delete failed: ' + res.status);
+                        }
+                        
+                        // Also remove cloudId from any local profile that was linked to this gist
+                        profiles.forEach(p => {
+                            if (p.cloudId === gistId) {
+                                delete p.cloudId;
+                            }
+                        });
+                        saveProfiles();
+                        
+                        showToast('Widget deleted');
+                        loadSavedWidgets();
+                        
+                        if (currentLoadedWidgetId === gistId) {
+                            currentLoadedWidgetId = null;
+                        }
+                        
+                    } catch (e) {
+                        console.error('Delete error:', e);
+                        showToast('Failed to delete widget');
                     }
-                });
-                saveProfiles();
-                
-                showToast('Widget deleted');
-                loadSavedWidgets();
-                
-                if (currentLoadedWidgetId === gistId) {
-                    currentLoadedWidgetId = null;
                 }
-                
-            } catch (e) {
-                console.error('Delete error:', e);
-                showToast('Failed to delete widget');
-            }
+            });
         }
 
         // Save to Cloud button
@@ -7016,33 +7276,41 @@
             const profile = profiles.find(p => p.id === id);
             if (!profile) return;
 
-            if (confirm(`Delete profile "${profile.name}"?`)) {
-                // If profile has a cloudId, delete from cloud first
-                if (profile.cloudId && cloudToken && !tokenInvalidated) {
-                    deleteProfileFromCloud(profile.cloudId, profile.name);
+            showConfirmModal({
+                type: 'danger',
+                title: 'Delete Profile?',
+                message: 'This will permanently delete this widget profile. If synced to the cloud, it will also be removed from your GitHub Gists.',
+                itemName: profile.name,
+                itemIcon: '<svg viewBox="0 0 24 24" style="fill: #6b7280;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm3-8h-2v3h-2v-3H9V7h2V4h2v3h2v2z"/></svg>',
+                actionText: 'Delete Profile',
+                onConfirm: function() {
+                    // If profile has a cloudId, delete from cloud first
+                    if (profile.cloudId && cloudToken && !tokenInvalidated) {
+                        deleteProfileFromCloud(profile.cloudId, profile.name);
+                    }
+                    
+                    profiles = profiles.filter(p => p.id !== id);
+                    if (activeProfileId === id) {
+                        activeProfileId = null;
+                        localStorage.removeItem('chatWidgetActiveProfile');
+                    }
+                    
+                    // Save profiles without triggering dirty state (deletion is already synced)
+                    const wasInitializing = isInitializing;
+                    isInitializing = true; // Prevent markDirty from being called
+                    saveProfiles();
+                    isInitializing = wasInitializing;
+                    
+                    renderProfiles();
+                    showToast('Profile deleted');
+                    
+                    // Update status to synced (deletion was pushed to cloud)
+                    if (cloudToken && !tokenInvalidated) {
+                        updateCloudSyncStatus('synced');
+                        isDirty = false;
+                    }
                 }
-                
-                profiles = profiles.filter(p => p.id !== id);
-                if (activeProfileId === id) {
-                    activeProfileId = null;
-                    localStorage.removeItem('chatWidgetActiveProfile');
-                }
-                
-                // Save profiles without triggering dirty state (deletion is already synced)
-                const wasInitializing = isInitializing;
-                isInitializing = true; // Prevent markDirty from being called
-                saveProfiles();
-                isInitializing = wasInitializing;
-                
-                renderProfiles();
-                showToast('Profile deleted');
-                
-                // Update status to synced (deletion was pushed to cloud)
-                if (cloudToken && !tokenInvalidated) {
-                    updateCloudSyncStatus('synced');
-                    isDirty = false;
-                }
-            }
+            });
         }
         
         // Delete a profile's Gist from the cloud
