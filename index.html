@@ -4970,7 +4970,7 @@
             }
         }
 
-        function showLoggedInUI() {
+        async function showLoggedInUI() {
             document.getElementById('loginOverlay').classList.add('hidden');
             document.getElementById('userBar').classList.add('show');
             document.getElementById('userName').textContent = cloudUser.name || cloudUser.login;
@@ -4987,8 +4987,192 @@
             
             loadSavedWidgets();
             
+            // CRITICAL: Sync profiles from cloud after login
+            // This restores user's saved widgets when logging in on a new device
+            await syncProfilesFromCloud();
+            
             // Initialize team mode
             initializeTeamMode();
+        }
+        
+        // Sync profiles from cloud (GitHub Gists) after login
+        // This is critical for restoring user's widgets on new devices/browsers
+        async function syncProfilesFromCloud() {
+            if (!cloudToken || tokenInvalidated || !cloudUser) return;
+            
+            try {
+                console.log('☁️ Syncing profiles from cloud for user:', cloudUser.login);
+                
+                // Ensure profiles is an array
+                if (!Array.isArray(profiles)) {
+                    profiles = [];
+                }
+                
+                // Check if the current user is different from the last logged-in user
+                // This handles the case where someone logs out and logs in with a different account
+                const lastUserId = localStorage.getItem('d365_last_user_id');
+                const currentUserId = String(cloudUser.id);
+                
+                if (lastUserId && lastUserId !== currentUserId) {
+                    console.log('☁️ Different user detected! Previous:', lastUserId, 'Current:', currentUserId);
+                    // Clear profiles that belong to the previous user (those with cloudId)
+                    // Keep any profiles without cloudId (local-only profiles)
+                    const localOnlyProfiles = profiles.filter(p => p && !p.cloudId);
+                    profiles = localOnlyProfiles;
+                    saveProfiles();
+                    console.log('☁️ Cleared previous user profiles, kept', localOnlyProfiles.length, 'local-only profiles');
+                }
+                
+                // Save current user ID for future comparison
+                localStorage.setItem('d365_last_user_id', currentUserId);
+                
+                const res = await fetch('https://api.github.com/gists', {
+                    headers: { 'Authorization': 'token ' + cloudToken }
+                });
+                
+                if (res.status === 401) {
+                    handleTokenInvalidation();
+                    return;
+                }
+                
+                if (!res.ok) throw new Error('Failed to fetch gists');
+                
+                const gists = await res.json();
+                const widgetGists = gists.filter(g => g.description && g.description.startsWith(GIST_PREFIX));
+                
+                if (widgetGists.length === 0) {
+                    console.log('☁️ No cloud profiles found');
+                    return;
+                }
+                
+                console.log(`☁️ Found ${widgetGists.length} cloud profiles`);
+                
+                // Ensure profiles array exists
+                if (!Array.isArray(profiles)) {
+                    profiles = [];
+                }
+                
+                let importedCount = 0;
+                let updatedCount = 0;
+                
+                // Build a map of existing profiles by cloudId for quick lookup
+                const localProfilesByCloudId = {};
+                profiles.forEach(p => {
+                    if (p && p.cloudId) {
+                        localProfilesByCloudId[p.cloudId] = p;
+                    }
+                });
+                
+                // Process each cloud gist
+                for (const gist of widgetGists) {
+                    try {
+                        // Check if we already have this profile linked by cloudId
+                        const existingProfile = localProfilesByCloudId[gist.id];
+                        
+                        if (existingProfile) {
+                            // Profile already linked - check if cloud version is newer
+                            const cloudUpdatedAt = new Date(gist.updated_at);
+                            const localUpdatedAt = existingProfile.updatedAt ? new Date(existingProfile.updatedAt) : new Date(0);
+                            
+                            if (cloudUpdatedAt > localUpdatedAt) {
+                                // Cloud is newer - fetch full config and update local
+                                const fullGist = await fetchGistConfig(gist.id);
+                                if (fullGist) {
+                                    existingProfile.settings = fullGist.config;
+                                    existingProfile.updatedAt = gist.updated_at;
+                                    updatedCount++;
+                                    console.log(`☁️ Updated profile "${existingProfile.name}" from cloud`);
+                                }
+                            }
+                        } else {
+                            // New profile from cloud - import it
+                            const fullGist = await fetchGistConfig(gist.id);
+                            if (fullGist) {
+                                const profileName = gist.description.replace(GIST_PREFIX, '');
+                                
+                                // Check if a profile with same name already exists (without cloudId link)
+                                const existingByName = profiles.find(p => p.name === profileName && !p.cloudId);
+                                
+                                if (existingByName) {
+                                    // Link existing profile to cloud and update settings
+                                    existingByName.cloudId = gist.id;
+                                    existingByName.settings = fullGist.config;
+                                    existingByName.updatedAt = gist.updated_at;
+                                    updatedCount++;
+                                    console.log(`☁️ Linked and updated existing profile "${profileName}" to cloud`);
+                                } else {
+                                    // Create new local profile from cloud
+                                    const newProfile = {
+                                        id: 'profile_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                                        name: profileName,
+                                        settings: fullGist.config,
+                                        cloudId: gist.id,
+                                        createdAt: gist.created_at,
+                                        updatedAt: gist.updated_at
+                                    };
+                                    profiles.push(newProfile);
+                                    importedCount++;
+                                    console.log(`☁️ Imported new profile "${profileName}" from cloud`);
+                                }
+                            }
+                        }
+                        
+                        // Small delay to avoid rate limiting
+                        await new Promise(r => setTimeout(r, 200));
+                        
+                    } catch (e) {
+                        console.error(`☁️ Error processing gist ${gist.id}:`, e);
+                    }
+                }
+                
+                // Save updated profiles to localStorage
+                if (importedCount > 0 || updatedCount > 0) {
+                    saveProfiles();
+                    renderProfiles();
+                    
+                    if (importedCount > 0 && updatedCount > 0) {
+                        showToast(`☁️ Restored ${importedCount} profiles, updated ${updatedCount} from cloud`);
+                    } else if (importedCount > 0) {
+                        showToast(`☁️ Restored ${importedCount} profile${importedCount > 1 ? 's' : ''} from cloud`);
+                    } else {
+                        showToast(`☁️ Updated ${updatedCount} profile${updatedCount > 1 ? 's' : ''} from cloud`);
+                    }
+                }
+                
+                console.log(`☁️ Cloud sync complete: ${importedCount} imported, ${updatedCount} updated`);
+                
+            } catch (e) {
+                console.error('☁️ Cloud sync error:', e);
+                // Don't show error toast - this is a background operation
+            }
+        }
+        
+        // Helper to fetch full gist config
+        async function fetchGistConfig(gistId) {
+            try {
+                const res = await fetch('https://api.github.com/gists/' + gistId, {
+                    headers: { 'Authorization': 'token ' + cloudToken }
+                });
+                
+                if (res.status === 401) {
+                    handleTokenInvalidation();
+                    return null;
+                }
+                
+                if (!res.ok) return null;
+                
+                const gist = await res.json();
+                
+                if (gist.files && gist.files['config.json']) {
+                    const config = JSON.parse(gist.files['config.json'].content);
+                    return { config };
+                }
+                
+                return null;
+            } catch (e) {
+                console.error('Error fetching gist config:', e);
+                return null;
+            }
         }
         
         // Initialize team mode after login
@@ -5026,6 +5210,8 @@
                     hasRepoScope = false;
                     localStorage.removeItem('d365_user');
                     localStorage.removeItem('d365_github_token');
+                    // Note: We intentionally keep d365_last_user_id so we can detect
+                    // if a different user logs in next time and clear their profiles
                     // Clear team data on logout
                     clearTeamRepoConfig();
                     document.getElementById('teamProfileList').innerHTML = '';
@@ -5158,12 +5344,48 @@
                 
                 if (gist.files['config.json']) {
                     const config = JSON.parse(gist.files['config.json'].content);
+                    const widgetName = gist.description.replace(GIST_PREFIX, '');
                     
                     // Load the config into the form
                     applyCloudConfig(config);
                     currentLoadedWidgetId = gistId;
                     
-                    showToast('Widget loaded: ' + gist.description.replace(GIST_PREFIX, ''));
+                    // Also ensure this widget is linked to a local profile
+                    // Check if profile with this cloudId already exists
+                    let linkedProfile = profiles.find(p => p.cloudId === gistId);
+                    
+                    if (!linkedProfile) {
+                        // Check if profile with same name exists (but no cloudId - not linked to another cloud widget)
+                        linkedProfile = profiles.find(p => p.name === widgetName && !p.cloudId);
+                        
+                        if (linkedProfile) {
+                            // Link existing profile to this cloud widget
+                            linkedProfile.cloudId = gistId;
+                            linkedProfile.settings = config;
+                            linkedProfile.updatedAt = gist.updated_at;
+                        } else {
+                            // Create new local profile linked to cloud
+                            linkedProfile = {
+                                id: 'profile_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                                name: widgetName,
+                                settings: config,
+                                cloudId: gistId,
+                                createdAt: gist.created_at,
+                                updatedAt: gist.updated_at
+                            };
+                            profiles.push(linkedProfile);
+                        }
+                        
+                        saveProfiles();
+                        renderProfiles();
+                    }
+                    
+                    // Set as active profile
+                    activeProfileId = linkedProfile.id;
+                    localStorage.setItem('chatWidgetActiveProfile', activeProfileId);
+                    renderProfiles();
+                    
+                    showToast('Widget loaded: ' + widgetName);
                 }
                 
                 document.getElementById('savedWidgetsMenu').classList.remove('show');
@@ -5803,10 +6025,27 @@
             const saved = localStorage.getItem('chatWidgetProfiles');
             console.log('📦 RAW localStorage data:', saved ? saved.substring(0, 200) + '...' : 'EMPTY');
             if (saved) {
-                profiles = JSON.parse(saved);
-                console.log('📦 Loaded profiles array. First profile gradientStart:', profiles[0]?.settings?.gradientStart);
+                try {
+                    const parsed = JSON.parse(saved);
+                    // Ensure profiles is always an array
+                    profiles = Array.isArray(parsed) ? parsed : [];
+                    console.log('📦 Loaded profiles array. Count:', profiles.length, 'First profile gradientStart:', profiles[0]?.settings?.gradientStart);
+                } catch (e) {
+                    console.error('📦 Error parsing profiles from localStorage:', e);
+                    profiles = [];
+                }
+            } else {
+                profiles = [];
             }
             activeProfileId = localStorage.getItem('chatWidgetActiveProfile');
+            
+            // Verify activeProfileId still exists in profiles
+            if (activeProfileId && !profiles.find(p => p.id === activeProfileId)) {
+                console.log('📦 Active profile not found, clearing activeProfileId');
+                activeProfileId = null;
+                localStorage.removeItem('chatWidgetActiveProfile');
+            }
+            
             renderProfiles();
         }
 

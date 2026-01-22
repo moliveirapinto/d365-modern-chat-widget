@@ -1,4 +1,4 @@
-# Contributing to D365 Modern Chat Widget
+I need# Contributing to D365 Modern Chat Widget
 
 ## ⚠️ CRITICAL: Feature Parity Rule
 
