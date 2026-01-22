@@ -1627,29 +1627,28 @@
                 console.log('🎛️ Widget mode:', widgetMode);
 
                 if (widgetMode === 'custom') {
-                    // Custom mode - need to load the full custom widget from live.html
-                    // For now, show a message that custom mode requires live.html
-                    console.log('ℹ️ Custom widget mode selected - loading custom widget iframe');
+                    // Custom mode - load live.html in embed mode (transparent background)
+                    console.log('ℹ️ Custom widget mode selected - loading custom widget in embed mode');
                     
-                    // Create an iframe to load live.html with the custom widget
+                    // Create an iframe to load live.html with embed=true for transparent background
                     const widgetFrame = document.createElement('iframe');
                     widgetFrame.id = 'custom-widget-frame';
-                    widgetFrame.src = 'live.html';
+                    widgetFrame.src = 'live.html?embed=true';
                     widgetFrame.style.cssText = `
                         position: fixed;
                         bottom: 0;
                         right: 0;
-                        width: 100%;
-                        height: 100%;
+                        width: 450px;
+                        height: 700px;
                         border: none;
                         z-index: 9999;
-                        pointer-events: none;
+                        background: transparent;
                     `;
+                    widgetFrame.setAttribute('allowtransparency', 'true');
                     document.body.appendChild(widgetFrame);
                     
-                    // Allow pointer events only on the widget area
                     widgetFrame.onload = function() {
-                        console.log('✅ Custom widget iframe loaded');
+                        console.log('✅ Custom widget iframe loaded in embed mode');
                     };
                     
                 } else if (widgetMode === 'standard') {

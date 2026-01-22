@@ -2117,10 +2117,20 @@
         console.log('%c🔄 live.html loaded on: ' + window.location.hostname, 'background: #333; color: #fff; padding: 2px 6px; border-radius: 3px;');
         trackEvent('load');
 
+        // Check for embed mode (when loaded in iframe on industry demo pages)
+        const urlParams = new URLSearchParams(window.location.search);
+        const embedMode = urlParams.get('embed') === 'true';
+        
+        if (embedMode) {
+            console.log('🖼️ Embed mode active - transparent background');
+            document.body.style.background = 'transparent';
+            document.body.style.overflow = 'visible';
+        }
+
         // Load background screenshot if configured
         const demoBackground = document.getElementById('demoBackground');
         
-        if (adminSettings?.backgroundImageUrl && adminSettings.backgroundImageUrl.trim()) {
+        if (!embedMode && adminSettings?.backgroundImageUrl && adminSettings.backgroundImageUrl.trim()) {
             let imageUrl = adminSettings.backgroundImageUrl.trim();
             console.log('Loading background screenshot:', imageUrl);
             
@@ -2131,6 +2141,9 @@
             
             demoBackground.style.backgroundImage = `url('${imageUrl}')`;
             demoBackground.classList.add('active');
+        } else if (embedMode) {
+            // Hide background in embed mode
+            demoBackground.style.display = 'none';
         }
 
         // ============ WIDGET MODE CHECK ============
