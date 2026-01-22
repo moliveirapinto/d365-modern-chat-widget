@@ -3234,15 +3234,10 @@
                     </div>
                     <div>
                         <h2>D365 Connection</h2>
-                        <p>Paste your Live Chat Widget code snippet</p>
+                        <p>Connection details from your active profile</p>
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="form-group">
-                        <label class="form-label">LCW Embed Code</label>
-                        <textarea class="form-input lcw-textarea" id="lcwCode" rows="4" placeholder="Paste your D365 Live Chat Widget script here...&#10;&#10;Example: <script id=&quot;Microsoft_Omnichannel_LCWidget&quot; src=&quot;...&quot; data-app-id=&quot;...&quot; data-org-id=&quot;...&quot; data-org-url=&quot;...&quot;></script>"></textarea>
-                        <p class="form-hint">Go to the CSW Admin → Select your Chat workstream → Copy Chat Widget Script</p>
-                    </div>
                     <div class="extracted-values" id="extractedValues" style="display: none;">
                         <div class="extracted-header">
                             <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#10b981;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
@@ -3263,6 +3258,13 @@
                             </div>
                         </div>
                     </div>
+                    <div id="noProfileSelectedHint" style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 14px; margin-bottom: 12px;">
+                        <p style="margin: 0; color: #0369a1; font-size: 13px; line-height: 1.5;">
+                            💡 <strong>Tip:</strong> Select a profile from "Widget Profiles" above to view and edit the D365 connection. The LCW embed code is stored with each profile.
+                        </p>
+                    </div>
+                    <!-- Hidden lcwCode for backwards compatibility -->
+                    <textarea id="lcwCode" style="display: none;"></textarea>
                     <div class="connection-status" id="connectionStatus">
                         <span class="status-dot" id="statusDot"></span>
                         <span class="status-text" id="statusText">Not configured</span>
@@ -7963,9 +7965,11 @@
         // ============ LCW CODE PARSING ============
         function parseLCWCode(code) {
             const extractedContainer = document.getElementById('extractedValues');
+            const noProfileHint = document.getElementById('noProfileSelectedHint');
             
             if (!code || !code.trim()) {
                 extractedContainer.style.display = 'none';
+                if (noProfileHint) noProfileHint.style.display = 'block';
                 settings.orgId = '';
                 settings.orgUrl = '';
                 settings.widgetId = '';
@@ -7994,15 +7998,19 @@
                 showExtractedValues(appId, orgId, orgUrl);
             } else {
                 extractedContainer.style.display = 'none';
+                if (noProfileHint) noProfileHint.style.display = 'block';
             }
         }
 
         function showExtractedValues(appId, orgId, orgUrl) {
             const extractedContainer = document.getElementById('extractedValues');
+            const noProfileHint = document.getElementById('noProfileSelectedHint');
             document.getElementById('extractedAppId').textContent = appId || '-';
             document.getElementById('extractedOrgId').textContent = orgId || '-';
             document.getElementById('extractedOrgUrl').textContent = orgUrl || '-';
             extractedContainer.style.display = 'block';
+            // Hide the hint when values are shown
+            if (noProfileHint) noProfileHint.style.display = 'none';
         }
 
         // ============ COLOR PALETTE GALLERY ============
