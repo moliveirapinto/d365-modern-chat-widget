@@ -5467,6 +5467,9 @@
                 });
                 
                 // Process each cloud gist
+                // Track gists that return 404 (actually deleted but still in list cache)
+                const deletedGistIds = new Set();
+                
                 for (const gist of widgetGists) {
                     try {
                         // Check if we already have this profile linked by cloudId
@@ -5479,9 +5482,13 @@
                             
                             if (cloudUpdatedAt > localUpdatedAt) {
                                 // Cloud is newer - fetch full config and update local
-                                const fullGist = await fetchGistConfig(gist.id);
-                                if (fullGist) {
-                                    existingProfile.settings = fullGist.config;
+                                const fetchResult = await fetchGistConfig(gist.id);
+                                if (fetchResult === 'deleted') {
+                                    // Gist was deleted - mark for removal
+                                    deletedGistIds.add(gist.id);
+                                    console.log(`☁️ Gist ${gist.id} was deleted (404), marking for removal`);
+                                } else if (fetchResult) {
+                                    existingProfile.settings = fetchResult.config;
                                     existingProfile.updatedAt = gist.updated_at;
                                     updatedCount++;
                                     console.log(`☁️ Updated profile "${existingProfile.name}" from cloud`);
@@ -5489,8 +5496,12 @@
                             }
                         } else {
                             // New profile from cloud - import it
-                            const fullGist = await fetchGistConfig(gist.id);
-                            if (fullGist) {
+                            const fetchResult = await fetchGistConfig(gist.id);
+                            if (fetchResult === 'deleted') {
+                                // Gist was deleted - mark for removal (but won't affect anything since no local profile)
+                                deletedGistIds.add(gist.id);
+                                console.log(`☁️ Gist ${gist.id} was deleted (404), skipping import`);
+                            } else if (fetchResult) {
                                 const profileName = gist.description.replace(GIST_PREFIX, '');
                                 
                                 // Check if a profile with same name already exists (without cloudId link)
@@ -5499,7 +5510,7 @@
                                 if (existingByName) {
                                     // Link existing profile to cloud and update settings
                                     existingByName.cloudId = gist.id;
-                                    existingByName.settings = fullGist.config;
+                                    existingByName.settings = fetchResult.config;
                                     existingByName.updatedAt = gist.updated_at;
                                     updatedCount++;
                                     console.log(`☁️ Linked and updated existing profile "${profileName}" to cloud`);
@@ -5508,7 +5519,7 @@
                                     const newProfile = {
                                         id: 'profile_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
                                         name: profileName,
-                                        settings: fullGist.config,
+                                        settings: fetchResult.config,
                                         cloudId: gist.id,
                                         createdAt: gist.created_at,
                                         updatedAt: gist.updated_at
@@ -5529,8 +5540,11 @@
                 }
                 
                 // Remove local profiles whose cloudId no longer exists in the cloud
-                // (they were deleted from another browser/device)
+                // (they were deleted from another browser/device OR returned 404 when fetched)
                 const cloudGistIds = new Set(widgetGists.map(g => g.id));
+                // Also remove gists that returned 404 when we tried to fetch them
+                deletedGistIds.forEach(id => cloudGistIds.delete(id));
+                
                 const profilesToRemove = profiles.filter(p => p && p.cloudId && !cloudGistIds.has(p.cloudId));
                 let removedCount = 0;
                 
@@ -5583,6 +5597,7 @@
         }
         
         // Helper to fetch full gist config
+        // Returns { config } on success, 'deleted' if 404, null on other errors
         async function fetchGistConfig(gistId) {
             try {
                 const res = await fetch('https://api.github.com/gists/' + gistId, {
@@ -5592,6 +5607,12 @@
                 if (res.status === 401) {
                     handleTokenInvalidation();
                     return null;
+                }
+                
+                if (res.status === 404) {
+                    // Gist was deleted - return special marker
+                    console.log(`☁️ Gist ${gistId} returned 404 - marked as deleted`);
+                    return 'deleted';
                 }
                 
                 if (!res.ok) return null;
@@ -6929,9 +6950,21 @@
                     activeProfileId = null;
                     localStorage.removeItem('chatWidgetActiveProfile');
                 }
+                
+                // Save profiles without triggering dirty state (deletion is already synced)
+                const wasInitializing = isInitializing;
+                isInitializing = true; // Prevent markDirty from being called
                 saveProfiles();
+                isInitializing = wasInitializing;
+                
                 renderProfiles();
                 showToast('Profile deleted');
+                
+                // Update status to synced (deletion was pushed to cloud)
+                if (cloudToken && !tokenInvalidated) {
+                    updateCloudSyncStatus('synced');
+                    isDirty = false;
+                }
             }
         }
         
