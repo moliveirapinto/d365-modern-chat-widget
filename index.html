@@ -2863,6 +2863,10 @@
                         <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:white;vertical-align:middle;margin-right:4px;"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
                         Sync All
                     </button>
+                    <button class="btn btn-sm" style="display:none;background:#10b981;color:white;white-space:nowrap;margin-left:6px;" onclick="refreshFromCloud()" id="refreshCloudBtn" title="Refresh profiles from cloud">
+                        <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:white;vertical-align:middle;margin-right:4px;"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                        Refresh
+                    </button>
                 </div>
                 <div class="card-body">
                     <!-- Profile Tabs -->
@@ -4985,6 +4989,10 @@
             const syncAllBtn = document.getElementById('syncAllBtn');
             if (syncAllBtn) syncAllBtn.style.display = 'inline-flex';
             
+            // Show Refresh from Cloud button
+            const refreshCloudBtn = document.getElementById('refreshCloudBtn');
+            if (refreshCloudBtn) refreshCloudBtn.style.display = 'inline-flex';
+            
             loadSavedWidgets();
             
             // CRITICAL: Sync profiles from cloud after login
@@ -5125,26 +5133,58 @@
                     }
                 }
                 
+                // Remove local profiles whose cloudId no longer exists in the cloud
+                // (they were deleted from another browser/device)
+                const cloudGistIds = new Set(widgetGists.map(g => g.id));
+                const profilesToRemove = profiles.filter(p => p && p.cloudId && !cloudGistIds.has(p.cloudId));
+                let removedCount = 0;
+                
+                if (profilesToRemove.length > 0) {
+                    for (const p of profilesToRemove) {
+                        console.log(`☁️ Removing locally deleted profile "${p.name}" (cloudId ${p.cloudId} no longer exists)`);
+                        // If this was the active profile, deselect it
+                        if (activeProfileId === p.id) {
+                            activeProfileId = null;
+                            localStorage.removeItem('chatWidgetActiveProfile');
+                        }
+                    }
+                    profiles = profiles.filter(p => !p || !p.cloudId || cloudGistIds.has(p.cloudId));
+                    removedCount = profilesToRemove.length;
+                }
+                
                 // Save updated profiles to localStorage
-                if (importedCount > 0 || updatedCount > 0) {
+                if (importedCount > 0 || updatedCount > 0 || removedCount > 0) {
                     saveProfiles();
                     renderProfiles();
                     
-                    if (importedCount > 0 && updatedCount > 0) {
-                        showToast(`☁️ Restored ${importedCount} profiles, updated ${updatedCount} from cloud`);
-                    } else if (importedCount > 0) {
-                        showToast(`☁️ Restored ${importedCount} profile${importedCount > 1 ? 's' : ''} from cloud`);
-                    } else {
-                        showToast(`☁️ Updated ${updatedCount} profile${updatedCount > 1 ? 's' : ''} from cloud`);
+                    // Build toast message
+                    const parts = [];
+                    if (importedCount > 0) parts.push(`restored ${importedCount}`);
+                    if (updatedCount > 0) parts.push(`updated ${updatedCount}`);
+                    if (removedCount > 0) parts.push(`removed ${removedCount} deleted`);
+                    
+                    if (parts.length > 0) {
+                        showToast(`☁️ Sync: ${parts.join(', ')} profile${(importedCount + updatedCount + removedCount) > 1 ? 's' : ''}`);
                     }
                 }
                 
-                console.log(`☁️ Cloud sync complete: ${importedCount} imported, ${updatedCount} updated`);
+                console.log(`☁️ Cloud sync complete: ${importedCount} imported, ${updatedCount} updated, ${removedCount} removed`);
                 
             } catch (e) {
                 console.error('☁️ Cloud sync error:', e);
                 // Don't show error toast - this is a background operation
             }
+        }
+        
+        // Manual refresh from cloud button handler
+        async function refreshFromCloud() {
+            if (!cloudToken || tokenInvalidated) {
+                showToast('Please log in to refresh from cloud');
+                return;
+            }
+            
+            showToast('☁️ Refreshing from cloud...');
+            await syncProfilesFromCloud();
         }
         
         // Helper to fetch full gist config
@@ -5226,6 +5266,9 @@
                     // Hide Sync All button
                     const syncAllBtn = document.getElementById('syncAllBtn');
                     if (syncAllBtn) syncAllBtn.style.display = 'none';
+                    // Hide Refresh from Cloud button
+                    const refreshCloudBtn = document.getElementById('refreshCloudBtn');
+                    if (refreshCloudBtn) refreshCloudBtn.style.display = 'none';
                     // Reset token entry
                     document.getElementById('tokenEntry').classList.remove('show');
                     document.getElementById('tokenInput').value = '';
@@ -5946,6 +5989,18 @@
                 updateCloudSyncStatus('error');
             }
         }, 5000); // Every 5 seconds
+        
+        // Periodic sync FROM cloud to detect deletions/changes from other browsers
+        // Runs every 60 seconds when logged in
+        setInterval(async function() {
+            if (!cloudToken || tokenInvalidated || !cloudUser) return;
+            
+            // Don't sync if user is actively editing (has pending changes)
+            if (isDirty) return;
+            
+            console.log('☁️ Background sync from cloud...');
+            await syncProfilesFromCloud();
+        }, 60000); // Every 60 seconds
 
         // Mark as dirty when settings change
         function markDirty() {
@@ -6355,6 +6410,11 @@
             if (!profile) return;
 
             if (confirm(`Delete profile "${profile.name}"?`)) {
+                // If profile has a cloudId, delete from cloud first
+                if (profile.cloudId && cloudToken && !tokenInvalidated) {
+                    deleteProfileFromCloud(profile.cloudId, profile.name);
+                }
+                
                 profiles = profiles.filter(p => p.id !== id);
                 if (activeProfileId === id) {
                     activeProfileId = null;
@@ -6363,6 +6423,32 @@
                 saveProfiles();
                 renderProfiles();
                 showToast('Profile deleted');
+            }
+        }
+        
+        // Delete a profile's Gist from the cloud
+        async function deleteProfileFromCloud(cloudId, profileName) {
+            try {
+                console.log('☁️ Deleting gist from cloud:', cloudId);
+                const res = await fetch('https://api.github.com/gists/' + cloudId, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'token ' + cloudToken }
+                });
+                
+                if (res.status === 204) {
+                    console.log('☁️ Gist deleted successfully');
+                    showToast(`☁️ "${profileName}" deleted from cloud`);
+                } else if (res.status === 404) {
+                    // Gist already deleted or doesn't exist - that's fine
+                    console.log('☁️ Gist already deleted or not found');
+                } else if (res.status === 403) {
+                    // Can't delete - belongs to different user or no permission
+                    console.log('☁️ Cannot delete gist (403) - may belong to different user');
+                } else {
+                    console.error('☁️ Failed to delete gist:', res.status);
+                }
+            } catch (e) {
+                console.error('☁️ Error deleting gist:', e);
             }
         }
 
