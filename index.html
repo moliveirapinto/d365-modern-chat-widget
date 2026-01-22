@@ -4438,10 +4438,12 @@
         // ============ COLLABORATION ROOMS (No GitHub Required!) ============
         
         const COLLAB_API_URL = 'https://d365-widget-collab.mauricio-o-pinto.workers.dev';
-        let savedRooms = JSON.parse(localStorage.getItem('d365_collab_rooms') || '[]'); // Array of {code, name, createdBy, joinedAt}
+        let savedRooms = JSON.parse(localStorage.getItem('d365_collab_rooms') || '[]'); // Array of {code, name, createdBy, joinedAt, widgets}
         let activeRoomCode = localStorage.getItem('d365_collab_active_room') || null;
+        let activeRoomWidgetId = localStorage.getItem('d365_collab_active_widget') || null;
         let currentRoomVersion = null;
         let collabUserName = localStorage.getItem('d365_collab_user') || '';
+        let expandedRooms = JSON.parse(localStorage.getItem('d365_expanded_rooms') || '{}'); // Track which rooms are expanded
         
         // Migration from old single-room format
         (function migrateOldRoomFormat() {
@@ -4521,21 +4523,40 @@
                 
                 const data = await response.json();
                 
-                // Add to saved rooms list
+                // Create initial widget entry
+                const initialWidget = data.widgetId ? [{
+                    id: data.widgetId,
+                    name: 'Default Widget',
+                    config: config,
+                    createdAt: new Date().toISOString(),
+                    createdBy: userName,
+                    updatedAt: new Date().toISOString(),
+                    updatedBy: userName,
+                    version: 1
+                }] : [];
+                
+                // Add to saved rooms list with widgets
                 const newRoom = {
                     code: data.roomCode,
                     name: `Room ${data.roomCode}`,
                     createdBy: userName,
                     joinedAt: new Date().toISOString(),
-                    isOwner: true
+                    isOwner: true,
+                    widgets: initialWidget
                 };
                 savedRooms.push(newRoom);
                 localStorage.setItem('d365_collab_rooms', JSON.stringify(savedRooms));
                 
-                // Set as active room
+                // Set as active room and widget
                 activeRoomCode = data.roomCode;
+                activeRoomWidgetId = data.widgetId;
                 currentRoomVersion = 1;
                 localStorage.setItem('d365_collab_active_room', data.roomCode);
+                localStorage.setItem('d365_collab_active_widget', data.widgetId || '');
+                
+                // Expand this room
+                expandedRooms[data.roomCode] = true;
+                localStorage.setItem('d365_expanded_rooms', JSON.stringify(expandedRooms));
                 
                 // Show success
                 document.getElementById('newRoomCode').textContent = data.roomCode;
@@ -4617,13 +4638,14 @@
                 
                 const roomData = await response.json();
                 
-                // Add to saved rooms
+                // Add to saved rooms with widgets
                 const newRoom = {
                     code: roomCode,
                     name: `Room ${roomCode}`,
                     createdBy: roomData.createdBy || 'Unknown',
                     joinedAt: new Date().toISOString(),
-                    isOwner: false
+                    isOwner: false,
+                    widgets: roomData.widgets || []
                 };
                 savedRooms.push(newRoom);
                 localStorage.setItem('d365_collab_rooms', JSON.stringify(savedRooms));
@@ -4633,14 +4655,24 @@
                 currentRoomVersion = roomData.version;
                 localStorage.setItem('d365_collab_active_room', roomCode);
                 
-                // Apply the config
-                if (roomData.config) {
+                // Expand this room to show widgets
+                expandedRooms[roomCode] = true;
+                localStorage.setItem('d365_expanded_rooms', JSON.stringify(expandedRooms));
+                
+                // Apply the first widget's config if available, otherwise legacy config
+                if (roomData.widgets && roomData.widgets.length > 0) {
+                    applyWidgetConfig(roomData.widgets[0].config);
+                    activeRoomWidgetId = roomData.widgets[0].id;
+                    localStorage.setItem('d365_collab_active_widget', activeRoomWidgetId);
+                } else if (roomData.config) {
                     applyWidgetConfig(roomData.config);
                 }
                 
                 closeJoinRoomModal();
                 renderRoomList();
-                showToast(`Joined room ${roomCode}! Config loaded from ${roomData.createdBy || 'owner'}.`);
+                
+                const widgetCount = roomData.widgets?.length || 0;
+                showToast(`Joined room ${roomCode}! ${widgetCount} widget${widgetCount !== 1 ? 's' : ''} available.`);
                 
             } catch (error) {
                 console.error('Join room error:', error);
@@ -4670,37 +4702,23 @@
                 // If this was the active room, clear it
                 if (activeRoomCode === code) {
                     activeRoomCode = savedRooms.length > 0 ? savedRooms[0].code : null;
+                    activeRoomWidgetId = null;
                     localStorage.setItem('d365_collab_active_room', activeRoomCode || '');
+                    localStorage.removeItem('d365_collab_active_widget');
                 }
+                
+                // Clean up expanded state
+                delete expandedRooms[code];
+                localStorage.setItem('d365_expanded_rooms', JSON.stringify(expandedRooms));
                 
                 renderRoomList();
                 showToast(`Removed room ${code}`);
             }
         }
         
-        // Switch to a different room
+        // Switch to a different room (now just toggles expand)
         function switchToRoom(roomCode) {
-            if (activeRoomCode === roomCode) return;
-            
-            activeRoomCode = roomCode;
-            localStorage.setItem('d365_collab_active_room', roomCode);
-            
-            // Fetch and apply the room's config
-            fetch(`${COLLAB_API_URL}/room/${roomCode}`)
-                .then(r => r.json())
-                .then(data => {
-                    if (data.config) {
-                        currentRoomVersion = data.version;
-                        applyWidgetConfig(data.config);
-                        showToast(`Switched to room ${roomCode}`);
-                    }
-                })
-                .catch(err => {
-                    console.error('Error switching room:', err);
-                    showToast('Error loading room config', 'error');
-                });
-            
-            renderRoomList();
+            toggleRoomExpand(roomCode);
         }
         
         // Sync (pull) latest config from room
@@ -4797,7 +4815,7 @@
             }
         }
         
-        // Render the room list UI
+        // Render the room list UI with widgets inside each room
         function renderRoomList() {
             const listEl = document.getElementById('roomList');
             const emptyState = document.getElementById('roomEmptyState');
@@ -4805,9 +4823,13 @@
             
             if (!listEl) return;
             
+            // Count total widgets across all rooms
+            let totalWidgets = 0;
+            savedRooms.forEach(r => totalWidgets += (r.widgets?.length || 0));
+            
             // Update team count badge
             if (teamCountEl) {
-                teamCountEl.textContent = savedRooms.length;
+                teamCountEl.textContent = savedRooms.length > 0 ? savedRooms.length : '0';
             }
             
             if (savedRooms.length === 0) {
@@ -4819,39 +4841,373 @@
             emptyState.style.display = 'none';
             
             listEl.innerHTML = savedRooms.map(room => {
-                const isActive = room.code === activeRoomCode;
+                const isExpanded = expandedRooms[room.code] || false;
+                const widgets = room.widgets || [];
+                const hasWidgets = widgets.length > 0;
+                
                 return `
-                    <div class="profile-item ${isActive ? 'active' : ''}" onclick="switchToRoom('${room.code}')">
-                        <div class="profile-item-content">
-                            <div class="profile-item-header">
-                                <span class="profile-item-name" style="font-family: monospace; letter-spacing: 1px;">
-                                    ${isActive ? '🟢' : '⚪'} ${room.code}
-                                </span>
-                                ${room.isOwner ? '<span style="font-size: 10px; background: #dbeafe; color: #1e40af; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">Owner</span>' : ''}
+                    <div class="room-container" style="margin-bottom: 8px;">
+                        <!-- Room Header -->
+                        <div class="profile-item room-header" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; cursor: pointer;" onclick="toggleRoomExpand('${room.code}')">
+                            <div class="profile-item-content" style="flex: 1;">
+                                <div class="profile-item-header" style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="transition: transform 0.2s; transform: rotate(${isExpanded ? '90deg' : '0deg'}); font-size: 12px;">▶</span>
+                                    <span class="profile-item-name" style="font-family: monospace; letter-spacing: 1px; font-weight: 600; color: #1e40af;">
+                                        ${room.code}
+                                    </span>
+                                    ${room.isOwner ? '<span style="font-size: 10px; background: #dbeafe; color: #1e40af; padding: 2px 6px; border-radius: 4px;">Owner</span>' : ''}
+                                    <span style="font-size: 11px; color: #64748b; margin-left: auto;">${widgets.length} widget${widgets.length !== 1 ? 's' : ''}</span>
+                                </div>
+                                <div class="profile-item-details" style="font-size: 11px; color: #64748b;">
+                                    <span>by ${room.createdBy || 'Unknown'}</span>
+                                    <span>•</span>
+                                    <span>Joined ${new Date(room.joinedAt).toLocaleDateString()}</span>
+                                </div>
                             </div>
-                            <div class="profile-item-details">
-                                <span>${room.createdBy || 'Unknown'}</span>
-                                <span>•</span>
-                                <span>Joined ${new Date(room.joinedAt).toLocaleDateString()}</span>
+                            <div class="profile-item-actions" onclick="event.stopPropagation();" style="display:flex; gap:4px;">
+                                <button onclick="copyRoomCode('${room.code}')" title="Copy room code" style="background:transparent; border:none; padding:6px; cursor:pointer; border-radius:4px;">
+                                    <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#64748b;"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                                </button>
+                                <button onclick="refreshRoomWidgets('${room.code}')" title="Refresh widgets from server" style="background:transparent; border:none; padding:6px; cursor:pointer; border-radius:4px;">
+                                    <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#64748b;"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                                </button>
+                                <button onclick="showAddWidgetToRoomModal('${room.code}')" title="Add widget to room" style="background:transparent; border:none; padding:6px; cursor:pointer; border-radius:4px;">
+                                    <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#64748b;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                </button>
+                                <button onclick="leaveCollabRoom('${room.code}')" title="Leave room" style="background:transparent; border:none; padding:6px; cursor:pointer; border-radius:4px;">
+                                    <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#ef4444;"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                                </button>
                             </div>
                         </div>
-                        <div class="profile-item-actions" onclick="event.stopPropagation();" style="display:flex; gap:4px;">
-                            <button onclick="copyRoomCode('${room.code}')" title="Copy room code" style="background:transparent; border:none; padding:6px; cursor:pointer; border-radius:4px;">
-                                <img src="https://github.com/microsoft/fluentui-system-icons/raw/main/assets/Clipboard%20Text/SVG/ic_fluent_clipboard_text_32_regular.svg?raw=true" style="width:18px;height:18px;">
-                            </button>
-                            <button onclick="syncFromRoom('${room.code}')" title="Sync from room" style="background:transparent; border:none; padding:6px; cursor:pointer; border-radius:4px;">
-                                <img src="https://github.com/microsoft/fluentui-system-icons/raw/main/assets/Cloud%20Sync/SVG/ic_fluent_cloud_sync_48_regular.svg?raw=true" style="width:18px;height:18px;">
-                            </button>
-                            <button onclick="pushToRoom('${room.code}')" title="Push to room" style="background:transparent; border:none; padding:6px; cursor:pointer; border-radius:4px;">
-                                <img src="https://github.com/microsoft/fluentui-system-icons/raw/main/assets/Cloud%20Arrow%20Up/SVG/ic_fluent_cloud_arrow_up_48_regular.svg?raw=true" style="width:18px;height:18px;">
-                            </button>
-                            <button onclick="leaveCollabRoom('${room.code}')" title="Remove room" style="background:transparent; border:none; padding:6px; cursor:pointer; border-radius:4px;">
-                                <img src="https://github.com/microsoft/fluentui-system-icons/raw/main/assets/Delete/SVG/ic_fluent_delete_48_regular.svg?raw=true" style="width:18px;height:18px;">
-                            </button>
+                        
+                        <!-- Widgets List (collapsible) -->
+                        <div class="room-widgets" style="display: ${isExpanded ? 'block' : 'none'}; margin-left: 16px; border-left: 2px solid #e2e8f0; padding-left: 12px; margin-top: 4px;">
+                            ${hasWidgets ? widgets.map(widget => {
+                                const isActiveWidget = activeRoomCode === room.code && activeRoomWidgetId === widget.id;
+                                return `
+                                    <div class="profile-item widget-item ${isActiveWidget ? 'active' : ''}" style="margin-bottom: 4px; padding: 10px 12px; background: ${isActiveWidget ? '#eff6ff' : 'white'}; border: 1px solid ${isActiveWidget ? '#3b82f6' : '#e2e8f0'};">
+                                        <div class="profile-item-content" style="flex: 1; cursor: pointer;" onclick="loadRoomWidget('${room.code}', '${widget.id}')">
+                                            <div class="profile-item-header">
+                                                <span class="profile-item-name" style="font-weight: 500;">
+                                                    ${isActiveWidget ? '🟢' : '⚪'} ${widget.name || 'Unnamed Widget'}
+                                                </span>
+                                            </div>
+                                            <div class="profile-item-details" style="font-size: 11px; color: #64748b;">
+                                                <span>by ${widget.updatedBy || widget.createdBy || 'Unknown'}</span>
+                                                <span>•</span>
+                                                <span>${widget.updatedAt ? new Date(widget.updatedAt).toLocaleDateString() : 'Unknown date'}</span>
+                                            </div>
+                                        </div>
+                                        <div class="profile-item-actions" onclick="event.stopPropagation();" style="display:flex; gap:2px;">
+                                            <button onclick="loadRoomWidget('${room.code}', '${widget.id}')" title="Load widget" style="background:transparent; border:none; padding:5px; cursor:pointer; border-radius:4px;">
+                                                <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#64748b;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                                            </button>
+                                            <button onclick="saveCurrentToRoomWidget('${room.code}', '${widget.id}')" title="Save current settings to this widget" style="background:transparent; border:none; padding:5px; cursor:pointer; border-radius:4px;">
+                                                <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#64748b;"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+                                            </button>
+                                            <button onclick="copyRoomWidgetToPersonal('${room.code}', '${widget.id}')" title="Copy to Personal" style="background:transparent; border:none; padding:5px; cursor:pointer; border-radius:4px;">
+                                                <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#64748b;"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                                            </button>
+                                            <button onclick="deleteRoomWidget('${room.code}', '${widget.id}')" title="Delete widget" style="background:transparent; border:none; padding:5px; cursor:pointer; border-radius:4px;">
+                                                <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#ef4444;"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('') : `
+                                <div style="padding: 16px; text-align: center; color: #64748b; font-size: 13px;">
+                                    <p style="margin: 0 0 8px 0;">No widgets in this room yet</p>
+                                    <button onclick="showAddWidgetToRoomModal('${room.code}')" class="btn btn-sm btn-primary" style="font-size: 12px;">
+                                        <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:white;margin-right:4px;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                        Add Widget
+                                    </button>
+                                </div>
+                            `}
                         </div>
                     </div>
                 `;
             }).join('');
+        }
+        
+        // Toggle room expansion
+        function toggleRoomExpand(roomCode) {
+            expandedRooms[roomCode] = !expandedRooms[roomCode];
+            localStorage.setItem('d365_expanded_rooms', JSON.stringify(expandedRooms));
+            renderRoomList();
+        }
+        
+        // Refresh widgets from server for a specific room
+        async function refreshRoomWidgets(roomCode) {
+            try {
+                showToast('Refreshing room widgets...');
+                
+                const response = await fetch(`${COLLAB_API_URL}/room/${roomCode}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch room data');
+                }
+                
+                const roomData = await response.json();
+                
+                // Update local room data with widgets from server
+                const roomIndex = savedRooms.findIndex(r => r.code === roomCode);
+                if (roomIndex !== -1) {
+                    savedRooms[roomIndex].widgets = roomData.widgets || [];
+                    savedRooms[roomIndex].lastUpdated = roomData.lastUpdated;
+                    localStorage.setItem('d365_collab_rooms', JSON.stringify(savedRooms));
+                }
+                
+                renderRoomList();
+                showToast(`✅ Refreshed ${roomData.widgets?.length || 0} widgets from room`);
+                
+            } catch (error) {
+                console.error('Error refreshing room:', error);
+                showToast('Failed to refresh room: ' + error.message, 'error');
+            }
+        }
+        
+        // Load a specific widget from a room
+        async function loadRoomWidget(roomCode, widgetId) {
+            try {
+                showToast('Loading widget...');
+                
+                const response = await fetch(`${COLLAB_API_URL}/room/${roomCode}/widgets/${widgetId}`);
+                if (!response.ok) {
+                    throw new Error('Widget not found');
+                }
+                
+                const widget = await response.json();
+                
+                // Apply the config
+                if (widget.config) {
+                    applyWidgetConfig(widget.config);
+                }
+                
+                // Set as active room widget
+                activeRoomCode = roomCode;
+                activeRoomWidgetId = widgetId;
+                localStorage.setItem('d365_collab_active_room', roomCode);
+                localStorage.setItem('d365_collab_active_widget', widgetId);
+                
+                renderRoomList();
+                showToast(`✅ Loaded "${widget.name}" from room`);
+                
+            } catch (error) {
+                console.error('Error loading widget:', error);
+                showToast('Failed to load widget: ' + error.message, 'error');
+            }
+        }
+        
+        // Save current settings to a specific room widget
+        async function saveCurrentToRoomWidget(roomCode, widgetId) {
+            try {
+                showToast('Saving to widget...');
+                
+                const config = collectCurrentConfig();
+                
+                const response = await fetch(`${COLLAB_API_URL}/room/${roomCode}/widgets/${widgetId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        config: config,
+                        updaterName: collabUserName || cloudUser?.login || 'Anonymous'
+                    })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to save');
+                }
+                
+                // Refresh room data
+                await refreshRoomWidgets(roomCode);
+                
+                showToast('✅ Widget saved to room!');
+                
+            } catch (error) {
+                console.error('Error saving widget:', error);
+                showToast('Failed to save widget: ' + error.message, 'error');
+            }
+        }
+        
+        // Copy a room widget to personal profiles
+        async function copyRoomWidgetToPersonal(roomCode, widgetId) {
+            try {
+                const response = await fetch(`${COLLAB_API_URL}/room/${roomCode}/widgets/${widgetId}`);
+                if (!response.ok) {
+                    throw new Error('Widget not found');
+                }
+                
+                const widget = await response.json();
+                
+                // Create new personal profile
+                const newProfile = {
+                    id: 'profile_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                    name: widget.name + ' (from Room)',
+                    settings: widget.config,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                
+                profiles.push(newProfile);
+                saveProfiles();
+                renderProfiles();
+                
+                // If logged in, also save to cloud
+                if (cloudToken && !tokenInvalidated) {
+                    saveProfileToCloud(newProfile);
+                }
+                
+                showToast(`✅ "${widget.name}" copied to Personal profiles!`);
+                
+            } catch (error) {
+                console.error('Error copying widget:', error);
+                showToast('Failed to copy widget: ' + error.message, 'error');
+            }
+        }
+        
+        // Delete a widget from a room
+        async function deleteRoomWidget(roomCode, widgetId) {
+            if (!confirm('Delete this widget from the room? This cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${COLLAB_API_URL}/room/${roomCode}/widgets/${widgetId}?updaterName=${encodeURIComponent(collabUserName || 'Anonymous')}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to delete widget');
+                }
+                
+                // Clear active widget if it was the deleted one
+                if (activeRoomWidgetId === widgetId) {
+                    activeRoomWidgetId = null;
+                    localStorage.removeItem('d365_collab_active_widget');
+                }
+                
+                // Refresh room data
+                await refreshRoomWidgets(roomCode);
+                
+                showToast('✅ Widget deleted from room');
+                
+            } catch (error) {
+                console.error('Error deleting widget:', error);
+                showToast('Failed to delete widget: ' + error.message, 'error');
+            }
+        }
+        
+        // Show modal to add widget to room
+        function showAddWidgetToRoomModal(roomCode) {
+            // Create modal if it doesn't exist
+            let modal = document.getElementById('addWidgetToRoomModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'addWidgetToRoomModal';
+                modal.className = 'save-modal-overlay';
+                modal.innerHTML = `
+                    <div class="save-modal">
+                        <h3 style="margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 24px;">📦</span> Add Widget to Room
+                        </h3>
+                        <div class="form-group">
+                            <label class="form-label">Widget Name</label>
+                            <input type="text" class="form-input" id="newRoomWidgetName" placeholder="e.g., Contoso Demo">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" style="display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" id="useCurrentSettings" checked>
+                                Use current editor settings
+                            </label>
+                        </div>
+                        <div id="addWidgetToRoomStatus" style="display:none; padding: 12px; border-radius: 8px; margin-bottom: 12px;"></div>
+                        <div class="save-modal-buttons">
+                            <button class="save-modal-cancel" onclick="closeAddWidgetToRoomModal()">Cancel</button>
+                            <button class="save-modal-save" id="addWidgetToRoomBtn">
+                                <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;margin-right:6px;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                Add Widget
+                            </button>
+                        </div>
+                    </div>
+                `;
+                modal.onclick = function(e) { if (e.target === modal) closeAddWidgetToRoomModal(); };
+                document.body.appendChild(modal);
+            }
+            
+            // Store room code in modal
+            modal.dataset.roomCode = roomCode;
+            document.getElementById('newRoomWidgetName').value = '';
+            document.getElementById('useCurrentSettings').checked = true;
+            document.getElementById('addWidgetToRoomStatus').style.display = 'none';
+            
+            // Set up button handler
+            document.getElementById('addWidgetToRoomBtn').onclick = function() {
+                addWidgetToRoom(modal.dataset.roomCode);
+            };
+            
+            modal.classList.add('show');
+            document.getElementById('newRoomWidgetName').focus();
+        }
+        
+        function closeAddWidgetToRoomModal() {
+            const modal = document.getElementById('addWidgetToRoomModal');
+            if (modal) modal.classList.remove('show');
+        }
+        
+        // Add widget to room
+        async function addWidgetToRoom(roomCode) {
+            const name = document.getElementById('newRoomWidgetName').value.trim();
+            const useCurrentSettings = document.getElementById('useCurrentSettings').checked;
+            const statusEl = document.getElementById('addWidgetToRoomStatus');
+            
+            if (!name) {
+                statusEl.style.display = 'block';
+                statusEl.style.background = '#fef2f2';
+                statusEl.style.color = '#dc2626';
+                statusEl.textContent = 'Please enter a widget name';
+                return;
+            }
+            
+            try {
+                statusEl.style.display = 'block';
+                statusEl.style.background = '#eff6ff';
+                statusEl.style.color = '#1e40af';
+                statusEl.textContent = 'Adding widget...';
+                
+                const config = useCurrentSettings ? collectCurrentConfig() : {};
+                
+                const response = await fetch(`${COLLAB_API_URL}/room/${roomCode}/widgets`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name,
+                        config: config,
+                        creatorName: collabUserName || cloudUser?.login || 'Anonymous'
+                    })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to add widget');
+                }
+                
+                closeAddWidgetToRoomModal();
+                
+                // Expand the room and refresh
+                expandedRooms[roomCode] = true;
+                localStorage.setItem('d365_expanded_rooms', JSON.stringify(expandedRooms));
+                
+                await refreshRoomWidgets(roomCode);
+                
+                showToast(`✅ Widget "${name}" added to room!`);
+                
+            } catch (error) {
+                console.error('Error adding widget:', error);
+                statusEl.style.display = 'block';
+                statusEl.style.background = '#fef2f2';
+                statusEl.style.color = '#dc2626';
+                statusEl.textContent = 'Error: ' + error.message;
+            }
         }
         
         // Legacy function for compatibility
@@ -4859,10 +5215,30 @@
             renderRoomList();
         }
         
-        // Initialize room UI on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Render saved rooms
+        // Initialize room UI and refresh widgets from server on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Render saved rooms immediately with cached data
             renderRoomList();
+            
+            // Then refresh widgets from server for all rooms in background
+            if (savedRooms.length > 0) {
+                console.log('🏠 Refreshing room widgets from server...');
+                for (const room of savedRooms) {
+                    try {
+                        const response = await fetch(`${COLLAB_API_URL}/room/${room.code}`);
+                        if (response.ok) {
+                            const roomData = await response.json();
+                            room.widgets = roomData.widgets || [];
+                            room.lastUpdated = roomData.lastUpdated;
+                        }
+                    } catch (e) {
+                        console.log(`Failed to refresh room ${room.code}:`, e);
+                    }
+                }
+                localStorage.setItem('d365_collab_rooms', JSON.stringify(savedRooms));
+                renderRoomList();
+                console.log('🏠 Room widgets refreshed');
+            }
         });
 
         // Check for existing login on page load
@@ -6264,6 +6640,9 @@
                         <button class="profile-btn" onclick="event.stopPropagation(); updateProfile('${p.id}')" title="Update with current settings">
                             <svg viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
                         </button>
+                        <button class="profile-btn" onclick="event.stopPropagation(); showCopyToRoomModal('${p.id}')" title="Copy to Room" ${savedRooms.length === 0 ? 'disabled style="opacity: 0.4; cursor: not-allowed;"' : ''}>
+                            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                        </button>
                         <button class="profile-btn delete" onclick="event.stopPropagation(); deleteProfile('${p.id}')" title="Delete profile">
                             <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                         </button>
@@ -6271,6 +6650,133 @@
                 </div>
             `;
             }).join('');
+        }
+        
+        // Show modal to copy a personal profile to a room
+        function showCopyToRoomModal(profileId) {
+            const profile = profiles.find(p => p.id === profileId);
+            if (!profile) return;
+            
+            if (savedRooms.length === 0) {
+                showToast('Join or create a room first to copy widgets to it');
+                return;
+            }
+            
+            // Create modal if it doesn't exist
+            let modal = document.getElementById('copyToRoomModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'copyToRoomModal';
+                modal.className = 'save-modal-overlay';
+                modal.innerHTML = `
+                    <div class="save-modal">
+                        <h3 style="margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 24px;">📤</span> Copy to Room
+                        </h3>
+                        <p style="color: #64748b; font-size: 13px; margin-bottom: 16px;">
+                            Copying: <strong id="copyToRoomProfileName"></strong>
+                        </p>
+                        <div class="form-group">
+                            <label class="form-label">Select Room</label>
+                            <select class="form-input" id="copyToRoomSelect" style="padding: 10px;">
+                                <!-- Options will be populated -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Widget Name in Room</label>
+                            <input type="text" class="form-input" id="copyToRoomWidgetName" placeholder="Leave empty to use profile name">
+                        </div>
+                        <div id="copyToRoomStatus" style="display:none; padding: 12px; border-radius: 8px; margin-bottom: 12px;"></div>
+                        <div class="save-modal-buttons">
+                            <button class="save-modal-cancel" onclick="closeCopyToRoomModal()">Cancel</button>
+                            <button class="save-modal-save" id="copyToRoomBtn">
+                                <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;margin-right:6px;"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                                Copy to Room
+                            </button>
+                        </div>
+                    </div>
+                `;
+                modal.onclick = function(e) { if (e.target === modal) closeCopyToRoomModal(); };
+                document.body.appendChild(modal);
+            }
+            
+            // Store profile ID in modal
+            modal.dataset.profileId = profileId;
+            
+            // Populate modal
+            document.getElementById('copyToRoomProfileName').textContent = profile.name;
+            document.getElementById('copyToRoomWidgetName').value = profile.name;
+            document.getElementById('copyToRoomStatus').style.display = 'none';
+            
+            // Populate room dropdown
+            const select = document.getElementById('copyToRoomSelect');
+            select.innerHTML = savedRooms.map(room => 
+                `<option value="${room.code}">${room.code} (${room.widgets?.length || 0} widgets)</option>`
+            ).join('');
+            
+            // Set up button handler
+            document.getElementById('copyToRoomBtn').onclick = function() {
+                copyProfileToRoom(modal.dataset.profileId);
+            };
+            
+            modal.classList.add('show');
+        }
+        
+        function closeCopyToRoomModal() {
+            const modal = document.getElementById('copyToRoomModal');
+            if (modal) modal.classList.remove('show');
+        }
+        
+        // Copy a personal profile to a room
+        async function copyProfileToRoom(profileId) {
+            const profile = profiles.find(p => p.id === profileId);
+            if (!profile) return;
+            
+            const roomCode = document.getElementById('copyToRoomSelect').value;
+            const widgetName = document.getElementById('copyToRoomWidgetName').value.trim() || profile.name;
+            const statusEl = document.getElementById('copyToRoomStatus');
+            
+            try {
+                statusEl.style.display = 'block';
+                statusEl.style.background = '#eff6ff';
+                statusEl.style.color = '#1e40af';
+                statusEl.textContent = 'Copying to room...';
+                
+                const response = await fetch(`${COLLAB_API_URL}/room/${roomCode}/widgets`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: widgetName,
+                        config: profile.settings,
+                        creatorName: collabUserName || cloudUser?.login || 'Anonymous'
+                    })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to copy to room');
+                }
+                
+                closeCopyToRoomModal();
+                
+                // Expand the room and refresh
+                expandedRooms[roomCode] = true;
+                localStorage.setItem('d365_expanded_rooms', JSON.stringify(expandedRooms));
+                
+                await refreshRoomWidgets(roomCode);
+                
+                // Switch to team tab
+                switchProfileTab('team');
+                
+                showToast(`✅ "${widgetName}" copied to room ${roomCode}!`);
+                
+            } catch (error) {
+                console.error('Error copying to room:', error);
+                statusEl.style.display = 'block';
+                statusEl.style.background = '#fef2f2';
+                statusEl.style.color = '#dc2626';
+                statusEl.textContent = 'Error: ' + error.message;
+            }
         }
 
         function renameProfile(id) {
