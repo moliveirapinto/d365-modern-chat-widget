@@ -3297,15 +3297,15 @@
                 </div>
             </div>
 
-            <!-- Hidden elements for backwards compatibility -->
-            <textarea id="lcwCode" style="display: none;"></textarea>
-            <div id="extractedValues" style="display: none;">
+            <!-- Hidden elements for backwards compatibility (not rendered) -->
+            <textarea id="lcwCode" style="display: none !important; visibility: hidden; position: absolute; left: -9999px;"></textarea>
+            <div id="extractedValues" style="display: none !important; visibility: hidden; position: absolute; left: -9999px;">
                 <span id="extractedAppId"></span>
                 <span id="extractedOrgId"></span>
                 <span id="extractedOrgUrl"></span>
             </div>
-            <div id="noProfileSelectedHint" style="display: none;"></div>
-            <div id="connectionStatus" style="display: none;">
+            <div id="noProfileSelectedHint" style="display: none !important;"></div>
+            <div id="connectionStatus" style="display: none !important; visibility: hidden; position: absolute; left: -9999px;">
                 <span id="statusDot"></span>
                 <span id="statusText"></span>
             </div>
