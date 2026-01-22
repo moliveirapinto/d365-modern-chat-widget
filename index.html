@@ -7049,8 +7049,8 @@
                     host = 'Invalid org URL';
                 }
                 
-                // Get the embed code from the profile settings
-                const embedCode = p.settings?.lcwEmbedCode || '';
+                // Get the embed code from the profile settings (lcwCode is the standard field name)
+                const embedCode = p.settings?.lcwCode || '';
                 const hasEmbedCode = embedCode.trim().length > 0;
 
                 return `
@@ -7105,7 +7105,7 @@
         function updateProfileEmbedCode(profileId, newCode) {
             const profile = profiles.find(p => p.id === profileId);
             if (profile) {
-                profile.settings.lcwEmbedCode = newCode;
+                profile.settings.lcwCode = newCode;
                 saveProfiles();
                 // Re-render to update button states
                 renderProfiles();
@@ -7114,8 +7114,8 @@
         
         function copyProfileEmbedCode(profileId) {
             const profile = profiles.find(p => p.id === profileId);
-            if (profile && profile.settings.lcwEmbedCode) {
-                navigator.clipboard.writeText(profile.settings.lcwEmbedCode).then(() => {
+            if (profile && profile.settings.lcwCode) {
+                navigator.clipboard.writeText(profile.settings.lcwCode).then(() => {
                     showToast('Embed code copied to clipboard!');
                 });
             }
@@ -7125,7 +7125,7 @@
             const profile = profiles.find(p => p.id === profileId);
             if (!profile) return;
             
-            const embedCode = profile.settings.lcwEmbedCode || '';
+            const embedCode = profile.settings.lcwCode || '';
             if (!embedCode.trim()) {
                 showToast('No embed code to parse. Paste code first.', 'warning');
                 return;
