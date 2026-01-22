@@ -5574,6 +5574,14 @@
                     return;
                 }
                 
+                // 403 on POST means token lacks gist scope
+                if (res.status === 403 && !existingGistId) {
+                    const errorText = await res.text();
+                    console.error('☁️ Token lacks gist scope:', errorText);
+                    showToast('⚠️ Your GitHub token needs the "gist" scope. Please create a new token with gist permissions.', 8000);
+                    return;
+                }
+                
                 if (!res.ok) {
                     const errorText = await res.text();
                     console.error('☁️ Save failed:', res.status, errorText);
@@ -5712,6 +5720,14 @@
             if (res.status === 401) {
                 handleTokenInvalidation();
                 throw new Error('Token expired');
+            }
+            
+            // 403 on POST means token lacks gist scope
+            if (res.status === 403 && !existingGistId) {
+                const errorText = await res.text();
+                console.error('☁️ Token lacks gist scope:', errorText);
+                showToast('⚠️ Your GitHub token needs the "gist" scope. Please create a new token with gist permissions.', 8000);
+                throw new Error('Token missing gist scope');
             }
             
             if (!res.ok) {
