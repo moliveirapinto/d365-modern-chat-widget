@@ -4730,9 +4730,10 @@
             
             // Set up action button
             actionBtn.onclick = function() {
+                const callback = confirmModalCallback; // Save reference before closing
                 closeConfirmModal();
-                if (confirmModalCallback) {
-                    confirmModalCallback();
+                if (callback) {
+                    callback();
                 }
             };
             
