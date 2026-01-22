@@ -5208,6 +5208,7 @@
                     cloudToken = null;
                     currentLoadedWidgetId = null;
                     hasRepoScope = false;
+                    tokenInvalidated = false; // Reset token invalidation flag
                     localStorage.removeItem('d365_user');
                     localStorage.removeItem('d365_github_token');
                     // Note: We intentionally keep d365_last_user_id so we can detect
@@ -5229,6 +5230,10 @@
                     document.getElementById('tokenEntry').classList.remove('show');
                     document.getElementById('tokenInput').value = '';
                     document.getElementById('tokenStatus').style.display = 'none';
+                    // Update cloud sync status to offline
+                    updateCloudSyncStatus('offline');
+                    // Refresh the profile list to remove cloud indicators
+                    renderProfileList();
                     showToast('Logged out successfully');
                 });
             }
