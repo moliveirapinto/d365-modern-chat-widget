@@ -2570,6 +2570,14 @@
                 </p>
             </div>
             
+            <!-- Room name input -->
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 13px; color: #475569; font-weight: 500; margin-bottom: 6px;">
+                    Room name:
+                </label>
+                <input type="text" class="form-input" id="createRoomName" placeholder="e.g., Contoso Support Widget" style="font-size: 14px;">
+            </div>
+            
             <!-- Your name input -->
             <div style="margin-bottom: 16px;">
                 <label style="display: block; font-size: 13px; color: #475569; font-weight: 500; margin-bottom: 6px;">
@@ -4512,6 +4520,7 @@
             const spinner = document.getElementById('createRoomSpinner');
             const status = document.getElementById('createRoomStatus');
             const success = document.getElementById('createRoomSuccess');
+            const roomName = document.getElementById('createRoomName').value.trim() || 'My Room';
             const userName = document.getElementById('createRoomUserName').value.trim() || 'Anonymous';
             
             // Save username for future use
@@ -4531,7 +4540,8 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         config: config,
-                        creatorName: userName
+                        creatorName: userName,
+                        roomName: roomName
                     })
                 });
                 
@@ -4557,7 +4567,7 @@
                 // Add to saved rooms list with widgets
                 const newRoom = {
                     code: data.roomCode,
-                    name: `Room ${data.roomCode}`,
+                    name: data.roomName || roomName,
                     createdBy: userName,
                     joinedAt: new Date().toISOString(),
                     isOwner: true,
@@ -4660,7 +4670,7 @@
                 // Add to saved rooms with widgets
                 const newRoom = {
                     code: roomCode,
-                    name: `Room ${roomCode}`,
+                    name: roomData.name || `Room ${roomCode}`,
                     createdBy: roomData.createdBy || 'Unknown',
                     joinedAt: new Date().toISOString(),
                     isOwner: false,
@@ -4863,6 +4873,7 @@
                 const isExpanded = expandedRooms[room.code] || false;
                 const widgets = room.widgets || [];
                 const hasWidgets = widgets.length > 0;
+                const roomDisplayName = room.name || `Room ${room.code}`;
                 
                 return `
                     <div class="room-container" style="margin-bottom: 8px;">
@@ -4871,9 +4882,13 @@
                             <div class="profile-item-content" style="flex: 1;">
                                 <div class="profile-item-header" style="display: flex; align-items: center; gap: 8px;">
                                     <span style="transition: transform 0.2s; transform: rotate(${isExpanded ? '90deg' : '0deg'}); font-size: 12px;">▶</span>
-                                    <span class="profile-item-name" style="font-family: monospace; letter-spacing: 1px; font-weight: 600; color: #1e40af;">
-                                        ${room.code}
+                                    <span class="profile-item-name" style="font-weight: 600; color: #1e293b;">
+                                        ${roomDisplayName}
                                     </span>
+                                    <button onclick="event.stopPropagation(); copyRoomCode('${room.code}')" title="Copy room code ${room.code}" style="background: #f1f5f9; border: 1px solid #e2e8f0; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-family: monospace; font-size: 11px; color: #64748b; display: flex; align-items: center; gap: 4px;">
+                                        <span>${room.code}</span>
+                                        <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:#64748b;"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                                    </button>
                                     ${room.isOwner ? '<span style="font-size: 10px; background: #dbeafe; color: #1e40af; padding: 2px 6px; border-radius: 4px;">Owner</span>' : ''}
                                     <span style="font-size: 11px; color: #64748b; margin-left: auto;">${widgets.length} widget${widgets.length !== 1 ? 's' : ''}</span>
                                 </div>
@@ -4884,9 +4899,6 @@
                                 </div>
                             </div>
                             <div class="profile-item-actions" onclick="event.stopPropagation();" style="display:flex; gap:4px;">
-                                <button onclick="copyRoomCode('${room.code}')" title="Copy room code" style="background:transparent; border:none; padding:6px; cursor:pointer; border-radius:4px;">
-                                    <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#64748b;"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-                                </button>
                                 <button onclick="refreshRoomWidgets('${room.code}')" title="Refresh widgets from server" style="background:transparent; border:none; padding:6px; cursor:pointer; border-radius:4px;">
                                     <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#64748b;"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
                                 </button>
@@ -4972,6 +4984,10 @@
                 if (roomIndex !== -1) {
                     savedRooms[roomIndex].widgets = roomData.widgets || [];
                     savedRooms[roomIndex].lastUpdated = roomData.lastUpdated;
+                    // Also update room name if server has one
+                    if (roomData.name) {
+                        savedRooms[roomIndex].name = roomData.name;
+                    }
                     localStorage.setItem('d365_collab_rooms', JSON.stringify(savedRooms));
                 }
                 
@@ -6348,6 +6364,37 @@
         let isDirty = false; // Track if settings have changed since last cloud sync
         let lastCloudSync = null; // Timestamp of last cloud sync
 
+        // Debounce utility - prevents function from being called too frequently
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Debounced version of updateSettingsFromForm for input handlers
+        const debouncedUpdateSettings = debounce(() => {
+            updateSettingsFromForm();
+            updatePreview();
+            // Auto-save to active profile and localStorage (but not during initialization)
+            if (!isInitializing && activeProfileId) {
+                const profile = profiles.find(p => p.id === activeProfileId);
+                if (profile) {
+                    profile.settings = { ...settings };
+                    profile.updatedAt = new Date().toISOString();
+                    saveProfiles();
+                }
+            }
+            if (!isInitializing) {
+                localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+            }
+        }, 150); // 150ms debounce for smooth preview updates
+
         // Auto-save to cloud every 30 seconds if there are changes
         setInterval(async function() {
             if (isInitializing) return;
@@ -6665,7 +6712,7 @@
                             <svg viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
                         </button>
                         <button class="profile-btn" onclick="event.stopPropagation(); showCopyToRoomModal('${p.id}')" title="Copy to Room" ${savedRooms.length === 0 ? 'disabled style="opacity: 0.4; cursor: not-allowed;"' : ''}>
-                            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                            <img src="https://github.com/microsoft/fluentui-system-icons/raw/main/assets/Breakout%20Room/SVG/ic_fluent_breakout_room_32_regular.svg?raw=true" alt="Copy to Room" style="width: 16px; height: 16px; opacity: 0.7;">
                         </button>
                         <button class="profile-btn delete" onclick="event.stopPropagation(); deleteProfile('${p.id}')" title="Delete profile">
                             <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
@@ -6693,28 +6740,57 @@
                 modal.id = 'copyToRoomModal';
                 modal.className = 'save-modal-overlay';
                 modal.innerHTML = `
-                    <div class="save-modal">
-                        <h3 style="margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 24px;">📤</span> Copy to Room
-                        </h3>
-                        <p style="color: #64748b; font-size: 13px; margin-bottom: 16px;">
-                            Copying: <strong id="copyToRoomProfileName"></strong>
-                        </p>
-                        <div class="form-group">
-                            <label class="form-label">Select Room</label>
-                            <select class="form-input" id="copyToRoomSelect" style="padding: 10px;">
+                    <div class="save-modal" style="max-width: 420px;">
+                        <!-- Header with icon -->
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0;">
+                            <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <img src="https://github.com/microsoft/fluentui-system-icons/raw/main/assets/Breakout%20Room/SVG/ic_fluent_breakout_room_32_regular.svg?raw=true" alt="Room" style="width: 28px; height: 28px; filter: brightness(0) invert(1);">
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: #1e293b;">Copy to Room</h3>
+                                <p style="margin: 4px 0 0 0; font-size: 13px; color: #64748b;">Share this widget with your team</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Profile being copied -->
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                            <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: #6366f1; flex-shrink: 0;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                            <div>
+                                <div style="font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Copying Profile</div>
+                                <div id="copyToRoomProfileName" style="font-weight: 600; color: #1e293b;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Room Selection -->
+                        <div class="form-group" style="margin-bottom: 16px;">
+                            <label class="form-label" style="font-weight: 500; color: #374151; margin-bottom: 6px; display: block;">
+                                <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: #6366f1; vertical-align: -2px; margin-right: 4px;"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>
+                                Destination Room
+                            </label>
+                            <select class="form-input" id="copyToRoomSelect" style="padding: 12px; font-size: 14px; border-radius: 8px; border: 1px solid #d1d5db; background: white;">
                                 <!-- Options will be populated -->
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Widget Name in Room</label>
-                            <input type="text" class="form-input" id="copyToRoomWidgetName" placeholder="Leave empty to use profile name">
+                        
+                        <!-- Widget Name -->
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label class="form-label" style="font-weight: 500; color: #374151; margin-bottom: 6px; display: block;">
+                                <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: #6366f1; vertical-align: -2px; margin-right: 4px;"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                                Widget Name in Room
+                            </label>
+                            <input type="text" class="form-input" id="copyToRoomWidgetName" placeholder="Leave empty to use profile name" style="padding: 12px; font-size: 14px; border-radius: 8px; border: 1px solid #d1d5db;">
                         </div>
-                        <div id="copyToRoomStatus" style="display:none; padding: 12px; border-radius: 8px; margin-bottom: 12px;"></div>
-                        <div class="save-modal-buttons">
-                            <button class="save-modal-cancel" onclick="closeCopyToRoomModal()">Cancel</button>
-                            <button class="save-modal-save" id="copyToRoomBtn">
-                                <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;margin-right:6px;"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                        
+                        <!-- Status -->
+                        <div id="copyToRoomStatus" style="display:none; padding: 12px; border-radius: 8px; margin-bottom: 16px;"></div>
+                        
+                        <!-- Actions -->
+                        <div style="display: flex; gap: 12px; justify-content: flex-end; padding-top: 16px; border-top: 1px solid #e2e8f0;">
+                            <button onclick="closeCopyToRoomModal()" style="padding: 10px 20px; border-radius: 8px; border: 1px solid #d1d5db; background: white; color: #374151; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s;">
+                                Cancel
+                            </button>
+                            <button id="copyToRoomBtn" style="padding: 10px 24px; border-radius: 8px; border: none; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.15s; box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);">
+                                <img src="https://github.com/microsoft/fluentui-system-icons/raw/main/assets/Breakout%20Room/SVG/ic_fluent_breakout_room_32_regular.svg?raw=true" alt="" style="width: 18px; height: 18px; filter: brightness(0) invert(1);">
                                 Copy to Room
                             </button>
                         </div>
@@ -6732,11 +6808,12 @@
             document.getElementById('copyToRoomWidgetName').value = profile.name;
             document.getElementById('copyToRoomStatus').style.display = 'none';
             
-            // Populate room dropdown
+            // Populate room dropdown with room names
             const select = document.getElementById('copyToRoomSelect');
-            select.innerHTML = savedRooms.map(room => 
-                `<option value="${room.code}">${room.code} (${room.widgets?.length || 0} widgets)</option>`
-            ).join('');
+            select.innerHTML = savedRooms.map(room => {
+                const roomName = room.name || `Room ${room.code}`;
+                return `<option value="${room.code}">${roomName} (${room.code}) - ${room.widgets?.length || 0} widgets</option>`;
+            }).join('');
             
             // Set up button handler
             document.getElementById('copyToRoomBtn').onclick = function() {
@@ -7253,29 +7330,16 @@
             // Pre-chat hero gradient toggle
             document.getElementById('usePrechatGradient').addEventListener('change', togglePrechatGradient);
 
-            // Color pickers sync
+            // Color pickers sync - use debounced handler for performance
             document.querySelectorAll('input[type="color"]').forEach(picker => {
                 const hexInput = document.getElementById(picker.id + 'Hex');
                 picker.addEventListener('input', () => {
                     if (hexInput) hexInput.value = picker.value;
-                    updateSettingsFromForm();
-                    updatePreview();
-                    // Auto-save to active profile and localStorage (but not during initialization)
-                    if (!isInitializing && activeProfileId) {
-                        const profile = profiles.find(p => p.id === activeProfileId);
-                        if (profile) {
-                            profile.settings = { ...settings };
-                            profile.updatedAt = new Date().toISOString();
-                            saveProfiles();
-                        }
-                    }
-                    if (!isInitializing) {
-                        localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
-                    }
+                    debouncedUpdateSettings();
                 });
             });
 
-            // Hex inputs sync
+            // Hex inputs sync - use debounced handler for performance
             document.querySelectorAll('.color-hex-input').forEach(input => {
                 const pickerId = input.id.replace('Hex', '');
                 const picker = document.getElementById(pickerId);
@@ -7284,20 +7348,7 @@
                     if (!val.startsWith('#')) val = '#' + val;
                     if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
                         picker.value = val;
-                        updateSettingsFromForm();
-                        updatePreview();
-                        // Auto-save to active profile and localStorage (but not during initialization)
-                        if (!isInitializing && activeProfileId) {
-                            const profile = profiles.find(p => p.id === activeProfileId);
-                            if (profile) {
-                                profile.settings = { ...settings };
-                                profile.updatedAt = new Date().toISOString();
-                                saveProfiles();
-                            }
-                        }
-                        if (!isInitializing) {
-                            localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
-                        }
+                        debouncedUpdateSettings();
                     }
                 });
             });
@@ -7321,28 +7372,13 @@
                 }
             });
 
-            // Text inputs - real-time preview AND auto-save to active profile
+            // Text inputs - real-time preview AND auto-save to active profile (debounced)
             ['backgroundImageUrl', 'headerTitle', 'headerSubtitle', 'welcomeTitle', 'welcomeMessage', 
              'nameFieldLabel', 'emailFieldLabel', 'questionFieldLabel', 'questionFieldPlaceholder', 'startBtnText',
              'standardAuthName', 'standardAuthEmail', 'customAuthName', 'customAuthEmail'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
-                    el.addEventListener('input', () => {
-                        updateSettingsFromForm();
-                        updatePreview();
-                        // Auto-save to active profile and localStorage (but not during initialization)
-                        if (!isInitializing && activeProfileId) {
-                            const profile = profiles.find(p => p.id === activeProfileId);
-                            if (profile) {
-                                profile.settings = { ...settings };
-                                profile.updatedAt = new Date().toISOString();
-                                saveProfiles();
-                            }
-                        }
-                        if (!isInitializing) {
-                            localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
-                        }
-                    });
+                    el.addEventListener('input', debouncedUpdateSettings);
                 }
             });
 
@@ -8051,7 +8087,6 @@
             // Demo Settings
             const bgImageValue = document.getElementById('backgroundImageUrl').value;
             settings.backgroundImageUrl = bgImageValue;
-            console.log('✏️ updateSettingsFromForm - backgroundImageUrl:', bgImageValue);
 
             // Header & Branding
             settings.headerTitle = document.getElementById('headerTitle').value;
@@ -8146,7 +8181,6 @@
                 }
 
                 const headerAvatar = document.getElementById('previewHeaderAvatar');
-                console.log('Updating header logo, settings.headerLogo:', settings.headerLogo, 'isSafe:', isSafeImageData(settings.headerLogo));
                 if (headerAvatar) {
                     if (isSafeImageData(settings.headerLogo)) {
                         headerAvatar.classList.add('has-image');
@@ -8169,7 +8203,6 @@
                 }
 
                 const botAvatar = document.getElementById('previewBotAvatar');
-                console.log('Updating bot avatar, settings.botAvatar:', settings.botAvatar, 'isSafe:', isSafeImageData(settings.botAvatar));
                 if (botAvatar) {
                     if (isSafeImageData(settings.botAvatar)) {
                         botAvatar.innerHTML = `<img src="${settings.botAvatar}" alt="Bot" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;

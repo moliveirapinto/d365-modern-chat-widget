@@ -62,7 +62,7 @@ export default {
       // POST /room/create
       if (url.pathname === '/room/create' && request.method === 'POST') {
         const body = await request.json();
-        const { config, creatorName, widgetName } = body;
+        const { config, creatorName, widgetName, roomName } = body;
         
         // Generate unique room code
         let roomCode;
@@ -100,6 +100,7 @@ export default {
         // Store room data
         const roomData = {
           code: roomCode,
+          name: roomName || 'My Room',
           widgets: widgets,
           createdAt: new Date().toISOString(),
           createdBy: creatorName || 'Anonymous',
@@ -115,6 +116,7 @@ export default {
         return new Response(JSON.stringify({ 
           success: true, 
           roomCode,
+          roomName: roomData.name,
           widgetId: widgets.length > 0 ? widgets[0].id : null,
           message: `Room created! Share code: ${roomCode}`
         }), {
