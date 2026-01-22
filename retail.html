@@ -1318,7 +1318,7 @@
                                     High
                                 </span>
                             </td>
-                            <td>Jan 21, 2026</td>
+                            <td><span class="dynamic-date" data-days-ago="1"></span></td>
                             <td class="case-actions">
                                 <button onclick="alert('View case details')">View</button>
                             </td>
@@ -1333,7 +1333,7 @@
                                     Medium
                                 </span>
                             </td>
-                            <td>Jan 19, 2026</td>
+                            <td><span class="dynamic-date" data-days-ago="3"></span></td>
                             <td class="case-actions">
                                 <button onclick="alert('View case details')">View</button>
                             </td>
@@ -1348,7 +1348,7 @@
                                     Medium
                                 </span>
                             </td>
-                            <td>Jan 17, 2026</td>
+                            <td><span class="dynamic-date" data-days-ago="5"></span></td>
                             <td class="case-actions">
                                 <button onclick="alert('View case details')">View</button>
                             </td>
@@ -1363,7 +1363,7 @@
                                     Low
                                 </span>
                             </td>
-                            <td>Jan 12, 2026</td>
+                            <td><span class="dynamic-date" data-days-ago="10"></span></td>
                             <td class="case-actions">
                                 <button onclick="alert('View case details')">View</button>
                             </td>
@@ -1378,7 +1378,7 @@
                                     Low
                                 </span>
                             </td>
-                            <td>Jan 8, 2026</td>
+                            <td><span class="dynamic-date" data-days-ago="14"></span></td>
                             <td class="case-actions">
                                 <button onclick="alert('View case details')">View</button>
                             </td>
@@ -1393,7 +1393,7 @@
                                     Medium
                                 </span>
                             </td>
-                            <td>Jan 5, 2026</td>
+                            <td><span class="dynamic-date" data-days-ago="17"></span></td>
                             <td class="case-actions">
                                 <button onclick="alert('View case details')">View</button>
                             </td>
@@ -1408,7 +1408,7 @@
                                     High
                                 </span>
                             </td>
-                            <td>Jan 2, 2026</td>
+                            <td><span class="dynamic-date" data-days-ago="20"></span></td>
                             <td class="case-actions">
                                 <button onclick="alert('View case details')">View</button>
                             </td>
@@ -1753,8 +1753,27 @@
             }
         }
 
+        // Initialize dynamic dates for support cases
+        function initDynamicDates() {
+            const dateElements = document.querySelectorAll('.dynamic-date');
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+            dateElements.forEach(el => {
+                const daysAgo = parseInt(el.getAttribute('data-days-ago'), 10);
+                const date = new Date();
+                date.setDate(date.getDate() - daysAgo);
+                
+                const month = months[date.getMonth()];
+                const day = date.getDate();
+                const year = date.getFullYear();
+                
+                el.textContent = `${month} ${day}, ${year}`;
+            });
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+            initDynamicDates();
             loadWidget();
         });
     </script>
