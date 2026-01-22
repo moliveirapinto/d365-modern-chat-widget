@@ -5250,23 +5250,23 @@
                 return `
                     <div class="room-container" style="margin-bottom: 8px;">
                         <!-- Room Header -->
-                        <div class="profile-item room-header" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; cursor: pointer;" onclick="toggleRoomExpand('${room.code}')">
+                        <div class="profile-item room-header" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; cursor: pointer; padding: 14px 16px;" onclick="toggleRoomExpand('${room.code}')">
                             <div class="profile-item-content" style="flex: 1;">
-                                <div class="profile-item-header" style="display: flex; align-items: center; gap: 8px;">
+                                <div class="profile-item-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
                                     <span style="transition: transform 0.2s; transform: rotate(${isExpanded ? '90deg' : '0deg'}); font-size: 12px;">▶</span>
-                                    <span class="profile-item-name" style="font-weight: 600; color: #1e293b;">
+                                    <span class="profile-item-name" style="font-weight: 600; color: #1e293b; font-size: 14px;">
                                         ${roomDisplayName}
                                     </span>
                                     <button onclick="event.stopPropagation(); copyRoomCode('${room.code}')" title="Click to copy room code" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-family: monospace; font-size: 12px; font-weight: 600; color: white; display: flex; align-items: center; gap: 6px; letter-spacing: 1px; box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3); transition: all 0.15s;">
                                         <span>${room.code}</span>
                                         <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:white;"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
                                     </button>
-                                    ${room.isOwner ? '<span style="font-size: 10px; background: #dbeafe; color: #1e40af; padding: 2px 6px; border-radius: 4px;">Owner</span>' : ''}
+                                    ${room.isOwner ? '<span style="font-size: 10px; background: #dbeafe; color: #1e40af; padding: 3px 8px; border-radius: 4px; font-weight: 500;">Owner</span>' : ''}
                                     <span style="font-size: 11px; color: #64748b; margin-left: auto;">${widgets.length} widget${widgets.length !== 1 ? 's' : ''}</span>
                                 </div>
-                                <div class="profile-item-details" style="font-size: 11px; color: #64748b;">
+                                <div class="profile-item-details" style="font-size: 12px; color: #64748b; margin-left: 22px;">
                                     <span>by ${room.createdBy || 'Unknown'}</span>
-                                    <span>•</span>
+                                    <span style="margin: 0 6px;">•</span>
                                     <span>Joined ${new Date(room.joinedAt).toLocaleDateString()}</span>
                                 </div>
                             </div>
