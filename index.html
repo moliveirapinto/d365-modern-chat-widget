@@ -5523,12 +5523,12 @@
             
             try {
                 // Check if this profile already has a cloud ID
-                const existingGistId = profile.cloudId || null;
+                let existingGistId = profile.cloudId || null;
                 console.log('☁️ Existing gist ID:', existingGistId);
                 
                 let res;
                 if (existingGistId) {
-                    // Update existing gist
+                    // Try to update existing gist
                     console.log('☁️ Updating existing gist...');
                     res = await fetch('https://api.github.com/gists/' + existingGistId, {
                         method: 'PATCH',
@@ -5538,6 +5538,21 @@
                         },
                         body: JSON.stringify(gistData)
                     });
+                    
+                    // If 403 or 404, the gist belongs to another user/token - create new instead
+                    if (res.status === 403 || res.status === 404) {
+                        console.log('☁️ Cannot access existing gist (403/404), creating new one...');
+                        profile.cloudId = null; // Clear invalid cloudId
+                        existingGistId = null;
+                        res = await fetch('https://api.github.com/gists', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': 'token ' + cloudToken,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(gistData)
+                        });
+                    }
                 } else {
                     // Create new gist
                     console.log('☁️ Creating new gist...');
@@ -5651,10 +5666,12 @@
             };
             
             let res;
-            if (profile.cloudId) {
-                // Update existing gist
-                console.log('☁️ Updating existing gist:', profile.cloudId);
-                res = await fetch('https://api.github.com/gists/' + profile.cloudId, {
+            let existingGistId = profile.cloudId || null;
+            
+            if (existingGistId) {
+                // Try to update existing gist
+                console.log('☁️ Updating existing gist:', existingGistId);
+                res = await fetch('https://api.github.com/gists/' + existingGistId, {
                     method: 'PATCH',
                     headers: {
                         'Authorization': 'token ' + cloudToken,
@@ -5662,6 +5679,21 @@
                     },
                     body: JSON.stringify(gistData)
                 });
+                
+                // If 403 or 404, the gist belongs to another user/token - create new instead
+                if (res.status === 403 || res.status === 404) {
+                    console.log('☁️ Cannot access existing gist (403/404), creating new one...');
+                    profile.cloudId = null; // Clear invalid cloudId
+                    existingGistId = null;
+                    res = await fetch('https://api.github.com/gists', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'token ' + cloudToken,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(gistData)
+                    });
+                }
             } else {
                 // Create new gist
                 console.log('☁️ Creating new gist for:', profile.name);
