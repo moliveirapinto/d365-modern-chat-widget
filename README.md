@@ -4,7 +4,7 @@
 
 [![D365 Compatible](https://img.shields.io/badge/D365-Omnichannel-0078D4?style=flat-square&logo=microsoft)](https://dynamics.microsoft.com)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.5.0-blue?style=flat-square)](package.json)
+[![Version](https://img.shields.io/badge/version-v2.6.0-blue?style=flat-square)](package.json)
 
 ![Chat Widget Preview](preview.png)
 
@@ -76,6 +76,7 @@
 - 📚 **Quick Start Guide** - Interactive tutorial for new users with 3 deployment methods (Go To Widget, TamperMonkey, Embed)
 - 📊 **Analytics Dashboard** - Track widget usage with Cloudflare D1 SQL backend (sessions, chats, calls by domain)
 - 🔗 **Room Collaboration** - Share multiple widgets with a 6-character code, syncs across devices!
+- 🏪 **Industry Demo Pages** - Test widgets in realistic industry contexts (Retail, Financial, Healthcare, Education)
 
 </td>
 </tr>
@@ -250,7 +251,8 @@ window.chatWidget = new ModernChatWidget({
 ```
 d365-modern-chat-widget/
 ├── 📄 index.html                    # Admin configuration panel (Chat Widget Studio)
-├── 🎬 live.html                     # Live chat widget UI
+├── 🎬 live.html                     # Live chat widget UI (blank page)
+├── 🛍️ retail.html                   # Industry demo - Retail/E-commerce (LUXE & CO.)
 ├── 📊 analytics.html                # Analytics dashboard (private, in .gitignore)
 ├── 📘 D365-CHAT-SDK-GUIDE.md        # SDK implementation guide
 ├── 📦 package.json                  # NPM dependencies
@@ -1168,6 +1170,32 @@ See **[CONTRIBUTING.md](CONTRIBUTING.md)** for:
 ---
 
 ## 📝 Changelog
+
+### v2.6.0 (January 22, 2026)
+
+#### 🎯 Room Widget LCW Integration & UI Polish
+- **NEW:** LCW Embed Code section in Room Widgets - paste D365 embed code directly in team widgets
+- **NEW:** Connection status indicator for room widgets - shows configured/partial/not configured state
+- **NEW:** Extracted D365 values display (App ID, Org ID, Org URL) for room widgets
+- **NEW:** Apply to Settings button - parse embed code and extract D365 connection values automatically
+- **NEW:** Professional delete confirmation modals with danger/warning styling
+- **IMPROVED:** Room header layout - title/details on left, action icons on far right for consistency
+- **IMPROVED:** Add Widget to Room modal redesigned with cleaner, professional styling
+- **IMPROVED:** Better spacing and alignment in room list items
+- **FIX:** Delete confirmation callbacks now execute properly (race condition fixed)
+- **FIX:** Hidden D365 connection values no longer appear randomly on page
+
+#### 🏪 Industry Demo Pages
+- **NEW:** "Go to Widget" dropdown with industry selector - launch widget in different business contexts
+- **NEW:** Retail / E-commerce demo page (`retail.html`) - LUXE & CO. premium clothing store
+  - Full ecommerce website layout with Home, Shop, FAQ, Support, Contact pages
+  - Mock customer support portal with case history (7 cases: 2 open, 1 pending, 4 resolved)
+  - Professional navigation with tabbed interface
+  - Widget loads from saved localStorage settings
+  - "Back to Studio" navigation link
+- **COMING SOON:** Financial Services, Healthcare, Education industry demos
+
+---
 
 ### v2.3.0 (January 16, 2026)
 

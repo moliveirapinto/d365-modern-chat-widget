@@ -1032,6 +1032,97 @@
         }
         .btn svg { width: 18px; height: 18px; fill: currentColor; }
 
+        /* Widget Launch Dropdown */
+        .widget-launch-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .widget-launch-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .widget-launch-menu {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 0;
+            min-width: 280px;
+            background: var(--admin-card);
+            border: 1px solid var(--admin-border);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.2s ease;
+        }
+        .widget-launch-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .widget-launch-section {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--admin-border);
+        }
+        .widget-launch-section:last-child {
+            border-bottom: none;
+        }
+        .widget-launch-section-title {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            padding: 6px 16px;
+        }
+        .widget-launch-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            color: var(--admin-text);
+            text-decoration: none;
+            transition: all 0.15s ease;
+            cursor: pointer;
+        }
+        .widget-launch-option:hover:not(.disabled) {
+            background: rgba(99, 102, 241, 0.1);
+        }
+        .widget-launch-option.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .widget-launch-option-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .widget-launch-option-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+        }
+        .widget-launch-option-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .widget-launch-option-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--admin-text);
+        }
+        .widget-launch-option-desc {
+            font-size: 11px;
+            color: #64748b;
+        }
+
         .action-buttons {
             display: flex;
             gap: 12px;
@@ -4139,11 +4230,69 @@
                         <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
                         Reset to Default
                     </button>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <a href="live.html" target="_blank" class="btn btn-success" id="goToWidgetBtn" style="text-decoration:none;">
-                            <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
-                            Go to Live Widget
-                        </a>
+                    
+                    <!-- Go To Widget with Industry Selector -->
+                    <div style="display: flex; align-items: center; gap: 8px; position: relative;">
+                        <div class="widget-launch-dropdown">
+                            <button class="btn btn-success widget-launch-btn" onclick="toggleWidgetLaunchMenu()">
+                                <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                                Go to Widget
+                                <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; margin-left: 4px;"><path d="M7 10l5 5 5-5z"/></svg>
+                            </button>
+                            <div id="widgetLaunchMenu" class="widget-launch-menu">
+                                <div class="widget-launch-section">
+                                    <div class="widget-launch-section-title">Standard Demo</div>
+                                    <a href="live.html" target="_blank" class="widget-launch-option" onclick="closeWidgetLaunchMenu()">
+                                        <div class="widget-launch-option-icon" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
+                                            <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+                                        </div>
+                                        <div class="widget-launch-option-text">
+                                            <span class="widget-launch-option-title">Blank Page</span>
+                                            <span class="widget-launch-option-desc">Widget on plain background</span>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="widget-launch-section">
+                                    <div class="widget-launch-section-title">Industry Demos</div>
+                                    <a href="retail.html" target="_blank" class="widget-launch-option" onclick="closeWidgetLaunchMenu()">
+                                        <div class="widget-launch-option-icon" style="background: linear-gradient(135deg, #c9a962 0%, #a88a4a 100%);">
+                                            <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                                        </div>
+                                        <div class="widget-launch-option-text">
+                                            <span class="widget-launch-option-title">Retail / E-commerce</span>
+                                            <span class="widget-launch-option-desc">LUXE & CO. clothing store</span>
+                                        </div>
+                                    </a>
+                                    <div class="widget-launch-option disabled">
+                                        <div class="widget-launch-option-icon" style="background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);">
+                                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                                        </div>
+                                        <div class="widget-launch-option-text">
+                                            <span class="widget-launch-option-title">Financial Services</span>
+                                            <span class="widget-launch-option-desc">Coming soon...</span>
+                                        </div>
+                                    </div>
+                                    <div class="widget-launch-option disabled">
+                                        <div class="widget-launch-option-icon" style="background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);">
+                                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z"/></svg>
+                                        </div>
+                                        <div class="widget-launch-option-text">
+                                            <span class="widget-launch-option-title">Healthcare</span>
+                                            <span class="widget-launch-option-desc">Coming soon...</span>
+                                        </div>
+                                    </div>
+                                    <div class="widget-launch-option disabled">
+                                        <div class="widget-launch-option-icon" style="background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);">
+                                            <svg viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
+                                        </div>
+                                        <div class="widget-launch-option-text">
+                                            <span class="widget-launch-option-title">Education</span>
+                                            <span class="widget-launch-option-desc">Coming soon...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <span style="font-size: 11px; color: #94a3b8; white-space: nowrap;">(save first!)</span>
                     </div>
                 </div>
@@ -4325,14 +4474,31 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v2.5.0';
+        const APP_VERSION = 'v2.6.0';
         const APP_LAST_UPDATED = 'Jan 22, 2026';
         
         const CHANGELOG = [
             {
-                version: 'v2.5.0',
+                version: 'v2.6.0',
                 date: 'Jan 22, 2026',
                 latest: true,
+                items: [
+                    { type: 'new', text: 'LCW Embed Code section in Room Widgets - paste D365 embed code directly in team widgets' },
+                    { type: 'new', text: 'Connection status indicator for room widgets - shows configured/partial/not configured state' },
+                    { type: 'new', text: 'Extracted D365 values display (App ID, Org ID, Org URL) for room widgets' },
+                    { type: 'new', text: 'Apply to Settings button - parse embed code and extract D365 connection values automatically' },
+                    { type: 'new', text: 'Professional delete confirmation modals with danger/warning styling' },
+                    { type: 'improve', text: 'Room header layout - title/details on left, action icons on far right for consistency' },
+                    { type: 'improve', text: 'Add Widget to Room modal redesigned with cleaner, professional styling' },
+                    { type: 'improve', text: 'Better spacing and alignment in room list items' },
+                    { type: 'fix', text: 'Delete confirmation callbacks now execute properly (race condition fixed)' },
+                    { type: 'fix', text: 'Hidden D365 connection values no longer appear randomly on page' }
+                ]
+            },
+            {
+                version: 'v2.5.0',
+                date: 'Jan 22, 2026',
+                latest: false,
                 items: [
                     { type: 'new', text: 'Multiple widgets per room - each room can now hold unlimited widget profiles' },
                     { type: 'new', text: 'Copy Personal → Room - share your personal profiles with teammates in one click' },
@@ -9089,6 +9255,30 @@
                 console.error('Error in updatePreview:', err);
             }
         }
+
+        // Widget Launch Dropdown Functions
+        function toggleWidgetLaunchMenu() {
+            const menu = document.getElementById('widgetLaunchMenu');
+            if (menu) {
+                menu.classList.toggle('active');
+            }
+        }
+
+        function closeWidgetLaunchMenu() {
+            const menu = document.getElementById('widgetLaunchMenu');
+            if (menu) {
+                menu.classList.remove('active');
+            }
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const dropdown = document.querySelector('.widget-launch-dropdown');
+            const menu = document.getElementById('widgetLaunchMenu');
+            if (dropdown && menu && !dropdown.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+        });
 
         function saveSettings() {
             updateSettingsFromForm();

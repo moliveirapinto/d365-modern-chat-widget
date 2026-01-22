@@ -1,6 +1,6 @@
 {
   "name": "d365-modern-chat",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "scripts": {
     "build": "echo 'No build needed - using pre-bundled files'"
   },
