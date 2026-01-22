@@ -4,7 +4,7 @@
 
 [![D365 Compatible](https://img.shields.io/badge/D365-Omnichannel-0078D4?style=flat-square&logo=microsoft)](https://dynamics.microsoft.com)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.4.0-blue?style=flat-square)](package.json)
+[![Version](https://img.shields.io/badge/version-v2.5.0-blue?style=flat-square)](package.json)
 
 ![Chat Widget Preview](preview.png)
 
@@ -61,7 +61,7 @@
 
 #### Admin Panel (Chat Widget Studio Analytics)
 - 🎭 **Widget Profiles** - Save and switch between multiple customer configurations
-- 👥 **Room Collaboration** - Share settings instantly with 6-character room codes (no accounts needed)
+- 👥 **Room Collaboration** - Share multiple widget profiles with 6-character room codes (no accounts needed)
 - 🔄 **Widget Mode Selector** - Choose between Standard (native D365 LCW) or Custom (styled widget)
 - 🔤 **Font Library** - 30 professional fonts in 4 categories (Sans-Serif, Serif, Monospace, Display)
 - 🔌 **D365 Configuration** - Easy setup with connection validation
@@ -75,7 +75,7 @@
 - 📋 **Quick Embed Code** - Copy integration code with one click
 - 📚 **Quick Start Guide** - Interactive tutorial for new users with 3 deployment methods (Go To Widget, TamperMonkey, Embed)
 - 📊 **Analytics Dashboard** - Track widget usage with Cloudflare D1 SQL backend (sessions, chats, calls by domain)
-- 🔗 **Room Collaboration** - Share settings with a 6-character code, no accounts needed!
+- 🔗 **Room Collaboration** - Share multiple widgets with a 6-character code, syncs across devices!
 
 </td>
 </tr>
@@ -1195,6 +1195,24 @@ See **[CONTRIBUTING.md](CONTRIBUTING.md)** for:
 - **NEW:** VoiceVideo keepalive - prevents call failures after 5 min
 - **NEW:** Visibility handler - fixes 480/10077 errors
 - **NEW:** Full markdown rendering with citation support
+
+---
+
+### v2.5.0 (January 17, 2026)
+
+#### 🎯 Multi-Widget Rooms & Cloud Sync
+- **NEW:** Multiple widgets per room - each room can now hold unlimited widget profiles
+- **NEW:** Copy Personal → Room - share your personal profiles with teammates in one click
+- **NEW:** Copy Room → Personal - save room widgets to your personal collection
+- **NEW:** Cloud profile sync - profiles now sync across browsers/devices via GitHub Gists
+- **NEW:** Refresh button - manually sync profiles from cloud at any time
+- **NEW:** 60-second background sync - keeps your profiles up-to-date automatically
+- **IMPROVED:** Expandable room list - click room to see all widgets inside
+- **IMPROVED:** Profile deletion syncs across devices - delete on one, removed everywhere
+- **IMPROVED:** Better error handling for GitHub token scope issues
+- **FIX:** Logout now immediately clears UI (page refresh)
+- **FIX:** Profiles no longer disappear after re-login on different devices
+- **FIX:** Fixed 403/404 errors when cloudId belongs to different account
 
 ---
 

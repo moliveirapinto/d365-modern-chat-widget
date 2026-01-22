@@ -4013,14 +4013,33 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v2.4.0';
-        const APP_LAST_UPDATED = 'Jan 16, 2026';
+        const APP_VERSION = 'v2.5.0';
+        const APP_LAST_UPDATED = 'Jan 17, 2026';
         
         const CHANGELOG = [
             {
+                version: 'v2.5.0',
+                date: 'Jan 17, 2026',
+                latest: true,
+                items: [
+                    { type: 'new', text: 'Multiple widgets per room - each room can now hold unlimited widget profiles' },
+                    { type: 'new', text: 'Copy Personal → Room - share your personal profiles with teammates in one click' },
+                    { type: 'new', text: 'Copy Room → Personal - save room widgets to your personal collection' },
+                    { type: 'new', text: 'Cloud profile sync - profiles now sync across browsers/devices via GitHub Gists' },
+                    { type: 'new', text: 'Refresh button - manually sync profiles from cloud at any time' },
+                    { type: 'new', text: '60-second background sync - keeps your profiles up-to-date automatically' },
+                    { type: 'improve', text: 'Expandable room list - click room to see all widgets inside' },
+                    { type: 'improve', text: 'Profile deletion syncs across devices - delete on one, removed everywhere' },
+                    { type: 'improve', text: 'Better error handling for GitHub token scope issues' },
+                    { type: 'fix', text: 'Logout now immediately clears UI (page refresh)' },
+                    { type: 'fix', text: 'Profiles no longer disappear after re-login on different devices' },
+                    { type: 'fix', text: 'Fixed 403/404 errors when cloudId belongs to different account' }
+                ]
+            },
+            {
                 version: 'v2.4.0',
                 date: 'Jan 16, 2026',
-                latest: true,
+                latest: false,
                 items: [
                     { type: 'new', text: 'Room Collaboration - share widget settings with a 6-character code (no accounts needed!)' },
                     { type: 'new', text: 'Multiple rooms support - create/join unlimited rooms, switch between them instantly' },
@@ -5631,29 +5650,13 @@
                     // if a different user logs in next time and clear their profiles
                     // Clear team data on logout
                     clearTeamRepoConfig();
-                    document.getElementById('teamProfileList').innerHTML = '';
-                    updateTeamUI();
-                    // Reset to personal tab
-                    switchProfileTab('personal');
-                    document.getElementById('userBar').classList.remove('show');
-                    // Show login button in header
-                    const loginBtn = document.getElementById('loginBtn');
-                    if (loginBtn) loginBtn.style.display = '';
-                    // Hide Sync All button
-                    const syncAllBtn = document.getElementById('syncAllBtn');
-                    if (syncAllBtn) syncAllBtn.style.display = 'none';
-                    // Hide Refresh from Cloud button
-                    const refreshCloudBtn = document.getElementById('refreshCloudBtn');
-                    if (refreshCloudBtn) refreshCloudBtn.style.display = 'none';
-                    // Reset token entry
-                    document.getElementById('tokenEntry').classList.remove('show');
-                    document.getElementById('tokenInput').value = '';
-                    document.getElementById('tokenStatus').style.display = 'none';
-                    // Update cloud sync status to offline
-                    updateCloudSyncStatus('offline');
-                    // Refresh the profile list to remove cloud indicators
-                    renderProfileList();
+                    
                     showToast('Logged out successfully');
+                    
+                    // Reload the page after a short delay to show the toast
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
                 });
             }
         });
