@@ -1351,6 +1351,77 @@
             height: 14px;
             fill: currentColor;
         }
+        
+        /* Profile Connection Status */
+        .profile-connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+        }
+        .profile-connection-status.configured {
+            background: #d1fae5;
+            border-color: #a7f3d0;
+        }
+        .profile-connection-status.partial {
+            background: #fef3c7;
+            border-color: #fde68a;
+        }
+        .profile-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #f59e0b;
+            flex-shrink: 0;
+        }
+        .profile-connection-status.configured .profile-status-dot {
+            background: #10b981;
+        }
+        .profile-status-text {
+            font-size: 12px;
+            font-weight: 500;
+            color: #92400e;
+        }
+        .profile-connection-status.configured .profile-status-text {
+            color: #065f46;
+        }
+        
+        /* Profile Extracted Values */
+        .profile-extracted-values {
+            background: white;
+            border: 1px solid var(--admin-border);
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+        }
+        .profile-extracted-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 4px 0;
+            font-size: 12px;
+        }
+        .profile-extracted-item:not(:last-child) {
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 6px;
+            margin-bottom: 2px;
+        }
+        .profile-extracted-label {
+            color: var(--admin-text-light);
+            font-weight: 500;
+            min-width: 55px;
+            flex-shrink: 0;
+        }
+        .profile-extracted-value {
+            color: var(--admin-text);
+            font-family: 'Consolas', 'Monaco', monospace;
+            word-break: break-all;
+            line-height: 1.4;
+        }
 
         .new-profile-row {
             display: flex;
@@ -3226,50 +3297,17 @@
                 </div>
             </div>
 
-            <!-- D365 Configuration -->
-            <div class="settings-card">
-                <div class="card-header">
-                    <div class="card-header-icon">
-                        <img src="img/icon/dynamics.png" alt="D365 Connection" style="width: 24px; height: 24px; object-fit: contain;">
-                    </div>
-                    <div>
-                        <h2>D365 Connection</h2>
-                        <p>Connection details from your active profile</p>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="extracted-values" id="extractedValues" style="display: none;">
-                        <div class="extracted-header">
-                            <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#10b981;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                            <span>Values extracted successfully</span>
-                        </div>
-                        <div class="extracted-grid">
-                            <div class="extracted-item">
-                                <span class="extracted-label">App ID:</span>
-                                <span class="extracted-value" id="extractedAppId">-</span>
-                            </div>
-                            <div class="extracted-item">
-                                <span class="extracted-label">Org ID:</span>
-                                <span class="extracted-value" id="extractedOrgId">-</span>
-                            </div>
-                            <div class="extracted-item">
-                                <span class="extracted-label">Org URL:</span>
-                                <span class="extracted-value" id="extractedOrgUrl">-</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="noProfileSelectedHint" style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 14px; margin-bottom: 12px;">
-                        <p style="margin: 0; color: #0369a1; font-size: 13px; line-height: 1.5;">
-                            💡 <strong>Tip:</strong> Select a profile from "Widget Profiles" above to view and edit the D365 connection. The LCW embed code is stored with each profile.
-                        </p>
-                    </div>
-                    <!-- Hidden lcwCode for backwards compatibility -->
-                    <textarea id="lcwCode" style="display: none;"></textarea>
-                    <div class="connection-status" id="connectionStatus">
-                        <span class="status-dot" id="statusDot"></span>
-                        <span class="status-text" id="statusText">Not configured</span>
-                    </div>
-                </div>
+            <!-- Hidden elements for backwards compatibility -->
+            <textarea id="lcwCode" style="display: none;"></textarea>
+            <div id="extractedValues" style="display: none;">
+                <span id="extractedAppId"></span>
+                <span id="extractedOrgId"></span>
+                <span id="extractedOrgUrl"></span>
+            </div>
+            <div id="noProfileSelectedHint" style="display: none;"></div>
+            <div id="connectionStatus" style="display: none;">
+                <span id="statusDot"></span>
+                <span id="statusText"></span>
             </div>
 
             <!-- Widget Mode Selector -->
@@ -7054,6 +7092,23 @@
                 // Get the embed code from the profile settings (lcwCode is the standard field name)
                 const embedCode = p.settings?.lcwCode || '';
                 const hasEmbedCode = embedCode.trim().length > 0;
+                
+                // Get connection details for display
+                const appId = p.settings?.widgetId || '';
+                const orgId = p.settings?.orgId || '';
+                const orgUrl = p.settings?.orgUrl || '';
+                const isConfigured = appId && orgId && orgUrl;
+                
+                // Determine connection status
+                let statusClass = '';
+                let statusText = 'Not configured';
+                if (isConfigured) {
+                    statusClass = 'configured';
+                    statusText = 'Ready to connect';
+                } else if (appId || orgId || orgUrl) {
+                    statusClass = 'partial';
+                    statusText = 'Partial configuration';
+                }
 
                 return `
                 <div class="profile-item ${p.id === activeProfileId ? 'active' : ''}" onclick="loadProfile('${p.id}')">
@@ -7078,6 +7133,31 @@
                         </div>
                     </div>
                     <div class="profile-embed-section">
+                        <!-- Connection Status -->
+                        <div class="profile-connection-status ${statusClass}">
+                            <span class="profile-status-dot"></span>
+                            <span class="profile-status-text">${statusText}</span>
+                        </div>
+                        
+                        <!-- Extracted Values (if configured) -->
+                        ${isConfigured ? `
+                        <div class="profile-extracted-values">
+                            <div class="profile-extracted-item">
+                                <span class="profile-extracted-label">App ID:</span>
+                                <span class="profile-extracted-value">${escapeHtml(appId)}</span>
+                            </div>
+                            <div class="profile-extracted-item">
+                                <span class="profile-extracted-label">Org ID:</span>
+                                <span class="profile-extracted-value">${escapeHtml(orgId)}</span>
+                            </div>
+                            <div class="profile-extracted-item">
+                                <span class="profile-extracted-label">Org URL:</span>
+                                <span class="profile-extracted-value">${escapeHtml(orgUrl)}</span>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        <!-- LCW Embed Code -->
                         <div class="profile-embed-label">
                             <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
                             D365 LCW Embed Code
