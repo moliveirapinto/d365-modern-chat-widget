@@ -3,6 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self' https://*.microsoft.com https://*.azure.com https://*.dynamics.com https://*.crm.dynamics.com;
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.microsoft.com https://*.azure.com https://*.azureedge.net https://oc-cdn-ocprod.azureedge.net;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.azureedge.net https://oc-cdn-ocprod.azureedge.net;
+        style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.azureedge.net https://oc-cdn-ocprod.azureedge.net;
+        font-src 'self' https://fonts.gstatic.com https://*.azureedge.net;
+        img-src 'self' data: blob: https://*.microsoft.com https://*.azure.com https://*.azureedge.net https://*.dynamics.com;
+        frame-src 'self' https://*.omnichannelengagementhub.com https://*.azureedge.net https://oc-cdn-ocprod.azureedge.net https://forms.office.com https://*.forms.office.com https://*.microsoft.com;
+        connect-src 'self' https://*.microsoft.com https://*.azure.com https://*.dynamics.com https://*.omnichannelengagementhub.com https://*.skype.com wss://*.skype.com https://*.azureedge.net;
+        worker-src 'self' blob:;
+    ">
     <title>LUXE & CO. | Premium Fashion</title>
     <link rel="icon" type="image/png" href="img/icon/retail-favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
