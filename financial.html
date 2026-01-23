@@ -14,24 +14,25 @@
         connect-src 'self' https://*.microsoft.com https://*.azure.com https://*.dynamics.com https://*.omnichannelengagementhub.com https://*.skype.com wss://*.skype.com https://*.azureedge.net wss://*.omnichannelengagementhub.com https://*.communication.azure.com wss://*.communication.azure.com;
         worker-src 'self' blob:;
     ">
-    <title>Meridian Bank | Online Banking Portal</title>
+    <title>Meridian Bank | Banking That Moves With You</title>
     <link rel="icon" type="image/png" href="img/icon/bank-favicon.png">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #0a2540;
-            --primary-light: #1a3a5c;
-            --secondary: #00d4aa;
-            --secondary-dark: #00b894;
-            --accent: #635bff;
-            --accent-light: #7c75ff;
-            --bg-dark: #0a0f1a;
-            --bg-card: #111827;
-            --bg-card-hover: #1f2937;
-            --text-white: #ffffff;
-            --text-light: #9ca3af;
-            --text-muted: #6b7280;
-            --border: #374151;
+            --primary: #0f172a;
+            --primary-light: #1e293b;
+            --accent: #0ea5e9;
+            --accent-dark: #0284c7;
+            --accent-light: #38bdf8;
+            --secondary: #10b981;
+            --gold: #fbbf24;
+            --text: #1e293b;
+            --text-light: #475569;
+            --text-muted: #94a3b8;
+            --bg: #ffffff;
+            --bg-light: #f8fafc;
+            --bg-dark: #f1f5f9;
+            --border: #e2e8f0;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
@@ -45,34 +46,68 @@
         }
 
         body {
-            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-white);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
             line-height: 1.6;
-            min-height: 100vh;
         }
 
-        /* Layout */
-        .app-container {
-            display: flex;
-            min-height: 100vh;
+        /* Top Bar */
+        .top-bar {
+            background: var(--primary);
+            color: white;
+            padding: 10px 0;
+            font-size: 13px;
         }
 
-        /* Sidebar Navigation */
-        .sidebar {
-            width: 280px;
-            background: var(--bg-card);
-            border-right: 1px solid var(--border);
+        .top-bar-content {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 40px;
             display: flex;
-            flex-direction: column;
-            position: fixed;
-            height: 100vh;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-bar a {
+            color: var(--accent-light);
+            text-decoration: none;
+        }
+
+        .top-bar a:hover {
+            text-decoration: underline;
+        }
+
+        .top-bar-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .top-bar-links a {
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+        }
+
+        .top-bar-links a:hover {
+            color: white;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
             z-index: 100;
         }
 
-        .sidebar-header {
-            padding: 24px;
-            border-bottom: 1px solid var(--border);
+        .header-main {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 16px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .logo {
@@ -83,9 +118,9 @@
         }
 
         .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -93,144 +128,46 @@
         }
 
         .logo-icon svg {
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             fill: white;
         }
 
         .logo-text {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 20px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 26px;
             font-weight: 700;
-            color: var(--text-white);
+            color: var(--primary);
             letter-spacing: -0.5px;
         }
 
         .logo-text span {
-            color: var(--secondary);
+            color: var(--accent);
         }
 
-        .sidebar-nav {
-            flex: 1;
-            padding: 24px 16px;
-            overflow-y: auto;
-        }
-
-        .nav-section {
-            margin-bottom: 32px;
-        }
-
-        .nav-section-title {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-            padding: 0 12px;
-            margin-bottom: 12px;
-        }
-
-        .nav-item {
+        .nav {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            border-radius: 10px;
-            color: var(--text-light);
+            gap: 8px;
+        }
+
+        .nav a {
             text-decoration: none;
-            font-size: 14px;
+            color: var(--text);
+            font-size: 15px;
             font-weight: 500;
+            padding: 10px 18px;
+            border-radius: 8px;
             transition: all 0.2s;
-            cursor: pointer;
-            margin-bottom: 4px;
         }
 
-        .nav-item:hover {
-            background: var(--bg-card-hover);
-            color: var(--text-white);
+        .nav a:hover {
+            background: var(--bg-light);
+            color: var(--accent);
         }
 
-        .nav-item.active {
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+        .nav a.active {
+            background: var(--accent);
             color: white;
-        }
-
-        .nav-item svg {
-            width: 20px;
-            height: 20px;
-            fill: currentColor;
-        }
-
-        .nav-item .badge {
-            margin-left: auto;
-            background: var(--danger);
-            color: white;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 10px;
-        }
-
-        .sidebar-footer {
-            padding: 20px;
-            border-top: 1px solid var(--border);
-        }
-
-        .user-card {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: var(--bg-card-hover);
-            border-radius: 12px;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .user-info {
-            flex: 1;
-        }
-
-        .user-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-white);
-        }
-
-        .user-role {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            margin-left: 280px;
-            min-height: 100vh;
-        }
-
-        /* Top Header */
-        .top-header {
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-        }
-
-        .page-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 24px;
-            font-weight: 600;
         }
 
         .header-actions {
@@ -239,643 +176,594 @@
             gap: 16px;
         }
 
-        .search-bar {
-            display: flex;
+        .btn {
+            display: inline-flex;
             align-items: center;
-            gap: 10px;
-            background: var(--bg-card-hover);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 10px 16px;
-            width: 300px;
-        }
-
-        .search-bar svg {
-            width: 18px;
-            height: 18px;
-            fill: var(--text-muted);
-        }
-
-        .search-bar input {
-            background: none;
-            border: none;
-            outline: none;
-            color: var(--text-white);
+            gap: 8px;
+            padding: 12px 24px;
             font-size: 14px;
-            width: 100%;
-        }
-
-        .search-bar input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .header-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: var(--bg-card-hover);
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
+            font-weight: 600;
+            border-radius: 8px;
+            text-decoration: none;
             transition: all 0.2s;
-            position: relative;
+            cursor: pointer;
+            border: none;
         }
 
-        .header-btn:hover {
-            background: var(--border);
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--border);
         }
 
-        .header-btn svg {
-            width: 20px;
-            height: 20px;
-            fill: var(--text-light);
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent);
         }
 
-        .header-btn .notification-dot {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 8px;
-            height: 8px;
-            background: var(--danger);
-            border-radius: 50%;
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-dark {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-dark:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-lg {
+            padding: 16px 32px;
+            font-size: 16px;
         }
 
         /* Page Content */
         .page-content {
             display: none;
-            padding: 32px;
         }
 
         .page-content.active {
             display: block;
         }
 
-        /* Dashboard Cards */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            transition: all 0.3s;
-        }
-
-        .stat-card:hover {
-            border-color: var(--accent);
-            transform: translateY(-2px);
-        }
-
-        .stat-card-header {
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, #334155 100%);
+            min-height: 600px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-        }
-
-        .stat-card-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .stat-card-icon.primary {
-            background: rgba(99, 91, 255, 0.15);
-        }
-
-        .stat-card-icon.success {
-            background: rgba(16, 185, 129, 0.15);
-        }
-
-        .stat-card-icon.warning {
-            background: rgba(245, 158, 11, 0.15);
-        }
-
-        .stat-card-icon.info {
-            background: rgba(59, 130, 246, 0.15);
-        }
-
-        .stat-card-icon svg {
-            width: 24px;
-            height: 24px;
-        }
-
-        .stat-card-icon.primary svg { fill: var(--accent); }
-        .stat-card-icon.success svg { fill: var(--success); }
-        .stat-card-icon.warning svg { fill: var(--warning); }
-        .stat-card-icon.info svg { fill: var(--info); }
-
-        .stat-card-change {
-            font-size: 12px;
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 6px;
-        }
-
-        .stat-card-change.positive {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--success);
-        }
-
-        .stat-card-change.negative {
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--danger);
-        }
-
-        .stat-card-label {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-        }
-
-        .stat-card-value {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--text-white);
-        }
-
-        /* Accounts Section */
-        .accounts-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        .account-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
             position: relative;
             overflow: hidden;
         }
 
-        .account-card::before {
+        .hero::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
+            top: -50%;
+            right: -10%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
         }
 
-        .account-card.checking::before {
-            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%);
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
         }
 
-        .account-card.savings::before {
-            background: linear-gradient(90deg, var(--secondary) 0%, var(--secondary-dark) 100%);
-        }
-
-        .account-card-header {
-            display: flex;
+        .hero-content {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 60px 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
         }
 
-        .account-type {
+        .hero-text {
+            color: white;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(14, 165, 233, 0.2);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--accent-light);
+            margin-bottom: 24px;
+        }
+
+        .hero-text h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 56px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -1px;
+        }
+
+        .hero-text h1 span {
+            background: linear-gradient(135deg, var(--accent-light) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-text p {
+            font-size: 18px;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 36px;
+            max-width: 500px;
+            line-height: 1.7;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 48px;
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .hero-stat h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .hero-stat p {
             font-size: 14px;
-            font-weight: 600;
-            color: var(--text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: rgba(255,255,255,0.6);
+            margin: 0;
         }
 
-        .account-number {
-            font-size: 13px;
-            color: var(--text-muted);
-            font-family: 'Space Grotesk', monospace;
+        .hero-image {
+            position: relative;
         }
 
-        .account-balance {
-            margin-bottom: 20px;
+        .hero-image img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.3);
         }
 
-        .balance-label {
-            font-size: 13px;
+        .hero-card {
+            position: absolute;
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .hero-card.rate {
+            bottom: 40px;
+            left: -40px;
+        }
+
+        .hero-card.trust {
+            top: 40px;
+            right: -40px;
+        }
+
+        .hero-card-title {
+            font-size: 12px;
             color: var(--text-muted);
             margin-bottom: 4px;
         }
 
-        .balance-amount {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 36px;
+        .hero-card-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
             font-weight: 700;
-            color: var(--text-white);
-        }
-
-        .balance-amount .currency {
-            font-size: 20px;
-            color: var(--text-light);
-        }
-
-        .account-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        .account-btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            background: var(--bg-card-hover);
-            color: var(--text-white);
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .account-btn:hover {
-            background: var(--accent);
-            border-color: var(--accent);
-        }
-
-        .account-btn svg {
-            width: 16px;
-            height: 16px;
-            fill: currentColor;
-        }
-
-        /* Transactions Table */
-        .content-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            overflow: hidden;
-        }
-
-        .content-card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .content-card-title {
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .view-all-btn {
-            font-size: 13px;
             color: var(--accent);
-            text-decoration: none;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
         }
 
-        .view-all-btn:hover {
-            text-decoration: underline;
+        .hero-card-value.green {
+            color: var(--secondary);
         }
 
-        .transactions-table {
-            width: 100%;
-            border-collapse: collapse;
+        /* Section Styles */
+        .section {
+            padding: 100px 0;
         }
 
-        .transactions-table th {
-            text-align: left;
-            padding: 14px 24px;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            background: rgba(0, 0, 0, 0.2);
+        .section.gray {
+            background: var(--bg-light);
         }
 
-        .transactions-table td {
-            padding: 16px 24px;
-            border-bottom: 1px solid var(--border);
-            font-size: 14px;
+        .section.dark {
+            background: var(--primary);
+            color: white;
         }
 
-        .transactions-table tr:last-child td {
-            border-bottom: none;
+        .section-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 40px;
         }
 
-        .transactions-table tr:hover td {
-            background: rgba(255, 255, 255, 0.02);
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 60px;
         }
 
-        .transaction-merchant {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .merchant-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: var(--bg-card-hover);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-
-        .merchant-details h4 {
-            font-weight: 500;
-            color: var(--text-white);
-            margin-bottom: 2px;
-        }
-
-        .merchant-details span {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .transaction-amount {
-            font-family: 'Space Grotesk', monospace;
-            font-weight: 600;
-        }
-
-        .transaction-amount.debit {
-            color: var(--danger);
-        }
-
-        .transaction-amount.credit {
-            color: var(--success);
-        }
-
-        .transaction-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .transaction-status.completed {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--success);
-        }
-
-        .transaction-status.pending {
-            background: rgba(245, 158, 11, 0.15);
-            color: var(--warning);
-        }
-
-        .transaction-status::before {
-            content: '';
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: currentColor;
-        }
-
-        /* Charts Section */
-        .charts-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 24px;
-            margin-top: 32px;
-        }
-
-        .chart-placeholder {
-            height: 300px;
-            background: linear-gradient(135deg, rgba(99, 91, 255, 0.1) 0%, rgba(0, 212, 170, 0.1) 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-muted);
-        }
-
-        /* Quick Actions */
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            padding: 24px;
-        }
-
-        .quick-action {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            padding: 20px;
-            background: var(--bg-card-hover);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-        }
-
-        .quick-action:hover {
-            background: var(--accent);
-        }
-
-        .quick-action-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .quick-action-icon svg {
-            width: 24px;
-            height: 24px;
-            fill: var(--text-white);
-        }
-
-        .quick-action span {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-white);
-        }
-
-        /* Services Page */
-        .services-hero {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            border-radius: 20px;
-            padding: 60px;
-            margin-bottom: 40px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .services-hero::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(0, 212, 170, 0.2) 0%, transparent 70%);
-            border-radius: 50%;
-        }
-
-        .services-hero-content {
-            position: relative;
-            z-index: 1;
-        }
-
-        .services-hero h1 {
-            font-family: 'Space Grotesk', sans-serif;
+        .section-header h2 {
+            font-family: 'Outfit', sans-serif;
             font-size: 42px;
             font-weight: 700;
-            margin-bottom: 20px;
-            line-height: 1.2;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
         }
 
-        .services-hero p {
-            font-size: 16px;
+        .section-header p {
+            font-size: 18px;
             color: var(--text-light);
-            margin-bottom: 32px;
-            max-width: 450px;
         }
 
-        .hero-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 14px 28px;
-            background: var(--secondary);
-            color: var(--primary);
-            font-weight: 600;
-            border-radius: 10px;
-            text-decoration: none;
-            transition: all 0.2s;
+        .section.dark .section-header p {
+            color: rgba(255,255,255,0.7);
         }
 
-        .hero-btn:hover {
-            background: var(--secondary-dark);
-            transform: translateY(-2px);
-        }
-
-        .services-hero-image {
-            position: relative;
-            z-index: 1;
-        }
-
-        .services-hero-image img {
-            width: 100%;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-        }
-
-        .services-grid {
+        /* Products Grid */
+        .products-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
+            gap: 32px;
         }
 
-        .service-card {
-            background: var(--bg-card);
+        .product-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 32px;
             border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 32px;
             transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
         }
 
-        .service-card:hover {
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
             border-color: var(--accent);
-            transform: translateY(-4px);
         }
 
-        .service-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 14px;
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+        .product-card.featured {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+        }
+
+        .product-card.featured .product-icon {
+            background: rgba(14, 165, 233, 0.2);
+        }
+
+        .product-card.featured .product-icon svg {
+            fill: var(--accent-light);
+        }
+
+        .product-card.featured p {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .product-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--bg-light);
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
-        .service-icon svg {
-            width: 28px;
-            height: 28px;
-            fill: white;
+        .product-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: var(--accent);
         }
 
-        .service-card h3 {
-            font-size: 18px;
+        .product-card h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
             font-weight: 600;
             margin-bottom: 12px;
         }
 
-        .service-card p {
-            font-size: 14px;
-            color: var(--text-muted);
+        .product-card p {
+            color: var(--text-light);
+            margin-bottom: 24px;
             line-height: 1.6;
         }
 
-        /* Support Page */
-        .support-header {
+        .product-features {
+            list-style: none;
+            margin-bottom: 24px;
+        }
+
+        .product-features li {
             display: flex;
             align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .product-features li svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--secondary);
+            flex-shrink: 0;
+        }
+
+        .product-card.featured .product-features li svg {
+            fill: var(--accent-light);
+        }
+
+        .product-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--accent);
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .product-link:hover {
+            gap: 10px;
+        }
+
+        .product-card.featured .product-link {
+            color: var(--accent-light);
+        }
+
+        /* Features Section */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 32px 24px;
+        }
+
+        .feature-icon {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .feature-icon svg {
+            width: 36px;
+            height: 36px;
+            fill: white;
+        }
+
+        .feature-card h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* Rates Banner */
+        .rates-banner {
+            background: linear-gradient(135deg, var(--secondary) 0%, #059669 100%);
+            border-radius: 24px;
+            padding: 60px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            color: white;
+            margin-top: 80px;
+        }
+
+        .rates-banner h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .rates-banner p {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 24px;
+        }
+
+        .rate-display {
+            display: flex;
+            gap: 40px;
+        }
+
+        .rate-item {
+            text-align: center;
+            background: rgba(255,255,255,0.15);
+            padding: 24px 32px;
+            border-radius: 16px;
+        }
+
+        .rate-item .rate-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 48px;
+            font-weight: 800;
+        }
+
+        .rate-item .rate-label {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* About Section */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .about-image img {
+            width: 100%;
+            border-radius: 20px;
+        }
+
+        .about-content h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            letter-spacing: -0.5px;
+        }
+
+        .about-content p {
+            color: var(--text-light);
+            margin-bottom: 24px;
+            line-height: 1.8;
+        }
+
+        .about-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+        }
+
+        .about-stat h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        .about-stat p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* Support Page */
+        .support-hero {
+            background: var(--bg-light);
+            padding: 60px 0;
+        }
+
+        .support-hero-content {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
             justify-content: space-between;
-            margin-bottom: 32px;
+            align-items: center;
+        }
+
+        .support-hero h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+        }
+
+        .support-hero p {
+            color: var(--text-light);
+            margin-top: 8px;
         }
 
         .support-stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 32px;
+            gap: 24px;
+            margin-bottom: 40px;
         }
 
-        .support-stat {
-            background: var(--bg-card);
+        .support-stat-card {
+            background: white;
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 16px;
+            padding: 24px;
             text-align: center;
         }
 
-        .support-stat-value {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 32px;
+        .support-stat-card .value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 36px;
             font-weight: 700;
-            margin-bottom: 4px;
         }
 
-        .support-stat-value.open { color: var(--warning); }
-        .support-stat-value.pending { color: var(--info); }
-        .support-stat-value.resolved { color: var(--success); }
-        .support-stat-value.total { color: var(--accent); }
+        .support-stat-card .value.open { color: var(--warning); }
+        .support-stat-card .value.pending { color: var(--info); }
+        .support-stat-card .value.resolved { color: var(--success); }
+        .support-stat-card .value.total { color: var(--accent); }
 
-        .support-stat-label {
-            font-size: 13px;
+        .support-stat-card .label {
+            font-size: 14px;
             color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .cases-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .cases-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cases-header h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
         }
 
         .cases-table {
@@ -885,69 +773,74 @@
 
         .cases-table th {
             text-align: left;
-            padding: 14px 20px;
+            padding: 16px 24px;
             font-size: 12px;
             font-weight: 600;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            background: rgba(0, 0, 0, 0.2);
+            background: var(--bg-light);
         }
 
         .cases-table td {
-            padding: 16px 20px;
+            padding: 20px 24px;
             border-bottom: 1px solid var(--border);
             font-size: 14px;
         }
 
+        .cases-table tr:last-child td {
+            border-bottom: none;
+        }
+
         .cases-table tr:hover td {
-            background: rgba(255, 255, 255, 0.02);
+            background: var(--bg-light);
         }
 
         .case-id {
-            font-family: 'Space Grotesk', monospace;
+            font-family: 'Outfit', monospace;
             font-weight: 600;
             color: var(--accent);
         }
 
         .case-subject {
-            color: var(--text-white);
+            font-weight: 500;
+            color: var(--text);
         }
 
         .case-status {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 13px;
             font-weight: 500;
         }
 
         .case-status.open {
-            background: rgba(245, 158, 11, 0.15);
+            background: rgba(245, 158, 11, 0.1);
             color: var(--warning);
         }
 
         .case-status.pending {
-            background: rgba(59, 130, 246, 0.15);
+            background: rgba(59, 130, 246, 0.1);
             color: var(--info);
         }
 
         .case-status.resolved {
-            background: rgba(16, 185, 129, 0.15);
+            background: rgba(16, 185, 129, 0.1);
             color: var(--success);
         }
 
         .case-status.closed {
-            background: rgba(107, 114, 128, 0.15);
+            background: rgba(148, 163, 184, 0.1);
             color: var(--text-muted);
         }
 
         .case-priority {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
 
         .priority-dot {
@@ -964,9 +857,9 @@
             padding: 8px 16px;
             border-radius: 8px;
             border: 1px solid var(--border);
-            background: var(--bg-card-hover);
-            color: var(--text-white);
-            font-size: 12px;
+            background: white;
+            color: var(--text);
+            font-size: 13px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
@@ -975,65 +868,47 @@
         .case-actions button:hover {
             background: var(--accent);
             border-color: var(--accent);
-        }
-
-        .new-case-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
-            background: var(--accent);
             color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .new-case-btn:hover {
-            background: var(--accent-light);
-        }
-
-        .new-case-btn svg {
-            width: 18px;
-            height: 18px;
-            fill: currentColor;
         }
 
         /* Contact Page */
         .contact-grid {
             display: grid;
-            grid-template-columns: 1fr 1.5fr;
-            gap: 40px;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 60px;
         }
 
-        .contact-info-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 32px;
+        .contact-info {
+            background: var(--primary);
+            color: white;
+            border-radius: 24px;
+            padding: 48px;
         }
 
-        .contact-info-card h3 {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 24px;
+        .contact-info h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .contact-info > p {
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 40px;
         }
 
         .contact-method {
             display: flex;
             align-items: flex-start;
             gap: 16px;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
 
         .contact-method-icon {
             width: 48px;
             height: 48px;
+            background: rgba(14, 165, 233, 0.2);
             border-radius: 12px;
-            background: rgba(99, 91, 255, 0.15);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1043,50 +918,50 @@
         .contact-method-icon svg {
             width: 24px;
             height: 24px;
-            fill: var(--accent);
+            fill: var(--accent-light);
         }
 
-        .contact-method-info h4 {
-            font-size: 14px;
+        .contact-method h4 {
+            font-size: 16px;
             font-weight: 600;
             margin-bottom: 4px;
         }
 
-        .contact-method-info p {
+        .contact-method p {
             font-size: 14px;
-            color: var(--text-muted);
+            color: rgba(255,255,255,0.7);
         }
 
-        .branch-locator {
-            margin-top: 32px;
+        .contact-hours {
+            margin-top: 40px;
             padding-top: 32px;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
 
-        .branch-locator h4 {
+        .contact-hours h4 {
             font-size: 16px;
             font-weight: 600;
             margin-bottom: 16px;
         }
 
-        .branch-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 12px;
+        .contact-hours p {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 8px;
         }
 
-        .contact-form-card {
-            background: var(--bg-card);
+        .contact-form {
+            background: white;
             border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 32px;
+            border-radius: 24px;
+            padding: 48px;
         }
 
-        .contact-form-card h3 {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 24px;
+        .contact-form h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 32px;
         }
 
         .form-row {
@@ -1096,28 +971,28 @@
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .form-group label {
             display: block;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 500;
             margin-bottom: 8px;
-            color: var(--text-light);
+            color: var(--text);
         }
 
         .form-group input,
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 14px 16px;
-            background: var(--bg-card-hover);
+            padding: 14px 18px;
             border: 1px solid var(--border);
             border-radius: 10px;
-            color: var(--text-white);
-            font-size: 14px;
+            font-size: 15px;
             transition: all 0.2s;
+            background: white;
+            color: var(--text);
         }
 
         .form-group input:focus,
@@ -1125,916 +1000,758 @@
         .form-group textarea:focus {
             outline: none;
             border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
         }
 
         .form-group textarea {
-            min-height: 120px;
+            min-height: 140px;
             resize: vertical;
         }
 
-        .submit-btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(99, 91, 255, 0.3);
-        }
-
-        /* Profile Page */
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 32px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 32px;
-            margin-bottom: 32px;
-        }
-
-        .profile-avatar-large {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid var(--accent);
-        }
-
-        .profile-info h2 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .profile-info p {
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
-
-        .profile-badges {
-            display: flex;
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .profile-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .profile-badge.verified {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--success);
-        }
-
-        .profile-badge.premium {
-            background: rgba(245, 158, 11, 0.15);
-            color: var(--warning);
-        }
-
-        .profile-grid {
+        /* FAQ Section */
+        .faq-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 24px;
         }
 
-        .profile-section {
-            background: var(--bg-card);
+        .faq-item {
+            background: white;
             border: 1px solid var(--border);
             border-radius: 16px;
+            padding: 28px;
+            transition: all 0.2s;
+        }
+
+        .faq-item:hover {
+            border-color: var(--accent);
+        }
+
+        .faq-item h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .faq-item h3 svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--accent);
+        }
+
+        .faq-item p {
+            font-size: 14px;
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+
+        /* Locations Section */
+        .locations-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+        }
+
+        .location-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .location-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .location-image {
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .location-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .location-content {
             padding: 24px;
         }
 
-        .profile-section h3 {
-            font-size: 16px;
+        .location-content h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
             font-weight: 600;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border);
+            margin-bottom: 8px;
         }
 
-        .profile-field {
+        .location-content p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .location-content a {
+            color: var(--accent);
+            font-weight: 500;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--primary);
+            color: white;
+            padding: 80px 0 40px;
+        }
+
+        .footer-content {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 60px;
+        }
+
+        .footer-brand .logo-text {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .footer-brand p {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.7;
+        }
+
+        .footer-column h4 {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+
+        .footer-column a {
+            display: block;
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            font-size: 14px;
+            padding: 6px 0;
+            transition: color 0.2s;
+        }
+
+        .footer-column a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            padding-top: 40px;
+            border-top: 1px solid rgba(255,255,255,0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border);
         }
 
-        .profile-field:last-child {
-            border-bottom: none;
-        }
-
-        .profile-field-label {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .profile-field-value {
+        .footer-bottom p {
             font-size: 14px;
-            font-weight: 500;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .footer-legal {
+            display: flex;
+            gap: 24px;
+        }
+
+        .footer-legal a {
+            font-size: 14px;
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+        }
+
+        .footer-legal a:hover {
+            color: white;
         }
 
         /* Responsive */
         @media (max-width: 1200px) {
-            .dashboard-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
             }
             
-            .charts-grid {
+            .hero-text h1 {
+                font-size: 44px;
+            }
+            
+            .hero-text p {
+                margin: 0 auto 36px;
+            }
+            
+            .hero-buttons {
+                justify-content: center;
+            }
+            
+            .hero-stats {
+                justify-content: center;
+            }
+            
+            .hero-image {
+                display: none;
+            }
+            
+            .products-grid {
                 grid-template-columns: 1fr;
             }
             
-            .services-grid {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .footer-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
 
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
+            .nav {
+                display: none;
             }
             
-            .main-content {
-                margin-left: 0;
+            .section {
+                padding: 60px 0;
             }
             
-            .accounts-grid {
+            .about-grid, .contact-grid {
                 grid-template-columns: 1fr;
             }
             
-            .services-hero {
+            .locations-grid {
                 grid-template-columns: 1fr;
-                padding: 40px;
             }
             
-            .contact-grid {
+            .faq-grid {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <a href="#" class="logo">
-                    <div class="logo-icon">
-                        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                    </div>
-                    <span class="logo-text">Meridian<span>Bank</span></span>
-                </a>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="top-bar-content">
+            <span>🏆 Rated #1 Digital Bank 2026 by Forbes — <a href="#">Learn More</a></span>
+            <div class="top-bar-links">
+                <a href="#">ATM Locator</a>
+                <a href="#">Rates</a>
+                <a href="#">Careers</a>
             </div>
+        </div>
+    </div>
 
-            <nav class="sidebar-nav">
-                <div class="nav-section">
-                    <div class="nav-section-title">Main</div>
-                    <a href="#" class="nav-item active" data-page="dashboard">
-                        <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
-                        Dashboard
-                    </a>
-                    <a href="#" class="nav-item" data-page="accounts">
-                        <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
-                        Accounts
-                    </a>
-                    <a href="#" class="nav-item" data-page="transactions">
-                        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
-                        Transactions
-                    </a>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-main">
+            <a href="#" class="logo" onclick="showPage('home'); return false;">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                 </div>
-
-                <div class="nav-section">
-                    <div class="nav-section-title">Services</div>
-                    <a href="#" class="nav-item" data-page="services">
-                        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-                        Our Services
-                    </a>
-                    <a href="#" class="nav-item" data-page="transfers">
-                        <svg viewBox="0 0 24 24"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>
-                        Transfers
-                    </a>
-                </div>
-
-                <div class="nav-section">
-                    <div class="nav-section-title">Support</div>
-                    <a href="#" class="nav-item" data-page="support">
-                        <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
-                        Support Cases
-                        <span class="badge">3</span>
-                    </a>
-                    <a href="#" class="nav-item" data-page="contact">
-                        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-                        Contact Us
-                    </a>
-                </div>
-
-                <div class="nav-section">
-                    <div class="nav-section-title">Account</div>
-                    <a href="#" class="nav-item" data-page="profile">
-                        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                        My Profile
-                    </a>
-                    <a href="#" class="nav-item" data-page="settings">
-                        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-                        Settings
-                    </a>
-                </div>
+                <span class="logo-text">Meridian<span>Bank</span></span>
+            </a>
+            <nav class="nav">
+                <a href="#" class="active" data-page="home">Home</a>
+                <a href="#" data-page="products">Products</a>
+                <a href="#" data-page="about">About Us</a>
+                <a href="#" data-page="support">Support</a>
+                <a href="#" data-page="contact">Contact</a>
             </nav>
+            <div class="header-actions">
+                <a href="#" class="btn btn-outline">Sign In</a>
+                <a href="#" class="btn btn-primary">Open Account</a>
+            </div>
+        </div>
+    </header>
 
-            <div class="sidebar-footer">
-                <div class="user-card">
-                    <img src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100" alt="User" class="user-avatar">
-                    <div class="user-info">
-                        <div class="user-name">James Wilson</div>
-                        <div class="user-role">Premium Member</div>
+    <!-- Home Page -->
+    <div id="page-home" class="page-content active">
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <div class="hero-badge">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        Trusted by 2M+ customers
+                    </div>
+                    <h1>Banking That <span>Moves With You</span></h1>
+                    <p>Experience the future of banking with Meridian. Smart savings, instant transfers, and world-class security — all in one place.</p>
+                    <div class="hero-buttons">
+                        <a href="#" class="btn btn-primary btn-lg" onclick="showPage('products'); return false;">Explore Products</a>
+                        <a href="#" class="btn btn-outline btn-lg" style="border-color: rgba(255,255,255,0.3); color: white;">Watch Demo</a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <h3>$50B+</h3>
+                            <p>Assets Under Management</p>
+                        </div>
+                        <div class="hero-stat">
+                            <h3>2M+</h3>
+                            <p>Happy Customers</p>
+                        </div>
+                        <div class="hero-stat">
+                            <h3>150+</h3>
+                            <p>Branch Locations</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Team collaboration">
+                    <div class="hero-card rate">
+                        <div class="hero-card-title">Savings APY</div>
+                        <div class="hero-card-value green">4.50%</div>
+                    </div>
+                    <div class="hero-card trust">
+                        <div class="hero-card-title">Trust Score</div>
+                        <div class="hero-card-value">98%</div>
                     </div>
                 </div>
             </div>
-        </aside>
+        </section>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Top Header -->
-            <header class="top-header">
-                <h1 class="page-title" id="pageTitle">Dashboard</h1>
-                <div class="header-actions">
-                    <div class="search-bar">
-                        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                        <input type="text" placeholder="Search transactions, accounts...">
-                    </div>
-                    <button class="header-btn">
-                        <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-                        <span class="notification-dot"></span>
-                    </button>
-                    <button class="header-btn">
-                        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58z"/></svg>
-                    </button>
+        <!-- Features -->
+        <section class="section">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2>Why Choose Meridian Bank?</h2>
+                    <p>We combine traditional banking values with modern technology to deliver an exceptional experience.</p>
                 </div>
-            </header>
-
-            <!-- Dashboard Page -->
-            <div id="page-dashboard" class="page-content active">
-                <!-- Stats Cards -->
-                <div class="dashboard-grid">
-                    <div class="stat-card">
-                        <div class="stat-card-header">
-                            <div class="stat-card-icon primary">
-                                <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
-                            </div>
-                            <span class="stat-card-change positive">+12.5%</span>
-                        </div>
-                        <div class="stat-card-label">Total Balance</div>
-                        <div class="stat-card-value">$124,582.00</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-card-header">
-                            <div class="stat-card-icon success">
-                                <svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
-                            </div>
-                            <span class="stat-card-change positive">+8.2%</span>
-                        </div>
-                        <div class="stat-card-label">Monthly Income</div>
-                        <div class="stat-card-value">$8,450.00</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-card-header">
-                            <div class="stat-card-icon warning">
-                                <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
-                            </div>
-                            <span class="stat-card-change negative">-3.1%</span>
-                        </div>
-                        <div class="stat-card-label">Monthly Expenses</div>
-                        <div class="stat-card-value">$5,230.00</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-card-header">
-                            <div class="stat-card-icon info">
-                                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2V9h2v8zm0-10h-2V5h2v2z"/></svg>
-                            </div>
-                            <span class="stat-card-change positive">+2</span>
-                        </div>
-                        <div class="stat-card-label">Active Accounts</div>
-                        <div class="stat-card-value">4</div>
-                    </div>
-                </div>
-
-                <!-- Accounts Overview -->
-                <div class="accounts-grid">
-                    <div class="account-card checking">
-                        <div class="account-card-header">
-                            <span class="account-type">Primary Checking</span>
-                            <span class="account-number">•••• 4829</span>
-                        </div>
-                        <div class="account-balance">
-                            <div class="balance-label">Available Balance</div>
-                            <div class="balance-amount"><span class="currency">$</span>45,892.50</div>
-                        </div>
-                        <div class="account-actions">
-                            <button class="account-btn" onclick="alert('Transfer initiated')">
-                                <svg viewBox="0 0 24 24"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>
-                                Transfer
-                            </button>
-                            <button class="account-btn" onclick="alert('Payment initiated')">
-                                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
-                                Pay Bills
-                            </button>
-                        </div>
-                    </div>
-                    <div class="account-card savings">
-                        <div class="account-card-header">
-                            <span class="account-type">High-Yield Savings</span>
-                            <span class="account-number">•••• 7156</span>
-                        </div>
-                        <div class="account-balance">
-                            <div class="balance-label">Available Balance</div>
-                            <div class="balance-amount"><span class="currency">$</span>78,689.50</div>
-                        </div>
-                        <div class="account-actions">
-                            <button class="account-btn" onclick="alert('Transfer initiated')">
-                                <svg viewBox="0 0 24 24"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>
-                                Transfer
-                            </button>
-                            <button class="account-btn" onclick="alert('View details')">
-                                <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-                                Details
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Transactions -->
-                <div class="content-card">
-                    <div class="content-card-header">
-                        <h3 class="content-card-title">Recent Transactions</h3>
-                        <a href="#" class="view-all-btn" onclick="showPage('transactions'); return false;">
-                            View All
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-                        </a>
-                    </div>
-                    <table class="transactions-table">
-                        <thead>
-                            <tr>
-                                <th>Merchant</th>
-                                <th>Date</th>
-                                <th>Category</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div class="transaction-merchant">
-                                        <div class="merchant-icon">🏪</div>
-                                        <div class="merchant-details">
-                                            <h4>Whole Foods Market</h4>
-                                            <span>Grocery Store</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="dynamic-date" data-days-ago="0"></span></td>
-                                <td>Groceries</td>
-                                <td class="transaction-amount debit">-$156.42</td>
-                                <td><span class="transaction-status completed">Completed</span></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="transaction-merchant">
-                                        <div class="merchant-icon">💼</div>
-                                        <div class="merchant-details">
-                                            <h4>Salary Deposit</h4>
-                                            <span>ACME Corporation</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="dynamic-date" data-days-ago="1"></span></td>
-                                <td>Income</td>
-                                <td class="transaction-amount credit">+$4,250.00</td>
-                                <td><span class="transaction-status completed">Completed</span></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="transaction-merchant">
-                                        <div class="merchant-icon">⛽</div>
-                                        <div class="merchant-details">
-                                            <h4>Shell Gas Station</h4>
-                                            <span>Fuel</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="dynamic-date" data-days-ago="2"></span></td>
-                                <td>Transportation</td>
-                                <td class="transaction-amount debit">-$58.90</td>
-                                <td><span class="transaction-status completed">Completed</span></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="transaction-merchant">
-                                        <div class="merchant-icon">🎬</div>
-                                        <div class="merchant-details">
-                                            <h4>Netflix</h4>
-                                            <span>Subscription</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="dynamic-date" data-days-ago="3"></span></td>
-                                <td>Entertainment</td>
-                                <td class="transaction-amount debit">-$15.99</td>
-                                <td><span class="transaction-status pending">Pending</span></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="transaction-merchant">
-                                        <div class="merchant-icon">🏠</div>
-                                        <div class="merchant-details">
-                                            <h4>Rent Payment</h4>
-                                            <span>Auto Transfer</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="dynamic-date" data-days-ago="5"></span></td>
-                                <td>Housing</td>
-                                <td class="transaction-amount debit">-$2,100.00</td>
-                                <td><span class="transaction-status completed">Completed</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Charts Section -->
-                <div class="charts-grid">
-                    <div class="content-card">
-                        <div class="content-card-header">
-                            <h3 class="content-card-title">Spending Overview</h3>
-                        </div>
-                        <div class="chart-placeholder">
-                            📊 Spending chart visualization would appear here
-                        </div>
-                    </div>
-                    <div class="content-card">
-                        <div class="content-card-header">
-                            <h3 class="content-card-title">Quick Actions</h3>
-                        </div>
-                        <div class="quick-actions">
-                            <a href="#" class="quick-action" onclick="alert('Transfer money'); return false;">
-                                <div class="quick-action-icon">
-                                    <svg viewBox="0 0 24 24"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>
-                                </div>
-                                <span>Transfer</span>
-                            </a>
-                            <a href="#" class="quick-action" onclick="alert('Pay bills'); return false;">
-                                <div class="quick-action-icon">
-                                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
-                                </div>
-                                <span>Pay Bills</span>
-                            </a>
-                            <a href="#" class="quick-action" onclick="alert('Deposit check'); return false;">
-                                <div class="quick-action-icon">
-                                    <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 8H3V9h9v2zm0-4H3V5h9v2z"/></svg>
-                                </div>
-                                <span>Deposit</span>
-                            </a>
-                            <a href="#" class="quick-action" onclick="showPage('support'); return false;">
-                                <div class="quick-action-icon">
-                                    <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
-                                </div>
-                                <span>Support</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Accounts Page -->
-            <div id="page-accounts" class="page-content">
-                <div class="accounts-grid" style="margin-bottom: 24px;">
-                    <div class="account-card checking">
-                        <div class="account-card-header">
-                            <span class="account-type">Primary Checking</span>
-                            <span class="account-number">Account: •••• 4829</span>
-                        </div>
-                        <div class="account-balance">
-                            <div class="balance-label">Available Balance</div>
-                            <div class="balance-amount"><span class="currency">$</span>45,892.50</div>
-                        </div>
-                        <div class="account-actions">
-                            <button class="account-btn" onclick="alert('Transfer initiated')">Transfer</button>
-                            <button class="account-btn" onclick="alert('View statements')">Statements</button>
-                        </div>
-                    </div>
-                    <div class="account-card savings">
-                        <div class="account-card-header">
-                            <span class="account-type">High-Yield Savings</span>
-                            <span class="account-number">Account: •••• 7156</span>
-                        </div>
-                        <div class="account-balance">
-                            <div class="balance-label">Available Balance</div>
-                            <div class="balance-amount"><span class="currency">$</span>78,689.50</div>
-                        </div>
-                        <div class="account-actions">
-                            <button class="account-btn" onclick="alert('Transfer initiated')">Transfer</button>
-                            <button class="account-btn" onclick="alert('View statements')">Statements</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="content-card">
-                    <div class="content-card-header">
-                        <h3 class="content-card-title">All Accounts Summary</h3>
-                    </div>
-                    <table class="transactions-table">
-                        <thead>
-                            <tr>
-                                <th>Account Name</th>
-                                <th>Account Number</th>
-                                <th>Type</th>
-                                <th>Balance</th>
-                                <th>APY</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>Primary Checking</strong></td>
-                                <td style="font-family: 'Space Grotesk', monospace;">•••• 4829</td>
-                                <td>Checking</td>
-                                <td class="transaction-amount">$45,892.50</td>
-                                <td>0.01%</td>
-                            </tr>
-                            <tr>
-                                <td><strong>High-Yield Savings</strong></td>
-                                <td style="font-family: 'Space Grotesk', monospace;">•••• 7156</td>
-                                <td>Savings</td>
-                                <td class="transaction-amount">$78,689.50</td>
-                                <td>4.50%</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Business Account</strong></td>
-                                <td style="font-family: 'Space Grotesk', monospace;">•••• 3412</td>
-                                <td>Business</td>
-                                <td class="transaction-amount">$12,450.00</td>
-                                <td>0.05%</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Investment Account</strong></td>
-                                <td style="font-family: 'Space Grotesk', monospace;">•••• 9087</td>
-                                <td>Investment</td>
-                                <td class="transaction-amount">$35,200.00</td>
-                                <td>Variable</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Transactions Page -->
-            <div id="page-transactions" class="page-content">
-                <div class="content-card">
-                    <div class="content-card-header">
-                        <h3 class="content-card-title">Transaction History</h3>
-                        <div style="display: flex; gap: 12px;">
-                            <select style="padding: 8px 16px; background: var(--bg-card-hover); border: 1px solid var(--border); border-radius: 8px; color: var(--text-white);">
-                                <option>All Accounts</option>
-                                <option>Primary Checking</option>
-                                <option>High-Yield Savings</option>
-                            </select>
-                            <select style="padding: 8px 16px; background: var(--bg-card-hover); border: 1px solid var(--border); border-radius: 8px; color: var(--text-white);">
-                                <option>Last 30 Days</option>
-                                <option>Last 60 Days</option>
-                                <option>Last 90 Days</option>
-                            </select>
-                        </div>
-                    </div>
-                    <table class="transactions-table">
-                        <thead>
-                            <tr>
-                                <th>Merchant</th>
-                                <th>Date</th>
-                                <th>Category</th>
-                                <th>Account</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div class="transaction-merchant">
-                                        <div class="merchant-icon">🏪</div>
-                                        <div class="merchant-details">
-                                            <h4>Whole Foods Market</h4>
-                                            <span>Grocery Store</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="dynamic-date" data-days-ago="0"></span></td>
-                                <td>Groceries</td>
-                                <td>•••• 4829</td>
-                                <td class="transaction-amount debit">-$156.42</td>
-                                <td><span class="transaction-status completed">Completed</span></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="transaction-merchant">
-                                        <div class="merchant-icon">💼</div>
-                                        <div class="merchant-details">
-                                            <h4>Salary Deposit</h4>
-                                            <span>ACME Corporation</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="dynamic-date" data-days-ago="1"></span></td>
-                                <td>Income</td>
-                                <td>•••• 4829</td>
-                                <td class="transaction-amount credit">+$4,250.00</td>
-                                <td><span class="transaction-status completed">Completed</span></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="transaction-merchant">
-                                        <div class="merchant-icon">⛽</div>
-                                        <div class="merchant-details">
-                                            <h4>Shell Gas Station</h4>
-                                            <span>Fuel</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="dynamic-date" data-days-ago="2"></span></td>
-                                <td>Transportation</td>
-                                <td>•••• 4829</td>
-                                <td class="transaction-amount debit">-$58.90</td>
-                                <td><span class="transaction-status completed">Completed</span></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="transaction-merchant">
-                                        <div class="merchant-icon">🎬</div>
-                                        <div class="merchant-details">
-                                            <h4>Netflix</h4>
-                                            <span>Subscription</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="dynamic-date" data-days-ago="3"></span></td>
-                                <td>Entertainment</td>
-                                <td>•••• 4829</td>
-                                <td class="transaction-amount debit">-$15.99</td>
-                                <td><span class="transaction-status pending">Pending</span></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="transaction-merchant">
-                                        <div class="merchant-icon">🏠</div>
-                                        <div class="merchant-details">
-                                            <h4>Rent Payment</h4>
-                                            <span>Auto Transfer</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="dynamic-date" data-days-ago="5"></span></td>
-                                <td>Housing</td>
-                                <td>•••• 4829</td>
-                                <td class="transaction-amount debit">-$2,100.00</td>
-                                <td><span class="transaction-status completed">Completed</span></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="transaction-merchant">
-                                        <div class="merchant-icon">💳</div>
-                                        <div class="merchant-details">
-                                            <h4>Amazon Prime</h4>
-                                            <span>Online Shopping</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="dynamic-date" data-days-ago="7"></span></td>
-                                <td>Shopping</td>
-                                <td>•••• 4829</td>
-                                <td class="transaction-amount debit">-$234.56</td>
-                                <td><span class="transaction-status completed">Completed</span></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="transaction-merchant">
-                                        <div class="merchant-icon">🏦</div>
-                                        <div class="merchant-details">
-                                            <h4>Savings Transfer</h4>
-                                            <span>Scheduled Transfer</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="dynamic-date" data-days-ago="10"></span></td>
-                                <td>Transfer</td>
-                                <td>•••• 7156</td>
-                                <td class="transaction-amount credit">+$500.00</td>
-                                <td><span class="transaction-status completed">Completed</span></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="transaction-merchant">
-                                        <div class="merchant-icon">🍕</div>
-                                        <div class="merchant-details">
-                                            <h4>DoorDash</h4>
-                                            <span>Food Delivery</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="dynamic-date" data-days-ago="12"></span></td>
-                                <td>Dining</td>
-                                <td>•••• 4829</td>
-                                <td class="transaction-amount debit">-$42.80</td>
-                                <td><span class="transaction-status completed">Completed</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Services Page -->
-            <div id="page-services" class="page-content">
-                <div class="services-hero">
-                    <div class="services-hero-content">
-                        <h1>Banking Made<br>Simple & Secure</h1>
-                        <p>Discover our comprehensive suite of financial services designed to help you achieve your goals. From savings to investments, we've got you covered.</p>
-                        <a href="#" class="hero-btn" onclick="showPage('contact'); return false;">
-                            Get Started
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-                        </a>
-                    </div>
-                    <div class="services-hero-image">
-                        <img src="https://images.pexels.com/photos/3943716/pexels-photo-3943716.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Banking Services">
-                    </div>
-                </div>
-
-                <div class="services-grid">
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
-                        </div>
-                        <h3>Personal Banking</h3>
-                        <p>Checking and savings accounts with competitive rates, mobile banking, and 24/7 customer support.</p>
-                    </div>
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg>
-                        </div>
-                        <h3>Wealth Management</h3>
-                        <p>Expert investment advice, portfolio management, and retirement planning for your financial future.</p>
-                    </div>
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2V9h2v8zm0-10h-2V5h2v2z"/></svg>
-                        </div>
-                        <h3>Business Solutions</h3>
-                        <p>Tailored financial solutions for businesses of all sizes, including loans, merchant services, and treasury management.</p>
-                    </div>
-                    <div class="service-card">
-                        <div class="service-icon">
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
                             <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
                         </div>
-                        <h3>Secure Transactions</h3>
-                        <p>Bank-level encryption and multi-factor authentication to keep your money and data protected.</p>
+                        <h3>Bank-Grade Security</h3>
+                        <p>256-bit encryption and multi-factor authentication protect your money 24/7.</p>
                     </div>
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
-                        </div>
-                        <h3>Insurance Products</h3>
-                        <p>Comprehensive insurance options including life, home, and auto insurance to protect what matters most.</p>
-                    </div>
-                    <div class="service-card">
-                        <div class="service-icon">
+                    <div class="feature-card">
+                        <div class="feature-icon">
                             <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
                         </div>
-                        <h3>Mortgage & Loans</h3>
-                        <p>Competitive rates on home mortgages, personal loans, and lines of credit with flexible terms.</p>
+                        <h3>No Hidden Fees</h3>
+                        <p>Transparent pricing with no surprise charges. What you see is what you get.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        </div>
+                        <h3>FDIC Insured</h3>
+                        <p>Your deposits are protected up to $250,000 by the Federal Deposit Insurance Corporation.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                        </div>
+                        <h3>24/7 Support</h3>
+                        <p>Our dedicated support team is available around the clock via chat, phone, or email.</p>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <!-- Transfers Page -->
-            <div id="page-transfers" class="page-content">
-                <div class="contact-grid">
-                    <div class="contact-form-card">
-                        <h3>Transfer Money</h3>
-                        <form onsubmit="alert('Transfer submitted!'); return false;">
-                            <div class="form-group">
-                                <label>From Account</label>
-                                <select>
-                                    <option>Primary Checking (•••• 4829) - $45,892.50</option>
-                                    <option>High-Yield Savings (•••• 7156) - $78,689.50</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>To Account</label>
-                                <select>
-                                    <option>High-Yield Savings (•••• 7156)</option>
-                                    <option>Primary Checking (•••• 4829)</option>
-                                    <option>External Account</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Amount</label>
-                                <input type="text" placeholder="$0.00">
-                            </div>
-                            <div class="form-group">
-                                <label>Transfer Date</label>
-                                <input type="date">
-                            </div>
-                            <div class="form-group">
-                                <label>Memo (Optional)</label>
-                                <input type="text" placeholder="Add a note">
-                            </div>
-                            <button type="submit" class="submit-btn">Transfer Funds</button>
-                        </form>
+        <!-- Products Preview -->
+        <section class="section gray">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2>Financial Solutions For Everyone</h2>
+                    <p>From everyday banking to long-term investments, we have the right products for your journey.</p>
+                </div>
+                <div class="products-grid">
+                    <div class="product-card">
+                        <div class="product-icon">
+                            <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                        </div>
+                        <h3>Personal Checking</h3>
+                        <p>Everyday banking made simple with no monthly fees and unlimited transactions.</p>
+                        <ul class="product-features">
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> No monthly fees</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Free ATM withdrawals</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Mobile check deposit</li>
+                        </ul>
+                        <a href="#" class="product-link" onclick="showPage('products'); return false;">
+                            Learn More
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                        </a>
                     </div>
-                    <div class="contact-info-card">
-                        <h3>Recent Transfers</h3>
-                        <div style="margin-top: 20px;">
-                            <div style="display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border);">
-                                <div>
-                                    <div style="font-weight: 500;">To Savings Account</div>
-                                    <div style="font-size: 13px; color: var(--text-muted);"><span class="dynamic-date" data-days-ago="3"></span></div>
-                                </div>
-                                <div style="font-weight: 600; color: var(--success);">$500.00</div>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border);">
-                                <div>
-                                    <div style="font-weight: 500;">To External Account</div>
-                                    <div style="font-size: 13px; color: var(--text-muted);"><span class="dynamic-date" data-days-ago="8"></span></div>
-                                </div>
-                                <div style="font-weight: 600; color: var(--danger);">$1,200.00</div>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border);">
-                                <div>
-                                    <div style="font-weight: 500;">From Savings</div>
-                                    <div style="font-size: 13px; color: var(--text-muted);"><span class="dynamic-date" data-days-ago="15"></span></div>
-                                </div>
-                                <div style="font-weight: 600; color: var(--success);">$300.00</div>
-                            </div>
+                    <div class="product-card featured">
+                        <div class="product-icon">
+                            <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
                         </div>
-                        
-                        <div class="branch-locator" style="margin-top: 32px;">
-                            <h4>Wire Transfer Information</h4>
-                            <p style="color: var(--text-muted); font-size: 14px; margin-top: 12px;">
-                                <strong>Routing Number:</strong> 021000089<br>
-                                <strong>SWIFT Code:</strong> MRDBUSXX<br>
-                                <strong>Bank Name:</strong> Meridian Bank
-                            </p>
+                        <h3>High-Yield Savings</h3>
+                        <p>Grow your money faster with our industry-leading 4.50% APY savings account.</p>
+                        <ul class="product-features">
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 4.50% APY</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> No minimum balance</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Automatic savings tools</li>
+                        </ul>
+                        <a href="#" class="product-link" onclick="showPage('products'); return false;">
+                            Learn More
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                        </a>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-icon">
+                            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
                         </div>
+                        <h3>Credit Cards</h3>
+                        <p>Earn rewards on every purchase with no annual fee and flexible payment options.</p>
+                        <ul class="product-features">
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 2% cash back</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> No annual fee</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Travel rewards</li>
+                        </ul>
+                        <a href="#" class="product-link" onclick="showPage('products'); return false;">
+                            Learn More
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                        </a>
                     </div>
                 </div>
-            </div>
 
-            <!-- Support Page -->
-            <div id="page-support" class="page-content">
-                <div class="support-header">
+                <div class="rates-banner">
                     <div>
-                        <h2 style="font-size: 20px; margin-bottom: 8px;">My Support Cases</h2>
-                        <p style="color: var(--text-muted);">Track and manage your support requests</p>
+                        <h3>Lock in Today's Best Rates</h3>
+                        <p>Open a Certificate of Deposit and enjoy guaranteed returns with flexible terms from 6 months to 5 years.</p>
+                        <a href="#" class="btn btn-dark" onclick="showPage('products'); return false;">View All CD Rates</a>
                     </div>
-                    <button class="new-case-btn" onclick="alert('Create new case dialog')">
-                        <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                        New Case
-                    </button>
+                    <div class="rate-display">
+                        <div class="rate-item">
+                            <div class="rate-value">4.75%</div>
+                            <div class="rate-label">12-Month CD</div>
+                        </div>
+                        <div class="rate-item">
+                            <div class="rate-value">5.00%</div>
+                            <div class="rate-label">24-Month CD</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Locations -->
+        <section class="section">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2>Visit Us In Person</h2>
+                    <p>With over 150 branches nationwide, there's always a Meridian Bank near you.</p>
+                </div>
+                <div class="locations-grid">
+                    <div class="location-card">
+                        <div class="location-image">
+                            <img src="https://images.pexels.com/photos/534216/pexels-photo-534216.jpeg?auto=compress&cs=tinysrgb&w=600" alt="New York Branch">
+                        </div>
+                        <div class="location-content">
+                            <h3>New York - Manhattan</h3>
+                            <p>100 Financial Center Drive<br>New York, NY 10004</p>
+                            <a href="#">Get Directions →</a>
+                        </div>
+                    </div>
+                    <div class="location-card">
+                        <div class="location-image">
+                            <img src="https://images.pexels.com/photos/1098460/pexels-photo-1098460.jpeg?auto=compress&cs=tinysrgb&w=600" alt="San Francisco Branch">
+                        </div>
+                        <div class="location-content">
+                            <h3>San Francisco - Downtown</h3>
+                            <p>555 Market Street<br>San Francisco, CA 94105</p>
+                            <a href="#">Get Directions →</a>
+                        </div>
+                    </div>
+                    <div class="location-card">
+                        <div class="location-image">
+                            <img src="https://images.pexels.com/photos/3184339/pexels-photo-3184339.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Chicago Branch">
+                        </div>
+                        <div class="location-content">
+                            <h3>Chicago - The Loop</h3>
+                            <p>200 West Adams Street<br>Chicago, IL 60606</p>
+                            <a href="#">Get Directions →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Products Page -->
+    <div id="page-products" class="page-content">
+        <section class="section gray">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2>Our Products & Services</h2>
+                    <p>Comprehensive financial solutions designed to help you save, grow, and protect your money.</p>
                 </div>
 
+                <div class="products-grid" style="margin-bottom: 48px;">
+                    <div class="product-card">
+                        <div class="product-icon">
+                            <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                        </div>
+                        <h3>Personal Checking</h3>
+                        <p>Your everyday spending account with no monthly fees, unlimited transactions, and instant mobile access.</p>
+                        <ul class="product-features">
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> No monthly maintenance fees</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 60,000+ free ATMs nationwide</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Instant mobile check deposit</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Free bill pay & transfers</li>
+                        </ul>
+                        <a href="#" class="btn btn-primary" style="width: 100%; justify-content: center;">Open Account</a>
+                    </div>
+                    <div class="product-card featured">
+                        <div class="product-icon">
+                            <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                        </div>
+                        <h3>High-Yield Savings</h3>
+                        <p>Watch your money grow with our industry-leading APY and automatic savings features.</p>
+                        <ul class="product-features">
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 4.50% APY — Best in class</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> No minimum balance required</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Automatic round-up savings</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> FDIC insured up to $250K</li>
+                        </ul>
+                        <a href="#" class="btn btn-primary" style="width: 100%; justify-content: center; background: var(--secondary);">Open Account</a>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-icon">
+                            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+                        </div>
+                        <h3>Meridian Cash Back Card</h3>
+                        <p>Earn unlimited 2% cash back on every purchase with no annual fee or foreign transaction fees.</p>
+                        <ul class="product-features">
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 2% cash back on everything</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> No annual fee, ever</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> $200 welcome bonus</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Zero fraud liability</li>
+                        </ul>
+                        <a href="#" class="btn btn-primary" style="width: 100%; justify-content: center;">Apply Now</a>
+                    </div>
+                </div>
+
+                <div class="products-grid">
+                    <div class="product-card">
+                        <div class="product-icon">
+                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+                        </div>
+                        <h3>Investment Accounts</h3>
+                        <p>Build your portfolio with our low-cost investment options and expert guidance.</p>
+                        <ul class="product-features">
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> IRAs & brokerage accounts</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Commission-free trading</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Robo-advisor available</li>
+                        </ul>
+                        <a href="#" class="product-link">
+                            Learn More
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                        </a>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-icon">
+                            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        </div>
+                        <h3>Home Mortgages</h3>
+                        <p>Competitive rates and personalized service to help you find your dream home.</p>
+                        <ul class="product-features">
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Fixed & adjustable rates</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> First-time buyer programs</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Quick pre-approval</li>
+                        </ul>
+                        <a href="#" class="product-link">
+                            Learn More
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                        </a>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-icon">
+                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                        </div>
+                        <h3>Business Banking</h3>
+                        <p>Tailored solutions to help your business manage cash flow and grow.</p>
+                        <ul class="product-features">
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Business checking & savings</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Lines of credit</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Merchant services</li>
+                        </ul>
+                        <a href="#" class="product-link">
+                            Learn More
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- About Page -->
+    <div id="page-about" class="page-content">
+        <section class="section">
+            <div class="section-container">
+                <div class="about-grid">
+                    <div class="about-image">
+                        <img src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Our team">
+                    </div>
+                    <div class="about-content">
+                        <h2>Banking With Purpose Since 1952</h2>
+                        <p>For over 70 years, Meridian Bank has been helping families and businesses achieve their financial goals. What started as a small community bank has grown into a nationwide institution serving over 2 million customers.</p>
+                        <p>Our mission remains the same: provide exceptional banking services with integrity, innovation, and a personal touch. We believe that banking should be simple, transparent, and accessible to everyone.</p>
+                        <div class="about-stats">
+                            <div class="about-stat">
+                                <h4>70+</h4>
+                                <p>Years of Service</p>
+                            </div>
+                            <div class="about-stat">
+                                <h4>2M+</h4>
+                                <p>Customers</p>
+                            </div>
+                            <div class="about-stat">
+                                <h4>150+</h4>
+                                <p>Branches</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section gray">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2>Our Values</h2>
+                    <p>The principles that guide everything we do.</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                        </div>
+                        <h3>Customer First</h3>
+                        <p>Every decision starts with our customers' needs.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+                        </div>
+                        <h3>Trust & Security</h3>
+                        <p>Your money and data are always protected.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>
+                        </div>
+                        <h3>Innovation</h3>
+                        <p>Constantly improving how banking works.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        </div>
+                        <h3>Integrity</h3>
+                        <p>Honest and transparent in all we do.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2>Leadership Team</h2>
+                    <p>Meet the people driving Meridian Bank forward.</p>
+                </div>
+                <div class="locations-grid">
+                    <div class="location-card">
+                        <div class="location-image">
+                            <img src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=600" alt="CEO">
+                        </div>
+                        <div class="location-content">
+                            <h3>Michael Chen</h3>
+                            <p>Chief Executive Officer<br>25+ years in banking</p>
+                        </div>
+                    </div>
+                    <div class="location-card">
+                        <div class="location-image">
+                            <img src="https://images.pexels.com/photos/3756679/pexels-photo-3756679.jpeg?auto=compress&cs=tinysrgb&w=600" alt="CFO">
+                        </div>
+                        <div class="location-content">
+                            <h3>Sarah Williams</h3>
+                            <p>Chief Financial Officer<br>Former Goldman Sachs</p>
+                        </div>
+                    </div>
+                    <div class="location-card">
+                        <div class="location-image">
+                            <img src="https://images.pexels.com/photos/3778603/pexels-photo-3778603.jpeg?auto=compress&cs=tinysrgb&w=600" alt="CTO">
+                        </div>
+                        <div class="location-content">
+                            <h3>David Rodriguez</h3>
+                            <p>Chief Technology Officer<br>Ex-Google Engineering</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Support Page -->
+    <div id="page-support" class="page-content">
+        <div class="support-hero">
+            <div class="support-hero-content">
+                <div>
+                    <h1>Support Center</h1>
+                    <p>Track your cases and find answers to common questions</p>
+                </div>
+                <button class="btn btn-primary" onclick="alert('Opening new case form...')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                    New Support Case
+                </button>
+            </div>
+        </div>
+
+        <section class="section" style="padding-top: 40px;">
+            <div class="section-container">
                 <div class="support-stats">
-                    <div class="support-stat">
-                        <div class="support-stat-value open">2</div>
-                        <div class="support-stat-label">Open</div>
+                    <div class="support-stat-card">
+                        <div class="value open">2</div>
+                        <div class="label">Open Cases</div>
                     </div>
-                    <div class="support-stat">
-                        <div class="support-stat-value pending">1</div>
-                        <div class="support-stat-label">Pending</div>
+                    <div class="support-stat-card">
+                        <div class="value pending">1</div>
+                        <div class="label">Pending</div>
                     </div>
-                    <div class="support-stat">
-                        <div class="support-stat-value resolved">5</div>
-                        <div class="support-stat-label">Resolved</div>
+                    <div class="support-stat-card">
+                        <div class="value resolved">4</div>
+                        <div class="label">Resolved</div>
                     </div>
-                    <div class="support-stat">
-                        <div class="support-stat-value total">8</div>
-                        <div class="support-stat-label">Total Cases</div>
+                    <div class="support-stat-card">
+                        <div class="value total">7</div>
+                        <div class="label">Total Cases</div>
                     </div>
                 </div>
 
-                <div class="content-card">
+                <div class="cases-card">
+                    <div class="cases-header">
+                        <h2>My Support Cases</h2>
+                        <select style="padding: 10px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+                            <option>All Cases</option>
+                            <option>Open</option>
+                            <option>Pending</option>
+                            <option>Resolved</option>
+                        </select>
+                    </div>
                     <table class="cases-table">
                         <thead>
                             <tr>
@@ -2049,7 +1766,7 @@
                         <tbody>
                             <tr>
                                 <td><span class="case-id">#MRD-2026-0892</span></td>
-                                <td><span class="case-subject">Unauthorized transaction dispute</span></td>
+                                <td><span class="case-subject">Unauthorized transaction dispute - $450.00</span></td>
                                 <td><span class="case-status open">● Open</span></td>
                                 <td>
                                     <span class="case-priority">
@@ -2064,7 +1781,7 @@
                             </tr>
                             <tr>
                                 <td><span class="case-id">#MRD-2026-0885</span></td>
-                                <td><span class="case-subject">Wire transfer delay inquiry</span></td>
+                                <td><span class="case-subject">Wire transfer to Europe - status inquiry</span></td>
                                 <td><span class="case-status pending">● Pending</span></td>
                                 <td>
                                     <span class="case-priority">
@@ -2079,7 +1796,7 @@
                             </tr>
                             <tr>
                                 <td><span class="case-id">#MRD-2026-0871</span></td>
-                                <td><span class="case-subject">Request to update account information</span></td>
+                                <td><span class="case-subject">Update mailing address request</span></td>
                                 <td><span class="case-status open">● Open</span></td>
                                 <td>
                                     <span class="case-priority">
@@ -2094,7 +1811,7 @@
                             </tr>
                             <tr>
                                 <td><span class="case-id">#MRD-2026-0856</span></td>
-                                <td><span class="case-subject">Credit card limit increase request</span></td>
+                                <td><span class="case-subject">Credit card limit increase approved</span></td>
                                 <td><span class="case-status resolved">● Resolved</span></td>
                                 <td>
                                     <span class="case-priority">
@@ -2109,7 +1826,7 @@
                             </tr>
                             <tr>
                                 <td><span class="case-id">#MRD-2026-0842</span></td>
-                                <td><span class="case-subject">Mobile app login issues</span></td>
+                                <td><span class="case-subject">Mobile app two-factor authentication issue</span></td>
                                 <td><span class="case-status resolved">● Resolved</span></td>
                                 <td>
                                     <span class="case-priority">
@@ -2124,7 +1841,7 @@
                             </tr>
                             <tr>
                                 <td><span class="case-id">#MRD-2026-0831</span></td>
-                                <td><span class="case-subject">Statement discrepancy</span></td>
+                                <td><span class="case-subject">Interest calculation discrepancy</span></td>
                                 <td><span class="case-status resolved">● Resolved</span></td>
                                 <td>
                                     <span class="case-priority">
@@ -2139,22 +1856,7 @@
                             </tr>
                             <tr>
                                 <td><span class="case-id">#MRD-2026-0818</span></td>
-                                <td><span class="case-subject">Interest rate inquiry</span></td>
-                                <td><span class="case-status resolved">● Resolved</span></td>
-                                <td>
-                                    <span class="case-priority">
-                                        <span class="priority-dot low"></span>
-                                        Low
-                                    </span>
-                                </td>
-                                <td><span class="dynamic-date" data-days-ago="22"></span></td>
-                                <td class="case-actions">
-                                    <button onclick="alert('View case details')">View</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="case-id">#MRD-2026-0805</span></td>
-                                <td><span class="case-subject">New debit card request</span></td>
+                                <td><span class="case-subject">New debit card request - expedited shipping</span></td>
                                 <td><span class="case-status closed">● Closed</span></td>
                                 <td>
                                     <span class="case-priority">
@@ -2162,7 +1864,7 @@
                                         Medium
                                     </span>
                                 </td>
-                                <td><span class="dynamic-date" data-days-ago="28"></span></td>
+                                <td><span class="dynamic-date" data-days-ago="22"></span></td>
                                 <td class="case-actions">
                                     <button onclick="alert('View case details')">View</button>
                                 </td>
@@ -2171,20 +1873,67 @@
                     </table>
                 </div>
             </div>
+        </section>
 
-            <!-- Contact Page -->
-            <div id="page-contact" class="page-content">
+        <section class="section gray">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2>Frequently Asked Questions</h2>
+                    <p>Quick answers to common questions.</p>
+                </div>
+                <div class="faq-grid">
+                    <div class="faq-item">
+                        <h3>
+                            <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                            How do I reset my online banking password?
+                        </h3>
+                        <p>Click "Forgot Password" on the login page and follow the verification steps. You'll receive a reset link via email or SMS.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>
+                            <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                            What is the daily ATM withdrawal limit?
+                        </h3>
+                        <p>The standard daily ATM withdrawal limit is $500. Premium members enjoy limits up to $1,000. Contact us to request an increase.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>
+                            <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                            How do I dispute a transaction?
+                        </h3>
+                        <p>Open a support case or call us at 1-800-MERIDIAN. Disputes must be filed within 60 days of the transaction date.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>
+                            <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                            How long do wire transfers take?
+                        </h3>
+                        <p>Domestic wire transfers typically complete same-day. International transfers take 1-5 business days depending on the destination.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Contact Page -->
+    <div id="page-contact" class="page-content">
+        <section class="section">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2>Get in Touch</h2>
+                    <p>We're here to help. Reach out through any channel that works for you.</p>
+                </div>
                 <div class="contact-grid">
-                    <div class="contact-info-card">
-                        <h3>Get in Touch</h3>
-                        <p style="color: var(--text-muted); margin-bottom: 24px;">Our team is here to help with any banking questions or concerns.</p>
-                        
+                    <div class="contact-info">
+                        <h2>Contact Information</h2>
+                        <p>Our team is available to assist you with any questions about our products and services.</p>
+
                         <div class="contact-method">
                             <div class="contact-method-icon">
                                 <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
                             </div>
-                            <div class="contact-method-info">
-                                <h4>Phone Support</h4>
+                            <div>
+                                <h4>Phone</h4>
                                 <p>1-800-MERIDIAN (637-4342)</p>
                             </div>
                         </div>
@@ -2193,7 +1942,7 @@
                             <div class="contact-method-icon">
                                 <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
                             </div>
-                            <div class="contact-method-info">
+                            <div>
                                 <h4>Email</h4>
                                 <p>support@meridianbank.com</p>
                             </div>
@@ -2203,170 +1952,119 @@
                             <div class="contact-method-icon">
                                 <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                             </div>
-                            <div class="contact-method-info">
+                            <div>
                                 <h4>Headquarters</h4>
                                 <p>100 Financial Center Drive<br>New York, NY 10004</p>
                             </div>
                         </div>
 
-                        <div class="branch-locator">
-                            <h4>Find a Branch</h4>
-                            <img src="https://images.pexels.com/photos/534216/pexels-photo-534216.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Branch" class="branch-image">
+                        <div class="contact-hours">
+                            <h4>Customer Service Hours</h4>
+                            <p>Monday - Friday: 8:00 AM - 9:00 PM EST</p>
+                            <p>Saturday: 9:00 AM - 5:00 PM EST</p>
+                            <p>Sunday: Closed</p>
                         </div>
                     </div>
 
-                    <div class="contact-form-card">
-                        <h3>Send Us a Message</h3>
-                        <form onsubmit="alert('Message sent!'); return false;">
+                    <div class="contact-form">
+                        <h2>Send Us a Message</h2>
+                        <form onsubmit="alert('Message sent successfully!'); return false;">
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>First Name</label>
-                                    <input type="text" placeholder="James" value="James">
+                                    <input type="text" placeholder="John">
                                 </div>
                                 <div class="form-group">
                                     <label>Last Name</label>
-                                    <input type="text" placeholder="Wilson" value="Wilson">
+                                    <input type="text" placeholder="Smith">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Email</label>
-                                <input type="email" placeholder="james.wilson@email.com" value="james.wilson@email.com">
+                                <label>Email Address</label>
+                                <input type="email" placeholder="john.smith@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <input type="tel" placeholder="(555) 123-4567">
                             </div>
                             <div class="form-group">
                                 <label>Subject</label>
                                 <select>
-                                    <option>General Inquiry</option>
-                                    <option>Account Question</option>
+                                    <option>Select a topic</option>
+                                    <option>Account Inquiry</option>
+                                    <option>Loan Application</option>
+                                    <option>Credit Card Question</option>
                                     <option>Technical Support</option>
                                     <option>Fraud Report</option>
-                                    <option>Loan Application</option>
-                                    <option>Other</option>
+                                    <option>General Question</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label>Message</label>
-                                <textarea placeholder="How can we help you?"></textarea>
+                                <textarea placeholder="How can we help you today?"></textarea>
                             </div>
-                            <button type="submit" class="submit-btn">Send Message</button>
+                            <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; justify-content: center;">Send Message</button>
                         </form>
                     </div>
                 </div>
             </div>
-
-            <!-- Profile Page -->
-            <div id="page-profile" class="page-content">
-                <div class="profile-header">
-                    <img src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=200" alt="Profile" class="profile-avatar-large">
-                    <div class="profile-info">
-                        <h2>James Wilson</h2>
-                        <p>james.wilson@email.com</p>
-                        <p>Member since January 2019</p>
-                        <div class="profile-badges">
-                            <span class="profile-badge verified">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                                Verified
-                            </span>
-                            <span class="profile-badge premium">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                                Premium
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="profile-grid">
-                    <div class="profile-section">
-                        <h3>Personal Information</h3>
-                        <div class="profile-field">
-                            <span class="profile-field-label">Full Name</span>
-                            <span class="profile-field-value">James Michael Wilson</span>
-                        </div>
-                        <div class="profile-field">
-                            <span class="profile-field-label">Email</span>
-                            <span class="profile-field-value">james.wilson@email.com</span>
-                        </div>
-                        <div class="profile-field">
-                            <span class="profile-field-label">Phone</span>
-                            <span class="profile-field-value">+1 (555) 123-4567</span>
-                        </div>
-                        <div class="profile-field">
-                            <span class="profile-field-label">Address</span>
-                            <span class="profile-field-value">456 Oak Street, Boston, MA 02108</span>
-                        </div>
-                    </div>
-                    <div class="profile-section">
-                        <h3>Account Settings</h3>
-                        <div class="profile-field">
-                            <span class="profile-field-label">Account Type</span>
-                            <span class="profile-field-value">Premium Banking</span>
-                        </div>
-                        <div class="profile-field">
-                            <span class="profile-field-label">Two-Factor Auth</span>
-                            <span class="profile-field-value" style="color: var(--success);">Enabled</span>
-                        </div>
-                        <div class="profile-field">
-                            <span class="profile-field-label">Statement Delivery</span>
-                            <span class="profile-field-value">Paperless</span>
-                        </div>
-                        <div class="profile-field">
-                            <span class="profile-field-label">Notifications</span>
-                            <span class="profile-field-value">Email & SMS</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Settings Page -->
-            <div id="page-settings" class="page-content">
-                <div class="profile-grid">
-                    <div class="profile-section">
-                        <h3>Security Settings</h3>
-                        <div class="profile-field">
-                            <span class="profile-field-label">Password</span>
-                            <button class="account-btn" style="padding: 8px 16px;">Change Password</button>
-                        </div>
-                        <div class="profile-field">
-                            <span class="profile-field-label">Two-Factor Authentication</span>
-                            <button class="account-btn" style="padding: 8px 16px; background: var(--success); border-color: var(--success);">Enabled</button>
-                        </div>
-                        <div class="profile-field">
-                            <span class="profile-field-label">Biometric Login</span>
-                            <button class="account-btn" style="padding: 8px 16px;">Enable</button>
-                        </div>
-                        <div class="profile-field">
-                            <span class="profile-field-label">Login Alerts</span>
-                            <button class="account-btn" style="padding: 8px 16px; background: var(--success); border-color: var(--success);">Active</button>
-                        </div>
-                    </div>
-                    <div class="profile-section">
-                        <h3>Notification Preferences</h3>
-                        <div class="profile-field">
-                            <span class="profile-field-label">Transaction Alerts</span>
-                            <button class="account-btn" style="padding: 8px 16px; background: var(--success); border-color: var(--success);">On</button>
-                        </div>
-                        <div class="profile-field">
-                            <span class="profile-field-label">Marketing Emails</span>
-                            <button class="account-btn" style="padding: 8px 16px;">Off</button>
-                        </div>
-                        <div class="profile-field">
-                            <span class="profile-field-label">Account Statements</span>
-                            <button class="account-btn" style="padding: 8px 16px; background: var(--success); border-color: var(--success);">Email</button>
-                        </div>
-                        <div class="profile-field">
-                            <span class="profile-field-label">Security Alerts</span>
-                            <button class="account-btn" style="padding: 8px 16px; background: var(--success); border-color: var(--success);">SMS & Email</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+        </section>
     </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="logo-text">Meridian<span>Bank</span></div>
+                    <p>Banking that moves with you. Serving customers nationwide since 1952 with integrity, innovation, and personalized service.</p>
+                </div>
+                <div class="footer-column">
+                    <h4>Products</h4>
+                    <a href="#">Checking</a>
+                    <a href="#">Savings</a>
+                    <a href="#">Credit Cards</a>
+                    <a href="#">Mortgages</a>
+                    <a href="#">Investments</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Company</h4>
+                    <a href="#">About Us</a>
+                    <a href="#">Careers</a>
+                    <a href="#">Press</a>
+                    <a href="#">Investor Relations</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Resources</h4>
+                    <a href="#">Help Center</a>
+                    <a href="#">Security</a>
+                    <a href="#">Blog</a>
+                    <a href="#">Rates</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Legal</h4>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Cookie Policy</a>
+                    <a href="#">Accessibility</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 Meridian Bank. All rights reserved. Member FDIC. Equal Housing Lender.</p>
+                <div class="footer-legal">
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
+                    <a href="#">Sitemap</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script>
         // Navigation
         function showPage(pageName) {
             // Update nav items
-            document.querySelectorAll('.nav-item').forEach(item => {
+            document.querySelectorAll('.nav a').forEach(item => {
                 item.classList.remove('active');
                 if (item.dataset.page === pageName) {
                     item.classList.add('active');
@@ -2382,23 +2080,12 @@
                 targetPage.classList.add('active');
             }
 
-            // Update page title
-            const titles = {
-                'dashboard': 'Dashboard',
-                'accounts': 'My Accounts',
-                'transactions': 'Transactions',
-                'services': 'Our Services',
-                'transfers': 'Money Transfer',
-                'support': 'Support Cases',
-                'contact': 'Contact Us',
-                'profile': 'My Profile',
-                'settings': 'Settings'
-            };
-            document.getElementById('pageTitle').textContent = titles[pageName] || 'Dashboard';
+            // Scroll to top
+            window.scrollTo(0, 0);
         }
 
         // Add click handlers to nav items
-        document.querySelectorAll('.nav-item').forEach(item => {
+        document.querySelectorAll('.nav a').forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
                 const page = item.dataset.page;
@@ -2426,7 +2113,7 @@
             });
         }
 
-        // Widget Loading
+        // Widget Loading - Same as retail.html
         function loadWidget() {
             const settingsJson = localStorage.getItem('chatWidgetSettings');
             
@@ -2434,7 +2121,7 @@
                 const config = JSON.parse(settingsJson);
                 const widgetMode = config.widgetMode || 'standard';
                 
-                console.log('📱 Financial Portal: Loading widget in mode:', widgetMode);
+                console.log('🏦 Financial Portal: Loading widget in mode:', widgetMode);
                 
                 if (widgetMode === 'custom') {
                     // Load custom embedded SDK
