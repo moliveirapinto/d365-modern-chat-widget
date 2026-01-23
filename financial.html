@@ -1,0 +1,2549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self' https://*.microsoft.com https://*.azure.com https://*.dynamics.com https://*.crm.dynamics.com https://*.github.io;
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.microsoft.com https://*.azure.com https://*.azureedge.net https://oc-cdn-ocprod.azureedge.net https://moliveirapinto.github.io https://*.github.io https://unpkg.com;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.azureedge.net https://oc-cdn-ocprod.azureedge.net;
+        style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.azureedge.net https://oc-cdn-ocprod.azureedge.net;
+        font-src 'self' https://fonts.gstatic.com https://*.azureedge.net;
+        img-src 'self' data: blob: https: *;
+        frame-src 'self' https://*.omnichannelengagementhub.com https://*.azureedge.net https://oc-cdn-ocprod.azureedge.net https://forms.office.com https://*.forms.office.com https://*.microsoft.com;
+        connect-src 'self' https://*.microsoft.com https://*.azure.com https://*.dynamics.com https://*.omnichannelengagementhub.com https://*.skype.com wss://*.skype.com https://*.azureedge.net wss://*.omnichannelengagementhub.com https://*.communication.azure.com wss://*.communication.azure.com;
+        worker-src 'self' blob:;
+    ">
+    <title>Meridian Bank | Online Banking Portal</title>
+    <link rel="icon" type="image/png" href="img/icon/bank-favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0a2540;
+            --primary-light: #1a3a5c;
+            --secondary: #00d4aa;
+            --secondary-dark: #00b894;
+            --accent: #635bff;
+            --accent-light: #7c75ff;
+            --bg-dark: #0a0f1a;
+            --bg-card: #111827;
+            --bg-card-hover: #1f2937;
+            --text-white: #ffffff;
+            --text-light: #9ca3af;
+            --text-muted: #6b7280;
+            --border: #374151;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-white);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Layout */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        .logo-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-white);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            color: var(--secondary);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 24px 16px;
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            margin-bottom: 32px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            padding: 0 12px;
+            margin-bottom: 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+            margin-bottom: 4px;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-white);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            color: white;
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .nav-item .badge {
+            margin-left: auto;
+            background: var(--danger);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-card-hover);
+            border-radius: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-white);
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            min-height: 100vh;
+        }
+
+        /* Top Header */
+        .top-header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .page-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-card-hover);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 16px;
+            width: 300px;
+        }
+
+        .search-bar svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--text-muted);
+        }
+
+        .search-bar input {
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--text-white);
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .search-bar input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .header-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--bg-card-hover);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .header-btn:hover {
+            background: var(--border);
+        }
+
+        .header-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--text-light);
+        }
+
+        .header-btn .notification-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: var(--danger);
+            border-radius: 50%;
+        }
+
+        /* Page Content */
+        .page-content {
+            display: none;
+            padding: 32px;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .stat-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .stat-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-card-icon.primary {
+            background: rgba(99, 91, 255, 0.15);
+        }
+
+        .stat-card-icon.success {
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        .stat-card-icon.warning {
+            background: rgba(245, 158, 11, 0.15);
+        }
+
+        .stat-card-icon.info {
+            background: rgba(59, 130, 246, 0.15);
+        }
+
+        .stat-card-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .stat-card-icon.primary svg { fill: var(--accent); }
+        .stat-card-icon.success svg { fill: var(--success); }
+        .stat-card-icon.warning svg { fill: var(--warning); }
+        .stat-card-icon.info svg { fill: var(--info); }
+
+        .stat-card-change {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .stat-card-change.positive {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .stat-card-change.negative {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        .stat-card-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .stat-card-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-white);
+        }
+
+        /* Accounts Section */
+        .accounts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .account-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .account-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .account-card.checking::before {
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%);
+        }
+
+        .account-card.savings::before {
+            background: linear-gradient(90deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+        }
+
+        .account-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .account-type {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .account-number {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-family: 'Space Grotesk', monospace;
+        }
+
+        .account-balance {
+            margin-bottom: 20px;
+        }
+
+        .balance-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .balance-amount {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-white);
+        }
+
+        .balance-amount .currency {
+            font-size: 20px;
+            color: var(--text-light);
+        }
+
+        .account-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .account-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg-card-hover);
+            color: var(--text-white);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .account-btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .account-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        /* Transactions Table */
+        .content-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .content-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .content-card-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .view-all-btn {
+            font-size: 13px;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .view-all-btn:hover {
+            text-decoration: underline;
+        }
+
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .transactions-table th {
+            text-align: left;
+            padding: 14px 24px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .transactions-table td {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .transactions-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .transactions-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .transaction-merchant {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .merchant-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--bg-card-hover);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .merchant-details h4 {
+            font-weight: 500;
+            color: var(--text-white);
+            margin-bottom: 2px;
+        }
+
+        .merchant-details span {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .transaction-amount {
+            font-family: 'Space Grotesk', monospace;
+            font-weight: 600;
+        }
+
+        .transaction-amount.debit {
+            color: var(--danger);
+        }
+
+        .transaction-amount.credit {
+            color: var(--success);
+        }
+
+        .transaction-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .transaction-status.completed {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .transaction-status.pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+
+        .transaction-status::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* Charts Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            background: linear-gradient(135deg, rgba(99, 91, 255, 0.1) 0%, rgba(0, 212, 170, 0.1) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            padding: 24px;
+        }
+
+        .quick-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 20px;
+            background: var(--bg-card-hover);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .quick-action:hover {
+            background: var(--accent);
+        }
+
+        .quick-action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quick-action-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-white);
+        }
+
+        .quick-action span {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-white);
+        }
+
+        /* Services Page */
+        .services-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 20px;
+            padding: 60px;
+            margin-bottom: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .services-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 212, 170, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .services-hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .services-hero h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .services-hero p {
+            font-size: 16px;
+            color: var(--text-light);
+            margin-bottom: 32px;
+            max-width: 450px;
+        }
+
+        .hero-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: var(--secondary);
+            color: var(--primary);
+            font-weight: 600;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .hero-btn:hover {
+            background: var(--secondary-dark);
+            transform: translateY(-2px);
+        }
+
+        .services-hero-image {
+            position: relative;
+            z-index: 1;
+        }
+
+        .services-hero-image img {
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .service-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s;
+        }
+
+        .service-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+        }
+
+        .service-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .service-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: white;
+        }
+
+        .service-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .service-card p {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Support Page */
+        .support-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+
+        .support-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .support-stat {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .support-stat-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .support-stat-value.open { color: var(--warning); }
+        .support-stat-value.pending { color: var(--info); }
+        .support-stat-value.resolved { color: var(--success); }
+        .support-stat-value.total { color: var(--accent); }
+
+        .support-stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .cases-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .cases-table th {
+            text-align: left;
+            padding: 14px 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .cases-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .cases-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .case-id {
+            font-family: 'Space Grotesk', monospace;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .case-subject {
+            color: var(--text-white);
+        }
+
+        .case-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .case-status.open {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+
+        .case-status.pending {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--info);
+        }
+
+        .case-status.resolved {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .case-status.closed {
+            background: rgba(107, 114, 128, 0.15);
+            color: var(--text-muted);
+        }
+
+        .case-priority {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .priority-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .priority-dot.high { background: var(--danger); }
+        .priority-dot.medium { background: var(--warning); }
+        .priority-dot.low { background: var(--success); }
+
+        .case-actions button {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-card-hover);
+            color: var(--text-white);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .case-actions button:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .new-case-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .new-case-btn:hover {
+            background: var(--accent-light);
+        }
+
+        .new-case-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        /* Contact Page */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 40px;
+        }
+
+        .contact-info-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+        }
+
+        .contact-info-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .contact-method {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .contact-method-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(99, 91, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .contact-method-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--accent);
+        }
+
+        .contact-method-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .contact-method-info p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .branch-locator {
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border);
+        }
+
+        .branch-locator h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .branch-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+        .contact-form-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+        }
+
+        .contact-form-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-light);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-card-hover);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-white);
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 91, 255, 0.3);
+        }
+
+        /* Profile Page */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .profile-avatar-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--accent);
+        }
+
+        .profile-info h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .profile-info p {
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .profile-badges {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .profile-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .profile-badge.verified {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .profile-badge.premium {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .profile-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .profile-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .profile-field {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .profile-field:last-child {
+            border-bottom: none;
+        }
+
+        .profile-field-label {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .profile-field-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .accounts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .services-hero {
+                grid-template-columns: 1fr;
+                padding: 40px;
+            }
+            
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    </div>
+                    <span class="logo-text">Meridian<span>Bank</span></span>
+                </a>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="#" class="nav-item active" data-page="dashboard">
+                        <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                        Dashboard
+                    </a>
+                    <a href="#" class="nav-item" data-page="accounts">
+                        <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                        Accounts
+                    </a>
+                    <a href="#" class="nav-item" data-page="transactions">
+                        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+                        Transactions
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Services</div>
+                    <a href="#" class="nav-item" data-page="services">
+                        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                        Our Services
+                    </a>
+                    <a href="#" class="nav-item" data-page="transfers">
+                        <svg viewBox="0 0 24 24"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>
+                        Transfers
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Support</div>
+                    <a href="#" class="nav-item" data-page="support">
+                        <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
+                        Support Cases
+                        <span class="badge">3</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="contact">
+                        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                        Contact Us
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#" class="nav-item" data-page="profile">
+                        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        My Profile
+                    </a>
+                    <a href="#" class="nav-item" data-page="settings">
+                        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                        Settings
+                    </a>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-card">
+                    <img src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100" alt="User" class="user-avatar">
+                    <div class="user-info">
+                        <div class="user-name">James Wilson</div>
+                        <div class="user-role">Premium Member</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <h1 class="page-title" id="pageTitle">Dashboard</h1>
+                <div class="header-actions">
+                    <div class="search-bar">
+                        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                        <input type="text" placeholder="Search transactions, accounts...">
+                    </div>
+                    <button class="header-btn">
+                        <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                        <span class="notification-dot"></span>
+                    </button>
+                    <button class="header-btn">
+                        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58z"/></svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Page -->
+            <div id="page-dashboard" class="page-content active">
+                <!-- Stats Cards -->
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon primary">
+                                <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                            </div>
+                            <span class="stat-card-change positive">+12.5%</span>
+                        </div>
+                        <div class="stat-card-label">Total Balance</div>
+                        <div class="stat-card-value">$124,582.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon success">
+                                <svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+                            </div>
+                            <span class="stat-card-change positive">+8.2%</span>
+                        </div>
+                        <div class="stat-card-label">Monthly Income</div>
+                        <div class="stat-card-value">$8,450.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon warning">
+                                <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                            </div>
+                            <span class="stat-card-change negative">-3.1%</span>
+                        </div>
+                        <div class="stat-card-label">Monthly Expenses</div>
+                        <div class="stat-card-value">$5,230.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon info">
+                                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2V9h2v8zm0-10h-2V5h2v2z"/></svg>
+                            </div>
+                            <span class="stat-card-change positive">+2</span>
+                        </div>
+                        <div class="stat-card-label">Active Accounts</div>
+                        <div class="stat-card-value">4</div>
+                    </div>
+                </div>
+
+                <!-- Accounts Overview -->
+                <div class="accounts-grid">
+                    <div class="account-card checking">
+                        <div class="account-card-header">
+                            <span class="account-type">Primary Checking</span>
+                            <span class="account-number">•••• 4829</span>
+                        </div>
+                        <div class="account-balance">
+                            <div class="balance-label">Available Balance</div>
+                            <div class="balance-amount"><span class="currency">$</span>45,892.50</div>
+                        </div>
+                        <div class="account-actions">
+                            <button class="account-btn" onclick="alert('Transfer initiated')">
+                                <svg viewBox="0 0 24 24"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>
+                                Transfer
+                            </button>
+                            <button class="account-btn" onclick="alert('Payment initiated')">
+                                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+                                Pay Bills
+                            </button>
+                        </div>
+                    </div>
+                    <div class="account-card savings">
+                        <div class="account-card-header">
+                            <span class="account-type">High-Yield Savings</span>
+                            <span class="account-number">•••• 7156</span>
+                        </div>
+                        <div class="account-balance">
+                            <div class="balance-label">Available Balance</div>
+                            <div class="balance-amount"><span class="currency">$</span>78,689.50</div>
+                        </div>
+                        <div class="account-actions">
+                            <button class="account-btn" onclick="alert('Transfer initiated')">
+                                <svg viewBox="0 0 24 24"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>
+                                Transfer
+                            </button>
+                            <button class="account-btn" onclick="alert('View details')">
+                                <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                                Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h3 class="content-card-title">Recent Transactions</h3>
+                        <a href="#" class="view-all-btn" onclick="showPage('transactions'); return false;">
+                            View All
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                        </a>
+                    </div>
+                    <table class="transactions-table">
+                        <thead>
+                            <tr>
+                                <th>Merchant</th>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="transaction-merchant">
+                                        <div class="merchant-icon">🏪</div>
+                                        <div class="merchant-details">
+                                            <h4>Whole Foods Market</h4>
+                                            <span>Grocery Store</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="0"></span></td>
+                                <td>Groceries</td>
+                                <td class="transaction-amount debit">-$156.42</td>
+                                <td><span class="transaction-status completed">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="transaction-merchant">
+                                        <div class="merchant-icon">💼</div>
+                                        <div class="merchant-details">
+                                            <h4>Salary Deposit</h4>
+                                            <span>ACME Corporation</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="1"></span></td>
+                                <td>Income</td>
+                                <td class="transaction-amount credit">+$4,250.00</td>
+                                <td><span class="transaction-status completed">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="transaction-merchant">
+                                        <div class="merchant-icon">⛽</div>
+                                        <div class="merchant-details">
+                                            <h4>Shell Gas Station</h4>
+                                            <span>Fuel</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="2"></span></td>
+                                <td>Transportation</td>
+                                <td class="transaction-amount debit">-$58.90</td>
+                                <td><span class="transaction-status completed">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="transaction-merchant">
+                                        <div class="merchant-icon">🎬</div>
+                                        <div class="merchant-details">
+                                            <h4>Netflix</h4>
+                                            <span>Subscription</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="3"></span></td>
+                                <td>Entertainment</td>
+                                <td class="transaction-amount debit">-$15.99</td>
+                                <td><span class="transaction-status pending">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="transaction-merchant">
+                                        <div class="merchant-icon">🏠</div>
+                                        <div class="merchant-details">
+                                            <h4>Rent Payment</h4>
+                                            <span>Auto Transfer</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="5"></span></td>
+                                <td>Housing</td>
+                                <td class="transaction-amount debit">-$2,100.00</td>
+                                <td><span class="transaction-status completed">Completed</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-grid">
+                    <div class="content-card">
+                        <div class="content-card-header">
+                            <h3 class="content-card-title">Spending Overview</h3>
+                        </div>
+                        <div class="chart-placeholder">
+                            📊 Spending chart visualization would appear here
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="content-card-header">
+                            <h3 class="content-card-title">Quick Actions</h3>
+                        </div>
+                        <div class="quick-actions">
+                            <a href="#" class="quick-action" onclick="alert('Transfer money'); return false;">
+                                <div class="quick-action-icon">
+                                    <svg viewBox="0 0 24 24"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>
+                                </div>
+                                <span>Transfer</span>
+                            </a>
+                            <a href="#" class="quick-action" onclick="alert('Pay bills'); return false;">
+                                <div class="quick-action-icon">
+                                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+                                </div>
+                                <span>Pay Bills</span>
+                            </a>
+                            <a href="#" class="quick-action" onclick="alert('Deposit check'); return false;">
+                                <div class="quick-action-icon">
+                                    <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 8H3V9h9v2zm0-4H3V5h9v2z"/></svg>
+                                </div>
+                                <span>Deposit</span>
+                            </a>
+                            <a href="#" class="quick-action" onclick="showPage('support'); return false;">
+                                <div class="quick-action-icon">
+                                    <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                                </div>
+                                <span>Support</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accounts Page -->
+            <div id="page-accounts" class="page-content">
+                <div class="accounts-grid" style="margin-bottom: 24px;">
+                    <div class="account-card checking">
+                        <div class="account-card-header">
+                            <span class="account-type">Primary Checking</span>
+                            <span class="account-number">Account: •••• 4829</span>
+                        </div>
+                        <div class="account-balance">
+                            <div class="balance-label">Available Balance</div>
+                            <div class="balance-amount"><span class="currency">$</span>45,892.50</div>
+                        </div>
+                        <div class="account-actions">
+                            <button class="account-btn" onclick="alert('Transfer initiated')">Transfer</button>
+                            <button class="account-btn" onclick="alert('View statements')">Statements</button>
+                        </div>
+                    </div>
+                    <div class="account-card savings">
+                        <div class="account-card-header">
+                            <span class="account-type">High-Yield Savings</span>
+                            <span class="account-number">Account: •••• 7156</span>
+                        </div>
+                        <div class="account-balance">
+                            <div class="balance-label">Available Balance</div>
+                            <div class="balance-amount"><span class="currency">$</span>78,689.50</div>
+                        </div>
+                        <div class="account-actions">
+                            <button class="account-btn" onclick="alert('Transfer initiated')">Transfer</button>
+                            <button class="account-btn" onclick="alert('View statements')">Statements</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h3 class="content-card-title">All Accounts Summary</h3>
+                    </div>
+                    <table class="transactions-table">
+                        <thead>
+                            <tr>
+                                <th>Account Name</th>
+                                <th>Account Number</th>
+                                <th>Type</th>
+                                <th>Balance</th>
+                                <th>APY</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Primary Checking</strong></td>
+                                <td style="font-family: 'Space Grotesk', monospace;">•••• 4829</td>
+                                <td>Checking</td>
+                                <td class="transaction-amount">$45,892.50</td>
+                                <td>0.01%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>High-Yield Savings</strong></td>
+                                <td style="font-family: 'Space Grotesk', monospace;">•••• 7156</td>
+                                <td>Savings</td>
+                                <td class="transaction-amount">$78,689.50</td>
+                                <td>4.50%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Business Account</strong></td>
+                                <td style="font-family: 'Space Grotesk', monospace;">•••• 3412</td>
+                                <td>Business</td>
+                                <td class="transaction-amount">$12,450.00</td>
+                                <td>0.05%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Investment Account</strong></td>
+                                <td style="font-family: 'Space Grotesk', monospace;">•••• 9087</td>
+                                <td>Investment</td>
+                                <td class="transaction-amount">$35,200.00</td>
+                                <td>Variable</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Transactions Page -->
+            <div id="page-transactions" class="page-content">
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h3 class="content-card-title">Transaction History</h3>
+                        <div style="display: flex; gap: 12px;">
+                            <select style="padding: 8px 16px; background: var(--bg-card-hover); border: 1px solid var(--border); border-radius: 8px; color: var(--text-white);">
+                                <option>All Accounts</option>
+                                <option>Primary Checking</option>
+                                <option>High-Yield Savings</option>
+                            </select>
+                            <select style="padding: 8px 16px; background: var(--bg-card-hover); border: 1px solid var(--border); border-radius: 8px; color: var(--text-white);">
+                                <option>Last 30 Days</option>
+                                <option>Last 60 Days</option>
+                                <option>Last 90 Days</option>
+                            </select>
+                        </div>
+                    </div>
+                    <table class="transactions-table">
+                        <thead>
+                            <tr>
+                                <th>Merchant</th>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Account</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="transaction-merchant">
+                                        <div class="merchant-icon">🏪</div>
+                                        <div class="merchant-details">
+                                            <h4>Whole Foods Market</h4>
+                                            <span>Grocery Store</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="0"></span></td>
+                                <td>Groceries</td>
+                                <td>•••• 4829</td>
+                                <td class="transaction-amount debit">-$156.42</td>
+                                <td><span class="transaction-status completed">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="transaction-merchant">
+                                        <div class="merchant-icon">💼</div>
+                                        <div class="merchant-details">
+                                            <h4>Salary Deposit</h4>
+                                            <span>ACME Corporation</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="1"></span></td>
+                                <td>Income</td>
+                                <td>•••• 4829</td>
+                                <td class="transaction-amount credit">+$4,250.00</td>
+                                <td><span class="transaction-status completed">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="transaction-merchant">
+                                        <div class="merchant-icon">⛽</div>
+                                        <div class="merchant-details">
+                                            <h4>Shell Gas Station</h4>
+                                            <span>Fuel</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="2"></span></td>
+                                <td>Transportation</td>
+                                <td>•••• 4829</td>
+                                <td class="transaction-amount debit">-$58.90</td>
+                                <td><span class="transaction-status completed">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="transaction-merchant">
+                                        <div class="merchant-icon">🎬</div>
+                                        <div class="merchant-details">
+                                            <h4>Netflix</h4>
+                                            <span>Subscription</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="3"></span></td>
+                                <td>Entertainment</td>
+                                <td>•••• 4829</td>
+                                <td class="transaction-amount debit">-$15.99</td>
+                                <td><span class="transaction-status pending">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="transaction-merchant">
+                                        <div class="merchant-icon">🏠</div>
+                                        <div class="merchant-details">
+                                            <h4>Rent Payment</h4>
+                                            <span>Auto Transfer</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="5"></span></td>
+                                <td>Housing</td>
+                                <td>•••• 4829</td>
+                                <td class="transaction-amount debit">-$2,100.00</td>
+                                <td><span class="transaction-status completed">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="transaction-merchant">
+                                        <div class="merchant-icon">💳</div>
+                                        <div class="merchant-details">
+                                            <h4>Amazon Prime</h4>
+                                            <span>Online Shopping</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="7"></span></td>
+                                <td>Shopping</td>
+                                <td>•••• 4829</td>
+                                <td class="transaction-amount debit">-$234.56</td>
+                                <td><span class="transaction-status completed">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="transaction-merchant">
+                                        <div class="merchant-icon">🏦</div>
+                                        <div class="merchant-details">
+                                            <h4>Savings Transfer</h4>
+                                            <span>Scheduled Transfer</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="10"></span></td>
+                                <td>Transfer</td>
+                                <td>•••• 7156</td>
+                                <td class="transaction-amount credit">+$500.00</td>
+                                <td><span class="transaction-status completed">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="transaction-merchant">
+                                        <div class="merchant-icon">🍕</div>
+                                        <div class="merchant-details">
+                                            <h4>DoorDash</h4>
+                                            <span>Food Delivery</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="12"></span></td>
+                                <td>Dining</td>
+                                <td>•••• 4829</td>
+                                <td class="transaction-amount debit">-$42.80</td>
+                                <td><span class="transaction-status completed">Completed</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Services Page -->
+            <div id="page-services" class="page-content">
+                <div class="services-hero">
+                    <div class="services-hero-content">
+                        <h1>Banking Made<br>Simple & Secure</h1>
+                        <p>Discover our comprehensive suite of financial services designed to help you achieve your goals. From savings to investments, we've got you covered.</p>
+                        <a href="#" class="hero-btn" onclick="showPage('contact'); return false;">
+                            Get Started
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                        </a>
+                    </div>
+                    <div class="services-hero-image">
+                        <img src="https://images.pexels.com/photos/3943716/pexels-photo-3943716.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Banking Services">
+                    </div>
+                </div>
+
+                <div class="services-grid">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                        </div>
+                        <h3>Personal Banking</h3>
+                        <p>Checking and savings accounts with competitive rates, mobile banking, and 24/7 customer support.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg>
+                        </div>
+                        <h3>Wealth Management</h3>
+                        <p>Expert investment advice, portfolio management, and retirement planning for your financial future.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2V9h2v8zm0-10h-2V5h2v2z"/></svg>
+                        </div>
+                        <h3>Business Solutions</h3>
+                        <p>Tailored financial solutions for businesses of all sizes, including loans, merchant services, and treasury management.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                        </div>
+                        <h3>Secure Transactions</h3>
+                        <p>Bank-level encryption and multi-factor authentication to keep your money and data protected.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+                        </div>
+                        <h3>Insurance Products</h3>
+                        <p>Comprehensive insurance options including life, home, and auto insurance to protect what matters most.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                        </div>
+                        <h3>Mortgage & Loans</h3>
+                        <p>Competitive rates on home mortgages, personal loans, and lines of credit with flexible terms.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transfers Page -->
+            <div id="page-transfers" class="page-content">
+                <div class="contact-grid">
+                    <div class="contact-form-card">
+                        <h3>Transfer Money</h3>
+                        <form onsubmit="alert('Transfer submitted!'); return false;">
+                            <div class="form-group">
+                                <label>From Account</label>
+                                <select>
+                                    <option>Primary Checking (•••• 4829) - $45,892.50</option>
+                                    <option>High-Yield Savings (•••• 7156) - $78,689.50</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>To Account</label>
+                                <select>
+                                    <option>High-Yield Savings (•••• 7156)</option>
+                                    <option>Primary Checking (•••• 4829)</option>
+                                    <option>External Account</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Amount</label>
+                                <input type="text" placeholder="$0.00">
+                            </div>
+                            <div class="form-group">
+                                <label>Transfer Date</label>
+                                <input type="date">
+                            </div>
+                            <div class="form-group">
+                                <label>Memo (Optional)</label>
+                                <input type="text" placeholder="Add a note">
+                            </div>
+                            <button type="submit" class="submit-btn">Transfer Funds</button>
+                        </form>
+                    </div>
+                    <div class="contact-info-card">
+                        <h3>Recent Transfers</h3>
+                        <div style="margin-top: 20px;">
+                            <div style="display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border);">
+                                <div>
+                                    <div style="font-weight: 500;">To Savings Account</div>
+                                    <div style="font-size: 13px; color: var(--text-muted);"><span class="dynamic-date" data-days-ago="3"></span></div>
+                                </div>
+                                <div style="font-weight: 600; color: var(--success);">$500.00</div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border);">
+                                <div>
+                                    <div style="font-weight: 500;">To External Account</div>
+                                    <div style="font-size: 13px; color: var(--text-muted);"><span class="dynamic-date" data-days-ago="8"></span></div>
+                                </div>
+                                <div style="font-weight: 600; color: var(--danger);">$1,200.00</div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border);">
+                                <div>
+                                    <div style="font-weight: 500;">From Savings</div>
+                                    <div style="font-size: 13px; color: var(--text-muted);"><span class="dynamic-date" data-days-ago="15"></span></div>
+                                </div>
+                                <div style="font-weight: 600; color: var(--success);">$300.00</div>
+                            </div>
+                        </div>
+                        
+                        <div class="branch-locator" style="margin-top: 32px;">
+                            <h4>Wire Transfer Information</h4>
+                            <p style="color: var(--text-muted); font-size: 14px; margin-top: 12px;">
+                                <strong>Routing Number:</strong> 021000089<br>
+                                <strong>SWIFT Code:</strong> MRDBUSXX<br>
+                                <strong>Bank Name:</strong> Meridian Bank
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Page -->
+            <div id="page-support" class="page-content">
+                <div class="support-header">
+                    <div>
+                        <h2 style="font-size: 20px; margin-bottom: 8px;">My Support Cases</h2>
+                        <p style="color: var(--text-muted);">Track and manage your support requests</p>
+                    </div>
+                    <button class="new-case-btn" onclick="alert('Create new case dialog')">
+                        <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                        New Case
+                    </button>
+                </div>
+
+                <div class="support-stats">
+                    <div class="support-stat">
+                        <div class="support-stat-value open">2</div>
+                        <div class="support-stat-label">Open</div>
+                    </div>
+                    <div class="support-stat">
+                        <div class="support-stat-value pending">1</div>
+                        <div class="support-stat-label">Pending</div>
+                    </div>
+                    <div class="support-stat">
+                        <div class="support-stat-value resolved">5</div>
+                        <div class="support-stat-label">Resolved</div>
+                    </div>
+                    <div class="support-stat">
+                        <div class="support-stat-value total">8</div>
+                        <div class="support-stat-label">Total Cases</div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <table class="cases-table">
+                        <thead>
+                            <tr>
+                                <th>Case ID</th>
+                                <th>Subject</th>
+                                <th>Status</th>
+                                <th>Priority</th>
+                                <th>Created</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="case-id">#MRD-2026-0892</span></td>
+                                <td><span class="case-subject">Unauthorized transaction dispute</span></td>
+                                <td><span class="case-status open">● Open</span></td>
+                                <td>
+                                    <span class="case-priority">
+                                        <span class="priority-dot high"></span>
+                                        High
+                                    </span>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="1"></span></td>
+                                <td class="case-actions">
+                                    <button onclick="alert('View case details')">View</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="case-id">#MRD-2026-0885</span></td>
+                                <td><span class="case-subject">Wire transfer delay inquiry</span></td>
+                                <td><span class="case-status pending">● Pending</span></td>
+                                <td>
+                                    <span class="case-priority">
+                                        <span class="priority-dot medium"></span>
+                                        Medium
+                                    </span>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="3"></span></td>
+                                <td class="case-actions">
+                                    <button onclick="alert('View case details')">View</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="case-id">#MRD-2026-0871</span></td>
+                                <td><span class="case-subject">Request to update account information</span></td>
+                                <td><span class="case-status open">● Open</span></td>
+                                <td>
+                                    <span class="case-priority">
+                                        <span class="priority-dot low"></span>
+                                        Low
+                                    </span>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="5"></span></td>
+                                <td class="case-actions">
+                                    <button onclick="alert('View case details')">View</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="case-id">#MRD-2026-0856</span></td>
+                                <td><span class="case-subject">Credit card limit increase request</span></td>
+                                <td><span class="case-status resolved">● Resolved</span></td>
+                                <td>
+                                    <span class="case-priority">
+                                        <span class="priority-dot medium"></span>
+                                        Medium
+                                    </span>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="10"></span></td>
+                                <td class="case-actions">
+                                    <button onclick="alert('View case details')">View</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="case-id">#MRD-2026-0842</span></td>
+                                <td><span class="case-subject">Mobile app login issues</span></td>
+                                <td><span class="case-status resolved">● Resolved</span></td>
+                                <td>
+                                    <span class="case-priority">
+                                        <span class="priority-dot high"></span>
+                                        High
+                                    </span>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="14"></span></td>
+                                <td class="case-actions">
+                                    <button onclick="alert('View case details')">View</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="case-id">#MRD-2026-0831</span></td>
+                                <td><span class="case-subject">Statement discrepancy</span></td>
+                                <td><span class="case-status resolved">● Resolved</span></td>
+                                <td>
+                                    <span class="case-priority">
+                                        <span class="priority-dot low"></span>
+                                        Low
+                                    </span>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="18"></span></td>
+                                <td class="case-actions">
+                                    <button onclick="alert('View case details')">View</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="case-id">#MRD-2026-0818</span></td>
+                                <td><span class="case-subject">Interest rate inquiry</span></td>
+                                <td><span class="case-status resolved">● Resolved</span></td>
+                                <td>
+                                    <span class="case-priority">
+                                        <span class="priority-dot low"></span>
+                                        Low
+                                    </span>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="22"></span></td>
+                                <td class="case-actions">
+                                    <button onclick="alert('View case details')">View</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="case-id">#MRD-2026-0805</span></td>
+                                <td><span class="case-subject">New debit card request</span></td>
+                                <td><span class="case-status closed">● Closed</span></td>
+                                <td>
+                                    <span class="case-priority">
+                                        <span class="priority-dot medium"></span>
+                                        Medium
+                                    </span>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="28"></span></td>
+                                <td class="case-actions">
+                                    <button onclick="alert('View case details')">View</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Contact Page -->
+            <div id="page-contact" class="page-content">
+                <div class="contact-grid">
+                    <div class="contact-info-card">
+                        <h3>Get in Touch</h3>
+                        <p style="color: var(--text-muted); margin-bottom: 24px;">Our team is here to help with any banking questions or concerns.</p>
+                        
+                        <div class="contact-method">
+                            <div class="contact-method-icon">
+                                <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                            </div>
+                            <div class="contact-method-info">
+                                <h4>Phone Support</h4>
+                                <p>1-800-MERIDIAN (637-4342)</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-method">
+                            <div class="contact-method-icon">
+                                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                            </div>
+                            <div class="contact-method-info">
+                                <h4>Email</h4>
+                                <p>support@meridianbank.com</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-method">
+                            <div class="contact-method-icon">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                            </div>
+                            <div class="contact-method-info">
+                                <h4>Headquarters</h4>
+                                <p>100 Financial Center Drive<br>New York, NY 10004</p>
+                            </div>
+                        </div>
+
+                        <div class="branch-locator">
+                            <h4>Find a Branch</h4>
+                            <img src="https://images.pexels.com/photos/534216/pexels-photo-534216.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Branch" class="branch-image">
+                        </div>
+                    </div>
+
+                    <div class="contact-form-card">
+                        <h3>Send Us a Message</h3>
+                        <form onsubmit="alert('Message sent!'); return false;">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>First Name</label>
+                                    <input type="text" placeholder="James" value="James">
+                                </div>
+                                <div class="form-group">
+                                    <label>Last Name</label>
+                                    <input type="text" placeholder="Wilson" value="Wilson">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" placeholder="james.wilson@email.com" value="james.wilson@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Subject</label>
+                                <select>
+                                    <option>General Inquiry</option>
+                                    <option>Account Question</option>
+                                    <option>Technical Support</option>
+                                    <option>Fraud Report</option>
+                                    <option>Loan Application</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Message</label>
+                                <textarea placeholder="How can we help you?"></textarea>
+                            </div>
+                            <button type="submit" class="submit-btn">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div id="page-profile" class="page-content">
+                <div class="profile-header">
+                    <img src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=200" alt="Profile" class="profile-avatar-large">
+                    <div class="profile-info">
+                        <h2>James Wilson</h2>
+                        <p>james.wilson@email.com</p>
+                        <p>Member since January 2019</p>
+                        <div class="profile-badges">
+                            <span class="profile-badge verified">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                                Verified
+                            </span>
+                            <span class="profile-badge premium">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                                Premium
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-grid">
+                    <div class="profile-section">
+                        <h3>Personal Information</h3>
+                        <div class="profile-field">
+                            <span class="profile-field-label">Full Name</span>
+                            <span class="profile-field-value">James Michael Wilson</span>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-field-label">Email</span>
+                            <span class="profile-field-value">james.wilson@email.com</span>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-field-label">Phone</span>
+                            <span class="profile-field-value">+1 (555) 123-4567</span>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-field-label">Address</span>
+                            <span class="profile-field-value">456 Oak Street, Boston, MA 02108</span>
+                        </div>
+                    </div>
+                    <div class="profile-section">
+                        <h3>Account Settings</h3>
+                        <div class="profile-field">
+                            <span class="profile-field-label">Account Type</span>
+                            <span class="profile-field-value">Premium Banking</span>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-field-label">Two-Factor Auth</span>
+                            <span class="profile-field-value" style="color: var(--success);">Enabled</span>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-field-label">Statement Delivery</span>
+                            <span class="profile-field-value">Paperless</span>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-field-label">Notifications</span>
+                            <span class="profile-field-value">Email & SMS</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="page-settings" class="page-content">
+                <div class="profile-grid">
+                    <div class="profile-section">
+                        <h3>Security Settings</h3>
+                        <div class="profile-field">
+                            <span class="profile-field-label">Password</span>
+                            <button class="account-btn" style="padding: 8px 16px;">Change Password</button>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-field-label">Two-Factor Authentication</span>
+                            <button class="account-btn" style="padding: 8px 16px; background: var(--success); border-color: var(--success);">Enabled</button>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-field-label">Biometric Login</span>
+                            <button class="account-btn" style="padding: 8px 16px;">Enable</button>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-field-label">Login Alerts</span>
+                            <button class="account-btn" style="padding: 8px 16px; background: var(--success); border-color: var(--success);">Active</button>
+                        </div>
+                    </div>
+                    <div class="profile-section">
+                        <h3>Notification Preferences</h3>
+                        <div class="profile-field">
+                            <span class="profile-field-label">Transaction Alerts</span>
+                            <button class="account-btn" style="padding: 8px 16px; background: var(--success); border-color: var(--success);">On</button>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-field-label">Marketing Emails</span>
+                            <button class="account-btn" style="padding: 8px 16px;">Off</button>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-field-label">Account Statements</span>
+                            <button class="account-btn" style="padding: 8px 16px; background: var(--success); border-color: var(--success);">Email</button>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-field-label">Security Alerts</span>
+                            <button class="account-btn" style="padding: 8px 16px; background: var(--success); border-color: var(--success);">SMS & Email</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Navigation
+        function showPage(pageName) {
+            // Update nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.page === pageName) {
+                    item.classList.add('active');
+                }
+            });
+
+            // Update page content
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.remove('active');
+            });
+            const targetPage = document.getElementById('page-' + pageName);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            // Update page title
+            const titles = {
+                'dashboard': 'Dashboard',
+                'accounts': 'My Accounts',
+                'transactions': 'Transactions',
+                'services': 'Our Services',
+                'transfers': 'Money Transfer',
+                'support': 'Support Cases',
+                'contact': 'Contact Us',
+                'profile': 'My Profile',
+                'settings': 'Settings'
+            };
+            document.getElementById('pageTitle').textContent = titles[pageName] || 'Dashboard';
+        }
+
+        // Add click handlers to nav items
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = item.dataset.page;
+                if (page) {
+                    showPage(page);
+                }
+            });
+        });
+
+        // Initialize dynamic dates
+        function initDynamicDates() {
+            const dateElements = document.querySelectorAll('.dynamic-date');
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+            dateElements.forEach(el => {
+                const daysAgo = parseInt(el.getAttribute('data-days-ago'), 10);
+                const date = new Date();
+                date.setDate(date.getDate() - daysAgo);
+                
+                const month = months[date.getMonth()];
+                const day = date.getDate();
+                const year = date.getFullYear();
+                
+                el.textContent = `${month} ${day}, ${year}`;
+            });
+        }
+
+        // Widget Loading
+        function loadWidget() {
+            const settingsJson = localStorage.getItem('chatWidgetSettings');
+            
+            if (settingsJson) {
+                const config = JSON.parse(settingsJson);
+                const widgetMode = config.widgetMode || 'standard';
+                
+                console.log('📱 Financial Portal: Loading widget in mode:', widgetMode);
+                
+                if (widgetMode === 'custom') {
+                    // Load custom embedded SDK
+                    console.log('✅ Loading custom embedded SDK');
+                    
+                    window.D365WidgetConfig = {
+                        position: config.position || 'bottom-right',
+                        theme: config.theme || 'default',
+                        accentColor: config.accentColor || '#0078d4',
+                        title: config.title || 'Chat with us',
+                        subtitle: config.subtitle || '',
+                        welcomeMessage: config.welcomeMessage || 'Hello! How can I help you today?'
+                    };
+                    
+                    const widgetScript = document.createElement('script');
+                    widgetScript.src = 'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js';
+                    widgetScript.async = true;
+                    widgetScript.onload = () => {
+                        console.log('✅ Custom widget SDK loaded successfully');
+                    };
+                    widgetScript.onerror = (e) => {
+                        console.error('❌ Failed to load custom widget SDK:', e);
+                    };
+                    document.body.appendChild(widgetScript);
+                } else {
+                    // Standard D365 LCW mode
+                    console.log('✅ Loading standard D365 LCW widget');
+                    
+                    if (config.lcwCode) {
+                        const scriptMatch = config.lcwCode.match(/<script[^>]*>([\s\S]*?)<\/script>/i);
+                        if (scriptMatch) {
+                            const scriptContent = scriptMatch[0];
+                            const srcMatch = scriptContent.match(/src="([^"]+)"/);
+                            const appIdMatch = scriptContent.match(/data-app-id="([^"]+)"/);
+                            const orgIdMatch = scriptContent.match(/data-org-id="([^"]+)"/);
+                            const orgUrlMatch = scriptContent.match(/data-org-url="([^"]+)"/);
+
+                            if (srcMatch && appIdMatch && orgIdMatch && orgUrlMatch) {
+                                const lcwScript = document.createElement('script');
+                                lcwScript.id = 'Microsoft_Omnichannel_LCWidget';
+                                lcwScript.src = srcMatch[1];
+                                lcwScript.setAttribute('data-app-id', appIdMatch[1]);
+                                lcwScript.setAttribute('data-org-id', orgIdMatch[1]);
+                                lcwScript.setAttribute('data-org-url', orgUrlMatch[1]);
+                                document.head.appendChild(lcwScript);
+                                
+                                console.log('✅ D365 LCW widget loaded');
+
+                                window.addEventListener("lcw:ready", function handleLivechatReadyEvent() {
+                                    console.log('✅ LCW Ready on financial portal');
+                                    
+                                    if (config.enableStandardAuth === true && typeof Microsoft !== 'undefined') {
+                                        Microsoft.Omnichannel.LiveChatWidget.SDK.setContextProvider(function contextProvider() {
+                                            const authName = config.standardAuthName || 'Anonymous User';
+                                            const authEmail = config.standardAuthEmail || 'anonymous@example.com';
+                                            console.log('🔒 Using auto-authentication:', { authName, authEmail });
+                                            
+                                            return {
+                                                'emailaddress1': authEmail,
+                                                'Name': { value: authName, isDisplayable: true },
+                                                'Authenticated': { value: 'Authenticated', isDisplayable: true }
+                                            };
+                                        });
+                                    }
+                                });
+                            } else {
+                                console.error('❌ Could not parse LCW code - invalid format');
+                            }
+                        }
+                    } else if (config.widgetId && config.orgId && config.orgUrl) {
+                        const lcwScript = document.createElement('script');
+                        lcwScript.id = 'Microsoft_Omnichannel_LCWidget';
+                        lcwScript.src = 'https://oc-cdn-ocprod.azureedge.net/livechatwidget/scripts/LiveChatBootstrapper.js';
+                        lcwScript.setAttribute('data-app-id', config.widgetId);
+                        lcwScript.setAttribute('data-org-id', config.orgId);
+                        lcwScript.setAttribute('data-org-url', config.orgUrl);
+                        document.head.appendChild(lcwScript);
+                        
+                        console.log('✅ D365 LCW widget loaded with individual values');
+
+                        window.addEventListener("lcw:ready", function handleLivechatReadyEvent() {
+                            console.log('✅ LCW Ready on financial portal');
+                            
+                            if (config.enableStandardAuth === true && typeof Microsoft !== 'undefined') {
+                                Microsoft.Omnichannel.LiveChatWidget.SDK.setContextProvider(function contextProvider() {
+                                    const authName = config.standardAuthName || 'Anonymous User';
+                                    const authEmail = config.standardAuthEmail || 'anonymous@example.com';
+                                    return {
+                                        'emailaddress1': authEmail,
+                                        'Name': { value: authName, isDisplayable: true },
+                                        'Authenticated': { value: 'Authenticated', isDisplayable: true }
+                                    };
+                                });
+                            }
+                        });
+                    } else {
+                        console.warn('⚠️ Standard mode requires lcwCode OR (widgetId + orgId + orgUrl)');
+                    }
+                }
+            } else {
+                console.log('ℹ️ No widget configuration found. Configure in Chat Widget Studio first and save.');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initDynamicDates();
+            loadWidget();
+        });
+    </script>
+</body>
+</html>
