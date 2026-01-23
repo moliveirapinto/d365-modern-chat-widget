@@ -105,6 +105,7 @@
     chatBgColor: '#f8fafc',
     badgeColor: '#ff4757',
     launcherIcon: 'chat_multiple',
+    customLauncherIcon: '',
     enablePrechatForm: true,
     enableCustomAuth: false,
     customAuthName: '',
@@ -136,7 +137,10 @@
     }
 
     var fontFamily = fontFamilies[config.fontFamily] || fontFamilies.system;
-    var launcherIcon = iconPaths[config.launcherIcon] || iconPaths.chat_multiple;
+    // Handle custom launcher icon
+    var launcherIcon = (config.launcherIcon === 'custom' && config.customLauncherIcon) 
+      ? 'custom:' + config.customLauncherIcon 
+      : (iconPaths[config.launcherIcon] || iconPaths.chat_multiple);
     var gradient = config.useGradient ? 
       'linear-gradient(135deg, ' + config.gradientStart + ' 0%, ' + config.gradientEnd + ' 100%)' : 
       config.primaryColor;
@@ -387,10 +391,19 @@
   }
 
   function injectHTML(c, launcherIcon, gradient) {
+    // Handle custom launcher icon (URL) vs SVG path
+    var launcherIconHtml;
+    if (launcherIcon.startsWith('custom:')) {
+      var customIconUrl = launcherIcon.substring(7);
+      launcherIconHtml = '<svg class="chat-icon" viewBox="0 0 24 24"><image href="'+customIconUrl+'" x="0" y="0" width="24" height="24" preserveAspectRatio="xMidYMid meet"/></svg>';
+    } else {
+      launcherIconHtml = '<svg class="chat-icon" viewBox="0 0 24 24"><path d="'+launcherIcon+'"/></svg>';
+    }
+    
     var html = [
       '<button class="d365-launcher" id="d365Launcher">',
         '<span class="d365-badge" id="d365Badge">0</span>',
-        '<svg class="chat-icon" viewBox="0 0 24 24"><path d="'+launcherIcon+'"/></svg>',
+        launcherIconHtml,
         '<svg class="close-icon" viewBox="0 0 24 24"><path d="'+iconPaths.close+'"/></svg>',
       '</button>',
       '<div class="d365-container" id="d365Container">',
