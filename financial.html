@@ -2115,83 +2115,143 @@
 
         // Widget Loading - Same as retail.html
         function loadWidget() {
-            const settingsJson = localStorage.getItem('chatWidgetSettings');
+            const urlParams = new URLSearchParams(window.location.search);
+            const configParam = urlParams.get('config');
             
-            if (settingsJson) {
-                const config = JSON.parse(settingsJson);
-                const widgetMode = config.widgetMode || 'standard';
-                
-                console.log('🏦 Financial Portal: Loading widget in mode:', widgetMode);
-                
+            let config = null;
+            
+            if (configParam) {
+                try {
+                    config = JSON.parse(decodeURIComponent(configParam));
+                } catch (e) {
+                    console.error('Failed to parse config from URL:', e);
+                }
+            }
+            
+            if (!config) {
+                // Try to load from localStorage (same key as index.html saves to)
+                const savedSettings = localStorage.getItem('chatWidgetSettings');
+                if (savedSettings) {
+                    try {
+                        config = JSON.parse(savedSettings);
+                        console.log('🏦 Financial Portal: Loaded widget config from localStorage:', {
+                            widgetId: config.widgetId,
+                            orgId: config.orgId,
+                            orgUrl: config.orgUrl
+                        });
+                    } catch (e) {
+                        console.error('Failed to parse saved settings:', e);
+                    }
+                }
+            }
+
+            if (config) {
+                // Check widget mode - default to 'custom' if not set
+                const widgetMode = config.widgetMode || 'custom';
+                console.log('🎛️ Widget mode:', widgetMode);
+
                 if (widgetMode === 'custom') {
-                    // Load custom embedded SDK
-                    console.log('✅ Loading custom embedded SDK');
+                    // Custom mode - load the embedded SDK directly (like a real website would)
+                    console.log('✅ Custom widget mode - loading embedded SDK directly');
                     
+                    // Set the global config for the widget SDK
                     window.D365WidgetConfig = {
-                        position: config.position || 'bottom-right',
-                        theme: config.theme || 'default',
-                        accentColor: config.accentColor || '#0078d4',
-                        title: config.title || 'Chat with us',
-                        subtitle: config.subtitle || '',
-                        welcomeMessage: config.welcomeMessage || 'Hello! How can I help you today?'
+                        orgId: config.orgId,
+                        orgUrl: config.orgUrl,
+                        widgetId: config.widgetId
                     };
                     
-                    const widgetScript = document.createElement('script');
-                    widgetScript.src = 'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js';
-                    widgetScript.async = true;
-                    widgetScript.onload = () => {
-                        console.log('✅ Custom widget SDK loaded successfully');
-                    };
-                    widgetScript.onerror = (e) => {
-                        console.error('❌ Failed to load custom widget SDK:', e);
-                    };
-                    document.body.appendChild(widgetScript);
-                } else {
-                    // Standard D365 LCW mode
-                    console.log('✅ Loading standard D365 LCW widget');
+                    // Add all the styling/customization options from config
+                    if (config.headerTitle) window.D365WidgetConfig.headerTitle = config.headerTitle;
+                    if (config.headerSubtitle) window.D365WidgetConfig.headerSubtitle = config.headerSubtitle;
+                    if (config.headerTitleColor) window.D365WidgetConfig.headerTitleColor = config.headerTitleColor;
+                    if (config.headerSubtitleColor) window.D365WidgetConfig.headerSubtitleColor = config.headerSubtitleColor;
+                    if (config.headerLogo) window.D365WidgetConfig.headerLogo = config.headerLogo;
+                    if (config.fontFamily) window.D365WidgetConfig.fontFamily = config.fontFamily;
+                    if (config.useGradient !== undefined) window.D365WidgetConfig.useGradient = config.useGradient;
+                    if (config.gradientStart) window.D365WidgetConfig.gradientStart = config.gradientStart;
+                    if (config.gradientEnd) window.D365WidgetConfig.gradientEnd = config.gradientEnd;
+                    if (config.primaryColor) window.D365WidgetConfig.primaryColor = config.primaryColor;
+                    if (config.userBubbleColor) window.D365WidgetConfig.userBubbleColor = config.userBubbleColor;
+                    if (config.userTextColor) window.D365WidgetConfig.userTextColor = config.userTextColor;
+                    if (config.agentBubbleColor) window.D365WidgetConfig.agentBubbleColor = config.agentBubbleColor;
+                    if (config.agentTextColor) window.D365WidgetConfig.agentTextColor = config.agentTextColor;
+                    if (config.chatBgColor) window.D365WidgetConfig.chatBgColor = config.chatBgColor;
+                    if (config.launcherColor) window.D365WidgetConfig.launcherColor = config.launcherColor;
+                    if (config.launcherIcon) window.D365WidgetConfig.launcherIcon = config.launcherIcon;
+                    if (config.badgeColor) window.D365WidgetConfig.badgeColor = config.badgeColor;
+                    if (config.sendBtnColor) window.D365WidgetConfig.sendBtnColor = config.sendBtnColor;
+                    if (config.agentAvatar) window.D365WidgetConfig.agentAvatar = config.agentAvatar;
+                    if (config.customerAvatar) window.D365WidgetConfig.customerAvatar = config.customerAvatar;
+                    if (config.botAvatar) window.D365WidgetConfig.botAvatar = config.botAvatar;
+                    if (config.enablePrechatForm !== undefined) window.D365WidgetConfig.enablePrechatForm = config.enablePrechatForm;
+                    if (config.welcomeTitle) window.D365WidgetConfig.welcomeTitle = config.welcomeTitle;
+                    if (config.welcomeMessage) window.D365WidgetConfig.welcomeMessage = config.welcomeMessage;
+                    if (config.usePrechatGradient !== undefined) window.D365WidgetConfig.usePrechatGradient = config.usePrechatGradient;
+                    if (config.prechatSolidColor) window.D365WidgetConfig.prechatSolidColor = config.prechatSolidColor;
+                    if (config.prechatGradientStart) window.D365WidgetConfig.prechatGradientStart = config.prechatGradientStart;
+                    if (config.prechatGradientEnd) window.D365WidgetConfig.prechatGradientEnd = config.prechatGradientEnd;
+                    if (config.prechatTitleColor) window.D365WidgetConfig.prechatTitleColor = config.prechatTitleColor;
+                    if (config.prechatSubtitleColor) window.D365WidgetConfig.prechatSubtitleColor = config.prechatSubtitleColor;
                     
+                    console.log('📦 Widget config set:', window.D365WidgetConfig);
+                    
+                    // Load the widget SDK from CDN
+                    const script = document.createElement('script');
+                    script.src = 'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js';
+                    script.onload = function() {
+                        console.log('✅ Widget SDK loaded successfully');
+                    };
+                    script.onerror = function() {
+                        console.error('❌ Failed to load widget SDK from CDN');
+                    };
+                    document.head.appendChild(script);
+                    
+                } else if (widgetMode === 'standard') {
+                    // Standard mode - load the D365 LCW widget
                     if (config.lcwCode) {
-                        const scriptMatch = config.lcwCode.match(/<script[^>]*>([\s\S]*?)<\/script>/i);
-                        if (scriptMatch) {
-                            const scriptContent = scriptMatch[0];
-                            const srcMatch = scriptContent.match(/src="([^"]+)"/);
-                            const appIdMatch = scriptContent.match(/data-app-id="([^"]+)"/);
-                            const orgIdMatch = scriptContent.match(/data-org-id="([^"]+)"/);
-                            const orgUrlMatch = scriptContent.match(/data-org-url="([^"]+)"/);
-
-                            if (srcMatch && appIdMatch && orgIdMatch && orgUrlMatch) {
-                                const lcwScript = document.createElement('script');
-                                lcwScript.id = 'Microsoft_Omnichannel_LCWidget';
-                                lcwScript.src = srcMatch[1];
-                                lcwScript.setAttribute('data-app-id', appIdMatch[1]);
-                                lcwScript.setAttribute('data-org-id', orgIdMatch[1]);
-                                lcwScript.setAttribute('data-org-url', orgUrlMatch[1]);
-                                document.head.appendChild(lcwScript);
+                        console.log('✅ Loading standard D365 LCW widget from embed code');
+                        
+                        // Parse the lcwCode to extract the script attributes
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(config.lcwCode, 'text/html');
+                        const scriptTag = doc.querySelector('script[id="Microsoft_Omnichannel_LCWidget"]');
+                        
+                        if (scriptTag) {
+                            const lcwScript = document.createElement('script');
+                            lcwScript.id = 'Microsoft_Omnichannel_LCWidget';
+                            lcwScript.src = scriptTag.getAttribute('src');
+                            lcwScript.setAttribute('data-app-id', scriptTag.getAttribute('data-app-id'));
+                            lcwScript.setAttribute('data-org-id', scriptTag.getAttribute('data-org-id'));
+                            lcwScript.setAttribute('data-org-url', scriptTag.getAttribute('data-org-url'));
+                            document.head.appendChild(lcwScript);
+                            console.log('✅ D365 LCW widget script injected');
+                            
+                            // Set up context provider for authentication
+                            window.addEventListener("lcw:ready", function handleLivechatReadyEvent() {
+                                console.log('✅ LCW Ready on financial portal');
                                 
-                                console.log('✅ D365 LCW widget loaded');
-
-                                window.addEventListener("lcw:ready", function handleLivechatReadyEvent() {
-                                    console.log('✅ LCW Ready on financial portal');
-                                    
-                                    if (config.enableStandardAuth === true && typeof Microsoft !== 'undefined') {
-                                        Microsoft.Omnichannel.LiveChatWidget.SDK.setContextProvider(function contextProvider() {
-                                            const authName = config.standardAuthName || 'Anonymous User';
-                                            const authEmail = config.standardAuthEmail || 'anonymous@example.com';
-                                            console.log('🔒 Using auto-authentication:', { authName, authEmail });
-                                            
-                                            return {
-                                                'emailaddress1': authEmail,
-                                                'Name': { value: authName, isDisplayable: true },
-                                                'Authenticated': { value: 'Authenticated', isDisplayable: true }
-                                            };
-                                        });
-                                    }
-                                });
-                            } else {
-                                console.error('❌ Could not parse LCW code - invalid format');
-                            }
+                                if (config.enableStandardAuth === true && typeof Microsoft !== 'undefined') {
+                                    Microsoft.Omnichannel.LiveChatWidget.SDK.setContextProvider(function contextProvider() {
+                                        const authName = config.standardAuthName || 'Anonymous User';
+                                        const authEmail = config.standardAuthEmail || 'anonymous@example.com';
+                                        console.log('🔒 Using auto-authentication:', { authName, authEmail });
+                                        
+                                        return {
+                                            'emailaddress1': authEmail,
+                                            'Name': { value: authName, isDisplayable: true },
+                                            'Authenticated': { value: 'Authenticated', isDisplayable: true }
+                                        };
+                                    });
+                                }
+                            });
+                        } else {
+                            console.error('❌ Could not parse LCW code - invalid format');
                         }
                     } else if (config.widgetId && config.orgId && config.orgUrl) {
+                        // Fallback: Build LCW script from individual values
+                        console.log('✅ Building LCW widget from individual D365 values');
+                        
                         const lcwScript = document.createElement('script');
                         lcwScript.id = 'Microsoft_Omnichannel_LCWidget';
                         lcwScript.src = 'https://oc-cdn-ocprod.azureedge.net/livechatwidget/scripts/LiveChatBootstrapper.js';
@@ -2199,9 +2259,13 @@
                         lcwScript.setAttribute('data-org-id', config.orgId);
                         lcwScript.setAttribute('data-org-url', config.orgUrl);
                         document.head.appendChild(lcwScript);
+                        console.log('✅ D365 LCW widget loaded with:', {
+                            appId: config.widgetId,
+                            orgId: config.orgId,
+                            orgUrl: config.orgUrl
+                        });
                         
-                        console.log('✅ D365 LCW widget loaded with individual values');
-
+                        // Set up context provider for authentication
                         window.addEventListener("lcw:ready", function handleLivechatReadyEvent() {
                             console.log('✅ LCW Ready on financial portal');
                             
