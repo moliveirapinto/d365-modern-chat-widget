@@ -5688,6 +5688,11 @@
                 
                 const widget = await response.json();
                 
+                // IMPORTANT: Clear personal profile context when loading a room widget
+                // This ensures personal and team widgets don't interfere with each other
+                activeProfileId = null;
+                localStorage.removeItem('chatWidgetActiveProfile');
+                
                 // Apply the config
                 if (widget.config) {
                     applyWidgetConfig(widget.config);
@@ -5699,7 +5704,9 @@
                 localStorage.setItem('d365_collab_active_room', roomCode);
                 localStorage.setItem('d365_collab_active_widget', widgetId);
                 
+                // Re-render both lists to update active states
                 renderRoomList();
+                renderProfiles();
                 showToast(`✅ Loaded "${widget.name}" from room`);
                 
             } catch (error) {
@@ -8033,6 +8040,13 @@
             const wasInitializing = isInitializing;
             isInitializing = true;
             
+            // IMPORTANT: Clear room widget context when loading a personal profile
+            // This ensures personal and team widgets don't interfere with each other
+            activeRoomCode = null;
+            activeRoomWidgetId = null;
+            localStorage.removeItem('d365_collab_active_room');
+            localStorage.removeItem('d365_collab_active_widget');
+            
             // Merge with defaults, ensuring undefined values are replaced with defaults
             settings = { ...defaultSettings, ...profile.settings };
             // Clean up any undefined values (from old profiles created before field existed)
@@ -8051,6 +8065,7 @@
             updatePreview();
             updateConnectionStatus();
             renderProfiles();
+            renderRoomList(); // Also update room list to clear active state
             
             // Re-enable auto-save after a short delay
             setTimeout(() => {
