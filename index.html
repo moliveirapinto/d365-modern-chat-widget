@@ -4906,6 +4906,12 @@
             // Merge config into settings
             Object.assign(settings, config);
             
+            // Ensure connection values are properly set from config
+            if (config.orgId) settings.orgId = config.orgId;
+            if (config.orgUrl) settings.orgUrl = config.orgUrl;
+            if (config.widgetId) settings.widgetId = config.widgetId;
+            if (config.lcwCode) settings.lcwCode = config.lcwCode;
+            
             // Save to localStorage
             localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
             
@@ -4915,8 +4921,13 @@
                 if (lcwEl) {
                     lcwEl.value = config.lcwCode;
                     if (typeof parseLCWCode === 'function') {
-                        parseLCWCode();
+                        parseLCWCode(config.lcwCode);
                     }
+                }
+            } else if (config.orgId && config.orgUrl && config.widgetId) {
+                // If we have connection values but no lcwCode, show extracted values
+                if (typeof showExtractedValues === 'function') {
+                    showExtractedValues(config.widgetId, config.orgId, config.orgUrl);
                 }
             }
             
@@ -4928,6 +4939,11 @@
             // Update preview
             if (typeof updatePreview === 'function') {
                 updatePreview();
+            }
+            
+            // Update connection status display
+            if (typeof updateConnectionStatus === 'function') {
+                updateConnectionStatus();
             }
         }
 
@@ -4962,6 +4978,11 @@
             }
             localStorage.removeItem('d365_collab_room'); // Clean up old key
         })();
+        
+        // Helper function to save rooms to localStorage
+        function saveRoomsToLocalStorage() {
+            localStorage.setItem('d365_collab_rooms', JSON.stringify(savedRooms));
+        }
         
         // Show Create Room modal
         function showCreateRoomModal() {
@@ -5203,6 +5224,12 @@
                 }
                 
                 const roomData = await response.json();
+                console.log('🔗 Joining room - received from server:', {
+                    code: roomCode,
+                    name: roomData.name,
+                    widgetCount: roomData.widgets?.length || 0,
+                    widgets: roomData.widgets?.map(w => ({ id: w.id, name: w.name })) || []
+                });
                 
                 // Add to saved rooms with widgets
                 const newRoom = {
@@ -5399,6 +5426,14 @@
             
             if (!listEl) return;
             
+            // Debug: Log what we're about to render
+            console.log('🖼️ Rendering room list:', savedRooms.map(r => ({
+                code: r.code,
+                name: r.name,
+                widgetCount: r.widgets?.length || 0,
+                widgets: r.widgets?.map(w => ({ id: w.id, name: w.name })) || []
+            })));
+            
             // Count total widgets across all rooms
             let totalWidgets = 0;
             savedRooms.forEach(r => totalWidgets += (r.widgets?.length || 0));
@@ -5593,6 +5628,12 @@
                 }
                 
                 const roomData = await response.json();
+                console.log('🔄 Refreshing room widgets - received from server:', {
+                    code: roomCode,
+                    name: roomData.name,
+                    widgetCount: roomData.widgets?.length || 0,
+                    widgets: roomData.widgets?.map(w => ({ id: w.id, name: w.name })) || []
+                });
                 
                 // Update local room data with widgets from server
                 const roomIndex = savedRooms.findIndex(r => r.code === roomCode);
@@ -5891,6 +5932,12 @@
         // Initialize room UI and refresh widgets from server on page load
         document.addEventListener('DOMContentLoaded', async function() {
             // Render saved rooms immediately with cached data
+            console.log('📦 Initial savedRooms from localStorage:', savedRooms.map(r => ({
+                code: r.code,
+                name: r.name,
+                widgetCount: r.widgets?.length || 0,
+                widgets: r.widgets?.map(w => ({ id: w.id, name: w.name })) || []
+            })));
             renderRoomList();
             
             // Then refresh widgets from server for all rooms in background
@@ -5901,8 +5948,13 @@
                         const response = await fetch(`${COLLAB_API_URL}/room/${room.code}`);
                         if (response.ok) {
                             const roomData = await response.json();
+                            console.log(`🔄 Room ${room.code} received ${roomData.widgets?.length || 0} widgets from server`);
                             room.widgets = roomData.widgets || [];
                             room.lastUpdated = roomData.lastUpdated;
+                            // Also update room name if server has one
+                            if (roomData.name) {
+                                room.name = roomData.name;
+                            }
                         }
                     } catch (e) {
                         console.log(`Failed to refresh room ${room.code}:`, e);
@@ -7479,15 +7531,27 @@
                 
                 saveProfiles();
                 
-                // If this is the active profile, also update the current form
+                // If this is the active profile, also update the global settings object
                 if (profileId === activeProfileId) {
-                    if (parsed.orgId) document.getElementById('orgId').value = parsed.orgId;
-                    if (parsed.orgUrl) document.getElementById('orgUrl').value = parsed.orgUrl;
-                    if (parsed.widgetId) document.getElementById('widgetId').value = parsed.widgetId;
-                    updateSettingsFromForm();
+                    if (parsed.orgId) settings.orgId = parsed.orgId;
+                    if (parsed.orgUrl) settings.orgUrl = parsed.orgUrl;
+                    if (parsed.widgetId) settings.widgetId = parsed.widgetId;
+                    settings.lcwCode = embedCode;
+                    
+                    // Sync to hidden lcwCode textarea and call parseLCWCode for UI updates
+                    const lcwTextarea = document.getElementById('lcwCode');
+                    if (lcwTextarea) {
+                        lcwTextarea.value = embedCode;
+                        parseLCWCode(embedCode);
+                    }
+                    
+                    // Also save to localStorage so live.html picks up the changes
+                    localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+                    console.log('💾 Saved settings to localStorage after parsing embed code');
                 }
                 
                 renderProfiles();
+                updateConnectionStatus();
                 showToast('D365 settings extracted and applied!');
             } else {
                 showToast('Could not parse embed code. Check format.', 'warning');
@@ -7608,15 +7672,27 @@
                     
                     saveRoomsToLocalStorage();
                     
-                    // If this is the active widget, update the current form
+                    // If this is the active widget, also update the global settings object
                     if (activeRoomCode === roomCode && activeRoomWidgetId === widgetId) {
-                        if (parsed.orgId) document.getElementById('orgId').value = parsed.orgId;
-                        if (parsed.orgUrl) document.getElementById('orgUrl').value = parsed.orgUrl;
-                        if (parsed.widgetId) document.getElementById('widgetId').value = parsed.widgetId;
-                        updateSettingsFromForm();
+                        if (parsed.orgId) settings.orgId = parsed.orgId;
+                        if (parsed.orgUrl) settings.orgUrl = parsed.orgUrl;
+                        if (parsed.widgetId) settings.widgetId = parsed.widgetId;
+                        settings.lcwCode = embedCode;
+                        
+                        // Sync to hidden lcwCode textarea and call parseLCWCode for UI updates
+                        const lcwTextarea = document.getElementById('lcwCode');
+                        if (lcwTextarea) {
+                            lcwTextarea.value = embedCode;
+                            parseLCWCode(embedCode);
+                        }
+                        
+                        // Also save to localStorage so live.html picks up the changes
+                        localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+                        console.log('💾 Saved settings to localStorage after parsing room widget embed code');
                     }
                     
                     renderRoomList();
+                    updateConnectionStatus();
                     showToast('D365 settings extracted and applied!');
                 } catch (error) {
                     console.error('Failed to sync parsed settings:', error);
