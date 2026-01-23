@@ -22,7 +22,8 @@ class ModernChatWidget {
             unreadMessages: 0,
             agentName: 'Support Agent',
             messages: [],
-            processedMessageIds: new Set()
+            processedMessageIds: new Set(),
+            soundEnabled: true // Notification sound enabled by default
         };
 
         // Message queue for batching and sorting messages
@@ -947,7 +948,23 @@ class ModernChatWidget {
                 this.state.unreadMessages++;
                 this.elements.badge.textContent = this.state.unreadMessages;
                 this.elements.badge.classList.add('show');
+                // Play notification sound when chat is minimized
+                if (this.state.soundEnabled) {
+                    this.playNotificationSound();
+                }
             }
+        }
+    }
+
+    // Play a subtle notification chime using audio file (same as index.html and dist/widget-core.js)
+    playNotificationSound() {
+        try {
+            // Use the same notification sound file as the rest of the app
+            const audio = new Audio('https://moliveirapinto.github.io/d365-modern-chat-widget/notification/new-notification-3-398649.mp3');
+            audio.volume = 0.5;
+            audio.play().catch(e => console.log('🔇 Could not play notification sound:', e));
+        } catch (e) {
+            console.log('🔇 Sound not supported:', e.message);
         }
     }
 
