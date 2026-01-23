@@ -2746,7 +2746,7 @@
             transcript += `${'='.repeat(50)}\n\n`;
             chatMessages.forEach(msg => {
                 const time = formatTime(msg.timestamp);
-                const sender = msg.isUser ? userName : (msg.senderName || 'Agent');
+                const sender = getDisplayName(msg.senderName, msg.isUser);
                 transcript += `[${time}] ${sender}:\n${msg.content}\n\n`;
             });
             transcript += `${'='.repeat(50)}\n`;
@@ -2803,6 +2803,16 @@
             const name = senderName.toLowerCase();
             return name.includes('bot') || name.includes('copilot') || name.includes('virtual') || 
                    name.includes('assistant') || name.includes('ai') || name === 'cps';
+        }
+        
+        // Get display name for agent/bot - use customBotName if set and sender is a bot
+        function getDisplayName(senderName, isUser) {
+            if (isUser) return userName;
+            // If custom bot name is set and this is a bot message, use custom name
+            if (adminSettings?.customBotName && isBotSender(senderName)) {
+                return adminSettings.customBotName;
+            }
+            return senderName || 'Agent';
         }
         
         function createAvatarElement(isUser, senderName, senderImage, isBot = false) {
@@ -2882,7 +2892,7 @@
             
             const senderDiv = document.createElement('div');
             senderDiv.className = 'message-sender';
-            senderDiv.textContent = isUser ? userName : (senderName || 'Agent');
+            senderDiv.textContent = getDisplayName(senderName, isUser);
             
             try {
                 const parsed = JSON.parse(content);
@@ -2950,7 +2960,7 @@
                 console.error('Error rendering suggested actions:', e);
                 // Fallback to plain text
                 contentDiv.innerHTML = `
-                    <div class="message-sender">${isUser ? userName : (senderName || 'Agent')}</div>
+                    <div class="message-sender">${getDisplayName(senderName, isUser)}</div>
                     <div class="message ${isUser ? 'user' : 'agent'}">${content}</div>
                     <div class="message-time">${formatTime(now)}</div>
                 `;
@@ -3005,7 +3015,7 @@
             
             const senderDiv = document.createElement('div');
             senderDiv.className = 'message-sender';
-            senderDiv.textContent = isUser ? userName : (senderName || 'Agent');
+            senderDiv.textContent = getDisplayName(senderName, isUser);
             
             const cardContainer = document.createElement('div');
             
@@ -3204,7 +3214,7 @@
             
             const senderDiv = document.createElement('div');
             senderDiv.className = 'message-sender';
-            senderDiv.textContent = isUser ? userName : (senderName || 'Agent');
+            senderDiv.textContent = getDisplayName(senderName, isUser);
             
             const cardContainer = document.createElement('div');
             cardContainer.className = 'message adaptive-card-message';
@@ -3344,7 +3354,7 @@
             const content = document.createElement('div');
             content.className = 'message-content';
             content.innerHTML = `
-                <div class="message-sender">${isUser ? userName : (senderName || 'Agent')}</div>
+                <div class="message-sender">${getDisplayName(senderName, isUser)}</div>
                 <div class="message-image-container">
                     <img src="${fileInfo.url}" class="message-image" alt="${fileInfo.name}" onclick="window.open('${fileInfo.url}', '_blank')">
                     <div class="message-file-info">${fileInfo.name}</div>
@@ -3495,7 +3505,7 @@
             const formattedText = isUser ? text : formatBotMessage(text);
             
             content.innerHTML = `
-                <div class="message-sender">${isUser ? userName : (senderName || 'Agent')}</div>
+                <div class="message-sender">${getDisplayName(senderName, isUser)}</div>
                 <div class="message ${isUser ? 'user' : 'agent'}">${formattedText}</div>
                 <div class="message-time">${formatTime(now)}</div>
             `;
@@ -3701,7 +3711,7 @@
             const content = document.createElement('div');
             content.className = 'message-content';
             content.innerHTML = `
-                <div class="message-sender">${isUser ? userName : (senderName || 'Agent')}</div>
+                <div class="message-sender">${getDisplayName(senderName, isUser)}</div>
                 <div class="message ${isUser ? 'user' : 'agent'}">
                     <a href="${fileInfo.url}" target="_blank" style="color: inherit; text-decoration: underline;">
                         ?? ${fileInfo.name}
@@ -3884,7 +3894,7 @@
                                 
                                 const senderDiv = document.createElement('div');
                                 senderDiv.className = 'message-sender';
-                                senderDiv.textContent = msg.isUser ? userName : (msg.senderName || 'Agent');
+                                senderDiv.textContent = getDisplayName(msg.senderName, msg.isUser);
                                 
                                 const cardContainer = document.createElement('div');
                                 cardContainer.className = 'message adaptive-card-message';
@@ -3984,7 +3994,7 @@
                                 const content = document.createElement('div');
                                 content.className = 'message-content';
                                 content.innerHTML = `
-                                    <div class="message-sender">${msg.isUser ? userName : (msg.senderName || 'Agent')}</div>
+                                    <div class="message-sender">${getDisplayName(msg.senderName, msg.isUser)}</div>
                                     <div class="message ${msg.isUser ? 'user' : 'agent'}">${msg.content}</div>
                                     <div class="message-time">${formatTime(now)}</div>
                                 `;
@@ -6843,6 +6853,9 @@
                 ? `linear-gradient(135deg, ${s.gradientStart || '#667eea'} 0%, ${s.gradientEnd || '#764ba2'} 100%)`
                 : s.primaryColor || '#667eea';
             
+            // Bubble gradient uses the same colors but is independent of header gradient toggle
+            const bubbleGradient = `linear-gradient(135deg, ${s.gradientStart || '#667eea'} 0%, ${s.gradientEnd || '#764ba2'} 100%)`;
+            
             const launcherBg = s.launcherColor || gradient;
 
             // Create dynamic style element
@@ -6861,7 +6874,7 @@
 
                 /* Messages */
                 .chat-messages { background: ${s.chatBgColor || '#f8fafc'} !important; }
-                .message.user { background: ${s.useBubbleGradient !== false ? gradient : (s.userBubbleColor || '#667eea')} !important; color: ${s.userTextColor || '#ffffff'} !important; }
+                .message.user { background: ${s.useBubbleGradient !== false ? bubbleGradient : (s.userBubbleColor || '#667eea')} !important; color: ${s.userTextColor || '#ffffff'} !important; }
                 .message.agent { background: ${s.agentBubbleColor || '#ffffff'} !important; color: ${s.agentTextColor || '#2d3748'} !important; }
                 .message.system { background: ${s.systemMsgColor || '#e2e8f0'} !important; color: ${s.systemTextColor || '#64748b'} !important; }
                 .message-avatar.agent { background: ${gradient} !important; }

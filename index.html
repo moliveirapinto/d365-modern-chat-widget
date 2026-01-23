@@ -1134,7 +1134,7 @@
         /* Toast Notification */
         .toast {
             position: fixed;
-            bottom: 24px;
+            bottom: 80px;
             right: 24px;
             background: #10b981;
             color: white;
@@ -1149,7 +1149,7 @@
             transform: translateY(100px);
             opacity: 0;
             transition: all 0.3s ease;
-            z-index: 1000;
+            z-index: 10000;
         }
         .toast.show {
             transform: translateY(0);
@@ -3617,6 +3617,11 @@
                         <label class="form-label">Header Subtitle</label>
                         <input type="text" class="form-input" id="headerSubtitle" value="We're here to help" placeholder="e.g., We're here to help">
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">Custom Bot/Agent Name</label>
+                        <input type="text" class="form-input" id="customBotName" value="" placeholder="e.g., Support Bot, Virtual Assistant (leave empty to use default)">
+                        <p class="form-hint">Override the Copilot Studio / chatbot name from Microsoft with your own custom name</p>
+                    </div>
                     <div class="color-grid" style="margin-top: 16px;">
                         <div class="color-item">
                             <label>Title Text Color</label>
@@ -5709,8 +5714,22 @@
                     throw new Error(error.error || 'Failed to save');
                 }
                 
-                // Refresh room data
-                await refreshRoomWidgets(roomCode);
+                // Server returns { success, version, message } - update local cache with our config
+                const room = savedRooms.find(r => r.code === roomCode);
+                if (room && room.widgets) {
+                    const widget = room.widgets.find(w => w.id === widgetId);
+                    if (widget) {
+                        widget.config = config;
+                        widget.updatedAt = new Date().toISOString();
+                        widget.updatedBy = collabUserName || cloudUser?.login || 'Anonymous';
+                    }
+                }
+                
+                // Save to localStorage immediately
+                saveRoomsToLocalStorage();
+                
+                // Re-render the room list to reflect changes
+                renderRoomList();
                 
                 showToast('✅ Widget saved to room!');
                 
@@ -6998,6 +7017,7 @@
             // Header & Branding
             headerTitle: 'Support Chat',
             headerSubtitle: "We're here to help",
+            customBotName: '',
             headerTitleColor: '#ffffff',
             headerSubtitleColor: '#e0e7ff',
             headerLogo: null,
@@ -7595,11 +7615,11 @@
             const widget = room.widgets.find(w => w.id === widgetId);
             if (!widget) return;
             
-            // Update locally
+            // Update locally first (optimistic update)
             if (!widget.config) widget.config = {};
             widget.config.lcwCode = newCode;
             
-            // Save to cloud
+            // Save to cloud (mandatory for collaboration)
             try {
                 const response = await fetch(`${COLLAB_API_URL}/room/${roomCode}/widgets/${widgetId}`, {
                     method: 'PUT',
@@ -7611,12 +7631,15 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error('Failed to save embed code');
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `Server error: ${response.status}`);
                 }
                 
+                // Cloud save succeeded - save locally too
                 saveRoomsToLocalStorage();
             } catch (error) {
                 console.error('Failed to sync embed code:', error);
+                showToast('Failed to sync embed code: ' + error.message);
             }
         }
         
@@ -7655,7 +7678,7 @@
                 if (parsed.orgUrl) widget.config.orgUrl = parsed.orgUrl;
                 if (parsed.widgetId) widget.config.widgetId = parsed.widgetId;
                 
-                // Save to cloud
+                // Save to cloud (mandatory for collaboration)
                 try {
                     const response = await fetch(`${COLLAB_API_URL}/room/${roomCode}/widgets/${widgetId}`, {
                         method: 'PUT',
@@ -7667,9 +7690,11 @@
                     });
                     
                     if (!response.ok) {
-                        throw new Error('Failed to save parsed settings');
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.error || `Server error: ${response.status}`);
                     }
                     
+                    // Cloud save succeeded - now save locally too
                     saveRoomsToLocalStorage();
                     
                     // If this is the active widget, also update the global settings object
@@ -7693,10 +7718,10 @@
                     
                     renderRoomList();
                     updateConnectionStatus();
-                    showToast('D365 settings extracted and applied!');
+                    showToast('D365 settings extracted and synced! ☁️');
                 } catch (error) {
                     console.error('Failed to sync parsed settings:', error);
-                    showToast('Failed to save changes to cloud', 'error');
+                    showToast('Failed to sync: ' + error.message);
                 }
             } else {
                 showToast('Could not parse embed code. Check format.', 'warning');
@@ -8164,6 +8189,7 @@
             
             document.getElementById('headerTitle').value = settings.headerTitle;
             document.getElementById('headerSubtitle').value = settings.headerSubtitle;
+            document.getElementById('customBotName').value = settings.customBotName || '';
             
             // Font family
             document.getElementById('fontFamily').value = settings.fontFamily || 'system';
@@ -9085,6 +9111,7 @@
             // Header & Branding
             settings.headerTitle = document.getElementById('headerTitle').value;
             settings.headerSubtitle = document.getElementById('headerSubtitle').value;
+            settings.customBotName = document.getElementById('customBotName').value;
             settings.headerTitleColor = document.getElementById('headerTitleColor').value;
             settings.headerSubtitleColor = document.getElementById('headerSubtitleColor').value;
             // Note: headerLogo is already in settings from handleImageUpload
@@ -9228,7 +9255,9 @@
                 // User bubble
                 const userBubble = document.getElementById('previewUserBubble');
                 if (userBubble) {
-                    userBubble.style.background = settings.useBubbleGradient ? gradient : settings.userBubbleColor;
+                    // Bubble gradient uses the same gradient colors but is controlled by its own toggle
+                    const bubbleGradient = `linear-gradient(135deg, ${settings.gradientStart} 0%, ${settings.gradientEnd} 100%)`;
+                    userBubble.style.background = settings.useBubbleGradient ? bubbleGradient : settings.userBubbleColor;
                     userBubble.style.color = settings.userTextColor;
                 }
 
@@ -9887,6 +9916,7 @@ window.D365WidgetConfig=${configJson};
                 widgetMode: 'custom',
                 headerTitle: settings.headerTitle || 'Support Chat',
                 headerSubtitle: settings.headerSubtitle || "We're here to help",
+                customBotName: settings.customBotName || '',
                 headerTitleColor: settings.headerTitleColor || '#ffffff',
                 headerSubtitleColor: settings.headerSubtitleColor || '#e0e7ff',
                 headerLogo: toGitHubRawUrl(settings.headerLogo) || '',
@@ -10890,6 +10920,17 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
              name.includes('assistant') || name.includes('ai');
     }
     
+    // Get display name - uses customBotName for bot messages if configured
+    function getDisplayName(senderName, isUser) {
+      var settings = getCurrentSettings();
+      if (isUser) return userName;
+      // If customBotName is set and this is a bot message, use customBotName
+      if (settings?.customBotName && isBotSender(senderName)) {
+        return settings.customBotName;
+      }
+      return senderName || 'Agent';
+    }
+    
     // Enhanced Markdown & Reference Parser
     function formatBotMessage(text) {
       if (!text) return '';
@@ -10981,7 +11022,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       
       var content = document.createElement('div');
       content.className = 'd365-message-content';
-      content.innerHTML = '<div class="d365-message-sender">' + (isUser ? userName : (senderName || 'Agent')) + '</div>' +
+      content.innerHTML = '<div class="d365-message-sender">' + getDisplayName(senderName, isUser) + '</div>' +
         '<div class="d365-message ' + (isUser ? 'user' : 'agent') + '">' + formattedText + '</div>' +
         '<div class="d365-message-time">' + formatTime(now) + '</div>';
       
@@ -11028,7 +11069,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       transcript += '='.repeat(50) + '\\n\\n';
       chatMessages.forEach(function(msg) {
         var time = formatTime(msg.timestamp);
-        var sender = msg.isUser ? userName : (msg.senderName || 'Agent');
+        var sender = getDisplayName(msg.senderName, msg.isUser);
         transcript += '[' + time + '] ' + sender + ':\\n' + msg.content + '\\n\\n';
       });
       transcript += '='.repeat(50) + '\\nEnd of transcript';
@@ -11639,7 +11680,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       
       var senderDiv = document.createElement('div');
       senderDiv.className = 'd365-message-sender';
-      senderDiv.textContent = senderName || 'Agent';
+      senderDiv.textContent = getDisplayName(senderName, false);
       
       var cardContainer = document.createElement('div');
       cardContainer.className = 'd365-message agent d365-adaptive-card';
@@ -11751,7 +11792,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       
       var senderDiv = document.createElement('div');
       senderDiv.className = 'd365-message-sender';
-      senderDiv.textContent = senderName || 'Agent';
+      senderDiv.textContent = getDisplayName(senderName, false);
       
       try {
         var parsed = JSON.parse(content);
@@ -11798,7 +11839,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
         contentDiv.appendChild(timeDiv);
       } catch (e) {
         console.error('Error rendering suggested actions:', e);
-        contentDiv.innerHTML = '<div class="d365-message-sender">' + (senderName || 'Agent') + '</div>' +
+        contentDiv.innerHTML = '<div class="d365-message-sender">' + getDisplayName(senderName, false) + '</div>' +
           '<div class="d365-message agent">' + content + '</div>' +
           '<div class="d365-message-time">' + formatTime(now) + '</div>';
       }

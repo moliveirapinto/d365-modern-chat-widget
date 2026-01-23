@@ -94,6 +94,7 @@
     headerSubtitle: "We're here to help",
     fontFamily: 'system',
     useGradient: true,
+    useBubbleGradient: true,
     gradientStart: '#667eea',
     gradientEnd: '#764ba2',
     primaryColor: '#667eea',
@@ -121,7 +122,8 @@
     prechatBadgeBg: '#ffffff',
     prechatBadgeText: '#059669',
     prechatStatusDot: '#10b981',
-    prechatAvatarBorder: '#ffffff'
+    prechatAvatarBorder: '#ffffff',
+    customBotName: ''
   };
 
   function init() {
@@ -234,7 +236,7 @@
       '.d365-msg-wrap.user .d365-msg-sender{text-align:right}',
       '.d365-msg{padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.5;word-wrap:break-word}',
       '.d365-msg.agent{background:'+c.agentBubbleColor+';color:'+c.agentTextColor+';border-bottom-left-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.08)}',
-      '.d365-msg.user{background:'+c.userBubbleColor+';color:'+c.userTextColor+';border-bottom-right-radius:4px;white-space:pre-wrap}',
+      '.d365-msg.user{background:'+(c.useBubbleGradient!==false?'linear-gradient(135deg,'+c.gradientStart+' 0%,'+c.gradientEnd+' 100%)':c.userBubbleColor)+';color:'+c.userTextColor+';border-bottom-right-radius:4px;white-space:pre-wrap}',
       // Markdown styles for bot messages
       '.d365-msg.agent h1,.d365-msg.agent h2,.d365-msg.agent h3,.d365-msg.agent h4{margin:0.5em 0 0.3em;font-weight:600;line-height:1.3}',
       '.d365-msg.agent h1{font-size:1.3em}',
@@ -939,6 +941,16 @@
              n.includes('assistant') || n.includes('ai') || n === 'cps';
     }
 
+    // Get display name - uses customBotName for bot/agent messages if configured
+    function getDisplayName(senderName, isUser) {
+      if (isUser) return userName;
+      // If customBotName is set and this is a bot message, use customBotName
+      if (config.customBotName && isBot(senderName)) {
+        return config.customBotName;
+      }
+      return senderName || 'Agent';
+    }
+
     function isBotRole(role) {
       return role === 'bot' || role === 'Bot' || role === 2;
     }
@@ -1314,7 +1326,7 @@
 
       var content = document.createElement('div');
       content.className = 'd365-msg-content';
-      content.innerHTML = '<div class="d365-msg-sender">'+(isUser?userName:(senderName||'Agent'))+'</div>'+
+      content.innerHTML = '<div class="d365-msg-sender">'+getDisplayName(senderName, isUser)+'</div>'+
         '<div class="d365-msg '+(isUser?'user':'agent')+'">'+formattedText+'</div>'+
         '<div class="d365-msg-time">'+formatTime(new Date())+'</div>';
 
@@ -1385,7 +1397,7 @@
       // Create sender div
       var senderDiv = document.createElement('div');
       senderDiv.className = 'd365-msg-sender';
-      senderDiv.textContent = senderName || 'Agent';
+      senderDiv.textContent = getDisplayName(senderName, false);
       contentDiv.appendChild(senderDiv);
 
       var cardBox = document.createElement('div');
@@ -1616,7 +1628,7 @@
 
         var senderDiv = document.createElement('div');
         senderDiv.className = 'd365-msg-sender';
-        senderDiv.textContent = senderName || 'Agent';
+        senderDiv.textContent = getDisplayName(senderName, false);
         contentDiv.appendChild(senderDiv);
 
         if (isCarousel) {
@@ -1694,7 +1706,7 @@
 
         var senderDiv = document.createElement('div');
         senderDiv.className = 'd365-msg-sender';
-        senderDiv.textContent = senderName || 'Agent';
+        senderDiv.textContent = getDisplayName(senderName, false);
         contentDiv.appendChild(senderDiv);
 
         var bubble = document.createElement('div');
