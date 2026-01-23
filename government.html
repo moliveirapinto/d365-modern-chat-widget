@@ -1,0 +1,2375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self' https://*.microsoft.com https://*.azure.com https://*.dynamics.com https://*.crm.dynamics.com https://*.github.io;
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.microsoft.com https://*.azure.com https://*.azureedge.net https://oc-cdn-ocprod.azureedge.net https://moliveirapinto.github.io https://*.github.io https://unpkg.com;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.azureedge.net https://oc-cdn-ocprod.azureedge.net;
+        style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.azureedge.net https://oc-cdn-ocprod.azureedge.net;
+        font-src 'self' https://fonts.gstatic.com https://*.azureedge.net;
+        img-src 'self' data: blob: https: *;
+        frame-src 'self' https://*.omnichannelengagementhub.com https://*.azureedge.net https://oc-cdn-ocprod.azureedge.net https://forms.office.com https://*.forms.office.com https://*.microsoft.com;
+        connect-src 'self' https://*.microsoft.com https://*.azure.com https://*.dynamics.com https://*.omnichannelengagementhub.com https://*.skype.com wss://*.skype.com https://*.azureedge.net wss://*.omnichannelengagementhub.com https://*.communication.azure.com wss://*.communication.azure.com;
+        worker-src 'self' blob:;
+    ">
+    <title>City of Riverside | Official Government Portal</title>
+    <link rel="icon" type="image/png" href="img/icon/gov-favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700;800&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #1e3a5f;
+            --navy-dark: #152a45;
+            --navy-light: #2d4a6f;
+            --gold: #c9a227;
+            --gold-light: #e3b93a;
+            --red: #b22234;
+            --white: #ffffff;
+            --cream: #f8f6f1;
+            --text: #2d3748;
+            --text-light: #4a5568;
+            --text-muted: #718096;
+            --border: #e2e8f0;
+            --success: #2f855a;
+            --warning: #c05621;
+            --info: #2b6cb0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--white);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Official Government Banner */
+        .gov-banner {
+            background: var(--navy-dark);
+            color: white;
+            padding: 8px 0;
+            font-size: 12px;
+            border-bottom: 3px solid var(--gold);
+        }
+
+        .gov-banner-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .gov-banner-flag {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .flag-icon {
+            width: 20px;
+            height: 14px;
+            background: linear-gradient(180deg, 
+                var(--red) 0%, var(--red) 30%,
+                var(--white) 30%, var(--white) 70%,
+                var(--navy) 70%, var(--navy) 100%);
+            border-radius: 2px;
+        }
+
+        .gov-banner a {
+            color: var(--gold-light);
+            text-decoration: underline;
+            margin-left: auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-top {
+            background: var(--navy);
+            padding: 16px 0;
+        }
+
+        .header-top-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-decoration: none;
+            color: white;
+        }
+
+        .logo-seal {
+            width: 56px;
+            height: 56px;
+            background: var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid white;
+            position: relative;
+        }
+
+        .logo-seal::before {
+            content: '';
+            position: absolute;
+            width: 48px;
+            height: 48px;
+            border: 2px solid var(--navy);
+            border-radius: 50%;
+        }
+
+        .logo-seal svg {
+            width: 28px;
+            height: 28px;
+            fill: var(--navy);
+        }
+
+        .logo-text h1 {
+            font-family: 'Merriweather', serif;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            opacity: 0.8;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .header-search {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            padding: 10px 16px;
+            color: white;
+            font-size: 14px;
+            width: 260px;
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .search-box input:focus {
+            outline: none;
+        }
+
+        .search-box button {
+            background: var(--gold);
+            border: none;
+            padding: 10px 16px;
+            cursor: pointer;
+        }
+
+        .search-box button svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--navy);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-link {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        .header-link:hover {
+            opacity: 1;
+        }
+
+        .header-link svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        /* Navigation */
+        .nav-bar {
+            background: white;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav {
+            display: flex;
+            gap: 0;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: var(--text);
+            font-size: 15px;
+            font-weight: 500;
+            padding: 16px 24px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav a:hover {
+            background: var(--cream);
+            color: var(--navy);
+        }
+
+        .nav a.active {
+            border-bottom-color: var(--navy);
+            color: var(--navy);
+            font-weight: 600;
+        }
+
+        .emergency-btn {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--red);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .emergency-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+        }
+
+        /* Page Content */
+        .page-content {
+            display: none;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        /* Hero - Different Layout: Full-width image with overlay */
+        .hero {
+            position: relative;
+            min-height: 500px;
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://images.pexels.com/photos/1550337/pexels-photo-1550337.jpeg?auto=compress&cs=tinysrgb&w=1920') center/cover;
+            opacity: 0.25;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 80px 32px;
+            display: flex;
+            gap: 60px;
+        }
+
+        .hero-main {
+            flex: 1;
+            color: white;
+        }
+
+        .hero-main h1 {
+            font-family: 'Merriweather', serif;
+            font-size: 44px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .hero-main p {
+            font-size: 18px;
+            opacity: 0.9;
+            max-width: 560px;
+            margin-bottom: 32px;
+            line-height: 1.7;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 48px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .hero-stat h3 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        .hero-stat p {
+            font-size: 14px;
+            margin: 0;
+            opacity: 0.8;
+        }
+
+        /* Quick Services Panel - Sidebar style */
+        .quick-services-panel {
+            width: 380px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .quick-services-header {
+            background: var(--gold);
+            padding: 20px 24px;
+        }
+
+        .quick-services-header h2 {
+            font-family: 'Merriweather', serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 4px;
+        }
+
+        .quick-services-header p {
+            font-size: 13px;
+            color: var(--navy);
+            opacity: 0.8;
+        }
+
+        .quick-service-list {
+            padding: 8px;
+        }
+
+        .quick-service-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+
+        .quick-service-item:hover {
+            background: var(--cream);
+        }
+
+        .quick-service-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .quick-service-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: white;
+        }
+
+        .quick-service-text h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .quick-service-text p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .quick-service-arrow {
+            margin-left: auto;
+            color: var(--text-muted);
+        }
+
+        /* Section Styles */
+        .section {
+            padding: 80px 0;
+        }
+
+        .section.cream {
+            background: var(--cream);
+        }
+
+        .section.navy {
+            background: var(--navy);
+            color: white;
+        }
+
+        .section-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        .section-header {
+            margin-bottom: 48px;
+        }
+
+        .section-header.center {
+            text-align: center;
+        }
+
+        .section-eyebrow {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--gold);
+            margin-bottom: 12px;
+        }
+
+        .section-header h2 {
+            font-family: 'Merriweather', serif;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .section-header p {
+            font-size: 18px;
+            color: var(--text-light);
+            max-width: 600px;
+        }
+
+        .section-header.center p {
+            margin: 0 auto;
+        }
+
+        /* Department Cards - Horizontal Layout */
+        .dept-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .dept-card {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .dept-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+        }
+
+        .dept-card-image {
+            width: 180px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .dept-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .dept-card-content {
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dept-card-content h3 {
+            font-family: 'Merriweather', serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--navy);
+        }
+
+        .dept-card-content p {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 16px;
+            flex: 1;
+        }
+
+        .dept-card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--navy);
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .dept-card-link:hover {
+            color: var(--gold);
+        }
+
+        /* News & Announcements - Timeline Layout */
+        .news-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 48px;
+        }
+
+        .featured-news {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+
+        .featured-news-image {
+            height: 220px;
+            overflow: hidden;
+        }
+
+        .featured-news-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .featured-news-content {
+            padding: 28px;
+        }
+
+        .news-badge {
+            display: inline-block;
+            background: var(--red);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .news-badge.alert {
+            background: var(--warning);
+        }
+
+        .news-badge.info {
+            background: var(--info);
+        }
+
+        .featured-news-content h3 {
+            font-family: 'Merriweather', serif;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .featured-news-content p {
+            font-size: 15px;
+            color: var(--text-light);
+            margin-bottom: 16px;
+        }
+
+        .news-meta {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .news-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .news-item {
+            display: flex;
+            gap: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .news-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .news-date {
+            text-align: center;
+            min-width: 60px;
+        }
+
+        .news-date .day {
+            display: block;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--navy);
+            line-height: 1;
+        }
+
+        .news-date .month {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .news-item-content h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .news-item-content h4 a {
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .news-item-content h4 a:hover {
+            color: var(--navy);
+        }
+
+        .news-item-content p {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        /* Services Page - Icon Grid */
+        .services-icon-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .service-icon-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px 24px;
+            text-align: center;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .service-icon-card:hover {
+            border-color: var(--navy);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+        }
+
+        .service-icon-card .icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .service-icon-card .icon svg {
+            width: 32px;
+            height: 32px;
+            fill: white;
+        }
+
+        .service-icon-card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .service-icon-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Officials Grid - Card with photo */
+        .officials-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+        }
+
+        .official-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+
+        .official-photo {
+            height: 200px;
+            overflow: hidden;
+            background: var(--cream);
+        }
+
+        .official-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .official-info {
+            padding: 24px;
+        }
+
+        .official-info h3 {
+            font-family: 'Merriweather', serif;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .official-info .title {
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .official-info .term {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Support Page */
+        .support-hero {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
+            padding: 48px 0;
+        }
+
+        .support-hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .support-hero h1 {
+            font-family: 'Merriweather', serif;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .support-hero p {
+            opacity: 0.8;
+            margin-top: 8px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-gold {
+            background: var(--gold);
+            color: var(--navy);
+        }
+
+        .btn-gold:hover {
+            background: var(--gold-light);
+        }
+
+        .btn-outline-white {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-outline-white:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: white;
+        }
+
+        /* Support Stats */
+        .support-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .support-stat-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .support-stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .support-stat-card.open::before { background: var(--warning); }
+        .support-stat-card.pending::before { background: var(--info); }
+        .support-stat-card.resolved::before { background: var(--success); }
+        .support-stat-card.total::before { background: var(--navy); }
+
+        .support-stat-card .value {
+            font-family: 'Merriweather', serif;
+            font-size: 36px;
+            font-weight: 700;
+        }
+
+        .support-stat-card.open .value { color: var(--warning); }
+        .support-stat-card.pending .value { color: var(--info); }
+        .support-stat-card.resolved .value { color: var(--success); }
+        .support-stat-card.total .value { color: var(--navy); }
+
+        .support-stat-card .label {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Cases Table */
+        .cases-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .cases-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cases-header h2 {
+            font-family: 'Merriweather', serif;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .cases-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .cases-table th {
+            text-align: left;
+            padding: 14px 24px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: var(--cream);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cases-table td {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .cases-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .cases-table tr:hover td {
+            background: rgba(248, 246, 241, 0.5);
+        }
+
+        .case-id {
+            font-family: monospace;
+            font-weight: 600;
+            color: var(--navy);
+        }
+
+        .case-subject {
+            font-weight: 500;
+        }
+
+        .case-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .case-status.open {
+            background: rgba(192, 86, 33, 0.1);
+            color: var(--warning);
+        }
+
+        .case-status.pending {
+            background: rgba(43, 108, 176, 0.1);
+            color: var(--info);
+        }
+
+        .case-status.resolved {
+            background: rgba(47, 133, 90, 0.1);
+            color: var(--success);
+        }
+
+        .case-status.closed {
+            background: rgba(113, 128, 150, 0.1);
+            color: var(--text-muted);
+        }
+
+        .case-dept {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .case-actions button {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .case-actions button:hover {
+            background: var(--navy);
+            border-color: var(--navy);
+            color: white;
+        }
+
+        /* Contact Page - Two Column */
+        .contact-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 60px;
+        }
+
+        .contact-sidebar {
+            background: var(--navy);
+            border-radius: 12px;
+            padding: 40px;
+            color: white;
+        }
+
+        .contact-sidebar h2 {
+            font-family: 'Merriweather', serif;
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .contact-sidebar > p {
+            opacity: 0.8;
+            margin-bottom: 36px;
+            line-height: 1.7;
+        }
+
+        .contact-method {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .contact-method-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(201, 162, 39, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .contact-method-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--gold);
+        }
+
+        .contact-method h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .contact-method p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .contact-hours {
+            margin-top: 36px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .contact-hours h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .contact-hours h4 svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--gold);
+        }
+
+        .contact-hours p {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+
+        .contact-form-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 40px;
+        }
+
+        .contact-form-card h2 {
+            font-family: 'Merriweather', serif;
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 28px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 15px;
+            transition: all 0.2s;
+            background: white;
+            color: var(--text);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--navy);
+            box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .btn-navy {
+            background: var(--navy);
+            color: white;
+        }
+
+        .btn-navy:hover {
+            background: var(--navy-dark);
+        }
+
+        /* FAQ Grid */
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .faq-item {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .faq-item h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--navy);
+        }
+
+        .faq-item p {
+            font-size: 14px;
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--navy-dark);
+            color: white;
+            padding: 60px 0 30px;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .footer-brand .logo-seal {
+            width: 48px;
+            height: 48px;
+        }
+
+        .footer-brand h3 {
+            font-family: 'Merriweather', serif;
+            font-size: 20px;
+        }
+
+        .footer-about p {
+            font-size: 14px;
+            opacity: 0.7;
+            line-height: 1.7;
+        }
+
+        .footer-column h4 {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            color: var(--gold);
+        }
+
+        .footer-column a {
+            display: block;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 14px;
+            padding: 6px 0;
+            transition: color 0.2s;
+        }
+
+        .footer-column a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-bottom p {
+            font-size: 13px;
+            opacity: 0.6;
+        }
+
+        .footer-legal {
+            display: flex;
+            gap: 24px;
+        }
+
+        .footer-legal a {
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+        }
+
+        .footer-legal a:hover {
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .hero-content {
+                flex-direction: column;
+            }
+            
+            .quick-services-panel {
+                width: 100%;
+            }
+            
+            .dept-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .services-icon-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .officials-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav {
+                display: none;
+            }
+            
+            .section {
+                padding: 60px 0;
+            }
+            
+            .contact-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .services-icon-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .faq-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-stats {
+                flex-direction: column;
+                gap: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Official Government Banner -->
+    <div class="gov-banner">
+        <div class="gov-banner-content">
+            <div class="gov-banner-flag">
+                <div class="flag-icon"></div>
+                <span>An official website of the City of Riverside</span>
+            </div>
+            <a href="#">How you know this is official ▾</a>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-top">
+            <div class="header-top-content">
+                <a href="#" class="logo" onclick="showPage('home'); return false;">
+                    <div class="logo-seal">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"/></svg>
+                    </div>
+                    <div class="logo-text">
+                        <h1>City of Riverside</h1>
+                        <p>Official Government Portal</p>
+                    </div>
+                </a>
+                
+                <div class="header-search">
+                    <div class="search-box">
+                        <input type="text" placeholder="Search services, departments...">
+                        <button>
+                            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="header-actions">
+                    <a href="#" class="header-link">
+                        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        Sign In
+                    </a>
+                    <a href="#" class="header-link">
+                        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2 0 .68.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56zm2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2 0-.68.07-1.35.16-2h4.68c.09.65.16 1.32.16 2 0 .68-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2 0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"/></svg>
+                        Translate
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="nav-bar">
+            <div class="nav-content">
+                <div class="nav">
+                    <a href="#" class="active" data-page="home">Home</a>
+                    <a href="#" data-page="services">Services</a>
+                    <a href="#" data-page="government">Government</a>
+                    <a href="#" data-page="support">Citizen Support</a>
+                    <a href="#" data-page="contact">Contact</a>
+                </div>
+                <a href="tel:911" class="emergency-btn">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                    Emergency: 911
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Home Page -->
+    <div id="page-home" class="page-content active">
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-bg"></div>
+            <div class="hero-content">
+                <div class="hero-main">
+                    <h1>Welcome to the City of Riverside</h1>
+                    <p>Your gateway to city services, information, and community resources. We're committed to making government work better for everyone.</p>
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <h3>125K+</h3>
+                            <p>Residents Served</p>
+                        </div>
+                        <div class="hero-stat">
+                            <h3>50+</h3>
+                            <p>City Services</p>
+                        </div>
+                        <div class="hero-stat">
+                            <h3>24/7</h3>
+                            <p>Online Access</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="quick-services-panel">
+                    <div class="quick-services-header">
+                        <h2>Quick Services</h2>
+                        <p>Access popular services instantly</p>
+                    </div>
+                    <div class="quick-service-list">
+                        <a href="#" class="quick-service-item">
+                            <div class="quick-service-icon">
+                                <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+                            </div>
+                            <div class="quick-service-text">
+                                <h4>Pay Utility Bill</h4>
+                                <p>Water, sewer & trash</p>
+                            </div>
+                            <span class="quick-service-arrow">→</span>
+                        </a>
+                        <a href="#" class="quick-service-item">
+                            <div class="quick-service-icon">
+                                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+                            </div>
+                            <div class="quick-service-text">
+                                <h4>Property Taxes</h4>
+                                <p>View & pay online</p>
+                            </div>
+                            <span class="quick-service-arrow">→</span>
+                        </a>
+                        <a href="#" class="quick-service-item">
+                            <div class="quick-service-icon">
+                                <svg viewBox="0 0 24 24"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>
+                            </div>
+                            <div class="quick-service-text">
+                                <h4>Building Permits</h4>
+                                <p>Apply & track status</p>
+                            </div>
+                            <span class="quick-service-arrow">→</span>
+                        </a>
+                        <a href="#" class="quick-service-item">
+                            <div class="quick-service-icon">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                            </div>
+                            <div class="quick-service-text">
+                                <h4>Report an Issue</h4>
+                                <p>Potholes, streetlights</p>
+                            </div>
+                            <span class="quick-service-arrow">→</span>
+                        </a>
+                        <a href="#" class="quick-service-item">
+                            <div class="quick-service-icon">
+                                <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+                            </div>
+                            <div class="quick-service-text">
+                                <h4>Business Licenses</h4>
+                                <p>New & renewals</p>
+                            </div>
+                            <span class="quick-service-arrow">→</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Departments -->
+        <section class="section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-eyebrow">City Departments</span>
+                    <h2>Serving Our Community</h2>
+                    <p>Dedicated teams working to make Riverside a great place to live, work, and visit.</p>
+                </div>
+                
+                <div class="dept-grid">
+                    <div class="dept-card">
+                        <div class="dept-card-image">
+                            <img src="https://images.pexels.com/photos/1550337/pexels-photo-1550337.jpeg?auto=compress&cs=tinysrgb&w=400" alt="City Hall">
+                        </div>
+                        <div class="dept-card-content">
+                            <h3>City Manager's Office</h3>
+                            <p>Leading city operations, strategic planning, and ensuring efficient delivery of services to residents.</p>
+                            <a href="#" class="dept-card-link">Learn More →</a>
+                        </div>
+                    </div>
+                    <div class="dept-card">
+                        <div class="dept-card-image">
+                            <img src="https://images.pexels.com/photos/3862130/pexels-photo-3862130.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Police">
+                        </div>
+                        <div class="dept-card-content">
+                            <h3>Police Department</h3>
+                            <p>Protecting and serving our community with professional law enforcement and public safety programs.</p>
+                            <a href="#" class="dept-card-link">Learn More →</a>
+                        </div>
+                    </div>
+                    <div class="dept-card">
+                        <div class="dept-card-image">
+                            <img src="https://images.pexels.com/photos/69934/pexels-photo-69934.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Fire">
+                        </div>
+                        <div class="dept-card-content">
+                            <h3>Fire & Rescue</h3>
+                            <p>Providing emergency response, fire prevention, and community safety education programs.</p>
+                            <a href="#" class="dept-card-link">Learn More →</a>
+                        </div>
+                    </div>
+                    <div class="dept-card">
+                        <div class="dept-card-image">
+                            <img src="https://images.pexels.com/photos/1123972/pexels-photo-1123972.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Parks">
+                        </div>
+                        <div class="dept-card-content">
+                            <h3>Parks & Recreation</h3>
+                            <p>Maintaining parks, trails, and recreation facilities while offering programs for all ages.</p>
+                            <a href="#" class="dept-card-link">Learn More →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- News & Announcements -->
+        <section class="section cream">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-eyebrow">Stay Informed</span>
+                    <h2>News & Announcements</h2>
+                    <p>Important updates and news from the City of Riverside.</p>
+                </div>
+                
+                <div class="news-grid">
+                    <div class="featured-news">
+                        <div class="featured-news-image">
+                            <img src="https://images.pexels.com/photos/1550337/pexels-photo-1550337.jpeg?auto=compress&cs=tinysrgb&w=600" alt="City Council">
+                        </div>
+                        <div class="featured-news-content">
+                            <span class="news-badge">Breaking</span>
+                            <h3>City Council Approves New Infrastructure Investment Plan</h3>
+                            <p>A comprehensive $45 million infrastructure plan has been approved to improve roads, utilities, and public facilities over the next five years.</p>
+                            <span class="news-meta dynamic-date" data-days-ago="1"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="news-list">
+                        <div class="news-item">
+                            <div class="news-date">
+                                <span class="day dynamic-day" data-days-ago="3"></span>
+                                <span class="month dynamic-month" data-days-ago="3"></span>
+                            </div>
+                            <div class="news-item-content">
+                                <h4><a href="#">Water Main Maintenance Scheduled for Downtown District</a></h4>
+                                <p>Planned maintenance will affect water service in select areas from 10 PM to 6 AM.</p>
+                            </div>
+                        </div>
+                        <div class="news-item">
+                            <div class="news-date">
+                                <span class="day dynamic-day" data-days-ago="5"></span>
+                                <span class="month dynamic-month" data-days-ago="5"></span>
+                            </div>
+                            <div class="news-item-content">
+                                <h4><a href="#">Community Input Sought for New Recreation Center Design</a></h4>
+                                <p>Public meetings scheduled to gather resident feedback on the proposed facility.</p>
+                            </div>
+                        </div>
+                        <div class="news-item">
+                            <div class="news-date">
+                                <span class="day dynamic-day" data-days-ago="8"></span>
+                                <span class="month dynamic-month" data-days-ago="8"></span>
+                            </div>
+                            <div class="news-item-content">
+                                <h4><a href="#">City Launches New Online Permit Application System</a></h4>
+                                <p>Residents can now apply for building permits entirely online with faster processing.</p>
+                            </div>
+                        </div>
+                        <div class="news-item">
+                            <div class="news-date">
+                                <span class="day dynamic-day" data-days-ago="12"></span>
+                                <span class="month dynamic-month" data-days-ago="12"></span>
+                            </div>
+                            <div class="news-item-content">
+                                <h4><a href="#">Annual Budget Town Hall Meeting Announced</a></h4>
+                                <p>Join city officials to discuss the proposed FY2027 budget and priorities.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Services Page -->
+    <div id="page-services" class="page-content">
+        <section class="section cream">
+            <div class="section-container">
+                <div class="section-header center">
+                    <span class="section-eyebrow">Online Services</span>
+                    <h2>What Can We Help You With?</h2>
+                    <p>Access city services anytime, anywhere. Most services are available 24/7 online.</p>
+                </div>
+                
+                <div class="services-icon-grid">
+                    <a href="#" class="service-icon-card">
+                        <div class="icon">
+                            <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+                        </div>
+                        <h3>Pay Bills Online</h3>
+                        <p>Utility, taxes, permits</p>
+                    </a>
+                    <a href="#" class="service-icon-card">
+                        <div class="icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10z"/></svg>
+                        </div>
+                        <h3>Building Permits</h3>
+                        <p>Apply & track status</p>
+                    </a>
+                    <a href="#" class="service-icon-card">
+                        <div class="icon">
+                            <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+                        </div>
+                        <h3>Business Licenses</h3>
+                        <p>New & renewal applications</p>
+                    </a>
+                    <a href="#" class="service-icon-card">
+                        <div class="icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+                        </div>
+                        <h3>Report Issues</h3>
+                        <p>Potholes, graffiti, lights</p>
+                    </a>
+                    <a href="#" class="service-icon-card">
+                        <div class="icon">
+                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/></svg>
+                        </div>
+                        <h3>Public Records</h3>
+                        <p>Request documents</p>
+                    </a>
+                    <a href="#" class="service-icon-card">
+                        <div class="icon">
+                            <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
+                        </div>
+                        <h3>Job Opportunities</h3>
+                        <p>City employment</p>
+                    </a>
+                    <a href="#" class="service-icon-card">
+                        <div class="icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 6c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2m0 10c2.7 0 5.8 1.29 6 2H6c.23-.72 3.31-2 6-2m0-12C9.79 4 8 5.79 8 8s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 10c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                        <h3>Voter Registration</h3>
+                        <p>Register & update info</p>
+                    </a>
+                    <a href="#" class="service-icon-card">
+                        <div class="icon">
+                            <svg viewBox="0 0 24 24"><path d="M14 6V4h-4v2h4zM4 8v11h16V8H4zm16-2c1.11 0 2 .89 2 2v11c0 1.11-.89 2-2 2H4c-1.11 0-2-.89-2-2l.01-11c0-1.11.88-2 1.99-2h4V4c0-1.11.89-2 2-2h4c1.11 0 2 .89 2 2v2h4z"/></svg>
+                        </div>
+                        <h3>Trash & Recycling</h3>
+                        <p>Schedules & guidelines</p>
+                    </a>
+                    <a href="#" class="service-icon-card">
+                        <div class="icon">
+                            <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
+                        </div>
+                        <h3>Parks & Facilities</h3>
+                        <p>Reserve & schedule</p>
+                    </a>
+                    <a href="#" class="service-icon-card">
+                        <div class="icon">
+                            <svg viewBox="0 0 24 24"><path d="M18 4l-4 4h3v7c0 1.1-.9 2-2 2s-2-.9-2-2V8c0-2.21-1.79-4-4-4S5 5.79 5 8v7H2l4 4 4-4H7V8c0-1.1.9-2 2-2s2 .9 2 2v7c0 2.21 1.79 4 4 4s4-1.79 4-4V8h3l-4-4z"/></svg>
+                        </div>
+                        <h3>Transit Services</h3>
+                        <p>Routes & passes</p>
+                    </a>
+                    <a href="#" class="service-icon-card">
+                        <div class="icon">
+                            <svg viewBox="0 0 24 24"><path d="M4.5 9.5c0-.28.22-.5.5-.5h14c.28 0 .5.22.5.5v6c0 .28-.22.5-.5.5H5c-.28 0-.5-.22-.5-.5v-6zM5 7c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2v3h2v-3h10v3h2v-3c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2H5zm2 6h4v2H7v-2zm8 0h2v2h-2v-2z"/></svg>
+                        </div>
+                        <h3>Pet Licenses</h3>
+                        <p>Register your pet</p>
+                    </a>
+                    <a href="#" class="service-icon-card">
+                        <div class="icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        </div>
+                        <h3>Code Compliance</h3>
+                        <p>Report violations</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Government Page -->
+    <div id="page-government" class="page-content">
+        <section class="section">
+            <div class="section-container">
+                <div class="section-header center">
+                    <span class="section-eyebrow">Your Government</span>
+                    <h2>Elected Officials</h2>
+                    <p>Meet the leaders committed to serving the people of Riverside.</p>
+                </div>
+                
+                <div class="officials-grid">
+                    <div class="official-card">
+                        <div class="official-photo">
+                            <img src="https://images.pexels.com/photos/5668859/pexels-photo-5668859.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Mayor">
+                        </div>
+                        <div class="official-info">
+                            <h3>Patricia Reynolds</h3>
+                            <p class="title">Mayor</p>
+                            <p class="term">Term: 2024-2028</p>
+                        </div>
+                    </div>
+                    <div class="official-card">
+                        <div class="official-photo">
+                            <img src="https://images.pexels.com/photos/5669619/pexels-photo-5669619.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Council Member">
+                        </div>
+                        <div class="official-info">
+                            <h3>Michael Chen</h3>
+                            <p class="title">Council President</p>
+                            <p class="term">District 1</p>
+                        </div>
+                    </div>
+                    <div class="official-card">
+                        <div class="official-photo">
+                            <img src="https://images.pexels.com/photos/5668882/pexels-photo-5668882.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Council Member">
+                        </div>
+                        <div class="official-info">
+                            <h3>Sarah Martinez</h3>
+                            <p class="title">Council Member</p>
+                            <p class="term">District 2</p>
+                        </div>
+                    </div>
+                    <div class="official-card">
+                        <div class="official-photo">
+                            <img src="https://images.pexels.com/photos/5669602/pexels-photo-5669602.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Council Member">
+                        </div>
+                        <div class="official-info">
+                            <h3>James Thompson</h3>
+                            <p class="title">Council Member</p>
+                            <p class="term">District 3</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section navy">
+            <div class="section-container">
+                <div class="section-header center" style="color: white;">
+                    <span class="section-eyebrow">Transparency</span>
+                    <h2>Open Government</h2>
+                    <p style="color: rgba(255,255,255,0.8);">We believe in transparent, accountable government that serves the public interest.</p>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; text-align: center;">
+                    <div>
+                        <h3 style="font-size: 48px; font-weight: 700; color: var(--gold); margin-bottom: 8px;">$82M</h3>
+                        <p style="opacity: 0.8;">Annual Budget</p>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 48px; font-weight: 700; color: var(--gold); margin-bottom: 8px;">1,200+</h3>
+                        <p style="opacity: 0.8;">City Employees</p>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 48px; font-weight: 700; color: var(--gold); margin-bottom: 8px;">15</h3>
+                        <p style="opacity: 0.8;">Departments</p>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 48px; font-weight: 700; color: var(--gold); margin-bottom: 8px;">100%</h3>
+                        <p style="opacity: 0.8;">Meetings Public</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Support Page -->
+    <div id="page-support" class="page-content">
+        <div class="support-hero">
+            <div class="support-hero-content">
+                <div>
+                    <h1>Citizen Support Center</h1>
+                    <p>Track your requests and get help with city services</p>
+                </div>
+                <button class="btn btn-gold" onclick="alert('Opening new request form...')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                    New Service Request
+                </button>
+            </div>
+        </div>
+
+        <section class="section" style="padding-top: 40px;">
+            <div class="section-container">
+                <div class="support-stats">
+                    <div class="support-stat-card open">
+                        <div class="value">3</div>
+                        <div class="label">Open Requests</div>
+                    </div>
+                    <div class="support-stat-card pending">
+                        <div class="value">2</div>
+                        <div class="label">In Progress</div>
+                    </div>
+                    <div class="support-stat-card resolved">
+                        <div class="value">4</div>
+                        <div class="label">Resolved</div>
+                    </div>
+                    <div class="support-stat-card total">
+                        <div class="value">9</div>
+                        <div class="label">Total Requests</div>
+                    </div>
+                </div>
+
+                <div class="cases-card">
+                    <div class="cases-header">
+                        <h2>My Service Requests</h2>
+                        <select style="padding: 10px 16px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px;">
+                            <option>All Requests</option>
+                            <option>Open</option>
+                            <option>In Progress</option>
+                            <option>Resolved</option>
+                        </select>
+                    </div>
+                    <table class="cases-table">
+                        <thead>
+                            <tr>
+                                <th>Request ID</th>
+                                <th>Description</th>
+                                <th>Department</th>
+                                <th>Status</th>
+                                <th>Submitted</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="case-id">SR-2026-8742</span></td>
+                                <td><span class="case-subject">Pothole repair needed - Oak Street & Main</span></td>
+                                <td><span class="case-dept">Public Works</span></td>
+                                <td><span class="case-status open">● Open</span></td>
+                                <td><span class="dynamic-date" data-days-ago="1"></span></td>
+                                <td class="case-actions"><button>View</button></td>
+                            </tr>
+                            <tr>
+                                <td><span class="case-id">SR-2026-8721</span></td>
+                                <td><span class="case-subject">Street light out - 500 block Elm Avenue</span></td>
+                                <td><span class="case-dept">Utilities</span></td>
+                                <td><span class="case-status pending">● In Progress</span></td>
+                                <td><span class="dynamic-date" data-days-ago="4"></span></td>
+                                <td class="case-actions"><button>View</button></td>
+                            </tr>
+                            <tr>
+                                <td><span class="case-id">SR-2026-8698</span></td>
+                                <td><span class="case-subject">Missed trash pickup - 123 Maple Lane</span></td>
+                                <td><span class="case-dept">Sanitation</span></td>
+                                <td><span class="case-status resolved">● Resolved</span></td>
+                                <td><span class="dynamic-date" data-days-ago="7"></span></td>
+                                <td class="case-actions"><button>View</button></td>
+                            </tr>
+                            <tr>
+                                <td><span class="case-id">SR-2026-8672</span></td>
+                                <td><span class="case-subject">Graffiti removal request - downtown alley</span></td>
+                                <td><span class="case-dept">Code Enforcement</span></td>
+                                <td><span class="case-status open">● Open</span></td>
+                                <td><span class="dynamic-date" data-days-ago="9"></span></td>
+                                <td class="case-actions"><button>View</button></td>
+                            </tr>
+                            <tr>
+                                <td><span class="case-id">SR-2026-8645</span></td>
+                                <td><span class="case-subject">Building permit inquiry - new fence</span></td>
+                                <td><span class="case-dept">Planning</span></td>
+                                <td><span class="case-status pending">● In Progress</span></td>
+                                <td><span class="dynamic-date" data-days-ago="12"></span></td>
+                                <td class="case-actions"><button>View</button></td>
+                            </tr>
+                            <tr>
+                                <td><span class="case-id">SR-2026-8612</span></td>
+                                <td><span class="case-subject">Tree trimming request - blocking view</span></td>
+                                <td><span class="case-dept">Parks</span></td>
+                                <td><span class="case-status resolved">● Resolved</span></td>
+                                <td><span class="dynamic-date" data-days-ago="15"></span></td>
+                                <td class="case-actions"><button>View</button></td>
+                            </tr>
+                            <tr>
+                                <td><span class="case-id">SR-2026-8589</span></td>
+                                <td><span class="case-subject">Water billing dispute</span></td>
+                                <td><span class="case-dept">Utilities</span></td>
+                                <td><span class="case-status resolved">● Resolved</span></td>
+                                <td><span class="dynamic-date" data-days-ago="18"></span></td>
+                                <td class="case-actions"><button>View</button></td>
+                            </tr>
+                            <tr>
+                                <td><span class="case-id">SR-2026-8556</span></td>
+                                <td><span class="case-subject">Noise complaint - construction hours</span></td>
+                                <td><span class="case-dept">Code Enforcement</span></td>
+                                <td><span class="case-status open">● Open</span></td>
+                                <td><span class="dynamic-date" data-days-ago="21"></span></td>
+                                <td class="case-actions"><button>View</button></td>
+                            </tr>
+                            <tr>
+                                <td><span class="case-id">SR-2026-8523</span></td>
+                                <td><span class="case-subject">Business license renewal question</span></td>
+                                <td><span class="case-dept">Finance</span></td>
+                                <td><span class="case-status closed">● Closed</span></td>
+                                <td><span class="dynamic-date" data-days-ago="25"></span></td>
+                                <td class="case-actions"><button>View</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="section cream">
+            <div class="section-container">
+                <div class="section-header center">
+                    <h2>Frequently Asked Questions</h2>
+                    <p>Quick answers to common citizen questions.</p>
+                </div>
+                <div class="faq-grid">
+                    <div class="faq-item">
+                        <h3>How do I pay my utility bill?</h3>
+                        <p>You can pay online through our portal, by phone at (555) 123-4567, by mail, or in person at City Hall during business hours.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>How do I report a pothole?</h3>
+                        <p>Use our online "Report an Issue" form, call 311, or submit a request through the Citizen Support Center.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>When is bulk trash pickup?</h3>
+                        <p>Bulk trash pickup is scheduled monthly. Check the Sanitation calendar or call for your neighborhood's schedule.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>How do I get a building permit?</h3>
+                        <p>Building permits can be applied for online or in person at the Planning Department. Most permits require 5-10 business days.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Contact Page -->
+    <div id="page-contact" class="page-content">
+        <section class="section">
+            <div class="section-container">
+                <div class="section-header center">
+                    <span class="section-eyebrow">Get In Touch</span>
+                    <h2>Contact the City of Riverside</h2>
+                    <p>We're here to serve you. Reach out with questions, feedback, or service requests.</p>
+                </div>
+                
+                <div class="contact-layout">
+                    <div class="contact-sidebar">
+                        <h2>City Hall</h2>
+                        <p>Our offices are open Monday through Friday. For emergencies, please call 911.</p>
+
+                        <div class="contact-method">
+                            <div class="contact-method-icon">
+                                <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                            </div>
+                            <div>
+                                <h4>Main Line</h4>
+                                <p>(555) 123-4567</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-method">
+                            <div class="contact-method-icon">
+                                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                            </div>
+                            <div>
+                                <h4>Email</h4>
+                                <p>info@riversidegov.org</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-method">
+                            <div class="contact-method-icon">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+                            </div>
+                            <div>
+                                <h4>Address</h4>
+                                <p>100 City Hall Plaza<br>Riverside, CA 92501</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-hours">
+                            <h4>
+                                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                                Business Hours
+                            </h4>
+                            <p>Monday - Friday: 8:00 AM - 5:00 PM</p>
+                            <p>Saturday - Sunday: Closed</p>
+                            <p>311 Services: 24/7</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-form-card">
+                        <h2>Send Us a Message</h2>
+                        <form onsubmit="alert('Message submitted successfully!'); return false;">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>First Name *</label>
+                                    <input type="text" placeholder="John" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Last Name *</label>
+                                    <input type="text" placeholder="Doe" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Email Address *</label>
+                                <input type="email" placeholder="john.doe@email.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <input type="tel" placeholder="(555) 123-4567">
+                            </div>
+                            <div class="form-group">
+                                <label>Department</label>
+                                <select>
+                                    <option>Select a department</option>
+                                    <option>City Manager's Office</option>
+                                    <option>Finance & Billing</option>
+                                    <option>Planning & Permits</option>
+                                    <option>Public Works</option>
+                                    <option>Parks & Recreation</option>
+                                    <option>Police Department</option>
+                                    <option>Fire Department</option>
+                                    <option>General Inquiry</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Message *</label>
+                                <textarea placeholder="How can we help you today?" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-navy" style="width: 100%; justify-content: center;">Submit Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-grid">
+                <div class="footer-about">
+                    <div class="footer-brand">
+                        <div class="logo-seal">
+                            <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"/></svg>
+                        </div>
+                        <h3>City of Riverside</h3>
+                    </div>
+                    <p>Serving our community with integrity, transparency, and dedication to the public good since 1883.</p>
+                </div>
+                <div class="footer-column">
+                    <h4>Services</h4>
+                    <a href="#">Pay Bills</a>
+                    <a href="#">Permits</a>
+                    <a href="#">Report Issues</a>
+                    <a href="#">Public Records</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Government</h4>
+                    <a href="#">City Council</a>
+                    <a href="#">Departments</a>
+                    <a href="#">Meetings</a>
+                    <a href="#">Budget</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Community</h4>
+                    <a href="#">Events</a>
+                    <a href="#">Parks</a>
+                    <a href="#">Libraries</a>
+                    <a href="#">Volunteer</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Connect</h4>
+                    <a href="#">Contact Us</a>
+                    <a href="#">311 Services</a>
+                    <a href="#">Careers</a>
+                    <a href="#">Newsletter</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 City of Riverside. All rights reserved.</p>
+                <div class="footer-legal">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Accessibility</a>
+                    <a href="#">Terms of Use</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Navigation
+        function showPage(pageName) {
+            document.querySelectorAll('.nav a').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.page === pageName) {
+                    item.classList.add('active');
+                }
+            });
+
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.remove('active');
+            });
+            const targetPage = document.getElementById('page-' + pageName);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        document.querySelectorAll('.nav a').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = item.dataset.page;
+                if (page) {
+                    showPage(page);
+                }
+            });
+        });
+
+        // Initialize dynamic dates
+        function initDynamicDates() {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+            // Full date elements
+            document.querySelectorAll('.dynamic-date').forEach(el => {
+                const daysAgo = parseInt(el.getAttribute('data-days-ago'), 10);
+                const date = new Date();
+                date.setDate(date.getDate() - daysAgo);
+                
+                const month = months[date.getMonth()];
+                const day = date.getDate();
+                const year = date.getFullYear();
+                
+                el.textContent = `${month} ${day}, ${year}`;
+            });
+            
+            // Day only elements
+            document.querySelectorAll('.dynamic-day').forEach(el => {
+                const daysAgo = parseInt(el.getAttribute('data-days-ago'), 10);
+                const date = new Date();
+                date.setDate(date.getDate() - daysAgo);
+                el.textContent = date.getDate();
+            });
+            
+            // Month only elements
+            document.querySelectorAll('.dynamic-month').forEach(el => {
+                const daysAgo = parseInt(el.getAttribute('data-days-ago'), 10);
+                const date = new Date();
+                date.setDate(date.getDate() - daysAgo);
+                el.textContent = months[date.getMonth()];
+            });
+        }
+
+        // Widget Loading
+        function loadWidget() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const configParam = urlParams.get('config');
+            
+            let config = null;
+            
+            if (configParam) {
+                try {
+                    config = JSON.parse(decodeURIComponent(configParam));
+                } catch (e) {
+                    console.error('Failed to parse config from URL:', e);
+                }
+            }
+            
+            if (!config) {
+                const savedSettings = localStorage.getItem('chatWidgetSettings');
+                if (savedSettings) {
+                    try {
+                        config = JSON.parse(savedSettings);
+                        console.log('🏛️ Government Portal: Loaded widget config from localStorage:', {
+                            widgetId: config.widgetId,
+                            orgId: config.orgId,
+                            orgUrl: config.orgUrl
+                        });
+                    } catch (e) {
+                        console.error('Failed to parse saved settings:', e);
+                    }
+                }
+            }
+
+            if (config) {
+                const widgetMode = config.widgetMode || 'custom';
+                console.log('🎛️ Widget mode:', widgetMode);
+
+                if (widgetMode === 'custom') {
+                    console.log('✅ Custom widget mode - loading embedded SDK directly');
+                    
+                    window.D365WidgetConfig = {
+                        orgId: config.orgId,
+                        orgUrl: config.orgUrl,
+                        widgetId: config.widgetId
+                    };
+                    
+                    if (config.headerTitle) window.D365WidgetConfig.headerTitle = config.headerTitle;
+                    if (config.headerSubtitle) window.D365WidgetConfig.headerSubtitle = config.headerSubtitle;
+                    if (config.headerTitleColor) window.D365WidgetConfig.headerTitleColor = config.headerTitleColor;
+                    if (config.headerSubtitleColor) window.D365WidgetConfig.headerSubtitleColor = config.headerSubtitleColor;
+                    if (config.headerLogo) window.D365WidgetConfig.headerLogo = config.headerLogo;
+                    if (config.fontFamily) window.D365WidgetConfig.fontFamily = config.fontFamily;
+                    if (config.useGradient !== undefined) window.D365WidgetConfig.useGradient = config.useGradient;
+                    if (config.gradientStart) window.D365WidgetConfig.gradientStart = config.gradientStart;
+                    if (config.gradientEnd) window.D365WidgetConfig.gradientEnd = config.gradientEnd;
+                    if (config.primaryColor) window.D365WidgetConfig.primaryColor = config.primaryColor;
+                    if (config.userBubbleColor) window.D365WidgetConfig.userBubbleColor = config.userBubbleColor;
+                    if (config.userTextColor) window.D365WidgetConfig.userTextColor = config.userTextColor;
+                    if (config.agentBubbleColor) window.D365WidgetConfig.agentBubbleColor = config.agentBubbleColor;
+                    if (config.agentTextColor) window.D365WidgetConfig.agentTextColor = config.agentTextColor;
+                    if (config.chatBgColor) window.D365WidgetConfig.chatBgColor = config.chatBgColor;
+                    if (config.launcherColor) window.D365WidgetConfig.launcherColor = config.launcherColor;
+                    if (config.launcherIcon) window.D365WidgetConfig.launcherIcon = config.launcherIcon;
+                    if (config.badgeColor) window.D365WidgetConfig.badgeColor = config.badgeColor;
+                    if (config.sendBtnColor) window.D365WidgetConfig.sendBtnColor = config.sendBtnColor;
+                    if (config.agentAvatar) window.D365WidgetConfig.agentAvatar = config.agentAvatar;
+                    if (config.customerAvatar) window.D365WidgetConfig.customerAvatar = config.customerAvatar;
+                    if (config.botAvatar) window.D365WidgetConfig.botAvatar = config.botAvatar;
+                    if (config.enablePrechatForm !== undefined) window.D365WidgetConfig.enablePrechatForm = config.enablePrechatForm;
+                    if (config.welcomeTitle) window.D365WidgetConfig.welcomeTitle = config.welcomeTitle;
+                    if (config.welcomeMessage) window.D365WidgetConfig.welcomeMessage = config.welcomeMessage;
+                    if (config.usePrechatGradient !== undefined) window.D365WidgetConfig.usePrechatGradient = config.usePrechatGradient;
+                    if (config.prechatSolidColor) window.D365WidgetConfig.prechatSolidColor = config.prechatSolidColor;
+                    if (config.prechatGradientStart) window.D365WidgetConfig.prechatGradientStart = config.prechatGradientStart;
+                    if (config.prechatGradientEnd) window.D365WidgetConfig.prechatGradientEnd = config.prechatGradientEnd;
+                    if (config.prechatTitleColor) window.D365WidgetConfig.prechatTitleColor = config.prechatTitleColor;
+                    if (config.prechatSubtitleColor) window.D365WidgetConfig.prechatSubtitleColor = config.prechatSubtitleColor;
+                    
+                    console.log('📦 Widget config set:', window.D365WidgetConfig);
+                    
+                    const script = document.createElement('script');
+                    script.src = 'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js';
+                    script.onload = function() {
+                        console.log('✅ Widget SDK loaded successfully');
+                    };
+                    script.onerror = function() {
+                        console.error('❌ Failed to load widget SDK from CDN');
+                    };
+                    document.head.appendChild(script);
+                    
+                } else if (widgetMode === 'standard') {
+                    if (config.lcwCode) {
+                        console.log('✅ Loading standard D365 LCW widget from embed code');
+                        
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(config.lcwCode, 'text/html');
+                        const scriptTag = doc.querySelector('script[id="Microsoft_Omnichannel_LCWidget"]');
+                        
+                        if (scriptTag) {
+                            const lcwScript = document.createElement('script');
+                            lcwScript.id = 'Microsoft_Omnichannel_LCWidget';
+                            lcwScript.src = scriptTag.getAttribute('src');
+                            lcwScript.setAttribute('data-app-id', scriptTag.getAttribute('data-app-id'));
+                            lcwScript.setAttribute('data-org-id', scriptTag.getAttribute('data-org-id'));
+                            lcwScript.setAttribute('data-org-url', scriptTag.getAttribute('data-org-url'));
+                            document.head.appendChild(lcwScript);
+                            console.log('✅ D365 LCW widget script injected');
+                            
+                            window.addEventListener("lcw:ready", function handleLivechatReadyEvent() {
+                                console.log('✅ LCW Ready on government portal');
+                                
+                                if (config.enableStandardAuth === true && typeof Microsoft !== 'undefined') {
+                                    Microsoft.Omnichannel.LiveChatWidget.SDK.setContextProvider(function contextProvider() {
+                                        const authName = config.standardAuthName || 'Anonymous User';
+                                        const authEmail = config.standardAuthEmail || 'anonymous@example.com';
+                                        return {
+                                            'emailaddress1': authEmail,
+                                            'Name': { value: authName, isDisplayable: true },
+                                            'Authenticated': { value: 'Authenticated', isDisplayable: true }
+                                        };
+                                    });
+                                }
+                            });
+                        } else {
+                            console.error('❌ Could not parse LCW code - invalid format');
+                        }
+                    } else if (config.widgetId && config.orgId && config.orgUrl) {
+                        console.log('✅ Building LCW widget from individual D365 values');
+                        
+                        const lcwScript = document.createElement('script');
+                        lcwScript.id = 'Microsoft_Omnichannel_LCWidget';
+                        lcwScript.src = 'https://oc-cdn-ocprod.azureedge.net/livechatwidget/scripts/LiveChatBootstrapper.js';
+                        lcwScript.setAttribute('data-app-id', config.widgetId);
+                        lcwScript.setAttribute('data-org-id', config.orgId);
+                        lcwScript.setAttribute('data-org-url', config.orgUrl);
+                        document.head.appendChild(lcwScript);
+                        
+                        window.addEventListener("lcw:ready", function handleLivechatReadyEvent() {
+                            console.log('✅ LCW Ready on government portal');
+                            
+                            if (config.enableStandardAuth === true && typeof Microsoft !== 'undefined') {
+                                Microsoft.Omnichannel.LiveChatWidget.SDK.setContextProvider(function contextProvider() {
+                                    const authName = config.standardAuthName || 'Anonymous User';
+                                    const authEmail = config.standardAuthEmail || 'anonymous@example.com';
+                                    return {
+                                        'emailaddress1': authEmail,
+                                        'Name': { value: authName, isDisplayable: true },
+                                        'Authenticated': { value: 'Authenticated', isDisplayable: true }
+                                    };
+                                });
+                            }
+                        });
+                    }
+                }
+            } else {
+                console.log('ℹ️ No widget configuration found. Configure in Chat Widget Studio first.');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initDynamicDates();
+            loadWidget();
+        });
+    </script>
+</body>
+</html>
