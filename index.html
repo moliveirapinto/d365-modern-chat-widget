@@ -4488,14 +4488,29 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v2.6.0';
-        const APP_LAST_UPDATED = 'Jan 22, 2026';
+        const APP_VERSION = 'v2.7.0';
+        const APP_LAST_UPDATED = 'Jan 23, 2026';
         
         const CHANGELOG = [
             {
+                version: 'v2.7.0',
+                date: 'Jan 23, 2026',
+                latest: true,
+                items: [
+                    { type: 'new', text: 'Custom Bot Name - override Microsoft Copilot Studio bot names with your own branding' },
+                    { type: 'new', text: 'User Bubble Gradient toggle - enable/disable gradient on user messages independently from header' },
+                    { type: 'improve', text: 'Embed code changes now properly clear old connection values (fixes widget malfunction)' },
+                    { type: 'improve', text: 'Visual parity enforced across all rendering methods (preview, live.html, embedded/Tampermonkey)' },
+                    { type: 'improve', text: 'CONTRIBUTING.md updated with Visual Change Checklist for developers' },
+                    { type: 'fix', text: 'Bubble gradient now uses correct colors when header gradient is disabled' },
+                    { type: 'fix', text: 'Room widget embed code changes now sync properly to global settings' },
+                    { type: 'fix', text: 'Profile embed code updates no longer keep stale orgId/orgUrl/widgetId values' }
+                ]
+            },
+            {
                 version: 'v2.6.0',
                 date: 'Jan 22, 2026',
-                latest: true,
+                latest: false,
                 items: [
                     { type: 'new', text: 'LCW Embed Code section in Room Widgets - paste D365 embed code directly in team widgets' },
                     { type: 'new', text: 'Connection status indicator for room widgets - shows configured/partial/not configured state' },
@@ -7514,10 +7529,40 @@
         function updateProfileEmbedCode(profileId, newCode) {
             const profile = profiles.find(p => p.id === profileId);
             if (profile) {
+                // Update the embed code
                 profile.settings.lcwCode = newCode;
+                
+                // IMPORTANT: Clear the old extracted values when embed code is changed
+                // They will be re-extracted when user clicks "Apply to Settings"
+                profile.settings.orgId = '';
+                profile.settings.orgUrl = '';
+                profile.settings.widgetId = '';
+                
+                // If this is the active profile, also clear the global settings
+                if (profileId === activeProfileId) {
+                    settings.lcwCode = newCode;
+                    settings.orgId = '';
+                    settings.orgUrl = '';
+                    settings.widgetId = '';
+                    
+                    // Update the hidden textarea
+                    const lcwTextarea = document.getElementById('lcwCode');
+                    if (lcwTextarea) {
+                        lcwTextarea.value = newCode;
+                    }
+                    
+                    // Save to localStorage
+                    localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+                    
+                    // Update connection status to show disconnected
+                    updateConnectionStatus();
+                }
+                
                 saveProfiles();
-                // Re-render to update button states
+                // Re-render to update button states and show cleared values
                 renderProfiles();
+                
+                console.log('📝 Embed code updated for profile:', profile.name, '- old connection values cleared');
             }
         }
         
@@ -7618,6 +7663,32 @@
             // Update locally first (optimistic update)
             if (!widget.config) widget.config = {};
             widget.config.lcwCode = newCode;
+            
+            // IMPORTANT: Clear the old extracted values when embed code is changed
+            // They will be re-extracted when user clicks "Apply to Settings"
+            widget.config.orgId = '';
+            widget.config.orgUrl = '';
+            widget.config.widgetId = '';
+            
+            // If this is the active widget, also clear global settings
+            if (roomCode === activeRoomCode && widgetId === activeRoomWidgetId) {
+                settings.lcwCode = newCode;
+                settings.orgId = '';
+                settings.orgUrl = '';
+                settings.widgetId = '';
+                
+                // Update the hidden textarea
+                const lcwTextarea = document.getElementById('lcwCode');
+                if (lcwTextarea) {
+                    lcwTextarea.value = newCode;
+                }
+                
+                // Save to localStorage
+                localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+                
+                // Update connection status to show disconnected
+                updateConnectionStatus();
+            }
             
             // Save to cloud (mandatory for collaboration)
             try {

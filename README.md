@@ -4,7 +4,7 @@
 
 [![D365 Compatible](https://img.shields.io/badge/D365-Omnichannel-0078D4?style=flat-square&logo=microsoft)](https://dynamics.microsoft.com)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.6.0-blue?style=flat-square)](package.json)
+[![Version](https://img.shields.io/badge/version-v2.7.0-blue?style=flat-square)](package.json)
 
 ![Chat Widget Preview](preview.png)
 
