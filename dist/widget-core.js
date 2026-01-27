@@ -2034,17 +2034,23 @@
     var dropZone = $('d365DropZone');
     var dragCounter = 0;
 
-    // Unified file handler
+    // Unified file handler - pass File object directly to SDK (not base64)
     function handleFileDeferred(file) {
       if (!file || !chatSDK || !chatStarted) return;
       if (file.size > 25000000) { alert('File too large (max 25MB)'); return; }
-      var reader = new FileReader();
-      reader.onload = function(evt) {
-        chatSDK.uploadFileAttachment({ name: file.name, type: file.type, data: evt.target.result })
-          .then(function() { addMessage('📎 ' + file.name, true, userName); })
-          .catch(function(err) { alert('Upload failed: ' + err.message); });
-      };
-      reader.readAsDataURL(file);
+      
+      // Show uploading indicator
+      addMessage('📎 Uploading: ' + file.name + '...', true, userName);
+      
+      // Pass File object directly to SDK (same as live.html)
+      chatSDK.uploadFileAttachment(file)
+        .then(function(result) {
+          console.log('[D365Widget] File uploaded successfully:', file.name);
+        })
+        .catch(function(err) {
+          console.error('[D365Widget] Upload failed:', err);
+          addMessage('❌ Upload failed: ' + (err.message || 'Unknown error'), false, 'System');
+        });
     }
 
     // Drag and drop handlers
