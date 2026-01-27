@@ -11865,6 +11865,34 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       var cardContainer = document.createElement('div');
       cardContainer.className = 'd365-message agent d365-adaptive-card';
       
+      // Helper function to recursively convert all text/title/value properties to strings
+      // This fixes the "data.indexOf is not a function" error in adaptivecards library
+      function sanitizeCardPayload(obj) {
+        if (obj === null || obj === undefined) return obj;
+        if (Array.isArray(obj)) {
+          return obj.map(function(item) { return sanitizeCardPayload(item); });
+        }
+        if (typeof obj === 'object') {
+          var result = {};
+          for (var key in obj) {
+            if (obj.hasOwnProperty(key)) {
+              var value = obj[key];
+              // Convert text-related properties to strings
+              if ((key === 'text' || key === 'title' || key === 'value' || key === 'altText' || 
+                   key === 'placeholder' || key === 'label' || key === 'errorMessage' ||
+                   key === 'fallbackText' || key === 'speak') && 
+                  value !== null && value !== undefined && typeof value !== 'string' && typeof value !== 'object') {
+                result[key] = String(value);
+              } else {
+                result[key] = sanitizeCardPayload(value);
+              }
+            }
+          }
+          return result;
+        }
+        return obj;
+      }
+      
       try {
         var parsed = JSON.parse(content);
         var cardPayload = null;
@@ -11879,6 +11907,9 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
         }
         
         if (cardPayload && typeof AdaptiveCards !== 'undefined') {
+          // Sanitize payload to ensure all text values are strings
+          cardPayload = sanitizeCardPayload(cardPayload);
+          
           var adaptiveCard = new AdaptiveCards.AdaptiveCard();
           adaptiveCard.hostConfig = new AdaptiveCards.HostConfig({
             fontFamily: "inherit",

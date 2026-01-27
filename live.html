@@ -3219,6 +3219,34 @@
             const cardContainer = document.createElement('div');
             cardContainer.className = 'message adaptive-card-message';
             
+            // Helper function to recursively convert all text/title/value properties to strings
+            // This fixes the "data.indexOf is not a function" error in adaptivecards library
+            function sanitizeCardPayload(obj) {
+                if (obj === null || obj === undefined) return obj;
+                if (Array.isArray(obj)) {
+                    return obj.map(item => sanitizeCardPayload(item));
+                }
+                if (typeof obj === 'object') {
+                    const result = {};
+                    for (const key in obj) {
+                        if (obj.hasOwnProperty(key)) {
+                            const value = obj[key];
+                            // Convert text-related properties to strings
+                            if ((key === 'text' || key === 'title' || key === 'value' || key === 'altText' || 
+                                 key === 'placeholder' || key === 'label' || key === 'errorMessage' ||
+                                 key === 'fallbackText' || key === 'speak') && 
+                                value !== null && value !== undefined && typeof value !== 'string' && typeof value !== 'object') {
+                                result[key] = String(value);
+                            } else {
+                                result[key] = sanitizeCardPayload(value);
+                            }
+                        }
+                    }
+                    return result;
+                }
+                return obj;
+            }
+            
             try {
                 const parsed = JSON.parse(content);
                 let cardPayload = null;
@@ -3236,6 +3264,9 @@
                 }
                 
                 if (cardPayload && adaptiveCardRenderer) {
+                    // Sanitize payload to ensure all text values are strings
+                    cardPayload = sanitizeCardPayload(cardPayload);
+                    
                     adaptiveCardRenderer.parse(cardPayload);
                     
                     // Set up action handlers
