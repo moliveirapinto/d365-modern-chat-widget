@@ -1422,7 +1422,7 @@
       function sanitizeCardPayload(obj, parentKey) {
         if (obj === null || obj === undefined) return obj;
         
-        // Handle arrays - but preserve structure for valid array properties like 'inlines', 'body', 'actions', 'columns', 'items', 'facts', 'images'
+        // Handle arrays - preserve structure
         if (Array.isArray(obj)) {
           return obj.map(function(item, idx) { return sanitizeCardPayload(item, parentKey); });
         }
@@ -1433,29 +1433,27 @@
             if (obj.hasOwnProperty(key)) {
               var value = obj[key];
               
-              // These properties MUST be strings - if they're not, convert them
+              // These text-display properties MUST be strings for the AdaptiveCards renderer
+              // DO NOT include 'data', 'id', 'url', 'value' - these can be objects/other types
               var mustBeString = (key === 'text' || key === 'title' || key === 'altText' || 
                    key === 'placeholder' || key === 'label' || key === 'errorMessage' ||
-                   key === 'fallbackText' || key === 'speak' || key === 'subtitle' ||
-                   key === 'id' || key === 'url' || key === 'data');
+                   key === 'fallbackText' || key === 'speak' || key === 'subtitle');
               
               if (mustBeString && value !== null && value !== undefined) {
                 if (typeof value === 'string') {
                   result[key] = value;
                 } else if (Array.isArray(value)) {
-                  // Array in a text field - flatten it to string
+                  // Array in a text field (RichTextBlock inlines) - flatten to string
                   result[key] = value.map(function(item) {
                     if (typeof item === 'string') return item;
                     if (item && typeof item === 'object') {
-                      // TextRun object - extract text
                       if (item.text !== undefined) return String(item.text);
-                      // Fallback: stringify
                       return JSON.stringify(item);
                     }
                     return String(item);
                   }).join('');
                 } else if (typeof value === 'object') {
-                  // Object in a text field - extract text or stringify
+                  // Object in a text field - extract text property or stringify
                   if (value.text !== undefined) {
                     result[key] = String(value.text);
                   } else {
@@ -1465,15 +1463,8 @@
                   // Number, boolean, etc - convert to string
                   result[key] = String(value);
                 }
-              } else if (key === 'value') {
-                // 'value' can be string or object (for form data), handle carefully
-                if (value !== null && value !== undefined && typeof value !== 'string' && typeof value !== 'object') {
-                  result[key] = String(value);
-                } else {
-                  result[key] = sanitizeCardPayload(value, key);
-                }
               } else {
-                // Recursively process other properties
+                // Recursively process other properties (preserves objects for 'data', 'value', etc.)
                 result[key] = sanitizeCardPayload(value, key);
               }
             }
@@ -1507,6 +1498,22 @@
           console.log('📋 Sanitized Adaptive Card payload:', JSON.stringify(payload).substring(0, 500));
           
           var card = new AdaptiveCards.AdaptiveCard();
+          
+          // CRITICAL: Override the markdown processing to prevent errors
+          // The default applyMarkdown can fail with "data.indexOf is not a function" 
+          // when it receives unexpected data types
+          AdaptiveCards.AdaptiveCard.onProcessMarkdown = function(text, result) {
+            // Simple passthrough - just return the text as-is (as HTML)
+            // This prevents the indexOf error while still displaying text
+            if (text && typeof text === 'string') {
+              result.outputHtml = text.replace(/\n/g, '<br>');
+            } else if (text !== null && text !== undefined) {
+              result.outputHtml = String(text);
+            } else {
+              result.outputHtml = '';
+            }
+            result.didProcess = true;
+          };
           
           // Configure host config for better styling
           card.hostConfig = new AdaptiveCards.HostConfig({

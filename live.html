@@ -3225,7 +3225,7 @@
             function sanitizeCardPayload(obj, parentKey) {
                 if (obj === null || obj === undefined) return obj;
                 
-                // Handle arrays - preserve structure for valid array properties
+                // Handle arrays - preserve structure
                 if (Array.isArray(obj)) {
                     return obj.map((item, idx) => sanitizeCardPayload(item, parentKey));
                 }
@@ -3236,17 +3236,17 @@
                         if (obj.hasOwnProperty(key)) {
                             const value = obj[key];
                             
-                            // These properties MUST be strings - if they're not, convert them
+                            // These text-display properties MUST be strings for the AdaptiveCards renderer
+                            // DO NOT include 'data', 'id', 'url', 'value' - these can be objects/other types
                             const mustBeString = (key === 'text' || key === 'title' || key === 'altText' || 
                                  key === 'placeholder' || key === 'label' || key === 'errorMessage' ||
-                                 key === 'fallbackText' || key === 'speak' || key === 'subtitle' ||
-                                 key === 'id' || key === 'url' || key === 'data');
+                                 key === 'fallbackText' || key === 'speak' || key === 'subtitle');
                             
                             if (mustBeString && value !== null && value !== undefined) {
                                 if (typeof value === 'string') {
                                     result[key] = value;
                                 } else if (Array.isArray(value)) {
-                                    // Array in a text field - flatten it to string
+                                    // Array in a text field (RichTextBlock inlines) - flatten to string
                                     result[key] = value.map(item => {
                                         if (typeof item === 'string') return item;
                                         if (item && typeof item === 'object') {
@@ -3256,23 +3256,18 @@
                                         return String(item);
                                     }).join('');
                                 } else if (typeof value === 'object') {
-                                    // Object in a text field - extract text or stringify
+                                    // Object in a text field - extract text property or stringify
                                     if (value.text !== undefined) {
                                         result[key] = String(value.text);
                                     } else {
                                         result[key] = JSON.stringify(value);
                                     }
                                 } else {
+                                    // Number, boolean, etc - convert to string
                                     result[key] = String(value);
-                                }
-                            } else if (key === 'value') {
-                                // 'value' can be string or object (for form data)
-                                if (value !== null && value !== undefined && typeof value !== 'string' && typeof value !== 'object') {
-                                    result[key] = String(value);
-                                } else {
-                                    result[key] = sanitizeCardPayload(value, key);
                                 }
                             } else {
+                                // Recursively process other properties (preserves objects for 'data', 'value', etc.)
                                 result[key] = sanitizeCardPayload(value, key);
                             }
                         }
@@ -3308,6 +3303,19 @@
                     
                     // Debug: log sanitized payload
                     console.log('📋 Sanitized Adaptive Card payload:', JSON.stringify(cardPayload).substring(0, 500));
+                    
+                    // CRITICAL: Override the markdown processing to prevent errors
+                    // The default applyMarkdown can fail with "data.indexOf is not a function"
+                    AdaptiveCards.AdaptiveCard.onProcessMarkdown = function(text, result) {
+                        if (text && typeof text === 'string') {
+                            result.outputHtml = text.replace(/\n/g, '<br>');
+                        } else if (text !== null && text !== undefined) {
+                            result.outputHtml = String(text);
+                        } else {
+                            result.outputHtml = '';
+                        }
+                        result.didProcess = true;
+                    };
                     
                     adaptiveCardRenderer.parse(cardPayload);
                     
