@@ -1416,49 +1416,71 @@
       var cardBox = document.createElement('div');
       cardBox.className = 'd365-msg agent d365-adaptive-card';
 
-      // Helper function to recursively convert all text/title/value properties to strings
+      // Helper function to recursively sanitize Adaptive Card payload
       // This fixes the "data.indexOf is not a function" error in adaptivecards library
-      function sanitizeCardPayload(obj) {
+      // which occurs when text properties contain non-string values
+      function sanitizeCardPayload(obj, parentKey) {
         if (obj === null || obj === undefined) return obj;
+        
+        // Handle arrays - but preserve structure for valid array properties like 'inlines', 'body', 'actions', 'columns', 'items', 'facts', 'images'
         if (Array.isArray(obj)) {
-          return obj.map(function(item) { return sanitizeCardPayload(item); });
+          return obj.map(function(item, idx) { return sanitizeCardPayload(item, parentKey); });
         }
+        
         if (typeof obj === 'object') {
           var result = {};
           for (var key in obj) {
             if (obj.hasOwnProperty(key)) {
               var value = obj[key];
-              // Convert text-related properties to strings (including arrays which cause indexOf errors)
-              var isTextProperty = (key === 'text' || key === 'title' || key === 'altText' || 
-                   key === 'placeholder' || key === 'label' || key === 'errorMessage' ||
-                   key === 'fallbackText' || key === 'speak' || key === 'inlines');
               
-              if (isTextProperty && value !== null && value !== undefined && typeof value !== 'string') {
-                // If it's an array, join the elements; otherwise stringify
-                if (Array.isArray(value)) {
-                  // Handle TextRun arrays - extract text from each run
+              // These properties MUST be strings - if they're not, convert them
+              var mustBeString = (key === 'text' || key === 'title' || key === 'altText' || 
+                   key === 'placeholder' || key === 'label' || key === 'errorMessage' ||
+                   key === 'fallbackText' || key === 'speak' || key === 'subtitle' ||
+                   key === 'id' || key === 'url' || key === 'data');
+              
+              if (mustBeString && value !== null && value !== undefined) {
+                if (typeof value === 'string') {
+                  result[key] = value;
+                } else if (Array.isArray(value)) {
+                  // Array in a text field - flatten it to string
                   result[key] = value.map(function(item) {
                     if (typeof item === 'string') return item;
-                    if (item && typeof item === 'object' && item.text) return String(item.text);
+                    if (item && typeof item === 'object') {
+                      // TextRun object - extract text
+                      if (item.text !== undefined) return String(item.text);
+                      // Fallback: stringify
+                      return JSON.stringify(item);
+                    }
                     return String(item);
                   }).join('');
                 } else if (typeof value === 'object') {
-                  // Handle single TextRun object
-                  result[key] = value.text ? String(value.text) : JSON.stringify(value);
+                  // Object in a text field - extract text or stringify
+                  if (value.text !== undefined) {
+                    result[key] = String(value.text);
+                  } else {
+                    result[key] = JSON.stringify(value);
+                  }
                 } else {
+                  // Number, boolean, etc - convert to string
                   result[key] = String(value);
                 }
-              } else if (key === 'value' && value !== null && value !== undefined && 
-                         typeof value !== 'string' && typeof value !== 'object') {
-                // For 'value', only convert primitives (keep objects for form data)
-                result[key] = String(value);
+              } else if (key === 'value') {
+                // 'value' can be string or object (for form data), handle carefully
+                if (value !== null && value !== undefined && typeof value !== 'string' && typeof value !== 'object') {
+                  result[key] = String(value);
+                } else {
+                  result[key] = sanitizeCardPayload(value, key);
+                }
               } else {
-                result[key] = sanitizeCardPayload(value);
+                // Recursively process other properties
+                result[key] = sanitizeCardPayload(value, key);
               }
             }
           }
           return result;
         }
+        
         return obj;
       }
 
@@ -1475,8 +1497,14 @@
         }
 
         if (payload && typeof AdaptiveCards !== 'undefined') {
+          // Debug: log original payload
+          console.log('📋 Original Adaptive Card payload:', JSON.stringify(payload).substring(0, 500));
+          
           // Sanitize payload to ensure all text values are strings
-          payload = sanitizeCardPayload(payload);
+          payload = sanitizeCardPayload(payload, null);
+          
+          // Debug: log sanitized payload
+          console.log('📋 Sanitized Adaptive Card payload:', JSON.stringify(payload).substring(0, 500));
           
           var card = new AdaptiveCards.AdaptiveCard();
           
@@ -1547,6 +1575,7 @@
         }
       } catch(e) {
         console.error('Error rendering Adaptive Card:', e);
+        console.error('Card content was:', content.substring(0, 1000));
         cardBox.innerHTML = '<p style="color:#e74c3c">Error displaying card</p>';
       }
 
