@@ -8412,6 +8412,17 @@
             document.getElementById('questionFieldPlaceholder').value = settings.questionFieldPlaceholder || defaultSettings.questionFieldPlaceholder;
             document.getElementById('startBtnText').value = settings.startBtnText || defaultSettings.startBtnText;
 
+            // Localization & Time Settings
+            document.getElementById('timeFormat').value = settings.timeFormat || '12h';
+            document.getElementById('textConnecting').value = settings.textConnecting || 'Connecting you with an agent...';
+            document.getElementById('textChatEndedTitle').value = settings.textChatEndedTitle || 'Chat Ended';
+            document.getElementById('textChatEndedMessage').value = settings.textChatEndedMessage || 'Thank you for chatting!';
+            document.getElementById('textStartNewChat').value = settings.textStartNewChat || 'Start New Chat';
+            document.getElementById('textEndChatTitle').value = settings.textEndChatTitle || 'End Chat?';
+            document.getElementById('textEndChatMessage').value = settings.textEndChatMessage || 'Are you sure you want to end this conversation?';
+            document.getElementById('textCancelButton').value = settings.textCancelButton || 'Cancel';
+            document.getElementById('textEndChatButton').value = settings.textEndChatButton || 'End Chat';
+
             // Color pickers - MUST be set BEFORE toggleGradient() which calls updateSettingsFromForm()
             const colorFields = [
                 'gradientStart', 'gradientEnd', 'primaryColor',
@@ -8609,10 +8620,29 @@
                 }
             });
 
+            // Time format selector
+            document.getElementById('timeFormat').addEventListener('change', (e) => {
+                updateSettingsFromForm();
+                // Auto-save
+                if (!isInitializing && activeProfileId) {
+                    const profile = profiles.find(p => p.id === activeProfileId);
+                    if (profile) {
+                        profile.settings = { ...settings };
+                        profile.updatedAt = new Date().toISOString();
+                        saveProfiles();
+                    }
+                }
+                if (!isInitializing) {
+                    localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+                }
+            });
+
             // Text inputs - real-time preview AND auto-save to active profile (debounced)
             ['backgroundImageUrl', 'headerTitle', 'headerSubtitle', 'welcomeTitle', 'welcomeMessage', 
              'nameFieldLabel', 'emailFieldLabel', 'questionFieldLabel', 'questionFieldPlaceholder', 'startBtnText',
-             'standardAuthName', 'standardAuthEmail', 'customAuthName', 'customAuthEmail'].forEach(id => {
+             'standardAuthName', 'standardAuthEmail', 'customAuthName', 'customAuthEmail',
+             'textConnecting', 'textChatEndedTitle', 'textChatEndedMessage', 'textStartNewChat',
+             'textEndChatTitle', 'textEndChatMessage', 'textCancelButton', 'textEndChatButton'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
                     el.addEventListener('input', debouncedUpdateSettings);

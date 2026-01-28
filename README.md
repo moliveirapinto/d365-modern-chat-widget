@@ -4,7 +4,7 @@
 
 [![D365 Compatible](https://img.shields.io/badge/D365-Omnichannel-0078D4?style=flat-square&logo=microsoft)](https://dynamics.microsoft.com)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.8.0-blue?style=flat-square)](package.json)
+[![Version](https://img.shields.io/badge/version-v2.9.0-blue?style=flat-square)](package.json)
 
 ![Chat Widget Preview](preview.png)
 
@@ -71,12 +71,13 @@
 - 🏷️ **Branding** - Custom header titles, subtitles, and logos with custom icon support
 - 📋 **Pre-chat Form Toggle** - Enable/disable with customizable fields
 - 👥 **Avatar Management** - Upload custom agent and customer avatars
+- 🌍 **Localization** - Customize all UI text and choose 12h/24h time format for international audiences
 - 💾 **Import/Export** - Share configurations or backup settings
 - 📋 **Quick Embed Code** - Copy integration code with one click
 - 📚 **Quick Start Guide** - Interactive tutorial for new users with 3 deployment methods (Go To Widget, TamperMonkey, Embed)
 - 📊 **Analytics Dashboard** - Track widget usage with Cloudflare D1 SQL backend (sessions, chats, calls by domain)
 - 🔗 **Room Collaboration** - Share multiple widgets with a 6-character code, syncs across devices!
-- 🏪 **Industry Demo Pages** - Test widgets in realistic industry contexts (Retail, Financial, Healthcare, Education)
+- 🏪 **Industry Demo Pages** - Test widgets in realistic industry contexts (Retail, Financial, Healthcare, Government)
 
 </td>
 </tr>
@@ -1170,6 +1171,20 @@ See **[CONTRIBUTING.md](CONTRIBUTING.md)** for:
 ---
 
 ## 📝 Changelog
+
+### v2.9.0 (January 28, 2026)
+
+#### 🌍 Localization & Time Format Settings
+- **NEW:** Localization & Time section in Chat Widget Studio - customize all UI text for international audiences
+- **NEW:** Time Format selector - choose between 12-hour (2:30 PM) and 24-hour (14:30) formats for message timestamps
+- **NEW:** Customizable Connecting View text - "Connecting you with an agent..."
+- **NEW:** Customizable Chat Ended View - title, message, and "Start New Chat" button text
+- **NEW:** Customizable End Chat Confirmation Dialog - title, message, cancel button, and end chat button text
+- **NEW:** All localization settings are saved per profile and sync across devices
+- **IMPROVED:** live.html now uses embedded widget-core.js (same as industry templates) - eliminates maintenance duplication
+- **IMPROVED:** Consistent widget experience across all deployment methods
+
+---
 
 ### v2.8.0 (January 28, 2026)
 

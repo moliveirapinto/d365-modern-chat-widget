@@ -2194,6 +2194,17 @@
                     if (config.prechatTitleColor) window.D365WidgetConfig.prechatTitleColor = config.prechatTitleColor;
                     if (config.prechatSubtitleColor) window.D365WidgetConfig.prechatSubtitleColor = config.prechatSubtitleColor;
                     
+                    // Localization & Time Settings
+                    if (config.timeFormat) window.D365WidgetConfig.timeFormat = config.timeFormat;
+                    if (config.textConnecting) window.D365WidgetConfig.textConnecting = config.textConnecting;
+                    if (config.textChatEndedTitle) window.D365WidgetConfig.textChatEndedTitle = config.textChatEndedTitle;
+                    if (config.textChatEndedMessage) window.D365WidgetConfig.textChatEndedMessage = config.textChatEndedMessage;
+                    if (config.textStartNewChat) window.D365WidgetConfig.textStartNewChat = config.textStartNewChat;
+                    if (config.textEndChatTitle) window.D365WidgetConfig.textEndChatTitle = config.textEndChatTitle;
+                    if (config.textEndChatMessage) window.D365WidgetConfig.textEndChatMessage = config.textEndChatMessage;
+                    if (config.textCancelButton) window.D365WidgetConfig.textCancelButton = config.textCancelButton;
+                    if (config.textEndChatButton) window.D365WidgetConfig.textEndChatButton = config.textEndChatButton;
+                    
                     console.log('📦 Widget config set:', window.D365WidgetConfig);
                     
                     // Load the widget SDK from CDN
