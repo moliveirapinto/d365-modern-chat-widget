@@ -3231,11 +3231,29 @@
                     for (const key in obj) {
                         if (obj.hasOwnProperty(key)) {
                             const value = obj[key];
-                            // Convert text-related properties to strings
-                            if ((key === 'text' || key === 'title' || key === 'value' || key === 'altText' || 
+                            // Convert text-related properties to strings (including arrays which cause indexOf errors)
+                            const isTextProperty = (key === 'text' || key === 'title' || key === 'altText' || 
                                  key === 'placeholder' || key === 'label' || key === 'errorMessage' ||
-                                 key === 'fallbackText' || key === 'speak') && 
-                                value !== null && value !== undefined && typeof value !== 'string' && typeof value !== 'object') {
+                                 key === 'fallbackText' || key === 'speak' || key === 'inlines');
+                            
+                            if (isTextProperty && value !== null && value !== undefined && typeof value !== 'string') {
+                                // If it's an array, join the elements; otherwise stringify
+                                if (Array.isArray(value)) {
+                                    // Handle TextRun arrays - extract text from each run
+                                    result[key] = value.map(item => {
+                                        if (typeof item === 'string') return item;
+                                        if (item && typeof item === 'object' && item.text) return String(item.text);
+                                        return String(item);
+                                    }).join('');
+                                } else if (typeof value === 'object') {
+                                    // Handle single TextRun object
+                                    result[key] = value.text ? String(value.text) : JSON.stringify(value);
+                                } else {
+                                    result[key] = String(value);
+                                }
+                            } else if (key === 'value' && value !== null && value !== undefined && 
+                                       typeof value !== 'string' && typeof value !== 'object') {
+                                // For 'value', only convert primitives (keep objects for form data)
                                 result[key] = String(value);
                             } else {
                                 result[key] = sanitizeCardPayload(value);
