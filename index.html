@@ -4152,6 +4152,97 @@
                 </div>
             </div>
 
+            <!-- Localization & Time Settings -->
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-header-icon">
+                        <svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: #6366f1;"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
+                    </div>
+                    <div>
+                        <h2>Localization & Time</h2>
+                        <p>Customize text labels and time format for international audiences</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Time Format -->
+                    <div class="form-group">
+                        <label class="form-label">Time Format</label>
+                        <select class="form-input" id="timeFormat" style="max-width: 200px;">
+                            <option value="12h">12-hour (2:30 PM)</option>
+                            <option value="24h">24-hour (14:30)</option>
+                        </select>
+                        <p class="form-hint">Choose how message timestamps are displayed</p>
+                    </div>
+
+                    <div style="border-top: 1px solid #e2e8f0; margin: 20px 0; padding-top: 20px;">
+                        <h4 style="font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                            <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: #6366f1;"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+                            Connecting View
+                        </h4>
+                        <div class="form-group">
+                            <label class="form-label">Connecting Text</label>
+                            <input type="text" class="form-input" id="textConnecting" value="Connecting you with an agent..." placeholder="Connecting you with an agent...">
+                        </div>
+                    </div>
+
+                    <div style="border-top: 1px solid #e2e8f0; margin: 20px 0; padding-top: 20px;">
+                        <h4 style="font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                            <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: #6366f1;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                            Chat Ended View
+                        </h4>
+                        <div class="form-group">
+                            <label class="form-label">Ended Title</label>
+                            <input type="text" class="form-input" id="textChatEndedTitle" value="Chat Ended" placeholder="Chat Ended">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Ended Message</label>
+                            <input type="text" class="form-input" id="textChatEndedMessage" value="Thank you for chatting!" placeholder="Thank you for chatting!">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">New Chat Button</label>
+                            <input type="text" class="form-input" id="textStartNewChat" value="Start New Chat" placeholder="Start New Chat">
+                        </div>
+                    </div>
+
+                    <div style="border-top: 1px solid #e2e8f0; margin: 20px 0; padding-top: 20px;">
+                        <h4 style="font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                            <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: #ef4444;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                            End Chat Confirmation Dialog
+                        </h4>
+                        <div class="form-group">
+                            <label class="form-label">Dialog Title</label>
+                            <input type="text" class="form-input" id="textEndChatTitle" value="End Chat?" placeholder="End Chat?">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confirmation Message</label>
+                            <input type="text" class="form-input" id="textEndChatMessage" value="Are you sure you want to end this conversation?" placeholder="Are you sure you want to end this conversation?">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div class="form-group">
+                                <label class="form-label">Cancel Button</label>
+                                <input type="text" class="form-input" id="textCancelButton" value="Cancel" placeholder="Cancel">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">End Chat Button</label>
+                                <input type="text" class="form-input" id="textEndChatButton" value="End Chat" placeholder="End Chat">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box" style="margin-top: 16px;">
+                        <div class="info-icon">🌍</div>
+                        <div>
+                            <strong>Localization Tips:</strong>
+                            <ul style="margin: 8px 0 0 0; padding-left: 20px; font-size: 13px; color: #64748b;">
+                                <li>Customize all visible text for your target language</li>
+                                <li>The pre-chat form labels can be customized in the "Pre-chat Form" section above</li>
+                                <li>Header title/subtitle can be set in the "Header & Branding" section</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             </div><!-- End customWidgetSettings -->
 
             <!-- Embed Widget Code Section -->
@@ -9350,6 +9441,17 @@
             settings.questionFieldLabel = document.getElementById('questionFieldLabel').value;
             settings.questionFieldPlaceholder = document.getElementById('questionFieldPlaceholder').value;
             settings.startBtnText = document.getElementById('startBtnText').value;
+
+            // Localization & Time Settings
+            settings.timeFormat = document.getElementById('timeFormat').value;
+            settings.textConnecting = document.getElementById('textConnecting').value;
+            settings.textChatEndedTitle = document.getElementById('textChatEndedTitle').value;
+            settings.textChatEndedMessage = document.getElementById('textChatEndedMessage').value;
+            settings.textStartNewChat = document.getElementById('textStartNewChat').value;
+            settings.textEndChatTitle = document.getElementById('textEndChatTitle').value;
+            settings.textEndChatMessage = document.getElementById('textEndChatMessage').value;
+            settings.textCancelButton = document.getElementById('textCancelButton').value;
+            settings.textEndChatButton = document.getElementById('textEndChatButton').value;
         }
 
         function updatePreview() {

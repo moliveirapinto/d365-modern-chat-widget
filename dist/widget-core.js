@@ -124,7 +124,17 @@
     prechatBadgeText: '#059669',
     prechatStatusDot: '#10b981',
     prechatAvatarBorder: '#ffffff',
-    customBotName: ''
+    customBotName: '',
+    // Localization & Time Settings
+    timeFormat: '12h',
+    textConnecting: 'Connecting you with an agent...',
+    textChatEndedTitle: 'Chat Ended',
+    textChatEndedMessage: 'Thank you for chatting!',
+    textStartNewChat: 'Start New Chat',
+    textEndChatTitle: 'End Chat?',
+    textEndChatMessage: 'Are you sure you want to end this conversation?',
+    textCancelButton: 'Cancel',
+    textEndChatButton: 'End Chat'
   };
 
   function init() {
@@ -477,7 +487,7 @@
           '</div>',
           '<div class="d365-connecting" id="d365Connecting">',
             '<div class="d365-spinner"></div>',
-            '<div style="color:#4a5568;font-size:14px">Connecting you with an agent...</div>',
+            '<div style="color:#4a5568;font-size:14px">'+(c.textConnecting||'Connecting you with an agent...')+'</div>',
           '</div>',
           '<div class="d365-messages" id="d365Messages">',
             '<div class="d365-typing" id="d365Typing"><div class="d365-typing-dots"><span></span><span></span><span></span></div></div>',
@@ -505,18 +515,18 @@
           '</div>',
           '<div class="d365-ended" id="d365Ended">',
             '<div style="font-size:48px">👋</div>',
-            '<div style="font-size:18px;font-weight:600;color:#2d3748">Chat Ended</div>',
-            '<div style="font-size:14px;color:#718096">Thank you for chatting!</div>',
-            '<button class="d365-new-btn" id="d365NewBtn">Start New Chat</button>',
+            '<div style="font-size:18px;font-weight:600;color:#2d3748">'+(c.textChatEndedTitle||'Chat Ended')+'</div>',
+            '<div style="font-size:14px;color:#718096">'+(c.textChatEndedMessage||'Thank you for chatting!')+'</div>',
+            '<button class="d365-new-btn" id="d365NewBtn">'+(c.textStartNewChat||'Start New Chat')+'</button>',
           '</div>',
         '</div>',
         '<div class="d365-confirm" id="d365Confirm">',
           '<div class="d365-confirm-box">',
-            '<div class="d365-confirm-title">End Chat?</div>',
-            '<div class="d365-confirm-text">Are you sure you want to end this conversation?</div>',
+            '<div class="d365-confirm-title">'+(c.textEndChatTitle||'End Chat?')+'</div>',
+            '<div class="d365-confirm-text">'+(c.textEndChatMessage||'Are you sure you want to end this conversation?')+'</div>',
             '<div class="d365-confirm-btns">',
-              '<button class="d365-confirm-btn cancel" id="d365ConfirmNo">Cancel</button>',
-              '<button class="d365-confirm-btn end" id="d365ConfirmYes">End Chat</button>',
+              '<button class="d365-confirm-btn cancel" id="d365ConfirmNo">'+(c.textCancelButton||'Cancel')+'</button>',
+              '<button class="d365-confirm-btn end" id="d365ConfirmYes">'+(c.textEndChatButton||'End Chat')+'</button>',
             '</div>',
           '</div>',
         '</div>',
@@ -944,7 +954,13 @@
     }
 
     function formatTime(d) {
-      return new Date(d).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+      var options = {hour:'2-digit',minute:'2-digit'};
+      if (config.timeFormat === '24h') {
+        options.hour12 = false;
+      } else {
+        options.hour12 = true;
+      }
+      return new Date(d).toLocaleTimeString([], options);
     }
 
     function isBot(name) {
