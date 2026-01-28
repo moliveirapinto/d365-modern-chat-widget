@@ -4504,14 +4504,26 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v2.7.0';
-        const APP_LAST_UPDATED = 'Jan 23, 2026';
+        const APP_VERSION = 'v2.8.0';
+        const APP_LAST_UPDATED = 'Jan 28, 2026';
         
         const CHANGELOG = [
             {
+                version: 'v2.8.0',
+                date: 'Jan 28, 2026',
+                latest: true,
+                items: [
+                    { type: 'fix', text: 'Adaptive Card rendering - fixed "data.indexOf is not a function" error for complex cards' },
+                    { type: 'new', text: 'Custom markdown processor for Adaptive Cards - prevents rendering crashes with malformed data' },
+                    { type: 'improve', text: 'Robust payload sanitization - text properties (text, title, altText, etc.) now safely converted to strings' },
+                    { type: 'improve', text: 'Preserved action.data as objects - form submissions now work correctly with Action.Submit buttons' },
+                    { type: 'improve', text: 'Debug logging for Adaptive Cards - original and sanitized payloads logged for troubleshooting' }
+                ]
+            },
+            {
                 version: 'v2.7.0',
                 date: 'Jan 23, 2026',
-                latest: true,
+                latest: false,
                 items: [
                     { type: 'new', text: 'Custom Bot Name - override Microsoft Copilot Studio bot names with your own branding' },
                     { type: 'new', text: 'User Bubble Gradient toggle - enable/disable gradient on user messages independently from header' },

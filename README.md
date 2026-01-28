@@ -4,7 +4,7 @@
 
 [![D365 Compatible](https://img.shields.io/badge/D365-Omnichannel-0078D4?style=flat-square&logo=microsoft)](https://dynamics.microsoft.com)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.7.0-blue?style=flat-square)](package.json)
+[![Version](https://img.shields.io/badge/version-v2.8.0-blue?style=flat-square)](package.json)
 
 ![Chat Widget Preview](preview.png)
 
@@ -53,7 +53,7 @@
 - 📄 **Chat Transcript** - Download conversation history
 - 🔔 **Toast Notifications** - User-friendly feedback messages
 - 🔴 **Notification Badge** - Unread message counter
-- 🎴 **Adaptive Cards** - Full support for Copilot Studio interactive cards
+- 🎴 **Adaptive Cards** - Full support for Copilot Studio interactive cards with robust error handling
 - 🌐 **Cross-Browser** - Works on Chrome, Edge, Firefox, Safari (Edge 143+ crash fix included)
 
 </td>
@@ -1170,6 +1170,31 @@ See **[CONTRIBUTING.md](CONTRIBUTING.md)** for:
 ---
 
 ## 📝 Changelog
+
+### v2.8.0 (January 28, 2026)
+
+#### 🎴 Adaptive Card Rendering Fix
+- **FIX:** Resolved "data.indexOf is not a function" error that caused complex Adaptive Cards to fail rendering
+- **NEW:** Custom markdown processor for Adaptive Cards - safely handles any input type to prevent crashes
+- **IMPROVED:** Robust payload sanitization - text properties (`text`, `title`, `altText`, `placeholder`, `label`, etc.) are now safely converted to strings
+- **IMPROVED:** Preserved `action.data` as objects - form submissions with `Action.Submit` buttons now work correctly
+- **IMPROVED:** Debug logging for Adaptive Cards - original and sanitized payloads are logged to console for troubleshooting
+
+---
+
+### v2.7.0 (January 23, 2026)
+
+#### 🤖 Custom Bot Name & UI Polish
+- **NEW:** Custom Bot Name - override Microsoft Copilot Studio bot names with your own branding
+- **NEW:** User Bubble Gradient toggle - enable/disable gradient on user messages independently from header
+- **IMPROVED:** Embed code changes now properly clear old connection values (fixes widget malfunction)
+- **IMPROVED:** Visual parity enforced across all rendering methods (preview, live.html, embedded/Tampermonkey)
+- **IMPROVED:** CONTRIBUTING.md updated with Visual Change Checklist for developers
+- **FIX:** Bubble gradient now uses correct colors when header gradient is disabled
+- **FIX:** Room widget embed code changes now sync properly to global settings
+- **FIX:** Profile embed code updates no longer keep stale orgId/orgUrl/widgetId values
+
+---
 
 ### v2.6.0 (January 22, 2026)
 
