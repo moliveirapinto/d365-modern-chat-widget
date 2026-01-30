@@ -1,7 +1,7 @@
 /**
  * D365 Modern Chat Widget - Core
  * This is the main widget code that gets loaded via the loader
- * Version: 2.9.0
+ * Version: 2.10.0
  * 
  * ╔═══════════════════════════════════════════════════════════════════════════╗
  * ║  ⚠️  FEATURE PARITY REQUIRED - READ CONTRIBUTING.md                       ║
@@ -113,7 +113,11 @@
     welcomeTitle: 'Welcome!',
     welcomeMessage: 'Please fill in your details to start chatting.',
     nameFieldLabel: 'Name *',
+    nameFieldPlaceholder: 'Enter your name',
     emailFieldLabel: 'Email *',
+    emailFieldPlaceholder: 'Enter your email',
+    questionFieldLabel: 'How can we help?',
+    questionFieldPlaceholder: 'Describe your question...',
     startBtnText: 'Start Chat',
     // Pre-chat Hero Colors
     prechatGradientStart: '#667eea',
@@ -134,11 +138,22 @@
     textEndChatTitle: 'End Chat?',
     textEndChatMessage: 'Are you sure you want to end this conversation?',
     textCancelButton: 'Cancel',
-    textEndChatButton: 'End Chat'
+    textEndChatButton: 'End Chat',
+    textInputPlaceholder: 'Type your message...'
   };
 
   function init() {
     var config = Object.assign({}, defaults, getConfig());
+    
+    // Debug: Log the received config vs defaults
+    console.log('%c🔧 Widget-core received config:', 'background: #4f46e5; color: white; padding: 2px 6px; border-radius: 3px;', {
+      useBubbleGradient: config.useBubbleGradient,
+      userBubbleColor: config.userBubbleColor,
+      gradientStart: config.gradientStart,
+      gradientEnd: config.gradientEnd,
+      primaryColor: config.primaryColor,
+      'from D365WidgetConfig': getConfig()
+    });
     
     // Validate required D365 settings
     if (!config.orgId || !config.orgUrl || !config.widgetId) {
@@ -501,7 +516,7 @@
               '<button class="d365-stop-voice" id="d365StopVoice">Stop</button>',
             '</div>',
             '<div class="d365-input-wrap">',
-              '<textarea class="d365-input" id="d365Input" placeholder="Type your message..." rows="3"></textarea>',
+              '<textarea class="d365-input" id="d365Input" placeholder="'+(c.textInputPlaceholder||'Type your message...')+'" rows="3"></textarea>',
               '<div class="d365-input-row">',
                 '<div class="d365-input-actions">',
                   '<input type="file" id="d365File" class="d365-visually-hidden-input" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt">',

@@ -3803,9 +3803,12 @@
                             </label>
                             <span class="toggle-label">Use gradient for user message bubbles</span>
                         </div>
+                        <p id="bubbleGradientHint" class="hint-text" style="color: #f59e0b; font-size: 12px; margin: 4px 0 12px 0; display: block;">
+                            ⚠️ Gradient is ON: User bubbles will use the Header gradient colors instead of the User Bubble color below.
+                        </p>
                         <div class="color-grid">
                             <div class="color-item">
-                                <label>User Bubble</label>
+                                <label>User Bubble <span id="userBubbleDisabledHint" style="color: #9ca3af; font-size: 10px;">(gradient active)</span></label>
                                 <div class="color-picker-wrapper">
                                     <input type="color" id="userBubbleColor" value="#667eea">
                                     <input type="text" class="color-hex-input" id="userBubbleColorHex" value="#667eea">
@@ -4229,6 +4232,18 @@
                         </div>
                     </div>
 
+                    <div style="border-top: 1px solid #e2e8f0; margin: 20px 0; padding-top: 20px;">
+                        <h4 style="font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                            <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: #6366f1;"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+                            Chat Input Area
+                        </h4>
+                        <div class="form-group">
+                            <label class="form-label">Message Input Placeholder</label>
+                            <input type="text" class="form-input" id="textInputPlaceholder" value="Type your message..." placeholder="Type your message...">
+                            <p class="form-hint">The placeholder text shown in the message input field</p>
+                        </div>
+                    </div>
+
                     <div class="info-box" style="margin-top: 16px;">
                         <div class="info-icon">🌍</div>
                         <div>
@@ -4560,7 +4575,7 @@
                             </div>
                         </div>
                         <div class="preview-input-area" id="previewInputArea">
-                            <div class="preview-input">Type your message...</div>
+                            <div class="preview-input" id="previewInputPlaceholder">Type your message...</div>
                             <button class="preview-send-btn" id="previewSendBtn">
                                 <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
                             </button>
@@ -4595,14 +4610,29 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v2.8.0';
-        const APP_LAST_UPDATED = 'Jan 28, 2026';
+        const APP_VERSION = 'v2.10.0';
+        const APP_LAST_UPDATED = 'Jan 30, 2026';
         
         const CHANGELOG = [
             {
+                version: 'v2.10.0',
+                date: 'Jan 30, 2026',
+                latest: true,
+                items: [
+                    { type: 'new', text: 'Message Input Placeholder - customize the "Type your message..." placeholder text' },
+                    { type: 'new', text: 'Bubble Gradient UX hints - clear warning when gradient overrides User Bubble color' },
+                    { type: 'fix', text: 'Color palette selection now properly passes useBubbleGradient to all deployment methods' },
+                    { type: 'fix', text: 'useBubbleGradient config now included in compact embed code generation' },
+                    { type: 'improve', text: 'Cache-busting for widget-core.js - ensures fresh code loads after updates' },
+                    { type: 'improve', text: 'Enhanced debug logging for color settings in widget-core.js' },
+                    { type: 'improve', text: 'Pre-chat form labels (Name, Email, Question) now pass to all template pages' },
+                    { type: 'improve', text: 'Auto-save when applying color palettes - changes persist immediately' }
+                ]
+            },
+            {
                 version: 'v2.8.0',
                 date: 'Jan 28, 2026',
-                latest: true,
+                latest: false,
                 items: [
                     { type: 'fix', text: 'Adaptive Card rendering - fixed "data.indexOf is not a function" error for complex cards' },
                     { type: 'new', text: 'Custom markdown processor for Adaptive Cards - prevents rendering crashes with malformed data' },
@@ -8422,6 +8452,7 @@
             document.getElementById('textEndChatMessage').value = settings.textEndChatMessage || 'Are you sure you want to end this conversation?';
             document.getElementById('textCancelButton').value = settings.textCancelButton || 'Cancel';
             document.getElementById('textEndChatButton').value = settings.textEndChatButton || 'End Chat';
+            document.getElementById('textInputPlaceholder').value = settings.textInputPlaceholder || 'Type your message...';
 
             // Color pickers - MUST be set BEFORE toggleGradient() which calls updateSettingsFromForm()
             const colorFields = [
@@ -8450,6 +8481,11 @@
             document.getElementById('usePrechatGradient').checked = settings.usePrechatGradient !== false;
             toggleGradient();
             togglePrechatGradient();
+            
+            // Update bubble gradient hint visibility
+            const isBubbleGradient = settings.useBubbleGradient !== false;
+            document.getElementById('bubbleGradientHint').style.display = isBubbleGradient ? 'block' : 'none';
+            document.getElementById('userBubbleDisabledHint').style.display = isBubbleGradient ? 'inline' : 'none';
 
             // Launcher Icon - restore selection
             if (settings.launcherIcon) {
@@ -8573,6 +8609,10 @@
             document.getElementById('useBubbleGradient').addEventListener('change', () => {
                 updateSettingsFromForm();
                 updatePreview();
+                // Update UI hints based on gradient toggle
+                const isGradient = document.getElementById('useBubbleGradient').checked;
+                document.getElementById('bubbleGradientHint').style.display = isGradient ? 'block' : 'none';
+                document.getElementById('userBubbleDisabledHint').style.display = isGradient ? 'inline' : 'none';
             });
 
             // Pre-chat hero gradient toggle
@@ -8642,7 +8682,7 @@
              'nameFieldLabel', 'emailFieldLabel', 'questionFieldLabel', 'questionFieldPlaceholder', 'startBtnText',
              'standardAuthName', 'standardAuthEmail', 'customAuthName', 'customAuthEmail',
              'textConnecting', 'textChatEndedTitle', 'textChatEndedMessage', 'textStartNewChat',
-             'textEndChatTitle', 'textEndChatMessage', 'textCancelButton', 'textEndChatButton'].forEach(id => {
+             'textEndChatTitle', 'textEndChatMessage', 'textCancelButton', 'textEndChatButton', 'textInputPlaceholder'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
                     el.addEventListener('input', debouncedUpdateSettings);
@@ -8903,6 +8943,19 @@
             updateSettingsFromForm();
             updatePreview();
             updateLauncherPreview();
+            
+            // Auto-save to active profile and localStorage
+            if (!isInitializing && activeProfileId) {
+                const profile = profiles.find(p => p.id === activeProfileId);
+                if (profile) {
+                    profile.settings = { ...settings };
+                    profile.updatedAt = new Date().toISOString();
+                    saveProfiles();
+                }
+            }
+            if (!isInitializing) {
+                localStorage.setItem('chatWidgetSettings', JSON.stringify(settings));
+            }
             
             // Mark selected palette
             document.querySelectorAll('.palette-card').forEach((card, i) => {
@@ -9482,6 +9535,7 @@
             settings.textEndChatMessage = document.getElementById('textEndChatMessage').value;
             settings.textCancelButton = document.getElementById('textCancelButton').value;
             settings.textEndChatButton = document.getElementById('textEndChatButton').value;
+            settings.textInputPlaceholder = document.getElementById('textInputPlaceholder').value;
         }
 
         function updatePreview() {
@@ -9597,6 +9651,10 @@
                 // Input area & send button
                 const previewInputArea = document.getElementById('previewInputArea');
                 if (previewInputArea) previewInputArea.style.background = settings.inputBgColor;
+                
+                // Input placeholder text
+                const previewInputPlaceholder = document.getElementById('previewInputPlaceholder');
+                if (previewInputPlaceholder) previewInputPlaceholder.textContent = settings.textInputPlaceholder || 'Type your message...';
                 // Preview send button keeps transparent background (like actual widget)
 
                 // Pre-chat Form Preview
@@ -10151,12 +10209,13 @@
             // Escape any problematic characters for inline JS
             configJson = configJson.replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
             
-            // Tiny loader that fetches from GitHub Pages
+            // Tiny loader that fetches from GitHub Pages with cache busting
+            const cacheBuster = new Date().getTime();
             const embedCode = `<!-- D365 Chat Widget - Compact Loader (Power Pages Compatible) -->
 <!-- Generated: ${new Date().toLocaleDateString()} | Size: ~1.5KB -->
 <script>
 window.D365WidgetConfig=${configJson};
-(function(){var s=document.createElement('script');s.src='https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js';document.head.appendChild(s);})();
+(function(){var s=document.createElement('script');s.src='https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js?v=${cacheBuster}';document.head.appendChild(s);})();
 <\/script>`;
             
             document.getElementById('embedCodeOutput').value = embedCode;
@@ -10183,6 +10242,7 @@ window.D365WidgetConfig=${configJson};
             if (settings.headerLogo) config.headerLogo = toGitHubRawUrl(settings.headerLogo);
             if (settings.fontFamily && settings.fontFamily !== 'system') config.fontFamily = settings.fontFamily;
             if (settings.useGradient === false) config.useGradient = false;
+            if (settings.useBubbleGradient === false) config.useBubbleGradient = false;
             if (settings.gradientStart && settings.gradientStart !== '#667eea') config.gradientStart = settings.gradientStart;
             if (settings.gradientEnd && settings.gradientEnd !== '#764ba2') config.gradientEnd = settings.gradientEnd;
             if (settings.primaryColor && settings.primaryColor !== '#667eea') config.primaryColor = settings.primaryColor;
@@ -10224,6 +10284,18 @@ window.D365WidgetConfig=${configJson};
                 if (settings.customAuthName) config.customAuthName = settings.customAuthName;
                 if (settings.customAuthEmail) config.customAuthEmail = settings.customAuthEmail;
             }
+            
+            // Localization & Time Settings (only if different from defaults)
+            if (settings.timeFormat && settings.timeFormat !== '12h') config.timeFormat = settings.timeFormat;
+            if (settings.textConnecting && settings.textConnecting !== 'Connecting you with an agent...') config.textConnecting = settings.textConnecting;
+            if (settings.textChatEndedTitle && settings.textChatEndedTitle !== 'Chat Ended') config.textChatEndedTitle = settings.textChatEndedTitle;
+            if (settings.textChatEndedMessage && settings.textChatEndedMessage !== 'Thank you for chatting!') config.textChatEndedMessage = settings.textChatEndedMessage;
+            if (settings.textStartNewChat && settings.textStartNewChat !== 'Start New Chat') config.textStartNewChat = settings.textStartNewChat;
+            if (settings.textEndChatTitle && settings.textEndChatTitle !== 'End Chat?') config.textEndChatTitle = settings.textEndChatTitle;
+            if (settings.textEndChatMessage && settings.textEndChatMessage !== 'Are you sure you want to end this conversation?') config.textEndChatMessage = settings.textEndChatMessage;
+            if (settings.textCancelButton && settings.textCancelButton !== 'Cancel') config.textCancelButton = settings.textCancelButton;
+            if (settings.textEndChatButton && settings.textEndChatButton !== 'End Chat') config.textEndChatButton = settings.textEndChatButton;
+            if (settings.textInputPlaceholder && settings.textInputPlaceholder !== 'Type your message...') config.textInputPlaceholder = settings.textInputPlaceholder;
             
             return config;
         }
@@ -10288,7 +10360,18 @@ window.D365WidgetConfig=${configJson};
                 startBtnText: settings.startBtnText || 'Start Chat',
                 enableCustomAuth: settings.enableCustomAuth || false,
                 customAuthName: settings.customAuthName || '',
-                customAuthEmail: settings.customAuthEmail || ''
+                customAuthEmail: settings.customAuthEmail || '',
+                // Localization & Time Settings
+                timeFormat: settings.timeFormat || '12h',
+                textConnecting: settings.textConnecting || 'Connecting you with an agent...',
+                textChatEndedTitle: settings.textChatEndedTitle || 'Chat Ended',
+                textChatEndedMessage: settings.textChatEndedMessage || 'Thank you for chatting!',
+                textStartNewChat: settings.textStartNewChat || 'Start New Chat',
+                textEndChatTitle: settings.textEndChatTitle || 'End Chat?',
+                textEndChatMessage: settings.textEndChatMessage || 'Are you sure you want to end this conversation?',
+                textCancelButton: settings.textCancelButton || 'Cancel',
+                textEndChatButton: settings.textEndChatButton || 'End Chat',
+                textInputPlaceholder: settings.textInputPlaceholder || 'Type your message...'
             };
             
             // Generate JSON and escape closing script tags to prevent breaking HTML parsing
@@ -12582,7 +12665,9 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     }
 
     const s = document.createElement('script');
-    s.src = 'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js';
+    // Add cache buster to ensure fresh widget code
+    const cacheBuster = new Date().getTime();
+    s.src = 'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js?v=' + cacheBuster;
     s.async = true;
     s.crossOrigin = 'anonymous';
 

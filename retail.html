@@ -1632,6 +1632,7 @@
                     if (config.headerLogo) window.D365WidgetConfig.headerLogo = config.headerLogo;
                     if (config.fontFamily) window.D365WidgetConfig.fontFamily = config.fontFamily;
                     if (config.useGradient !== undefined) window.D365WidgetConfig.useGradient = config.useGradient;
+                    if (config.useBubbleGradient !== undefined) window.D365WidgetConfig.useBubbleGradient = config.useBubbleGradient;
                     if (config.gradientStart) window.D365WidgetConfig.gradientStart = config.gradientStart;
                     if (config.gradientEnd) window.D365WidgetConfig.gradientEnd = config.gradientEnd;
                     if (config.primaryColor) window.D365WidgetConfig.primaryColor = config.primaryColor;
@@ -1657,6 +1658,21 @@
                     if (config.prechatTitleColor) window.D365WidgetConfig.prechatTitleColor = config.prechatTitleColor;
                     if (config.prechatSubtitleColor) window.D365WidgetConfig.prechatSubtitleColor = config.prechatSubtitleColor;
                     
+                    // Pre-chat Hero Colors (additional)
+                    if (config.prechatBadgeBg) window.D365WidgetConfig.prechatBadgeBg = config.prechatBadgeBg;
+                    if (config.prechatBadgeText) window.D365WidgetConfig.prechatBadgeText = config.prechatBadgeText;
+                    if (config.prechatStatusDot) window.D365WidgetConfig.prechatStatusDot = config.prechatStatusDot;
+                    if (config.prechatAvatarBorder) window.D365WidgetConfig.prechatAvatarBorder = config.prechatAvatarBorder;
+                    
+                    // Pre-chat Form Labels (Localization)
+                    if (config.nameFieldLabel) window.D365WidgetConfig.nameFieldLabel = config.nameFieldLabel;
+                    if (config.nameFieldPlaceholder) window.D365WidgetConfig.nameFieldPlaceholder = config.nameFieldPlaceholder;
+                    if (config.emailFieldLabel) window.D365WidgetConfig.emailFieldLabel = config.emailFieldLabel;
+                    if (config.emailFieldPlaceholder) window.D365WidgetConfig.emailFieldPlaceholder = config.emailFieldPlaceholder;
+                    if (config.questionFieldLabel) window.D365WidgetConfig.questionFieldLabel = config.questionFieldLabel;
+                    if (config.questionFieldPlaceholder) window.D365WidgetConfig.questionFieldPlaceholder = config.questionFieldPlaceholder;
+                    if (config.startBtnText) window.D365WidgetConfig.startBtnText = config.startBtnText;
+                    
                     // Localization & Time Settings
                     if (config.timeFormat) window.D365WidgetConfig.timeFormat = config.timeFormat;
                     if (config.textConnecting) window.D365WidgetConfig.textConnecting = config.textConnecting;
@@ -1667,12 +1683,24 @@
                     if (config.textEndChatMessage) window.D365WidgetConfig.textEndChatMessage = config.textEndChatMessage;
                     if (config.textCancelButton) window.D365WidgetConfig.textCancelButton = config.textCancelButton;
                     if (config.textEndChatButton) window.D365WidgetConfig.textEndChatButton = config.textEndChatButton;
+                    if (config.textInputPlaceholder) window.D365WidgetConfig.textInputPlaceholder = config.textInputPlaceholder;
                     
                     console.log('📦 Widget config set:', window.D365WidgetConfig);
                     
-                    // Load the widget SDK from CDN
+                    // Log all color settings for debugging
+                    console.log('🎨 Color settings:', {
+                        userBubbleColor: window.D365WidgetConfig.userBubbleColor,
+                        gradientStart: window.D365WidgetConfig.gradientStart,
+                        gradientEnd: window.D365WidgetConfig.gradientEnd,
+                        primaryColor: window.D365WidgetConfig.primaryColor,
+                        launcherColor: window.D365WidgetConfig.launcherColor,
+                        sendBtnColor: window.D365WidgetConfig.sendBtnColor
+                    });
+                    
+                    // Load the widget SDK from CDN with cache busting
                     const script = document.createElement('script');
-                    script.src = 'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js';
+                    const cacheBuster = new Date().getTime();
+                    script.src = 'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js?v=' + cacheBuster;
                     script.onload = function() {
                         console.log('✅ Widget SDK loaded successfully');
                     };
