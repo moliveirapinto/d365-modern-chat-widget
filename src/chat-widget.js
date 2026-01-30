@@ -10,7 +10,8 @@ class ModernChatWidget {
         this.config = {
             orgId: config.orgId || '',
             orgUrl: config.orgUrl || '',
-            widgetId: config.widgetId || ''
+            widgetId: config.widgetId || '',
+            customBotName: config.customBotName || ''
         };
 
         this.chatSDK = null;
@@ -941,7 +942,13 @@ class ModernChatWidget {
         }
         
         if (message.sender?.type === 'Agent' || role === 'bot' || role === 'Bot' || role === 'agent' || role === 'Agent') {
-            this.state.agentName = message.sender?.displayName || message.senderDisplayName || 'Agent';
+            const senderName = message.sender?.displayName || message.senderDisplayName || 'Agent';
+            // Use customBotName if configured and sender appears to be a bot
+            if (this.config.customBotName && this.isBotSender(senderName)) {
+                this.state.agentName = this.config.customBotName;
+            } else {
+                this.state.agentName = senderName;
+            }
             this.addAgentMessage(message.content || message.text);
             
             if (!this.state.isOpen) {
@@ -1134,6 +1141,14 @@ class ModernChatWidget {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    // Check if the sender name indicates a bot/virtual assistant
+    isBotSender(senderName) {
+        if (!senderName) return false;
+        const name = senderName.toLowerCase();
+        return name.includes('bot') || name.includes('copilot') || name.includes('virtual') || 
+               name.includes('assistant') || name.includes('ai');
     }
 }
 
