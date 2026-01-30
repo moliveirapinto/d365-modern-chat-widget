@@ -4610,14 +4610,24 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v2.10.0';
+        const APP_VERSION = 'v2.11.0';
         const APP_LAST_UPDATED = 'Jan 30, 2026';
         
         const CHANGELOG = [
             {
-                version: 'v2.10.0',
+                version: 'v2.11.0',
                 date: 'Jan 30, 2026',
                 latest: true,
+                items: [
+                    { type: 'fix', text: 'Custom Bot Name now works in SDK widget (chat-widget.js) - config option was missing' },
+                    { type: 'new', text: 'Added isBotSender() helper to detect bot messages by sender name keywords' },
+                    { type: 'improve', text: 'Bot name detection checks for: bot, copilot, virtual, assistant, ai in sender name' }
+                ]
+            },
+            {
+                version: 'v2.10.0',
+                date: 'Jan 30, 2026',
+                latest: false,
                 items: [
                     { type: 'new', text: 'Message Input Placeholder - customize the "Type your message..." placeholder text' },
                     { type: 'new', text: 'Bubble Gradient UX hints - clear warning when gradient overrides User Bubble color' },

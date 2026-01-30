@@ -4,7 +4,7 @@
 
 [![D365 Compatible](https://img.shields.io/badge/D365-Omnichannel-0078D4?style=flat-square&logo=microsoft)](https://dynamics.microsoft.com)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.10.0-blue?style=flat-square)](package.json)
+[![Version](https://img.shields.io/badge/version-v2.11.0-blue?style=flat-square)](package.json)
 
 ![Chat Widget Preview](preview.png)
 
@@ -1171,6 +1171,29 @@ See **[CONTRIBUTING.md](CONTRIBUTING.md)** for:
 ---
 
 ## 📝 Changelog
+
+### v2.11.0 (January 30, 2026)
+
+#### 🤖 Custom Bot Name SDK Fix
+- **FIX:** Custom Bot Name now works in SDK widget (`chat-widget.js`) - the `customBotName` config option was not being passed to the widget
+- **NEW:** Added `isBotSender()` helper method to detect bot messages by sender name keywords
+- **IMPROVED:** Bot name detection checks for: `bot`, `copilot`, `virtual`, `assistant`, `ai` in sender name
+
+---
+
+### v2.10.0 (January 30, 2026)
+
+#### 📝 Message Input & Color Palette Improvements
+- **NEW:** Message Input Placeholder - customize the "Type your message..." placeholder text
+- **NEW:** Bubble Gradient UX hints - clear warning when gradient overrides User Bubble color
+- **FIX:** Color palette selection now properly passes `useBubbleGradient` to all deployment methods
+- **FIX:** `useBubbleGradient` config now included in compact embed code generation
+- **IMPROVED:** Cache-busting for widget-core.js - ensures fresh code loads after updates
+- **IMPROVED:** Enhanced debug logging for color settings in widget-core.js
+- **IMPROVED:** Pre-chat form labels (Name, Email, Question) now pass to all template pages
+- **IMPROVED:** Auto-save when applying color palettes - changes persist immediately
+
+---
 
 ### v2.9.0 (January 28, 2026)
 
