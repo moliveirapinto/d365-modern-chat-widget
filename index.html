@@ -11342,11 +11342,12 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
              name.includes('assistant') || name.includes('ai') || name.includes('agent');
     }
     
-    // Get display name - uses customBotName for bot messages if configured
+    // Get display name - uses customBotName for ALL non-user messages when configured
     function getDisplayName(senderName, isUser) {
       if (isUser) return userName;
-      // If customBotName is set, use it for all non-user messages (bot/agent)
-      if (config.customBotName) {
+      // If customBotName is set, ALWAYS use it for all non-user messages (bot/agent)
+      // This replaces whatever name comes from D365/Copilot Studio
+      if (config.customBotName && config.customBotName.trim() !== '') {
         return config.customBotName;
       }
       return senderName || 'Agent';
@@ -11910,6 +11911,16 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     async function initializeChat(name, email, question) {
       try {
         userName = name; userEmail = email;
+        
+        // Clear previous conversation messages
+        chatMessages = [];
+        processedMessageIds = {};
+        messageQueue = [];
+        messageArrivalCounter = 0;
+        while (messagesContainer.firstChild !== typingIndicator) {
+          messagesContainer.removeChild(messagesContainer.firstChild);
+        }
+        
         showView('connecting');
         console.log('Starting chat initialization...');
         
