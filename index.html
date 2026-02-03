@@ -11339,11 +11339,10 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     
     // Get display name - uses customBotName for bot messages if configured
     function getDisplayName(senderName, isUser) {
-      var settings = getCurrentSettings();
       if (isUser) return userName;
       // If customBotName is set and this is a bot message, use customBotName
-      if (settings?.customBotName && isBotSender(senderName)) {
-        return settings.customBotName;
+      if (config.customBotName && isBotSender(senderName)) {
+        return config.customBotName;
       }
       return senderName || 'Agent';
     }
