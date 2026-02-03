@@ -7500,15 +7500,20 @@
         
         function restoreCollapsedStates() {
             const saved = localStorage.getItem('cardCollapsedStates');
-            if (saved) {
-                const states = JSON.parse(saved);
-                document.querySelectorAll('.settings-card').forEach(card => {
-                    const heading = card.querySelector('.card-header h2');
-                    if (heading && states[heading.textContent.trim()]) {
+            const states = saved ? JSON.parse(saved) : {};
+            
+            // By default, collapse all cards. Only expand if user explicitly expanded them (saved as false)
+            document.querySelectorAll('.settings-card').forEach(card => {
+                const heading = card.querySelector('.card-header h2');
+                if (heading) {
+                    const cardName = heading.textContent.trim();
+                    // If state was explicitly saved as false (expanded), don't collapse
+                    // Otherwise, collapse by default
+                    if (states[cardName] !== false) {
                         card.classList.add('collapsed');
                     }
-                });
-            }
+                }
+            });
         }
 
         // ============ PROFILES MANAGEMENT ============
@@ -10947,7 +10952,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
         </div>
       </div>
       <div class="d365-chat-body">
-        <form class="d365-prechat-form" id="d365PrechatForm" onsubmit="return false;">
+        <form class="d365-prechat-form\${config.enablePrechatForm === false ? ' hidden' : ''}" id="d365PrechatForm" onsubmit="return false;">
           <div class="d365-prechat-hero">
             <div class="d365-prechat-hero-content">
               <div class="d365-prechat-status">
@@ -11334,14 +11339,14 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       if (!senderName) return false;
       var name = senderName.toLowerCase();
       return name.includes('bot') || name.includes('copilot') || name.includes('virtual') || 
-             name.includes('assistant') || name.includes('ai');
+             name.includes('assistant') || name.includes('ai') || name.includes('agent');
     }
     
     // Get display name - uses customBotName for bot messages if configured
     function getDisplayName(senderName, isUser) {
       if (isUser) return userName;
-      // If customBotName is set and this is a bot message, use customBotName
-      if (config.customBotName && isBotSender(senderName)) {
+      // If customBotName is set, use it for all non-user messages (bot/agent)
+      if (config.customBotName) {
         return config.customBotName;
       }
       return senderName || 'Agent';

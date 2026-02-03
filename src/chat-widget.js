@@ -943,8 +943,8 @@ class ModernChatWidget {
         
         if (message.sender?.type === 'Agent' || role === 'bot' || role === 'Bot' || role === 'agent' || role === 'Agent') {
             const senderName = message.sender?.displayName || message.senderDisplayName || 'Agent';
-            // Use customBotName if configured and sender appears to be a bot
-            if (this.config.customBotName && this.isBotSender(senderName)) {
+            // Use customBotName if configured for all bot/agent messages
+            if (this.config.customBotName) {
                 this.state.agentName = this.config.customBotName;
             } else {
                 this.state.agentName = senderName;
