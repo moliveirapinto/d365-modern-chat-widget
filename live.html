@@ -465,7 +465,15 @@
                         document.body.style.backgroundSize = 'cover';
                         document.body.style.backgroundPosition = 'center';
                         document.body.style.backgroundRepeat = 'no-repeat';
+                        
+                        // Hide all demo content - show ONLY background + chat widget
+                        const demoContainer = document.querySelector('.demo-container');
+                        if (demoContainer) {
+                            demoContainer.style.display = 'none';
+                        }
+                        
                         console.log('🖼️ Applied background image to page:', config.backgroundImageUrl);
+                        console.log('🙈 Demo content hidden - showing only background + chat widget');
                     }
                     
                     console.log('📦 Widget config set:', window.D365WidgetConfig);
