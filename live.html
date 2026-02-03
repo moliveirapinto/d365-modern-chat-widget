@@ -456,7 +456,14 @@
                     if (config.textEndChatButton) window.D365WidgetConfig.textEndChatButton = config.textEndChatButton;
                     if (config.textInputPlaceholder) window.D365WidgetConfig.textInputPlaceholder = config.textInputPlaceholder;
                     
+                    // Custom Bot Name - replaces bot/agent name in messages
+                    if (config.customBotName) window.D365WidgetConfig.customBotName = config.customBotName;
+                    
                     console.log('📦 Widget config set:', window.D365WidgetConfig);
+                    
+                    // Log customBotName specifically for debugging
+                    console.log('🏷️ Custom Bot Name from saved config:', config.customBotName);
+                    console.log('🏷️ Custom Bot Name in D365WidgetConfig:', window.D365WidgetConfig.customBotName);
                     
                     // Log all color settings for debugging
                     console.log('🎨 Color settings:', {

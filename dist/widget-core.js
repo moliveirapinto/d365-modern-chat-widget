@@ -152,7 +152,17 @@
       gradientStart: config.gradientStart,
       gradientEnd: config.gradientEnd,
       primaryColor: config.primaryColor,
+      customBotName: config.customBotName,
+      enablePrechatForm: config.enablePrechatForm,
       'from D365WidgetConfig': getConfig()
+    });
+    
+    console.log('%c🏷️ Custom Bot Name Config:', 'background: #059669; color: white; padding: 2px 6px; border-radius: 3px;', {
+      customBotName: config.customBotName,
+      customBotNameType: typeof config.customBotName,
+      customBotNameLength: config.customBotName ? config.customBotName.length : 0,
+      customBotNameTrimmed: config.customBotName ? config.customBotName.trim() : null,
+      isEmpty: !config.customBotName || config.customBotName.trim() === ''
     });
     
     // Validate required D365 settings
@@ -478,7 +488,7 @@
               '<button class="d365-call-ctrl-btn end-call" id="d365EndCall" title="End call"><svg viewBox="0 0 24 24"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg></button>',
             '</div>',
           '</div>',
-          '<div class="d365-prechat" id="d365Prechat">',
+          '<div class="d365-prechat'+(c.enablePrechatForm===false?' hidden':'')+'" id="d365Prechat">',
             // Pre-chat Hero Section
             '<div class="d365-prechat-hero">',
               '<div class="d365-prechat-hero-content">',
@@ -985,13 +995,28 @@
              n.includes('assistant') || n.includes('ai') || n === 'cps';
     }
 
-    // Get display name - uses customBotName for bot/agent messages if configured
+    // Get display name - uses customBotName for ALL non-user messages if configured
     function getDisplayName(senderName, isUser) {
-      if (isUser) return userName;
-      // If customBotName is set and this is a bot message, use customBotName
-      if (config.customBotName && isBot(senderName)) {
+      console.log('🏷️ getDisplayName called:', {
+        senderName: senderName,
+        isUser: isUser,
+        customBotName: config.customBotName,
+        customBotNameTrimmed: config.customBotName ? config.customBotName.trim() : null,
+        userName: userName
+      });
+      
+      if (isUser) {
+        console.log('🏷️ Returning userName:', userName);
+        return userName;
+      }
+      
+      // If customBotName is set (and not empty), use it for ALL non-user messages
+      if (config.customBotName && config.customBotName.trim() !== '') {
+        console.log('🏷️ Using customBotName for non-user message:', config.customBotName);
         return config.customBotName;
       }
+      
+      console.log('🏷️ Returning original senderName:', senderName || 'Agent');
       return senderName || 'Agent';
     }
 
@@ -1352,6 +1377,8 @@
     }
 
     function addMessage(text, isUser, senderName, isBotMsg) {
+      console.log('📝 addMessage called:', { text: text ? text.substring(0, 50) + '...' : text, isUser: isUser, senderName: senderName, isBotMsg: isBotMsg });
+      
       var wrap = document.createElement('div');
       wrap.className = 'd365-msg-wrap ' + (isUser ? 'user' : 'agent');
 
@@ -1368,9 +1395,13 @@
       // Format bot/agent messages with markdown, user messages as plain text
       var formattedText = isUser ? text : formatBotMessage(text);
 
+      // Log what display name will be used
+      var displayName = getDisplayName(senderName, isUser);
+      console.log('📝 addMessage using displayName:', displayName);
+      
       var content = document.createElement('div');
       content.className = 'd365-msg-content';
-      content.innerHTML = '<div class="d365-msg-sender">'+getDisplayName(senderName, isUser)+'</div>'+
+      content.innerHTML = '<div class="d365-msg-sender">'+displayName+'</div>'+
         '<div class="d365-msg '+(isUser?'user':'agent')+'">'+formattedText+'</div>'+
         '<div class="d365-msg-time">'+formatTime(new Date())+'</div>';
 
@@ -1901,6 +1932,16 @@
         senderName = senderId;
       }
 
+      // Log raw message data for debugging
+      console.log('📨 Incoming message raw data:', {
+        role: role,
+        senderDisplayName: msg.senderDisplayName,
+        senderId: senderId,
+        extractedSenderName: senderName,
+        configCustomBotName: config.customBotName,
+        content: content ? content.substring(0, 100) + '...' : content
+      });
+
       // Skip user messages
       if (role === 'user' || role === 'User' || role === 1) return;
 
@@ -1913,6 +1954,7 @@
 
       // Detect bot by role OR by sender name
       var isBotMsg = isBotRole(role) || isBot(senderName);
+      console.log('🤖 Bot detection result:', { isBotMsg: isBotMsg, isBotRole: isBotRole(role), isBotName: isBot(senderName) });
 
       // Save to chat messages for session persistence
       chatMessages.push({

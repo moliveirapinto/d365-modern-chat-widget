@@ -10285,6 +10285,8 @@ window.D365WidgetConfig=${configJson};
             if (settings.agentAvatar) config.agentAvatar = toGitHubRawUrl(settings.agentAvatar);
             if (settings.customerAvatar) config.customerAvatar = toGitHubRawUrl(settings.customerAvatar);
             if (settings.botAvatar) config.botAvatar = toGitHubRawUrl(settings.botAvatar);
+            // Custom Bot Name - replaces bot/agent name in messages
+            if (settings.customBotName) config.customBotName = settings.customBotName;
             if (settings.enablePrechatForm === false) config.enablePrechatForm = false;
             if (settings.welcomeTitle && settings.welcomeTitle !== 'Welcome!') config.welcomeTitle = settings.welcomeTitle;
             if (settings.welcomeMessage && settings.welcomeMessage !== 'Please fill in your details to start chatting with us.') config.welcomeMessage = settings.welcomeMessage;
@@ -11344,12 +11346,25 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     
     // Get display name - uses customBotName for ALL non-user messages when configured
     function getDisplayName(senderName, isUser) {
-      if (isUser) return userName;
+      console.log('🏷️ getDisplayName called:', {
+        senderName: senderName,
+        isUser: isUser,
+        customBotName: config.customBotName,
+        customBotNameTrimmed: config.customBotName ? config.customBotName.trim() : null,
+        userName: userName
+      });
+      
+      if (isUser) {
+        console.log('🏷️ Returning userName:', userName);
+        return userName;
+      }
       // If customBotName is set, ALWAYS use it for all non-user messages (bot/agent)
       // This replaces whatever name comes from D365/Copilot Studio
       if (config.customBotName && config.customBotName.trim() !== '') {
+        console.log('🏷️ Using customBotName for non-user message:', config.customBotName);
         return config.customBotName;
       }
+      console.log('🏷️ Returning original senderName:', senderName || 'Agent');
       return senderName || 'Agent';
     }
     
