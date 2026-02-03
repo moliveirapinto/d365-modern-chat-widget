@@ -459,6 +459,15 @@
                     // Custom Bot Name - replaces bot/agent name in messages
                     if (config.customBotName) window.D365WidgetConfig.customBotName = config.customBotName;
                     
+                    // Apply background image URL to the live.html page if provided
+                    if (config.backgroundImageUrl) {
+                        document.body.style.backgroundImage = `url(${config.backgroundImageUrl})`;
+                        document.body.style.backgroundSize = 'cover';
+                        document.body.style.backgroundPosition = 'center';
+                        document.body.style.backgroundRepeat = 'no-repeat';
+                        console.log('🖼️ Applied background image to page:', config.backgroundImageUrl);
+                    }
+                    
                     console.log('📦 Widget config set:', window.D365WidgetConfig);
                     
                     // Log customBotName specifically for debugging
