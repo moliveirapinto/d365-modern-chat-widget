@@ -494,11 +494,11 @@ class ModernChatWidget {
             /* List styling for agent messages */
             .mcw-message.agent .mcw-msg-bubble ul,
             .mcw-message.agent .mcw-msg-bubble ol {
-                margin: 12px 0;
+                margin: 6px 0;
                 padding-left: 20px;
             }
             .mcw-message.agent .mcw-msg-bubble li {
-                margin: 6px 0;
+                margin: 3px 0;
                 line-height: 1.5;
                 padding: 0;
             }
@@ -506,7 +506,7 @@ class ModernChatWidget {
                 color: var(--mcw-primary);
             }
             .mcw-message.agent .mcw-msg-bubble p {
-                margin: 12px 0;
+                margin: 6px 0;
             }
             .mcw-message.agent .mcw-msg-bubble p:first-child {
                 margin-top: 0;
@@ -520,7 +520,7 @@ class ModernChatWidget {
             .mcw-message.agent .mcw-msg-bubble h4,
             .mcw-message.agent .mcw-msg-bubble h5,
             .mcw-message.agent .mcw-msg-bubble h6 {
-                margin: 16px 0 8px 0;
+                margin: 8px 0 4px 0;
                 line-height: 1.3;
             }
             .mcw-message.agent .mcw-msg-bubble h1:first-child,
@@ -532,7 +532,7 @@ class ModernChatWidget {
                 margin-top: 0;
             }
             .mcw-message.agent .mcw-msg-bubble blockquote {
-                margin: 12px 0;
+                margin: 6px 0;
                 padding-left: 12px;
                 border-left: 3px solid var(--mcw-primary);
                 color: var(--mcw-text-light);
@@ -1189,16 +1189,28 @@ class ModernChatWidget {
 
     resetChat() {
         this.state.isChatActive = false;
+        this.state.isChatEnded = false;
         this.state.messages = [];
+        this.state.processedMessageIds.clear();
         
         // Clear messages except typing indicator
         const messages = this.elements.messages.querySelectorAll('.mcw-message');
         messages.forEach(m => m.remove());
         
         this.elements.ended.classList.remove('active');
-        this.elements.prechat.classList.remove('mcw-hidden');
         this.elements.form.reset();
         this.updateStatus('Ready to help');
+        
+        // Respect the enablePrechatForm setting (check config or default to true)
+        const enablePrechat = this.config.enablePrechatForm !== false;
+        
+        if (enablePrechat) {
+            this.elements.prechat.classList.remove('mcw-hidden');
+        } else {
+            // Skip prechat and auto-start chat
+            this.elements.prechat.classList.add('mcw-hidden');
+            this.startChat();
+        }
     }
 
     onInputChange() {

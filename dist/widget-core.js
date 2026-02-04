@@ -277,18 +277,18 @@
       '.d365-msg.agent{background:'+c.agentBubbleColor+';color:'+c.agentTextColor+';border-bottom-left-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.08)}',
       '.d365-msg.user{background:'+(c.useBubbleGradient!==false?'linear-gradient(135deg,'+c.gradientStart+' 0%,'+c.gradientEnd+' 100%)':c.userBubbleColor)+';color:'+c.userTextColor+'!important;border-bottom-right-radius:4px;white-space:pre-wrap}',
       // Markdown styles for bot messages
-      '.d365-msg.agent h1,.d365-msg.agent h2,.d365-msg.agent h3,.d365-msg.agent h4{margin:16px 0 8px;font-weight:600;line-height:1.3}',
+      '.d365-msg.agent h1,.d365-msg.agent h2,.d365-msg.agent h3,.d365-msg.agent h4{margin:8px 0 4px;font-weight:600;line-height:1.3}',
       '.d365-msg.agent h1:first-child,.d365-msg.agent h2:first-child,.d365-msg.agent h3:first-child,.d365-msg.agent h4:first-child{margin-top:0}',
       '.d365-msg.agent h1{font-size:1.3em}',
       '.d365-msg.agent h2{font-size:1.2em}',
       '.d365-msg.agent h3{font-size:1.1em}',
       '.d365-msg.agent h4{font-size:1em}',
-      '.d365-msg.agent p{margin:12px 0}',
+      '.d365-msg.agent p{margin:6px 0}',
       '.d365-msg.agent p:first-child{margin-top:0}',
       '.d365-msg.agent p:last-child{margin-bottom:0}',
-      '.d365-msg.agent ul,.d365-msg.agent ol{margin:12px 0;padding-left:1.5em}',
-      '.d365-msg.agent li{margin:6px 0;line-height:1.5}',
-      '.d365-msg.agent blockquote{margin:12px 0;padding-left:12px;border-left:3px solid '+c.primaryColor+';color:#64748b}',
+      '.d365-msg.agent ul,.d365-msg.agent ol{margin:6px 0;padding-left:1.5em}',
+      '.d365-msg.agent li{margin:3px 0;line-height:1.5}',
+      '.d365-msg.agent blockquote{margin:6px 0;padding-left:12px;border-left:3px solid '+c.primaryColor+';color:#64748b}',
       '.d365-msg.agent code{background:rgba(0,0,0,0.06);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:0.9em}',
       '.d365-msg.agent pre{background:rgba(0,0,0,0.06);padding:12px;border-radius:8px;overflow-x:auto;margin:0.5em 0}',
       '.d365-msg.agent pre code{background:none;padding:0}',
@@ -2247,7 +2247,16 @@
       $('d365Email').value = '';
       $('d365Question').value = '';
       while (messages.firstChild !== typing) messages.removeChild(messages.firstChild);
-      showView('prechat');
+      
+      // Respect the enablePrechatForm setting
+      if (config.enablePrechatForm === false) {
+        // Skip prechat and auto-start chat
+        var authName = config.enableCustomAuth && config.customAuthName ? config.customAuthName : 'Anonymous';
+        var authEmail = config.enableCustomAuth && config.customAuthEmail ? config.customAuthEmail : 'anonymous@example.com';
+        initChat(authName, authEmail, '');
+      } else {
+        showView('prechat');
+      }
     };
 
     // Voice input with visual indicator
