@@ -494,11 +494,11 @@ class ModernChatWidget {
             /* List styling for agent messages */
             .mcw-message.agent .mcw-msg-bubble ul,
             .mcw-message.agent .mcw-msg-bubble ol {
-                margin: 6px 0;
+                margin: 4px 0;
                 padding-left: 20px;
             }
             .mcw-message.agent .mcw-msg-bubble li {
-                margin: 3px 0;
+                margin: 2px 0;
                 line-height: 1.5;
                 padding: 0;
             }
@@ -506,13 +506,21 @@ class ModernChatWidget {
                 color: var(--mcw-primary);
             }
             .mcw-message.agent .mcw-msg-bubble p {
-                margin: 6px 0;
+                margin: 4px 0;
             }
             .mcw-message.agent .mcw-msg-bubble p:first-child {
                 margin-top: 0;
             }
             .mcw-message.agent .mcw-msg-bubble p:last-child {
                 margin-bottom: 0;
+            }
+            .mcw-message.agent .mcw-msg-bubble p:empty {
+                display: none;
+            }
+            .mcw-message.agent .mcw-msg-bubble br {
+                display: block;
+                content: "";
+                margin: 2px 0;
             }
             .mcw-message.agent .mcw-msg-bubble h1,
             .mcw-message.agent .mcw-msg-bubble h2,
@@ -532,7 +540,7 @@ class ModernChatWidget {
                 margin-top: 0;
             }
             .mcw-message.agent .mcw-msg-bubble blockquote {
-                margin: 6px 0;
+                margin: 4px 0;
                 padding-left: 12px;
                 border-left: 3px solid var(--mcw-primary);
                 color: var(--mcw-text-light);

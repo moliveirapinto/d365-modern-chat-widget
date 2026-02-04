@@ -283,12 +283,14 @@
       '.d365-msg.agent h2{font-size:1.2em}',
       '.d365-msg.agent h3{font-size:1.1em}',
       '.d365-msg.agent h4{font-size:1em}',
-      '.d365-msg.agent p{margin:6px 0}',
+      '.d365-msg.agent p{margin:4px 0}',
       '.d365-msg.agent p:first-child{margin-top:0}',
       '.d365-msg.agent p:last-child{margin-bottom:0}',
-      '.d365-msg.agent ul,.d365-msg.agent ol{margin:6px 0;padding-left:1.5em}',
-      '.d365-msg.agent li{margin:3px 0;line-height:1.5}',
-      '.d365-msg.agent blockquote{margin:6px 0;padding-left:12px;border-left:3px solid '+c.primaryColor+';color:#64748b}',
+      '.d365-msg.agent p:empty{display:none}',
+      '.d365-msg.agent br{display:block;content:"";margin:2px 0}',
+      '.d365-msg.agent ul,.d365-msg.agent ol{margin:4px 0;padding-left:1.5em}',
+      '.d365-msg.agent li{margin:2px 0;line-height:1.5}',
+      '.d365-msg.agent blockquote{margin:4px 0;padding-left:12px;border-left:3px solid '+c.primaryColor+';color:#64748b}',
       '.d365-msg.agent code{background:rgba(0,0,0,0.06);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:0.9em}',
       '.d365-msg.agent pre{background:rgba(0,0,0,0.06);padding:12px;border-radius:8px;overflow-x:auto;margin:0.5em 0}',
       '.d365-msg.agent pre code{background:none;padding:0}',
@@ -1366,8 +1368,9 @@
       
       html = html
         .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color:#0078d4;">$1</a>')
-        .replace(/\n\n+/g, '</p><p>')
-        .replace(/\n/g, '<br>');
+        .replace(/\n\n\n+/g, '</p><p>')  // 3+ newlines = paragraph break
+        .replace(/\n\n/g, '<br><br>')     // 2 newlines = double line break  
+        .replace(/\n/g, '<br>');           // 1 newline = single line break
       
       // Wrap lists
       html = html.replace(/(<li>[\s\S]*?<\/li>)(\s*<li>)/g, '$1$2');
