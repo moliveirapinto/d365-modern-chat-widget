@@ -275,24 +275,37 @@
       '.d365-msg-wrap.user .d365-msg-sender{text-align:right}',
       '.d365-msg{padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.5;word-wrap:break-word}',
       '.d365-msg.agent{background:'+c.agentBubbleColor+';color:'+c.agentTextColor+';border-bottom-left-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.08)}',
-      '.d365-msg.user{background:'+(c.useBubbleGradient!==false?'linear-gradient(135deg,'+c.gradientStart+' 0%,'+c.gradientEnd+' 100%)':c.userBubbleColor)+';color:'+c.userTextColor+';border-bottom-right-radius:4px;white-space:pre-wrap}',
+      '.d365-msg.user{background:'+(c.useBubbleGradient!==false?'linear-gradient(135deg,'+c.gradientStart+' 0%,'+c.gradientEnd+' 100%)':c.userBubbleColor)+';color:'+c.userTextColor+'!important;border-bottom-right-radius:4px;white-space:pre-wrap}',
       // Markdown styles for bot messages
-      '.d365-msg.agent h1,.d365-msg.agent h2,.d365-msg.agent h3,.d365-msg.agent h4{margin:0.5em 0 0.3em;font-weight:600;line-height:1.3}',
+      '.d365-msg.agent h1,.d365-msg.agent h2,.d365-msg.agent h3,.d365-msg.agent h4{margin:16px 0 8px;font-weight:600;line-height:1.3}',
+      '.d365-msg.agent h1:first-child,.d365-msg.agent h2:first-child,.d365-msg.agent h3:first-child,.d365-msg.agent h4:first-child{margin-top:0}',
       '.d365-msg.agent h1{font-size:1.3em}',
       '.d365-msg.agent h2{font-size:1.2em}',
       '.d365-msg.agent h3{font-size:1.1em}',
       '.d365-msg.agent h4{font-size:1em}',
-      '.d365-msg.agent p{margin:0.5em 0}',
-      '.d365-msg.agent ul,.d365-msg.agent ol{margin:0.5em 0;padding-left:1.5em}',
-      '.d365-msg.agent li{margin:0.25em 0}',
+      '.d365-msg.agent p{margin:12px 0}',
+      '.d365-msg.agent p:first-child{margin-top:0}',
+      '.d365-msg.agent p:last-child{margin-bottom:0}',
+      '.d365-msg.agent ul,.d365-msg.agent ol{margin:12px 0;padding-left:1.5em}',
+      '.d365-msg.agent li{margin:6px 0;line-height:1.5}',
+      '.d365-msg.agent blockquote{margin:12px 0;padding-left:12px;border-left:3px solid '+c.primaryColor+';color:#64748b}',
       '.d365-msg.agent code{background:rgba(0,0,0,0.06);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:0.9em}',
       '.d365-msg.agent pre{background:rgba(0,0,0,0.06);padding:12px;border-radius:8px;overflow-x:auto;margin:0.5em 0}',
       '.d365-msg.agent pre code{background:none;padding:0}',
       '.d365-msg.agent strong{font-weight:600}',
       '.d365-msg.agent em{font-style:italic}',
       '.d365-msg.agent hr{border:none;border-top:1px solid rgba(0,0,0,0.1);margin:0.75em 0}',
-      '.d365-msg.agent a{color:#0078d4;text-decoration:none}',
+      '.d365-msg.agent a{color:'+c.primaryColor+';text-decoration:none;font-weight:500;transition:color .2s}',
       '.d365-msg.agent a:hover{text-decoration:underline}',
+      // Sources/References section styling
+      '.d365-sources{margin-top:16px;padding-top:12px;border-top:1px solid rgba(0,0,0,0.1);font-size:13px}',
+      '.d365-sources-title{font-weight:600;color:#1f2937;margin-bottom:8px;font-size:13px}',
+      '.d365-source-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;margin:6px 0;background:rgba(99,102,241,0.05);border-radius:8px;border-left:3px solid '+c.primaryColor+';transition:background .2s}',
+      '.d365-source-item:hover{background:rgba(99,102,241,0.1)}',
+      '.d365-source-number{color:'+c.primaryColor+';font-weight:600;font-size:12px;min-width:20px}',
+      '.d365-source-content{flex:1;min-width:0}',
+      '.d365-source-title{color:'+c.primaryColor+';font-weight:500;font-size:13px;line-height:1.4;word-break:break-word}',
+      '.d365-source-domain{color:#64748b;font-size:11px;margin-top:2px}',
       '.d365-msg-time{font-size:10px;color:#94a3b8;padding:0 4px}',
       '.d365-msg-wrap.user .d365-msg-time{text-align:right}',
       '.d365-adaptive-card{background:#fff!important;padding:0!important;overflow:hidden;border-radius:12px}',
@@ -1363,11 +1376,16 @@
       
       // Add sources section if references exist
       if (references.length > 0) {
-        var sourcesHtml = '<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,0,0,0.1);font-size:0.85em;">';
-        sourcesHtml += '<div style="color:#666;margin-bottom:4px;">Sources:</div>';
+        var sourcesHtml = '<div class="d365-sources">';
+        sourcesHtml += '<div class="d365-sources-title">Sources</div>';
         references.forEach(function(ref) {
           var domain = ref.url.replace(/https?:\/\/(www\.)?/, '').split('/')[0];
-          sourcesHtml += '<div style="margin:2px 0;"><a href="' + ref.url + '" target="_blank" style="color:#0078d4;text-decoration:none;">[' + ref.num + '] ' + ref.title + '</a> <span style="color:#999;font-size:0.9em;">(' + domain + ')</span></div>';
+          sourcesHtml += '<div class="d365-source-item">';
+          sourcesHtml += '<span class="d365-source-number">[' + ref.num + ']</span>';
+          sourcesHtml += '<div class="d365-source-content">';
+          sourcesHtml += '<a href="' + ref.url + '" target="_blank" class="d365-source-title">' + ref.title + '</a>';
+          sourcesHtml += '<div class="d365-source-domain">' + domain + '</div>';
+          sourcesHtml += '</div></div>';
         });
         sourcesHtml += '</div>';
         html += sourcesHtml;

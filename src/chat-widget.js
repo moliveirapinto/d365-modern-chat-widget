@@ -481,7 +481,7 @@ class ModernChatWidget {
 
             .mcw-message.customer .mcw-msg-bubble {
                 background: var(--mcw-gradient);
-                color: white;
+                color: #ffffff !important;
                 border-bottom-right-radius: 4px;
             }
 
@@ -494,25 +494,110 @@ class ModernChatWidget {
             /* List styling for agent messages */
             .mcw-message.agent .mcw-msg-bubble ul,
             .mcw-message.agent .mcw-msg-bubble ol {
-                margin: 4px 0;
+                margin: 12px 0;
                 padding-left: 20px;
             }
             .mcw-message.agent .mcw-msg-bubble li {
-                margin: 2px 0;
-                line-height: 1.4;
+                margin: 6px 0;
+                line-height: 1.5;
                 padding: 0;
             }
             .mcw-message.agent .mcw-msg-bubble li::marker {
                 color: var(--mcw-primary);
             }
             .mcw-message.agent .mcw-msg-bubble p {
-                margin: 4px 0;
+                margin: 12px 0;
             }
             .mcw-message.agent .mcw-msg-bubble p:first-child {
                 margin-top: 0;
             }
             .mcw-message.agent .mcw-msg-bubble p:last-child {
                 margin-bottom: 0;
+            }
+            .mcw-message.agent .mcw-msg-bubble h1,
+            .mcw-message.agent .mcw-msg-bubble h2,
+            .mcw-message.agent .mcw-msg-bubble h3,
+            .mcw-message.agent .mcw-msg-bubble h4,
+            .mcw-message.agent .mcw-msg-bubble h5,
+            .mcw-message.agent .mcw-msg-bubble h6 {
+                margin: 16px 0 8px 0;
+                line-height: 1.3;
+            }
+            .mcw-message.agent .mcw-msg-bubble h1:first-child,
+            .mcw-message.agent .mcw-msg-bubble h2:first-child,
+            .mcw-message.agent .mcw-msg-bubble h3:first-child,
+            .mcw-message.agent .mcw-msg-bubble h4:first-child,
+            .mcw-message.agent .mcw-msg-bubble h5:first-child,
+            .mcw-message.agent .mcw-msg-bubble h6:first-child {
+                margin-top: 0;
+            }
+            .mcw-message.agent .mcw-msg-bubble blockquote {
+                margin: 12px 0;
+                padding-left: 12px;
+                border-left: 3px solid var(--mcw-primary);
+                color: var(--mcw-text-light);
+            }
+
+            /* Link styling for agent messages */
+            .mcw-message.agent .mcw-msg-bubble a {
+                color: var(--mcw-primary);
+                text-decoration: none;
+                font-weight: 500;
+                transition: color 0.2s ease;
+            }
+            .mcw-message.agent .mcw-msg-bubble a:hover {
+                color: var(--mcw-primary-dark);
+                text-decoration: underline;
+            }
+
+            /* Sources/References section styling */
+            .mcw-message.agent .mcw-msg-bubble .mcw-sources {
+                margin-top: 16px;
+                padding-top: 12px;
+                border-top: 1px solid var(--mcw-border);
+                font-size: 13px;
+            }
+            .mcw-message.agent .mcw-msg-bubble .mcw-sources-title {
+                font-weight: 600;
+                color: var(--mcw-text);
+                margin-bottom: 8px;
+                font-size: 13px;
+            }
+            .mcw-message.agent .mcw-msg-bubble .mcw-source-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 8px;
+                padding: 8px 10px;
+                margin: 6px 0;
+                background: rgba(99, 102, 241, 0.05);
+                border-radius: 8px;
+                border-left: 3px solid var(--mcw-primary);
+                transition: background 0.2s ease;
+            }
+            .mcw-message.agent .mcw-msg-bubble .mcw-source-item:hover {
+                background: rgba(99, 102, 241, 0.1);
+            }
+            .mcw-message.agent .mcw-msg-bubble .mcw-source-number {
+                color: var(--mcw-primary);
+                font-weight: 600;
+                font-size: 12px;
+                min-width: 20px;
+            }
+            .mcw-message.agent .mcw-msg-bubble .mcw-source-content {
+                flex: 1;
+                min-width: 0;
+            }
+            .mcw-message.agent .mcw-msg-bubble .mcw-source-title {
+                color: var(--mcw-primary);
+                font-weight: 500;
+                font-size: 13px;
+                line-height: 1.4;
+                word-break: break-word;
+            }
+            .mcw-message.agent .mcw-msg-bubble .mcw-source-domain {
+                color: var(--mcw-text-light);
+                font-size: 11px;
+                margin-top: 2px;
             }
 
             .mcw-message.system .mcw-msg-bubble {
@@ -1022,7 +1107,7 @@ class ModernChatWidget {
                 </svg>
             </div>
             <div class="mcw-msg-content">
-                <div class="mcw-msg-bubble">${this.escapeHtml(text)}</div>
+                <div class="mcw-msg-bubble">${this.formatAgentMessage(text)}</div>
                 <span class="mcw-msg-time">${this.formatTime()}</span>
             </div>
         `;
@@ -1141,6 +1226,57 @@ class ModernChatWidget {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    // Format agent message with nice sources section
+    formatAgentMessage(text) {
+        if (!text) return '';
+        
+        // First escape the text
+        let formatted = this.escapeHtml(text);
+        
+        // Check if there's a Sources/References section
+        const sourcesMatch = formatted.match(/\n*(Sources?|References?):?\s*\n/i);
+        
+        if (sourcesMatch) {
+            const sourcesIndex = formatted.indexOf(sourcesMatch[0]);
+            const mainContent = formatted.substring(0, sourcesIndex);
+            const sourcesSection = formatted.substring(sourcesIndex + sourcesMatch[0].length);
+            
+            // Parse source items - look for patterns like [1] Title | Description (domain.com) or [1] Title (domain.com)
+            const sourceLines = sourcesSection.split('\n').filter(line => line.trim());
+            let sourcesHtml = '<div class="mcw-sources"><div class="mcw-sources-title">Sources</div>';
+            
+            sourceLines.forEach(line => {
+                // Match patterns like: [1] Title text (domain.com) or [1] Title | More text (domain.com)
+                const match = line.match(/^\[(\d+)\]\s*(.+?)(?:\s*\(([^)]+)\))?\s*$/);
+                if (match) {
+                    const number = match[1];
+                    const title = match[2].trim();
+                    const domain = match[3] ? match[3].trim() : '';
+                    
+                    sourcesHtml += `
+                        <div class="mcw-source-item">
+                            <span class="mcw-source-number">[${number}]</span>
+                            <div class="mcw-source-content">
+                                <div class="mcw-source-title">${title}</div>
+                                ${domain ? `<div class="mcw-source-domain">${domain}</div>` : ''}
+                            </div>
+                        </div>`;
+                } else if (line.trim()) {
+                    // Fallback for non-standard format
+                    sourcesHtml += `<div class="mcw-source-item"><div class="mcw-source-content"><div class="mcw-source-title">${line.trim()}</div></div></div>`;
+                }
+            });
+            
+            sourcesHtml += '</div>';
+            formatted = mainContent + sourcesHtml;
+        }
+        
+        // Convert newlines to <br> for the main content
+        formatted = formatted.replace(/\n/g, '<br>');
+        
+        return formatted;
     }
 
     // Check if the sender name indicates a bot/virtual assistant
