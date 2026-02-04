@@ -1368,14 +1368,14 @@
       
       html = html
         .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color:#0078d4;">$1</a>')
-        .replace(/\n\n\n+/g, '</p><p>')  // 3+ newlines = paragraph break
-        .replace(/\n\n/g, '<br><br>')     // 2 newlines = double line break  
-        .replace(/\n/g, '<br>');           // 1 newline = single line break
+        .replace(/\n\n\n+/g, '<br>')      // 3+ newlines = single break (collapse excessive spacing)
+        .replace(/\n\n/g, '<br>')          // 2 newlines = single break  
+        .replace(/\n/g, ' ');              // 1 newline = space (natural text flow)
       
-      // Wrap lists
+      // Wrap lists - no inline margins, let CSS handle it
       html = html.replace(/(<li>[\s\S]*?<\/li>)(\s*<li>)/g, '$1$2');
-      html = html.replace(/(<li>[\s\S]*?<\/li>)(?!\s*<li>)/g, '<ul style="margin:0.5em 0;padding-left:1.5em;">$1</ul>');
-      html = html.replace(/<\/ul>\s*<ul[^>]*>/g, '');
+      html = html.replace(/(<li>[\s\S]*?<\/li>)(?!\s*<li>)/g, '<ul>$1</ul>');
+      html = html.replace(/<\/ul>\s*<ul>/g, '');
       
       // Add sources section if references exist
       if (references.length > 0) {
