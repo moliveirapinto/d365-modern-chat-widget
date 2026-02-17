@@ -459,11 +459,16 @@
                     // Custom Bot Name - replaces bot/agent name in messages
                     if (config.customBotName) window.D365WidgetConfig.customBotName = config.customBotName;
                     
+                    // Contact Authentication settings
+                    if (config.enableCustomAuth !== undefined) window.D365WidgetConfig.enableCustomAuth = config.enableCustomAuth;
+                    if (config.customAuthName) window.D365WidgetConfig.customAuthName = config.customAuthName;
+                    if (config.customAuthEmail) window.D365WidgetConfig.customAuthEmail = config.customAuthEmail;
+                    
                     // Apply background image URL to the live.html page if provided
                     if (config.backgroundImageUrl) {
                         document.body.style.backgroundImage = `url(${config.backgroundImageUrl})`;
-                        document.body.style.backgroundSize = 'cover';
-                        document.body.style.backgroundPosition = 'center';
+                        document.body.style.backgroundSize = 'contain';
+                        document.body.style.backgroundPosition = 'center center';
                         document.body.style.backgroundRepeat = 'no-repeat';
                         
                         // Hide all demo content - show ONLY background + chat widget

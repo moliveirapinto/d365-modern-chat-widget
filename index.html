@@ -11920,7 +11920,13 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       while (messagesContainer.firstChild !== typingIndicator) {
         messagesContainer.removeChild(messagesContainer.firstChild);
       }
-      showView('prechat');
+      if (!config.enablePrechatForm) {
+        var defaultName = config.enableCustomAuth ? config.customAuthName : 'Anonymous';
+        var defaultEmail = config.enableCustomAuth ? config.customAuthEmail : 'anonymous@example.com';
+        initializeChat(defaultName, defaultEmail, '');
+      } else {
+        showView('prechat');
+      }
     });
     
     async function initializeChat(name, email, question) {

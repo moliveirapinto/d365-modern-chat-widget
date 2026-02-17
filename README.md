@@ -1172,6 +1172,16 @@ See **[CONTRIBUTING.md](CONTRIBUTING.md)** for:
 
 ## 📝 Changelog
 
+### v2.12.0 (February 17, 2026)
+
+#### 🔐 Authentication Fix & Background Image Improvement
+- **FIX:** Contact Authentication now works correctly — `enableCustomAuth`, `customAuthName`, and `customAuthEmail` settings are now properly passed to `widget-core.js` via `live.html`, so chats arrive with the customer record populated in Dynamics instead of as "visitor"
+- **FIX:** Email context field changed from `'Email'` to `'emailaddress1'` in `chat-widget.js` to match the D365 contact entity field, enabling proper contact record lookup
+- **FIX:** "New Chat" button in generated embed code now respects `enablePrechatForm` and `enableCustomAuth` settings instead of always showing the pre-chat form
+- **FIX:** "Your Background" image no longer appears stretched/cropped — changed from `background-size: cover` to `contain` so the full image is displayed without distortion
+
+---
+
 ### v2.11.0 (January 30, 2026)
 
 #### 🤖 Custom Bot Name SDK Fix

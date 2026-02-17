@@ -987,7 +987,7 @@ class ModernChatWidget {
                 await this.chatSDK.startChat({
                     customContext: {
                         'Name': { value: name, isDisplayable: true },
-                        'Email': { value: email, isDisplayable: true }
+                        'emailaddress1': { value: email, isDisplayable: true }
                     }
                 });
 
