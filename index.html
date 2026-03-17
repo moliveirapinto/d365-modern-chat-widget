@@ -1516,10 +1516,32 @@
 
         .new-profile-row {
             display: flex;
+            flex-direction: column;
             gap: 8px;
         }
-        .new-profile-row input {
+        .new-profile-row .new-profile-top {
+            display: flex;
+            gap: 8px;
+        }
+        .new-profile-row .new-profile-top input {
             flex: 1;
+        }
+        .new-profile-row textarea {
+            width: 100%;
+            min-height: 60px;
+            resize: vertical;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 11px;
+            border: 1px solid var(--admin-border);
+            border-radius: 6px;
+            padding: 8px;
+            background: var(--admin-surface);
+            color: var(--admin-text);
+        }
+        .new-profile-row textarea:focus {
+            outline: none;
+            border-color: var(--admin-primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
         }
 
         /* Spinner animation */
@@ -3323,11 +3345,14 @@
                             <!-- Profiles will be loaded dynamically -->
                         </div>
                         <div class="new-profile-row">
-                            <input type="text" class="form-input" id="newProfileName" placeholder="New profile name (e.g., Contoso Demo)">
-                            <button class="btn btn-primary btn-sm" onclick="saveAsProfile()">
-                                <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                                Save
-                            </button>
+                            <div class="new-profile-top">
+                                <input type="text" class="form-input" id="newProfileName" placeholder="New profile name (e.g., Contoso Demo)">
+                                <button class="btn btn-primary btn-sm" onclick="saveAsProfile()">
+                                    <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                    Save
+                                </button>
+                            </div>
+                            <textarea id="newProfileLcwCode" placeholder="Paste your D365 Omnichannel LCW embed code here (optional)..."></textarea>
                         </div>
                     </div>
 
@@ -4610,14 +4635,23 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v2.11.0';
-        const APP_LAST_UPDATED = 'Jan 30, 2026';
+        const APP_VERSION = 'v2.13.0';
+        const APP_LAST_UPDATED = 'Mar 17, 2026';
         
         const CHANGELOG = [
             {
+                version: 'v2.13.0',
+                date: 'Mar 17, 2026',
+                latest: true,
+                items: [
+                    { type: 'new', text: 'New profile form now includes LCW Embedded Code field - paste your D365 snippet directly when creating a profile' },
+                    { type: 'improve', text: 'LCW code is parsed and stored automatically when saving a new profile with embedded code' }
+                ]
+            },
+            {
                 version: 'v2.11.0',
                 date: 'Jan 30, 2026',
-                latest: true,
+                latest: false,
                 items: [
                     { type: 'fix', text: 'Custom Bot Name now works in SDK widget (chat-widget.js) - config option was missing' },
                     { type: 'new', text: 'Added isBotSender() helper to detect bot messages by sender name keywords' },
@@ -8150,13 +8184,22 @@
 
         function saveAsProfile() {
             const nameInput = document.getElementById('newProfileName');
+            const lcwInput = document.getElementById('newProfileLcwCode');
             const name = nameInput.value.trim();
+            const lcwCode = lcwInput.value.trim();
             if (!name) {
                 showToast('Please enter a profile name');
                 return;
             }
 
             updateSettingsFromForm();
+
+            // If LCW code was provided, parse it and store it in settings
+            if (lcwCode) {
+                settings.lcwCode = lcwCode;
+                parseLCWCode(lcwCode);
+            }
+
             console.log('💾 saveAsProfile called for:', name);
             console.log('💾 cloudToken exists:', !!cloudToken);
             console.log('💾 Saving new profile with backgroundImageUrl:', settings.backgroundImageUrl);
@@ -8177,6 +8220,7 @@
             saveProfiles();
             renderProfiles();
             nameInput.value = '';
+            lcwInput.value = '';
             
             // Auto-sync to cloud if logged in
             if (cloudToken) {
