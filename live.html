@@ -58,8 +58,9 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
             min-height: 100vh;
-            overflow: hidden;
+            overflow: auto;
             position: relative;
+            margin: 0;
         }
 
         /* Background pattern overlay */
@@ -464,21 +465,38 @@
                     if (config.customAuthName) window.D365WidgetConfig.customAuthName = config.customAuthName;
                     if (config.customAuthEmail) window.D365WidgetConfig.customAuthEmail = config.customAuthEmail;
                     
-                    // Apply background image URL to the live.html page if provided
+                    // Apply background image URL to the live.html page as a scrollable website simulation
                     if (config.backgroundImageUrl) {
-                        document.body.style.backgroundImage = `url(${config.backgroundImageUrl})`;
-                        document.body.style.backgroundSize = 'cover';
-                        document.body.style.backgroundPosition = 'center center';
-                        document.body.style.backgroundRepeat = 'no-repeat';
+                        // Create a full-width scrollable image instead of a fixed CSS background
+                        const bgImg = document.createElement('img');
+                        bgImg.src = config.backgroundImageUrl;
+                        bgImg.style.cssText = 'display:block; width:100%; height:auto; position:relative; z-index:0;';
+                        bgImg.alt = 'Website simulation background';
+                        bgImg.draggable = false;
                         
-                        // Hide all demo content - show ONLY background + chat widget
+                        // Remove default body background and allow scrolling
+                        document.body.style.background = 'none';
+                        document.body.style.backgroundColor = '#f0f0f0';
+                        document.body.style.margin = '0';
+                        document.body.style.padding = '0';
+                        document.body.style.overflow = 'auto';
+                        
+                        // Hide all demo content - show ONLY background image + chat widget
                         const demoContainer = document.querySelector('.demo-container');
                         if (demoContainer) {
                             demoContainer.style.display = 'none';
                         }
                         
-                        console.log('🖼️ Applied background image to page:', config.backgroundImageUrl);
-                        console.log('🙈 Demo content hidden - showing only background + chat widget');
+                        // Hide the gradient overlay pseudo-element
+                        const style = document.createElement('style');
+                        style.textContent = 'body::before { display: none !important; }';
+                        document.head.appendChild(style);
+                        
+                        // Insert the image as the first child of body
+                        document.body.insertBefore(bgImg, document.body.firstChild);
+                        
+                        console.log('🖼️ Applied scrollable background image to page:', config.backgroundImageUrl);
+                        console.log('🙈 Demo content hidden - showing only background image + chat widget');
                     }
                     
                     console.log('📦 Widget config set:', window.D365WidgetConfig);

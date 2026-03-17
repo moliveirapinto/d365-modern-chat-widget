@@ -4635,14 +4635,26 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v2.13.0';
+        const APP_VERSION = 'v2.14.0';
         const APP_LAST_UPDATED = 'Mar 17, 2026';
         
         const CHANGELOG = [
             {
-                version: 'v2.13.0',
+                version: 'v2.14.0',
                 date: 'Mar 17, 2026',
                 latest: true,
+                items: [
+                    { type: 'fix', text: 'Voice/video calling now works in Tampermonkey-injected widgets - added GM_addElement CSP bypass and unsafeWindow support' },
+                    { type: 'new', text: 'Tampermonkey scripts now include @connect directives for all D365 regional CDN domains enabling CallingBundle.js to load' },
+                    { type: 'fix', text: 'Session restore now properly re-initializes voice/video calling SDK (was missing preload step)' },
+                    { type: 'new', text: 'Automatic CDN URL resolution from orgUrl region - supports all 12 D365 regional endpoints' },
+                    { type: 'improve', text: 'Live preview page background image is now scrollable - renders as full-width image instead of fixed CSS background' }
+                ]
+            },
+            {
+                version: 'v2.13.0',
+                date: 'Mar 17, 2026',
+                latest: false,
                 items: [
                     { type: 'new', text: 'New profile form now includes LCW Embedded Code field - paste your D365 snippet directly when creating a profile' },
                     { type: 'improve', text: 'LCW code is parsed and stored automatically when saving a new profile with embedded code' }
@@ -12729,35 +12741,71 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
 // @name         ${scriptName} – D365 Chat Widget Injector
 // @namespace    https://moliveirapinto.github.io/d365-modern-chat-widget/
 // @version      1.0
-// @description  Injects the D365 Modern Chat Widget into target pages.
+// @description  Injects the D365 Modern Chat Widget with voice/video calling support.
 // @author       D365 Chat Widget Generator
 // @match        ${targetUrl}
 // @run-at       document-start
-// @grant        none
+// @grant        GM_addElement
+// @grant        unsafeWindow
+// @connect      moliveirapinto.github.io
+// @connect      oc-cdn-ocprod.azureedge.net
+// @connect      oc-cdn-public.azureedge.net
+// @connect      oc-cdn-public-eur.azureedge.net
+// @connect      oc-cdn-public-apj.azureedge.net
+// @connect      oc-cdn-public-gbr.azureedge.net
+// @connect      oc-cdn-public-ind.azureedge.net
+// @connect      oc-cdn-public-jpn.azureedge.net
+// @connect      oc-cdn-public-oce.azureedge.net
+// @connect      oc-cdn-public-sam.azureedge.net
+// @connect      oc-cdn-public-ger.azureedge.net
+// @connect      oc-cdn-public-che.azureedge.net
+// @connect      oc-cdn-ocfra-fra.azureedge.net
+// @connect      oc-cdn-ocuae-uae.azureedge.net
+// @connect      *.dynamics.com
+// @connect      *.communication.azure.com
+// @connect      *.skype.com
 // ==/UserScript==
 
 (function () {
   'use strict';
 
+  // Use unsafeWindow to set config on the actual page window (required when @grant is not 'none')
+  const pageWindow = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
+
   // --- Guard against duplicate injection ---
   const INJECTION_FLAG = '__d365_widget_injected__';
-  if (window[INJECTION_FLAG]) return;
-  window[INJECTION_FLAG] = true;
+  if (pageWindow[INJECTION_FLAG]) return;
+  pageWindow[INJECTION_FLAG] = true;
 
   // --- Widget Configuration ---
-  window.D365WidgetConfig = ${configObjectStr};
+  // Set on pageWindow so widget-core.js (running in page context) can read it
+  pageWindow.D365WidgetConfig = ${configObjectStr};
 
   // --- Loader injection ---
+  // Uses GM_addElement when available to bypass Content Security Policy (CSP).
+  // This ensures the widget, chat SDK, and voice/video CallingBundle.js all load
+  // even on pages with strict script-src directives.
   function injectLoader() {
     // If script is already present, skip
     if (document.querySelector('script[src*="moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js"]')) {
       return;
     }
 
-    const s = document.createElement('script');
-    // Add cache buster to ensure fresh widget code
     const cacheBuster = new Date().getTime();
-    s.src = 'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js?v=' + cacheBuster;
+    const scriptUrl = 'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js?v=' + cacheBuster;
+
+    // Prefer GM_addElement for CSP bypass (enables voice/video calling on strict pages)
+    if (typeof GM_addElement === 'function') {
+      try {
+        GM_addElement('script', { src: scriptUrl, type: 'text/javascript' });
+        return;
+      } catch (e) {
+        console.warn('GM_addElement failed, falling back to DOM injection:', e);
+      }
+    }
+
+    const s = document.createElement('script');
+    s.src = scriptUrl;
     s.async = true;
     s.crossOrigin = 'anonymous';
 

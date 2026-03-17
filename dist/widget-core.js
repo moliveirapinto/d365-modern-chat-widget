@@ -588,6 +588,37 @@
       if (loaded >= total) callback();
     }
 
+    // Helper: inject a script element, using GM_addElement for CSP bypass when available
+    function injectScript(src, onload, onerror) {
+      if (typeof GM_addElement === 'function') {
+        try {
+          var el = GM_addElement('script', { src: src, type: 'text/javascript' });
+          if (el) {
+            el.addEventListener('load', onload);
+            el.addEventListener('error', onerror);
+          } else {
+            // GM_addElement doesn't always return the element; use a polling fallback
+            // to detect when the script has loaded
+            var checkInterval = setInterval(function() {
+              if (typeof OmnichannelChatSDK !== 'undefined' || typeof AdaptiveCards !== 'undefined') {
+                clearInterval(checkInterval);
+                onload();
+              }
+            }, 100);
+            setTimeout(function() { clearInterval(checkInterval); onload(); }, 8000);
+          }
+          return;
+        } catch (e) {
+          console.warn('D365 Widget: GM_addElement failed, using DOM injection:', e);
+        }
+      }
+      var script = document.createElement('script');
+      script.src = src;
+      script.onload = onload;
+      script.onerror = onerror;
+      document.head.appendChild(script);
+    }
+
     // Load Adaptive Cards - use multiple sources with fallback
     var acSources = [
       'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/adaptivecards.min.js',
@@ -602,18 +633,14 @@
         checkDone();
         return;
       }
-      var script = document.createElement('script');
-      script.src = acSources[acIndex];
-      script.onload = function() {
+      injectScript(acSources[acIndex], function() {
         console.log('D365 Widget: AdaptiveCards loaded from', acSources[acIndex]);
         checkDone();
-      };
-      script.onerror = function() {
+      }, function() {
         console.warn('D365 Widget: AdaptiveCards failed from', acSources[acIndex]);
         acIndex++;
         loadAC();
-      };
-      document.head.appendChild(script);
+      });
     }
     loadAC();
 
@@ -630,17 +657,13 @@
         checkDone();
         return;
       }
-      var script = document.createElement('script');
-      script.src = sdkSources[sdkIndex];
-      script.onload = function() {
+      injectScript(sdkSources[sdkIndex], function() {
         console.log('D365 Widget: SDK loaded from', sdkSources[sdkIndex]);
         checkDone();
-      };
-      script.onerror = function() {
+      }, function() {
         sdkIndex++;
         loadSDK();
-      };
-      document.head.appendChild(script);
+      });
     }
     loadSDK();
   }
@@ -751,17 +774,63 @@
           console.log('⚠️ getVoiceVideoCalling not available on SDK');
           return;
         }
+        
+        // Check if calling is enabled before attempting load
+        if (sdk.isVoiceVideoCallingEnabled && !sdk.isVoiceVideoCallingEnabled()) {
+          console.log('ℹ️ Voice/Video calling is not enabled for this D365 widget');
+          return;
+        }
+        
+        // If widgetSnippetBaseUrl is empty, try to resolve it from the orgUrl.
+        // This commonly happens in headless/TamperMonkey scenarios where the SDK
+        // couldn't parse the CDN URL from the widget snippet.
+        if (sdk.widgetSnippetBaseUrl === '' || !sdk.widgetSnippetBaseUrl) {
+          console.log('📞 widgetSnippetBaseUrl is empty, attempting to resolve from orgUrl...');
+          var orgUrl = (config.orgUrl || '').toLowerCase();
+          var cdnBase = 'https://oc-cdn-ocprod.azureedge.net';
+          // Map known D365 regional domains to their regional CDN
+          if (orgUrl.indexOf('-crm9') !== -1) cdnBase = 'https://oc-cdn-public-gbr.azureedge.net';
+          else if (orgUrl.indexOf('.crm4.') !== -1) cdnBase = 'https://oc-cdn-public-eur.azureedge.net';
+          else if (orgUrl.indexOf('.crm5.') !== -1) cdnBase = 'https://oc-cdn-public-apj.azureedge.net';
+          else if (orgUrl.indexOf('.crm8.') !== -1) cdnBase = 'https://oc-cdn-public-ind.azureedge.net';
+          else if (orgUrl.indexOf('.crm7.') !== -1) cdnBase = 'https://oc-cdn-public-jpn.azureedge.net';
+          else if (orgUrl.indexOf('.crm6.') !== -1) cdnBase = 'https://oc-cdn-public-oce.azureedge.net';
+          else if (orgUrl.indexOf('.crm2.') !== -1) cdnBase = 'https://oc-cdn-public-sam.azureedge.net';
+          else if (orgUrl.indexOf('.crm12.') !== -1) cdnBase = 'https://oc-cdn-ocfra-fra.azureedge.net';
+          else if (orgUrl.indexOf('.crm15.') !== -1) cdnBase = 'https://oc-cdn-ocuae-uae.azureedge.net';
+          else if (orgUrl.indexOf('.crm16.') !== -1) cdnBase = 'https://oc-cdn-public-ger.azureedge.net';
+          else if (orgUrl.indexOf('.crm14.') !== -1) cdnBase = 'https://oc-cdn-public-che.azureedge.net';
+          sdk.widgetSnippetBaseUrl = cdnBase;
+          console.log('📞 Set widgetSnippetBaseUrl to:', cdnBase);
+        }
+        
         VoiceVideoCallingSDK = await sdk.getVoiceVideoCalling();
         console.log('📞 VoiceVideoCallingSDK pre-loaded:', VoiceVideoCallingSDK ? 'Yes' : 'No');
+        
+        if (!VoiceVideoCallingSDK) {
+          console.warn('⚠️ VoiceVideoCallingSDK returned undefined - CallingBundle.js may have failed to load.');
+          console.warn('⚠️ If using TamperMonkey, the target page CSP may block the calling SDK.');
+          console.warn('⚠️ Check browser console for blocked script errors.');
+        }
       } catch (err) {
-        console.log('⚠️ VoiceVideoCalling pre-load error:', err.message);
+        var errMsg = err && err.message ? err.message : String(err);
+        if (errMsg.indexOf('not enabled') !== -1) {
+          console.log('ℹ️ Voice/Video calling is not enabled in D365 admin settings');
+        } else if (errMsg.indexOf('LoadFailed') !== -1) {
+          console.error('❌ CallingBundle.js failed to load. This may be caused by:');
+          console.error('   - Content Security Policy (CSP) blocking the script');
+          console.error('   - Network issues reaching the D365 CDN');
+          console.error('   - If using TamperMonkey, try adding @grant GM_addElement to your script');
+        } else {
+          console.log('⚠️ VoiceVideoCalling pre-load error:', errMsg);
+        }
       }
     }
     
     async function initializeVoiceVideoCallingSDK(sdk) {
       console.log('📞 Initializing VoiceVideoCallingSDK...');
       if (!VoiceVideoCallingSDK) {
-        console.log('⚠️ VoiceVideoCallingSDK was not pre-loaded');
+        console.log('ℹ️ VoiceVideoCallingSDK not available - voice/video calls will not be supported in this session');
         return;
       }
       
@@ -1212,7 +1281,11 @@
         await chatSDK.startChat({ liveChatContext: session.liveChatContext });
         console.log('✅ Reconnected to existing chat session!');
         
+        // Pre-load and initialize voice/video calling SDK for restored session
+        await preloadVoiceVideoCallingSDK(chatSDK);
         await initializeVoiceVideoCallingSDK(chatSDK);
+        startVoiceVideoKeepalive(chatSDK);
+        setupVisibilityHandler(chatSDK);
         
         chatStarted = true;
         showView('chat');
