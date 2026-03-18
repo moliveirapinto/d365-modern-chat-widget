@@ -10995,6 +10995,14 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px;
       background: \${config.useGradient ? 'linear-gradient(135deg, ' + config.gradientStart + ' 0%, ' + config.gradientEnd + ' 100%)' : config.primaryColor};
     }
+    .d365-survey { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+    .d365-survey.active { display: flex; }
+    .d365-survey-header { padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e2e8f0; }
+    .d365-survey-header span { font-size: 14px; font-weight: 600; color: #2d3748; }
+    .d365-survey-skip { background: none; border: none; color: \${config.primaryColor}; font-size: 13px; font-weight: 500; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: background 0.2s; }
+    .d365-survey-skip:hover { background: \${config.primaryColor}1a; }
+    .d365-survey iframe { flex: 1; width: 100%; border: none; }
+    .d365-survey-loading { flex: 1; display: flex; align-items: center; justify-content: center; color: #64748b; font-size: 14px; }
   \`;
   document.head.appendChild(style);
   
@@ -11122,6 +11130,14 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
               </button>
             </div>
           </div>
+        </div>
+        <div class="d365-survey" id="d365Survey">
+          <div class="d365-survey-header">
+            <span>Post-Chat Survey</span>
+            <button class="d365-survey-skip" id="d365SurveySkip">Skip</button>
+          </div>
+          <div class="d365-survey-loading" id="d365SurveyLoading">Loading survey...</div>
+          <iframe id="d365SurveyFrame" style="display:none" title="Post-chat survey"></iframe>
         </div>
         <div class="d365-chat-ended" id="d365ChatEnded">
           <div style="font-size: 48px;">👋</div>
@@ -11379,12 +11395,17 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     var downloadChatBtn = document.getElementById('d365DownloadChat');
     var unreadCount = 0;
     
+    var surveyEl = document.getElementById('d365Survey');
+    var surveyFrame = document.getElementById('d365SurveyFrame');
+    var surveyLoading = document.getElementById('d365SurveyLoading');
+
     function showView(view) {
       prechatForm.classList.add('hidden');
       connectingView.classList.remove('active');
       messagesContainer.classList.remove('active');
       inputArea.classList.remove('active');
       chatEnded.classList.remove('active');
+      surveyEl.classList.remove('active');
       downloadChatBtn.style.display = 'none';
       if (view === 'prechat') prechatForm.classList.remove('hidden');
       else if (view === 'connecting') connectingView.classList.add('active');
@@ -11398,7 +11419,38 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
         chatStarted = false; 
         downloadChatBtn.style.display = 'flex';
       }
+      else if (view === 'survey') { 
+        surveyEl.classList.add('active'); 
+        chatStarted = false; 
+      }
     }
+
+    // Post-chat survey handler
+    async function handlePostChatSurvey() {
+      try {
+        if (!chatSDK) { showView('ended'); return; }
+        var surveyContext = await chatSDK.getPostChatSurveyContext();
+        console.log('📋 Post-chat survey context:', surveyContext);
+        if (surveyContext && surveyContext.surveyInviteLink) {
+          showView('survey');
+          surveyFrame.onload = function() {
+            surveyLoading.style.display = 'none';
+            surveyFrame.style.display = 'block';
+          };
+          surveyFrame.src = surveyContext.surveyInviteLink;
+        } else {
+          showView('ended');
+        }
+      } catch (e) {
+        console.log('📋 Post-chat survey not available:', e.message || e);
+        showView('ended');
+      }
+    }
+
+    document.getElementById('d365SurveySkip').addEventListener('click', function() {
+      surveyFrame.src = '';
+      showView('ended');
+    });
     
     function getInitials(name) {
       if (!name) return '?';
@@ -11635,7 +11687,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       if (chatSDK) {
         try { await chatSDK.endChat(); } catch (e) { console.log('End chat error:', e); }
       }
-      showView('ended');
+      handlePostChatSurvey();
     });
     
     // Start chat button
@@ -11987,6 +12039,8 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     // New chat button
     newChatBtn.addEventListener('click', function() {
       chatStarted = false; chatSDK = null; chatMessages = [];
+      // Reset survey state
+      surveyFrame.src = ''; surveyFrame.style.display = 'none'; surveyLoading.style.display = '';
       startBtn.disabled = false; startBtn.textContent = config.startBtnText;
       document.getElementById('d365UserName').value = '';
       document.getElementById('d365UserEmail').value = '';
@@ -12090,15 +12144,28 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
         
         chatSDK.onAgentEndSession(function() {
           console.log('Agent ended session');
-          showView('ended');
+          handlePostChatSurvey();
         });
+        
+        // Build custom context with name, email, and any configured context variables
+        var customCtx = {
+          'emailaddress1': { value: email, isDisplayable: true },
+          'Name': { value: name, isDisplayable: true }
+        };
+        if (config.contextVariables && typeof config.contextVariables === 'object') {
+          Object.keys(config.contextVariables).forEach(function(key) {
+            var val = config.contextVariables[key];
+            if (typeof val === 'object' && val !== null && val.value !== undefined) {
+              customCtx[key] = val;
+            } else {
+              customCtx[key] = { value: String(val), isDisplayable: true };
+            }
+          });
+        }
         
         console.log('Starting chat with context...');
         await chatSDK.startChat({
-          customContext: {
-            'emailaddress1': { value: email, isDisplayable: true },
-            'Name': { value: name, isDisplayable: true }
-          }
+          customContext: customCtx
         });
         
         console.log('Chat started successfully!');
