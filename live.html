@@ -465,6 +465,11 @@
                     if (config.customAuthName) window.D365WidgetConfig.customAuthName = config.customAuthName;
                     if (config.customAuthEmail) window.D365WidgetConfig.customAuthEmail = config.customAuthEmail;
                     
+                    // Context Variables - pass custom context variables to D365
+                    if (config.contextVariables && typeof config.contextVariables === 'object') {
+                        window.D365WidgetConfig.contextVariables = config.contextVariables;
+                    }
+                    
                     // Apply background image URL to the live.html page as a scrollable website simulation
                     if (config.backgroundImageUrl) {
                         // Create a full-width scrollable image instead of a fixed CSS background

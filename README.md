@@ -4,7 +4,7 @@
 
 [![D365 Compatible](https://img.shields.io/badge/D365-Omnichannel-0078D4?style=flat-square&logo=microsoft)](https://dynamics.microsoft.com)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.14.0-blue?style=flat-square)](package.json)
+[![Version](https://img.shields.io/badge/version-v2.15.0-blue?style=flat-square)](package.json)
 
 ![Chat Widget Preview](preview.png)
 
@@ -1171,6 +1171,17 @@ See **[CONTRIBUTING.md](CONTRIBUTING.md)** for:
 ---
 
 ## 📝 Changelog
+
+### v2.15.0 (March 18, 2026)
+
+#### 🔄 Context Variables & Post-Chat Survey Support
+- **NEW:** Context Variables — pass custom context variables from bot/config to D365 Omnichannel via `customContext` in `startChat()`. Supports both simple values and structured `{value, isDisplayable}` format
+- **NEW:** Post-Chat Survey — automatically renders D365 Customer Voice survey (iframe) after chat ends, if configured in Omnichannel admin center
+- **NEW:** Post-chat survey includes a Skip button to dismiss and go straight to the ended view
+- **IMPROVED:** Survey state properly resets when starting a new chat session
+- **IMPROVED:** Feature parity maintained across `widget-core.js`, `chat-widget.js`, `live.html`, and all embed modes
+
+---
 
 ### v2.12.0 (February 17, 2026)
 

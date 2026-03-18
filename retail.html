@@ -1685,6 +1685,11 @@
                     if (config.textEndChatButton) window.D365WidgetConfig.textEndChatButton = config.textEndChatButton;
                     if (config.textInputPlaceholder) window.D365WidgetConfig.textInputPlaceholder = config.textInputPlaceholder;
                     
+                    // Context Variables - pass custom context variables to D365
+                    if (config.contextVariables && typeof config.contextVariables === 'object') {
+                        window.D365WidgetConfig.contextVariables = config.contextVariables;
+                    }
+                    
                     console.log('📦 Widget config set:', window.D365WidgetConfig);
                     
                     // Log all color settings for debugging

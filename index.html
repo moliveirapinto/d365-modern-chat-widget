@@ -4635,14 +4635,26 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v2.14.0';
-        const APP_LAST_UPDATED = 'Mar 17, 2026';
+        const APP_VERSION = 'v2.15.0';
+        const APP_LAST_UPDATED = 'Mar 18, 2026';
         
         const CHANGELOG = [
             {
+                version: 'v2.15.0',
+                date: 'Mar 18, 2026',
+                latest: true,
+                items: [
+                    { type: 'new', text: 'Context Variables - pass custom context variables from bot/config to D365 Omnichannel via customContext in startChat()' },
+                    { type: 'new', text: 'Post-Chat Survey - automatically renders D365 Customer Voice survey after chat ends (if configured in Omnichannel admin)' },
+                    { type: 'new', text: 'Post-chat survey iframe with Skip button - works across widget-core.js, chat-widget.js, and all embed modes' },
+                    { type: 'improve', text: 'Context variables support both simple values and structured {value, isDisplayable} format' },
+                    { type: 'improve', text: 'Survey state properly resets when starting a new chat session' }
+                ]
+            },
+            {
                 version: 'v2.14.0',
                 date: 'Mar 17, 2026',
-                latest: true,
+                latest: false,
                 items: [
                     { type: 'fix', text: 'Voice/video calling now works in Tampermonkey-injected widgets - added GM_addElement CSP bypass and unsafeWindow support' },
                     { type: 'new', text: 'Tampermonkey scripts now include @connect directives for all D365 regional CDN domains enabling CallingBundle.js to load' },
@@ -10370,6 +10382,11 @@ window.D365WidgetConfig=${configJson};
             if (settings.textEndChatButton && settings.textEndChatButton !== 'End Chat') config.textEndChatButton = settings.textEndChatButton;
             if (settings.textInputPlaceholder && settings.textInputPlaceholder !== 'Type your message...') config.textInputPlaceholder = settings.textInputPlaceholder;
             
+            // Context Variables - pass custom context variables to D365
+            if (settings.contextVariables && typeof settings.contextVariables === 'object' && Object.keys(settings.contextVariables).length > 0) {
+                config.contextVariables = settings.contextVariables;
+            }
+            
             return config;
         }
         
@@ -10444,7 +10461,8 @@ window.D365WidgetConfig=${configJson};
                 textEndChatMessage: settings.textEndChatMessage || 'Are you sure you want to end this conversation?',
                 textCancelButton: settings.textCancelButton || 'Cancel',
                 textEndChatButton: settings.textEndChatButton || 'End Chat',
-                textInputPlaceholder: settings.textInputPlaceholder || 'Type your message...'
+                textInputPlaceholder: settings.textInputPlaceholder || 'Type your message...',
+                contextVariables: settings.contextVariables || {}
             };
             
             // Generate JSON and escape closing script tags to prevent breaking HTML parsing

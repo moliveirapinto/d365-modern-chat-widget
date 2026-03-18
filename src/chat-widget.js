@@ -11,7 +11,8 @@ class ModernChatWidget {
             orgId: config.orgId || '',
             orgUrl: config.orgUrl || '',
             widgetId: config.widgetId || '',
-            customBotName: config.customBotName || ''
+            customBotName: config.customBotName || '',
+            contextVariables: config.contextVariables || {}
         };
 
         this.chatSDK = null;
@@ -762,6 +763,44 @@ class ModernChatWidget {
 
             .mcw-hidden { display: none !important; }
 
+            /* Post-chat Survey */
+            .mcw-survey {
+                flex: 1;
+                display: none;
+                flex-direction: column;
+                overflow: hidden;
+            }
+            .mcw-survey.active { display: flex; }
+            .mcw-survey-header {
+                padding: 12px 16px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                border-bottom: 1px solid var(--mcw-border);
+            }
+            .mcw-survey-header span { font-size: 14px; font-weight: 600; color: var(--mcw-text); }
+            .mcw-survey-skip {
+                background: none;
+                border: none;
+                color: var(--mcw-primary);
+                font-size: 13px;
+                font-weight: 500;
+                cursor: pointer;
+                padding: 4px 8px;
+                border-radius: 6px;
+                transition: background 0.2s;
+            }
+            .mcw-survey-skip:hover { background: rgba(99, 102, 241, 0.1); }
+            .mcw-survey iframe { flex: 1; width: 100%; border: none; }
+            .mcw-survey-loading {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: var(--mcw-text-light);
+                font-size: 14px;
+            }
+
             @media (max-width: 480px) {
                 .mcw-window {
                     width: 100%;
@@ -901,6 +940,15 @@ class ModernChatWidget {
                     </div>
                 </div>
 
+                <div class="mcw-survey" id="mcw-survey">
+                    <div class="mcw-survey-header">
+                        <span>Post-Chat Survey</span>
+                        <button class="mcw-survey-skip" id="mcw-survey-skip">Skip</button>
+                    </div>
+                    <div class="mcw-survey-loading" id="mcw-survey-loading">Loading survey...</div>
+                    <iframe id="mcw-survey-frame" style="display:none" title="Post-chat survey"></iframe>
+                </div>
+
                 <div class="mcw-ended" id="mcw-ended">
                     <div class="mcw-ended-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -937,7 +985,11 @@ class ModernChatWidget {
             messageInput: document.getElementById('mcw-message-input'),
             send: document.getElementById('mcw-send'),
             ended: document.getElementById('mcw-ended'),
-            newChat: document.getElementById('mcw-new-chat')
+            newChat: document.getElementById('mcw-new-chat'),
+            survey: document.getElementById('mcw-survey'),
+            surveyFrame: document.getElementById('mcw-survey-frame'),
+            surveyLoading: document.getElementById('mcw-survey-loading'),
+            surveySkip: document.getElementById('mcw-survey-skip')
         };
     }
 
@@ -955,6 +1007,7 @@ class ModernChatWidget {
         });
         this.elements.send.addEventListener('click', () => this.sendMessage());
         this.elements.newChat.addEventListener('click', () => this.resetChat());
+        this.elements.surveySkip.addEventListener('click', () => this.skipSurvey());
     }
 
     toggleChat() {
@@ -984,16 +1037,27 @@ class ModernChatWidget {
 
         try {
             if (this.chatSDK) {
-                await this.chatSDK.startChat({
-                    customContext: {
-                        'Name': { value: name, isDisplayable: true },
-                        'emailaddress1': { value: email, isDisplayable: true }
-                    }
-                });
+                // Build custom context with name, email, and any configured context variables
+                const customContext = {
+                    'Name': { value: name, isDisplayable: true },
+                    'emailaddress1': { value: email, isDisplayable: true }
+                };
+                if (this.config.contextVariables && typeof this.config.contextVariables === 'object') {
+                    Object.keys(this.config.contextVariables).forEach(key => {
+                        const val = this.config.contextVariables[key];
+                        if (typeof val === 'object' && val !== null && val.value !== undefined) {
+                            customContext[key] = val;
+                        } else {
+                            customContext[key] = { value: String(val), isDisplayable: true };
+                        }
+                    });
+                }
+
+                await this.chatSDK.startChat({ customContext });
 
                 this.chatSDK.onNewMessage((msg) => this.handleIncomingMessage(msg));
                 this.chatSDK.onTypingEvent((e) => e.isTyping ? this.showTyping() : this.hideTyping());
-                this.chatSDK.onAgentEndSession(() => this.showEnded());
+                this.chatSDK.onAgentEndSession(() => this.handleChatEnded());
             }
 
             this.showChatView();
@@ -1178,8 +1242,47 @@ class ModernChatWidget {
         this.state.isChatActive = false;
         this.elements.messages.classList.remove('active');
         this.elements.inputArea.classList.remove('active');
+        this.elements.survey.classList.remove('active');
         this.elements.ended.classList.add('active');
         this.updateStatus('Chat ended');
+    }
+
+    async handleChatEnded() {
+        try {
+            if (this.chatSDK) {
+                const surveyContext = await this.chatSDK.getPostChatSurveyContext();
+                console.log('📋 Post-chat survey context:', surveyContext);
+                if (surveyContext && surveyContext.surveyInviteLink) {
+                    this.showSurvey(surveyContext.surveyInviteLink);
+                    return;
+                }
+            }
+        } catch (e) {
+            console.log('📋 Post-chat survey not available:', e.message || e);
+        }
+        this.showEnded();
+    }
+
+    showSurvey(surveyUrl) {
+        this.state.isChatActive = false;
+        this.elements.messages.classList.remove('active');
+        this.elements.inputArea.classList.remove('active');
+        this.elements.ended.classList.remove('active');
+        this.elements.survey.classList.add('active');
+        this.elements.surveyFrame.onload = () => {
+            this.elements.surveyLoading.style.display = 'none';
+            this.elements.surveyFrame.style.display = 'block';
+        };
+        this.elements.surveyFrame.src = surveyUrl;
+        this.updateStatus('Chat ended');
+    }
+
+    skipSurvey() {
+        this.elements.surveyFrame.src = '';
+        this.elements.surveyFrame.style.display = 'none';
+        this.elements.surveyLoading.style.display = '';
+        this.elements.survey.classList.remove('active');
+        this.showEnded();
     }
 
     async endChat() {
@@ -1188,7 +1291,7 @@ class ModernChatWidget {
                 if (this.chatSDK) {
                     try { await this.chatSDK.endChat(); } catch (e) {}
                 }
-                this.showEnded();
+                this.handleChatEnded();
             }
         } else {
             this.toggleChat();
@@ -1206,6 +1309,10 @@ class ModernChatWidget {
         messages.forEach(m => m.remove());
         
         this.elements.ended.classList.remove('active');
+        this.elements.survey.classList.remove('active');
+        this.elements.surveyFrame.src = '';
+        this.elements.surveyFrame.style.display = 'none';
+        this.elements.surveyLoading.style.display = '';
         this.elements.form.reset();
         this.updateStatus('Ready to help');
         

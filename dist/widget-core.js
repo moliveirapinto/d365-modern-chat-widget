@@ -1,7 +1,7 @@
 /**
  * D365 Modern Chat Widget - Core
  * This is the main widget code that gets loaded via the loader
- * Version: 2.10.0
+ * Version: 2.15.0
  * 
  * ╔═══════════════════════════════════════════════════════════════════════════╗
  * ║  ⚠️  FEATURE PARITY REQUIRED - READ CONTRIBUTING.md                       ║
@@ -23,7 +23,7 @@
   }
   
   window.D365ModernChatWidget = {
-    version: '2.9.0',
+    version: '2.15.0',
     initialized: false
   };
 
@@ -139,7 +139,8 @@
     textEndChatMessage: 'Are you sure you want to end this conversation?',
     textCancelButton: 'Cancel',
     textEndChatButton: 'End Chat',
-    textInputPlaceholder: 'Type your message...'
+    textInputPlaceholder: 'Type your message...',
+    contextVariables: {}
   };
 
   function init() {
@@ -392,6 +393,15 @@
       '.d365-ended{display:none;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:16px;padding:24px;text-align:center}',
       '.d365-ended.active{display:flex}',
       '.d365-new-btn{color:#fff;border:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;background:'+gradient+'}',
+      '.d365-survey{display:none;flex-direction:column;flex:1;overflow:hidden}',
+      '.d365-survey.active{display:flex}',
+      '.d365-survey-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0}',
+      '.d365-survey-header span{font-size:14px;font-weight:600;color:#2d3748}',
+      '.d365-survey-skip{background:none;border:none;color:'+c.primaryColor+';font-size:13px;font-weight:500;cursor:pointer;padding:4px 8px;border-radius:6px;transition:background .2s}',
+      '.d365-survey-skip:hover{background:'+c.primaryColor+'1a}',
+      '.d365-survey iframe{flex:1;width:100%;border:none}',
+      '.d365-survey-loading{flex:1;display:flex;align-items:center;justify-content:center;color:#64748b;font-size:14px}',
+      '.d365-survey-error{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center;color:#64748b;font-size:14px}',
       '.d365-confirm{position:absolute;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:200}',
       '.d365-confirm.show{display:flex}',
       '.d365-confirm-box{background:#fff;padding:24px;border-radius:16px;text-align:center;max-width:280px;margin:20px}',
@@ -552,6 +562,14 @@
                 '<button type="button" class="d365-send-btn" id="d365SendBtn" title="Send"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>',
               '</div>',
             '</div>',
+          '</div>',
+          '<div class="d365-survey" id="d365Survey">',
+            '<div class="d365-survey-header">',
+              '<span>Post-Chat Survey</span>',
+              '<button class="d365-survey-skip" id="d365SurveySkip">Skip</button>',
+            '</div>',
+            '<div class="d365-survey-loading" id="d365SurveyLoading">Loading survey...</div>',
+            '<iframe id="d365SurveyFrame" style="display:none" title="Post-chat survey"></iframe>',
           '</div>',
           '<div class="d365-ended" id="d365Ended">',
             '<div style="font-size:48px">👋</div>',
@@ -714,6 +732,9 @@
     var typing = $('d365Typing');
     var input = $('d365Input');
     var ended = $('d365Ended');
+    var survey = $('d365Survey');
+    var surveyFrame = $('d365SurveyFrame');
+    var surveyLoading = $('d365SurveyLoading');
     var confirm = $('d365Confirm');
     var soundBtn = $('d365Sound');
     
@@ -1050,10 +1071,35 @@
       messages.classList.remove('active');
       inputArea.classList.remove('active');
       ended.classList.remove('active');
+      survey.classList.remove('active');
       if (v === 'prechat') prechat.classList.remove('hidden');
       else if (v === 'connecting') connecting.classList.add('active');
       else if (v === 'chat') { messages.classList.add('active'); inputArea.classList.add('active'); }
       else if (v === 'ended') { ended.classList.add('active'); chatStarted = false; }
+      else if (v === 'survey') { survey.classList.add('active'); chatStarted = false; }
+    }
+
+    // Post-chat survey handler
+    async function handlePostChatSurvey() {
+      try {
+        if (!chatSDK) { showView('ended'); return; }
+        var surveyContext = await chatSDK.getPostChatSurveyContext();
+        console.log('📋 Post-chat survey context:', surveyContext);
+        if (surveyContext && surveyContext.surveyInviteLink) {
+          showView('survey');
+          surveyFrame.onload = function() {
+            surveyLoading.style.display = 'none';
+            surveyFrame.style.display = 'block';
+          };
+          surveyFrame.src = surveyContext.surveyInviteLink;
+        } else {
+          console.log('📋 No post-chat survey configured');
+          showView('ended');
+        }
+      } catch (e) {
+        console.log('📋 Post-chat survey not available:', e.message || e);
+        showView('ended');
+      }
     }
 
     function getInitials(name) {
@@ -1275,7 +1321,7 @@
           if (isInCall) endCall();
           stopVoiceVideoKeepalive();
           localStorage.removeItem('d365ChatSession');
-          showView('ended');
+          handlePostChatSurvey();
         });
         
         await chatSDK.startChat({ liveChatContext: session.liveChatContext });
@@ -2147,14 +2193,27 @@
           if (isInCall) endCall();
           stopVoiceVideoKeepalive();
           localStorage.removeItem('d365ChatSession');
-          showView('ended'); 
+          handlePostChatSurvey(); 
         });
 
+        // Build custom context with name, email, and any configured context variables
+        var customCtx = {
+          'emailaddress1': { value: email, isDisplayable: true },
+          'Name': { value: name, isDisplayable: true }
+        };
+        if (config.contextVariables && typeof config.contextVariables === 'object') {
+          Object.keys(config.contextVariables).forEach(function(key) {
+            var val = config.contextVariables[key];
+            if (typeof val === 'object' && val !== null && val.value !== undefined) {
+              customCtx[key] = val;
+            } else {
+              customCtx[key] = { value: String(val), isDisplayable: true };
+            }
+          });
+        }
+
         await chatSDK.startChat({
-          customContext: {
-            'emailaddress1': { value: email, isDisplayable: true },
-            'Name': { value: name, isDisplayable: true }
-          }
+          customContext: customCtx
         });
 
         // Track chat started
@@ -2231,6 +2290,11 @@
     $('d365ConfirmYes').onclick = async function() {
       confirm.classList.remove('show');
       if (chatSDK) try { await chatSDK.endChat(); } catch(e) {}
+      handlePostChatSurvey();
+    };
+
+    $('d365SurveySkip').onclick = function() {
+      surveyFrame.src = '';
       showView('ended');
     };
 
@@ -2317,6 +2381,10 @@
       liveChatContext = null;
       stopVoiceVideoKeepalive();
       localStorage.removeItem('d365ChatSession');
+      // Reset survey state
+      surveyFrame.src = '';
+      surveyFrame.style.display = 'none';
+      surveyLoading.style.display = '';
       $('d365StartBtn').disabled = false;
       $('d365StartBtn').textContent = config.startBtnText;
       $('d365Name').value = '';
