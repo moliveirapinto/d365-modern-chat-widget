@@ -4635,14 +4635,28 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v2.15.0';
-        const APP_LAST_UPDATED = 'Mar 18, 2026';
+        const APP_VERSION = 'v2.16.0';
+        const APP_LAST_UPDATED = 'Mar 23, 2026';
         
         const CHANGELOG = [
             {
+                version: 'v2.16.0',
+                date: 'Mar 23, 2026',
+                latest: true,
+                items: [
+                    { type: 'fix', text: 'Post-Chat Survey now works - survey context is pre-cached after startChat() and fetched before endChat() to prevent stale session errors' },
+                    { type: 'fix', text: 'CSP: Added wss://*.microsoft.com and wss://*.azure.com to connect-src - fixes Trouter WebSocket blocking that broke real-time chat' },
+                    { type: 'fix', text: 'CSP: Added media-src directive - fixes notification sound playback from GitHub-hosted MP3' },
+                    { type: 'fix', text: 'CSP: Added https://customervoice.microsoft.com to frame-src - ensures Customer Voice survey iframes can load' },
+                    { type: 'fix', text: 'CSP: Added https://*.clarity.ms to script-src - fixes Microsoft Clarity scripts.clarity.ms loading' },
+                    { type: 'improve', text: 'CSP policies updated consistently across live.html, all industry templates, and staticwebapp.config.json' },
+                    { type: 'improve', text: 'Survey context caching applied to widget-core.js, chat-widget.js, index.html, and all embed modes' }
+                ]
+            },
+            {
                 version: 'v2.15.0',
                 date: 'Mar 18, 2026',
-                latest: true,
+                latest: false,
                 items: [
                     { type: 'new', text: 'Context Variables - pass custom context variables from bot/config to D365 Omnichannel via customContext in startChat()' },
                     { type: 'new', text: 'Post-Chat Survey - automatically renders D365 Customer Voice survey after chat ends (if configured in Omnichannel admin)' },
@@ -11237,6 +11251,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     var chatSDK = null, chatStarted = false, userName = '', userEmail = '';
     var chatMessages = [];
     var soundEnabled = true;
+    var cachedSurveyContext = null;
     var processedMessageIds = {}; // Track processed message IDs to avoid duplicates
     
     // Message queue for batching and sorting messages
@@ -11425,26 +11440,39 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       }
     }
 
+    // Pre-cache post-chat survey context while session is still active
+    async function preCacheSurveyContext() {
+      try {
+        if (!chatSDK) return;
+        cachedSurveyContext = await chatSDK.getPostChatSurveyContext();
+        console.log('📋 Pre-cached post-chat survey context:', cachedSurveyContext);
+      } catch (e) {
+        console.log('📋 Could not pre-cache survey context:', e.message || e);
+      }
+    }
+
     // Post-chat survey handler
     async function handlePostChatSurvey() {
-      try {
-        if (!chatSDK) { showView('ended'); return; }
-        var surveyContext = await chatSDK.getPostChatSurveyContext();
-        console.log('📋 Post-chat survey context:', surveyContext);
-        if (surveyContext && surveyContext.surveyInviteLink) {
-          showView('survey');
-          surveyFrame.onload = function() {
-            surveyLoading.style.display = 'none';
-            surveyFrame.style.display = 'block';
-          };
-          surveyFrame.src = surveyContext.surveyInviteLink;
-        } else {
-          showView('ended');
+      var surveyContext = cachedSurveyContext;
+      if (!surveyContext) {
+        try {
+          if (chatSDK) surveyContext = await chatSDK.getPostChatSurveyContext();
+        } catch (e) {
+          console.log('📋 Post-chat survey not available:', e.message || e);
         }
-      } catch (e) {
-        console.log('📋 Post-chat survey not available:', e.message || e);
+      }
+      console.log('📋 Post-chat survey context:', surveyContext);
+      if (surveyContext && surveyContext.surveyInviteLink) {
+        showView('survey');
+        surveyFrame.onload = function() {
+          surveyLoading.style.display = 'none';
+          surveyFrame.style.display = 'block';
+        };
+        surveyFrame.src = surveyContext.surveyInviteLink;
+      } else {
         showView('ended');
       }
+      cachedSurveyContext = null;
     }
 
     document.getElementById('d365SurveySkip').addEventListener('click', function() {
@@ -11684,6 +11712,10 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     
     confirmYes.addEventListener('click', async function() {
       confirmModal.classList.remove('show');
+      // Fetch survey context BEFORE ending chat (session must be active)
+      if (chatSDK && !cachedSurveyContext) {
+        try { cachedSurveyContext = await chatSDK.getPostChatSurveyContext(); } catch(e) { console.log('📋 Could not get survey context before end:', e.message || e); }
+      }
       if (chatSDK) {
         try { await chatSDK.endChat(); } catch (e) { console.log('End chat error:', e); }
       }
@@ -12171,6 +12203,9 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
         console.log('Chat started successfully!');
         chatStarted = true;
         showView('chat');
+        
+        // Pre-cache post-chat survey context while session is active
+        preCacheSurveyContext();
         
         // Send initial question if provided
         if (question) {

@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self' https://*.microsoft.com https://*.azure.com https://*.dynamics.com https://*.crm.dynamics.com https://*.github.io;
-        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.microsoft.com https://*.azure.com https://*.azureedge.net https://oc-cdn-ocprod.azureedge.net https://moliveirapinto.github.io https://*.github.io https://unpkg.com https://www.googletagmanager.com https://www.clarity.ms;
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.microsoft.com https://*.azure.com https://*.azureedge.net https://oc-cdn-ocprod.azureedge.net https://moliveirapinto.github.io https://*.github.io https://unpkg.com https://www.googletagmanager.com https://*.clarity.ms;
         style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.azureedge.net https://oc-cdn-ocprod.azureedge.net;
         style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.azureedge.net https://oc-cdn-ocprod.azureedge.net;
         font-src 'self' https://fonts.gstatic.com https://*.azureedge.net;
         img-src 'self' data: blob: https: *;
-        frame-src 'self' https://*.omnichannelengagementhub.com https://*.azureedge.net https://oc-cdn-ocprod.azureedge.net https://forms.office.com https://*.forms.office.com https://*.microsoft.com;
-        connect-src 'self' https://*.microsoft.com https://*.azure.com https://*.dynamics.com https://*.omnichannelengagementhub.com https://*.skype.com wss://*.skype.com https://*.azureedge.net wss://*.omnichannelengagementhub.com https://*.communication.azure.com wss://*.communication.azure.com https://www.google-analytics.com https://region1.google-analytics.com https://*.clarity.ms https://d365-widget-analytics.mauricio-o-pinto.workers.dev;
+        media-src 'self' https://*.github.io https://moliveirapinto.github.io;
+        frame-src 'self' https://*.omnichannelengagementhub.com https://*.azureedge.net https://oc-cdn-ocprod.azureedge.net https://forms.office.com https://*.forms.office.com https://*.microsoft.com https://customervoice.microsoft.com https://*.customervoice.microsoft.com;
+        connect-src 'self' https://*.microsoft.com wss://*.microsoft.com https://*.azure.com wss://*.azure.com https://*.dynamics.com https://*.omnichannelengagementhub.com wss://*.omnichannelengagementhub.com https://*.skype.com wss://*.skype.com https://*.azureedge.net https://*.communication.azure.com wss://*.communication.azure.com https://*.github.io https://www.google-analytics.com https://region1.google-analytics.com https://*.clarity.ms https://d365-widget-analytics.mauricio-o-pinto.workers.dev;
         worker-src 'self' blob:;
     ">
     <title>Modern Chat Widget - Live Demo</title>

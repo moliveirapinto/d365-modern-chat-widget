@@ -16,6 +16,7 @@ class ModernChatWidget {
         };
 
         this.chatSDK = null;
+        this.cachedSurveyContext = null;
         this.state = {
             isOpen: false,
             isChatActive: false,
@@ -1063,6 +1064,9 @@ class ModernChatWidget {
             this.showChatView();
             this.addSystemMessage('Connected! An agent will be with you shortly.');
             
+            // Pre-cache post-chat survey context while session is active
+            this.preCacheSurveyContext();
+            
             if (question) {
                 setTimeout(() => this.sendMessage(question), 500);
             }
@@ -1247,20 +1251,32 @@ class ModernChatWidget {
         this.updateStatus('Chat ended');
     }
 
-    async handleChatEnded() {
+    async preCacheSurveyContext() {
         try {
-            if (this.chatSDK) {
-                const surveyContext = await this.chatSDK.getPostChatSurveyContext();
-                console.log('📋 Post-chat survey context:', surveyContext);
-                if (surveyContext && surveyContext.surveyInviteLink) {
-                    this.showSurvey(surveyContext.surveyInviteLink);
-                    return;
-                }
-            }
+            if (!this.chatSDK) return;
+            this.cachedSurveyContext = await this.chatSDK.getPostChatSurveyContext();
+            console.log('📋 Pre-cached post-chat survey context:', this.cachedSurveyContext);
         } catch (e) {
-            console.log('📋 Post-chat survey not available:', e.message || e);
+            console.log('📋 Could not pre-cache survey context:', e.message || e);
         }
-        this.showEnded();
+    }
+
+    async handleChatEnded() {
+        var surveyContext = this.cachedSurveyContext;
+        if (!surveyContext) {
+            try {
+                if (this.chatSDK) surveyContext = await this.chatSDK.getPostChatSurveyContext();
+            } catch (e) {
+                console.log('📋 Post-chat survey not available:', e.message || e);
+            }
+        }
+        console.log('📋 Post-chat survey context:', surveyContext);
+        if (surveyContext && surveyContext.surveyInviteLink) {
+            this.showSurvey(surveyContext.surveyInviteLink);
+        } else {
+            this.showEnded();
+        }
+        this.cachedSurveyContext = null;
     }
 
     showSurvey(surveyUrl) {
@@ -1288,6 +1304,10 @@ class ModernChatWidget {
     async endChat() {
         if (this.state.isChatActive) {
             if (confirm('End this chat?')) {
+                // Fetch survey context BEFORE ending chat (session must be active)
+                if (this.chatSDK && !this.cachedSurveyContext) {
+                    try { this.cachedSurveyContext = await this.chatSDK.getPostChatSurveyContext(); } catch (e) { console.log('📋 Could not get survey context before end:', e.message || e); }
+                }
                 if (this.chatSDK) {
                     try { await this.chatSDK.endChat(); } catch (e) {}
                 }

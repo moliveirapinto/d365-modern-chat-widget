@@ -1,7 +1,7 @@
 /**
  * D365 Modern Chat Widget - Core
  * This is the main widget code that gets loaded via the loader
- * Version: 2.15.0
+ * Version: 2.16.0
  * 
  * ╔═══════════════════════════════════════════════════════════════════════════╗
  * ║  ⚠️  FEATURE PARITY REQUIRED - READ CONTRIBUTING.md                       ║
@@ -23,7 +23,7 @@
   }
   
   window.D365ModernChatWidget = {
-    version: '2.15.0',
+    version: '2.16.0',
     initialized: false
   };
 
@@ -690,6 +690,7 @@
     var chatSDK = null, chatStarted = false, userName = '', userEmail = '';
     var processedMsgs = {};
     var unreadCount = 0;
+    var cachedSurveyContext = null;
     
     // Message queue for batching and sorting (like live.html)
     var messageQueue = [];
@@ -1079,27 +1080,40 @@
       else if (v === 'survey') { survey.classList.add('active'); chatStarted = false; }
     }
 
+    // Pre-cache post-chat survey context while session is still active
+    async function preCacheSurveyContext() {
+      try {
+        if (!chatSDK) return;
+        cachedSurveyContext = await chatSDK.getPostChatSurveyContext();
+        console.log('📋 Pre-cached post-chat survey context:', cachedSurveyContext);
+      } catch (e) {
+        console.log('📋 Could not pre-cache survey context:', e.message || e);
+      }
+    }
+
     // Post-chat survey handler
     async function handlePostChatSurvey() {
-      try {
-        if (!chatSDK) { showView('ended'); return; }
-        var surveyContext = await chatSDK.getPostChatSurveyContext();
-        console.log('📋 Post-chat survey context:', surveyContext);
-        if (surveyContext && surveyContext.surveyInviteLink) {
-          showView('survey');
-          surveyFrame.onload = function() {
-            surveyLoading.style.display = 'none';
-            surveyFrame.style.display = 'block';
-          };
-          surveyFrame.src = surveyContext.surveyInviteLink;
-        } else {
-          console.log('📋 No post-chat survey configured');
-          showView('ended');
+      var surveyContext = cachedSurveyContext;
+      if (!surveyContext) {
+        try {
+          if (chatSDK) surveyContext = await chatSDK.getPostChatSurveyContext();
+        } catch (e) {
+          console.log('📋 Post-chat survey not available:', e.message || e);
         }
-      } catch (e) {
-        console.log('📋 Post-chat survey not available:', e.message || e);
+      }
+      console.log('📋 Post-chat survey context:', surveyContext);
+      if (surveyContext && surveyContext.surveyInviteLink) {
+        showView('survey');
+        surveyFrame.onload = function() {
+          surveyLoading.style.display = 'none';
+          surveyFrame.style.display = 'block';
+        };
+        surveyFrame.src = surveyContext.surveyInviteLink;
+      } else {
+        console.log('📋 No post-chat survey configured');
         showView('ended');
       }
+      cachedSurveyContext = null;
     }
 
     function getInitials(name) {
@@ -1326,6 +1340,9 @@
         
         await chatSDK.startChat({ liveChatContext: session.liveChatContext });
         console.log('✅ Reconnected to existing chat session!');
+        
+        // Pre-cache post-chat survey context while session is active
+        preCacheSurveyContext();
         
         // Pre-load and initialize voice/video calling SDK for restored session
         await preloadVoiceVideoCallingSDK(chatSDK);
@@ -2222,6 +2239,9 @@
         chatStarted = true;
         showView('chat');
         
+        // Pre-cache post-chat survey context while session is active
+        preCacheSurveyContext();
+        
         // Initialize voice/video calling SDK AFTER startChat (chat token now valid)
         await initializeVoiceVideoCallingSDK(chatSDK);
         
@@ -2289,6 +2309,10 @@
     $('d365ConfirmNo').onclick = function() { confirm.classList.remove('show'); };
     $('d365ConfirmYes').onclick = async function() {
       confirm.classList.remove('show');
+      // Fetch survey context BEFORE ending chat (session must be active)
+      if (chatSDK && !cachedSurveyContext) {
+        try { cachedSurveyContext = await chatSDK.getPostChatSurveyContext(); } catch(e) { console.log('📋 Could not get survey context before end:', e.message || e); }
+      }
       if (chatSDK) try { await chatSDK.endChat(); } catch(e) {}
       handlePostChatSurvey();
     };

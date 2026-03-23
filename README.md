@@ -4,7 +4,7 @@
 
 [![D365 Compatible](https://img.shields.io/badge/D365-Omnichannel-0078D4?style=flat-square&logo=microsoft)](https://dynamics.microsoft.com)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.15.0-blue?style=flat-square)](package.json)
+[![Version](https://img.shields.io/badge/version-v2.16.0-blue?style=flat-square)](package.json)
 
 ![Chat Widget Preview](preview.png)
 
@@ -1171,6 +1171,19 @@ See **[CONTRIBUTING.md](CONTRIBUTING.md)** for:
 ---
 
 ## 📝 Changelog
+
+### v2.16.0 (March 23, 2026)
+
+#### 🔒 CSP Fixes & Post-Chat Survey Fix
+- **FIX:** Post-Chat Survey now works correctly — survey context is pre-cached after `startChat()` and fetched before `endChat()`, preventing the `LiveWorkItemDetails is null` error caused by stale sessions
+- **FIX:** CSP `connect-src` now includes `wss://*.microsoft.com` and `wss://*.azure.com` — fixes Trouter WebSocket connections being blocked, which broke real-time chat messaging
+- **FIX:** CSP `media-src` directive added — fixes notification sound playback from GitHub-hosted MP3 files
+- **FIX:** CSP `frame-src` now includes `https://customervoice.microsoft.com` and `https://*.customervoice.microsoft.com` — ensures Customer Voice survey iframes can load
+- **FIX:** CSP `script-src` updated to `https://*.clarity.ms` (was `https://www.clarity.ms`) — fixes `scripts.clarity.ms` being blocked
+- **IMPROVED:** CSP policies updated consistently across `live.html`, all industry templates (`government.html`, `financial.html`, `retail.html`, `healthcare.html`), and `staticwebapp.config.json`
+- **IMPROVED:** Survey context caching applied to `widget-core.js`, `chat-widget.js`, `index.html`, and all embed modes for feature parity
+
+---
 
 ### v2.15.0 (March 18, 2026)
 
