@@ -19,7 +19,7 @@
   ],
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/img/*", "/dist/*", "/*.js", "/*.css", "/*.json"]
+    "exclude": ["/img/*", "/img/Logo/*", "/img/icon/*", "/img/bot/*", "/img/headshots/*", "/img/extra/*", "/dist/*", "/industries/*", "/notification/*", "/app/*", "/*.js", "/*.css", "/*.json", "/*.html", "/*.ico"]
   },
   "auth": {
     "identityProviders": {
