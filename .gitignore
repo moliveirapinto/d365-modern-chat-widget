@@ -17,6 +17,15 @@ Thumbs.db
 *.log
 npm-debug.log*
 
+# Wrangler temp files
+.wrangler/
+
+# Node version file
+.node-version
+
+# Test files
+test-embed.html
+
 # Environment
 
 # Private analytics dashboard (keep local only)
