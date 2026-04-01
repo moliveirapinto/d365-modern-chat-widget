@@ -1,7 +1,7 @@
 /**
  * D365 Modern Chat Widget - Core
  * This is the main widget code that gets loaded via the loader
- * Version: 2.16.0
+ * Version: 3.0.0
  * 
  * ╔═══════════════════════════════════════════════════════════════════════════╗
  * ║  ⚠️  FEATURE PARITY REQUIRED - READ CONTRIBUTING.md                       ║
@@ -23,7 +23,7 @@
   }
   
   window.D365ModernChatWidget = {
-    version: '2.16.0',
+    version: '3.0.0',
     initialized: false
   };
 

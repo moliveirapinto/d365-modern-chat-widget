@@ -10,7 +10,7 @@ I need# Contributing to D365 Modern Chat Widget
 | `index.html` (SDK Export) | Generated embed code | Sites using exported SDK |
 | `live.html` | Direct website widget | Your hosted site |
 | `dist/widget-core.js` | TamperMonkey / Embedded | Third-party sites (M&S, etc.) |
-| Demo pages (`financial.html`, etc.) | Industry demos | Demo/showcase purposes |
+| Demo pages (`industries/*.html`) | Industry demos | Demo/showcase purposes |
 
 ### 🚨 THE GOLDEN RULES
 
@@ -35,7 +35,7 @@ Before committing ANY visual/styling change, verify it applies to:
 - [ ] `dist/widget-core.js` - Embedded widget styles
 
 ### Demo Pages (if applicable)
-- [ ] `financial.html`, `healthcare.html`, `retail.html`, `government.html`
+- [ ] `industries/` — all industry demo pages (retail, financial, healthcare, government, telecom, education)
 
 ### Key Visual Properties to Check
 - [ ] Colors (primary, gradient, bubbles, text)

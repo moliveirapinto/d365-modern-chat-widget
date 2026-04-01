@@ -6,7 +6,7 @@
 
 [![D365 Compatible](https://img.shields.io/badge/D365-Omnichannel-0078D4?style=flat-square&logo=microsoft)](https://dynamics.microsoft.com)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.16.0-blue?style=flat-square)](package.json)
+[![Version](https://img.shields.io/badge/version-v3.0.0-blue?style=flat-square)](package.json)
 
 ![Chat Widget Preview](preview.png)
 
@@ -146,10 +146,12 @@ If D365 isn't configured, the widget runs in **demo mode** automatically — per
 | `index.html` | Admin panel (Chat Widget Studio) |
 | `live.html` | Live chat widget page |
 | `src/chat-widget.js` | Widget core logic |
-| `retail.html` | Industry demo — Retail |
-| `financial.html` | Industry demo — Financial Services |
-| `healthcare.html` | Industry demo — Healthcare |
-| `government.html` | Industry demo — Government |
+| `industries/retail.html` | Industry demo — Retail |
+| `industries/financial.html` | Industry demo — Financial Services |
+| `industries/healthcare.html` | Industry demo — Healthcare |
+| `industries/government.html` | Industry demo — Government |
+| `industries/telecom.html` | Industry demo — Telecom |
+| `industries/education.html` | Industry demo — Education |
 | `cloudflare-worker/` | Analytics backend (Cloudflare Workers + D1) |
 
 ---

@@ -15,17 +15,18 @@
         connect-src 'self' https://*.microsoft.com wss://*.microsoft.com https://*.azure.com wss://*.azure.com https://*.dynamics.com https://*.omnichannelengagementhub.com wss://*.omnichannelengagementhub.com https://*.skype.com wss://*.skype.com https://*.azureedge.net https://*.communication.azure.com wss://*.communication.azure.com;
         worker-src 'self' blob:;
     ">
-    <title>Horizon Medical Center | Compassionate Care, Advanced Medicine</title>
-    <link rel="icon" type="image/png" href="img/icon/health-favicon.png">
+    <title>Meridian Bank | Banking That Moves With You</title>
+    <link rel="icon" type="image/png" href="../img/icon/bank-favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #0d9488;
-            --primary-dark: #0f766e;
-            --primary-light: #14b8a6;
-            --secondary: #6366f1;
+            --primary: #0f172a;
+            --primary-light: #1e293b;
             --accent: #0ea5e9;
-            --coral: #f97316;
+            --accent-dark: #0284c7;
+            --accent-light: #38bdf8;
+            --secondary: #10b981;
+            --gold: #fbbf24;
             --text: #1e293b;
             --text-light: #475569;
             --text-muted: #94a3b8;
@@ -54,7 +55,7 @@
 
         /* Top Bar */
         .top-bar {
-            background: var(--primary-dark);
+            background: var(--primary);
             color: white;
             padding: 10px 0;
             font-size: 13px;
@@ -69,21 +70,8 @@
             align-items: center;
         }
 
-        .top-bar-emergency {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-        }
-
-        .top-bar-emergency svg {
-            width: 16px;
-            height: 16px;
-            fill: #fbbf24;
-        }
-
         .top-bar a {
-            color: var(--primary-light);
+            color: var(--accent-light);
             text-decoration: none;
         }
 
@@ -133,7 +121,7 @@
         .logo-icon {
             width: 48px;
             height: 48px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -148,14 +136,14 @@
 
         .logo-text {
             font-family: 'Outfit', sans-serif;
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 700;
-            color: var(--text);
+            color: var(--primary);
             letter-spacing: -0.5px;
         }
 
         .logo-text span {
-            color: var(--primary);
+            color: var(--accent);
         }
 
         .nav {
@@ -175,11 +163,11 @@
 
         .nav a:hover {
             background: var(--bg-light);
-            color: var(--primary);
+            color: var(--accent);
         }
 
         .nav a.active {
-            background: var(--primary);
+            background: var(--accent);
             color: white;
         }
 
@@ -205,32 +193,32 @@
 
         .btn-outline {
             background: transparent;
-            color: var(--text);
+            color: var(--primary);
             border: 2px solid var(--border);
         }
 
         .btn-outline:hover {
-            border-color: var(--primary);
-            color: var(--primary);
+            border-color: var(--accent);
+            color: var(--accent);
         }
 
         .btn-primary {
-            background: var(--primary);
+            background: var(--accent);
             color: white;
         }
 
         .btn-primary:hover {
-            background: var(--primary-dark);
+            background: var(--accent-dark);
             transform: translateY(-1px);
         }
 
-        .btn-coral {
-            background: var(--coral);
+        .btn-dark {
+            background: var(--primary);
             color: white;
         }
 
-        .btn-coral:hover {
-            background: #ea580c;
+        .btn-dark:hover {
+            background: var(--primary-light);
         }
 
         .btn-lg {
@@ -249,7 +237,7 @@
 
         /* Hero Section */
         .hero {
-            background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #99f6e4 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, #334155 100%);
             min-height: 600px;
             display: flex;
             align-items: center;
@@ -260,11 +248,22 @@
         .hero::before {
             content: '';
             position: absolute;
-            top: -30%;
-            right: -15%;
-            width: 700px;
-            height: 700px;
-            background: radial-gradient(circle, rgba(13, 148, 136, 0.1) 0%, transparent 70%);
+            top: -50%;
+            right: -10%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
             border-radius: 50%;
         }
 
@@ -280,23 +279,43 @@
             z-index: 1;
         }
 
+        .hero-text {
+            color: white;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(14, 165, 233, 0.2);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--accent-light);
+            margin-bottom: 24px;
+        }
+
         .hero-text h1 {
             font-family: 'Outfit', sans-serif;
-            font-size: 52px;
+            font-size: 56px;
             font-weight: 800;
             line-height: 1.1;
             margin-bottom: 24px;
             letter-spacing: -1px;
-            color: var(--text);
         }
 
         .hero-text h1 span {
-            color: var(--primary);
+            background: linear-gradient(135deg, var(--accent-light) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .hero-text p {
             font-size: 18px;
-            color: var(--text-light);
+            color: rgba(255,255,255,0.8);
             margin-bottom: 36px;
             max-width: 500px;
             line-height: 1.7;
@@ -305,46 +324,26 @@
         .hero-buttons {
             display: flex;
             gap: 16px;
-            margin-bottom: 48px;
         }
 
-        .hero-features {
+        .hero-stats {
             display: flex;
-            gap: 32px;
+            gap: 48px;
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
 
-        .hero-feature {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .hero-stat h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: white;
         }
 
-        .hero-feature-icon {
-            width: 48px;
-            height: 48px;
-            background: white;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-
-        .hero-feature-icon svg {
-            width: 24px;
-            height: 24px;
-            fill: var(--primary);
-        }
-
-        .hero-feature-text h4 {
+        .hero-stat p {
             font-size: 14px;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .hero-feature-text p {
-            font-size: 13px;
-            color: var(--text-muted);
+            color: rgba(255,255,255,0.6);
             margin: 0;
         }
 
@@ -354,8 +353,8 @@
 
         .hero-image img {
             width: 100%;
-            border-radius: 24px;
-            box-shadow: 0 40px 80px rgba(0,0,0,0.15);
+            border-radius: 20px;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.3);
         }
 
         .hero-card {
@@ -363,58 +362,34 @@
             background: white;
             border-radius: 16px;
             padding: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
 
-        .hero-card.rating {
+        .hero-card.rate {
             bottom: 40px;
             left: -40px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
         }
 
-        .hero-card.appointment {
+        .hero-card.trust {
             top: 40px;
             right: -40px;
         }
 
-        .hero-card-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .hero-card-icon svg {
-            width: 24px;
-            height: 24px;
-            fill: white;
-        }
-
-        .hero-card-text h4 {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .hero-card-text p {
+        .hero-card-title {
             font-size: 12px;
             color: var(--text-muted);
+            margin-bottom: 4px;
         }
 
-        .stars {
-            display: flex;
-            gap: 2px;
+        .hero-card-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent);
         }
 
-        .stars svg {
-            width: 16px;
-            height: 16px;
-            fill: #fbbf24;
+        .hero-card-value.green {
+            color: var(--secondary);
         }
 
         /* Section Styles */
@@ -426,8 +401,8 @@
             background: var(--bg-light);
         }
 
-        .section.teal {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        .section.dark {
+            background: var(--primary);
             color: white;
         }
 
@@ -456,36 +431,139 @@
             color: var(--text-light);
         }
 
-        .section.teal .section-header p {
-            color: rgba(255,255,255,0.8);
+        .section.dark .section-header p {
+            color: rgba(255,255,255,0.7);
         }
 
-        /* Services Grid */
-        .services-grid {
+        /* Products Grid */
+        .products-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 32px;
         }
 
-        .service-card {
+        .product-card {
             background: white;
             border-radius: 20px;
-            padding: 36px 28px;
+            padding: 40px 32px;
             border: 1px solid var(--border);
             transition: all 0.3s;
-            text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        .service-card:hover {
+        .product-card:hover {
             transform: translateY(-8px);
             box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-            border-color: var(--primary);
+            border-color: var(--accent);
         }
 
-        .service-icon {
+        .product-card.featured {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+        }
+
+        .product-card.featured .product-icon {
+            background: rgba(14, 165, 233, 0.2);
+        }
+
+        .product-card.featured .product-icon svg {
+            fill: var(--accent-light);
+        }
+
+        .product-card.featured p {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .product-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--bg-light);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .product-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: var(--accent);
+        }
+
+        .product-card h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .product-card p {
+            color: var(--text-light);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .product-features {
+            list-style: none;
+            margin-bottom: 24px;
+        }
+
+        .product-features li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .product-features li svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--secondary);
+            flex-shrink: 0;
+        }
+
+        .product-card.featured .product-features li svg {
+            fill: var(--accent-light);
+        }
+
+        .product-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--accent);
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .product-link:hover {
+            gap: 10px;
+        }
+
+        .product-card.featured .product-link {
+            color: var(--accent-light);
+        }
+
+        /* Features Section */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 32px 24px;
+        }
+
+        .feature-icon {
             width: 72px;
             height: 72px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
             border-radius: 20px;
             display: flex;
             align-items: center;
@@ -493,170 +571,71 @@
             margin: 0 auto 20px;
         }
 
-        .service-icon svg {
+        .feature-icon svg {
             width: 36px;
             height: 36px;
             fill: white;
         }
 
-        .service-card h3 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .service-card p {
-            color: var(--text-light);
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .service-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--primary);
-            font-weight: 600;
-            text-decoration: none;
-            font-size: 14px;
-        }
-
-        .service-link:hover {
-            gap: 10px;
-        }
-
-        /* Specialties Grid */
-        .specialties-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
-        }
-
-        .specialty-card {
-            background: white;
-            border-radius: 16px;
-            padding: 28px 24px;
-            border: 1px solid var(--border);
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .specialty-card:hover {
-            border-color: var(--primary);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-        }
-
-        .specialty-icon {
-            width: 56px;
-            height: 56px;
-            background: var(--bg-light);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .specialty-icon svg {
-            width: 28px;
-            height: 28px;
-            fill: var(--primary);
-        }
-
-        .specialty-card h4 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .specialty-card p {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin: 0;
-        }
-
-        /* Doctors Grid */
-        .doctors-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 32px;
-        }
-
-        .doctor-card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            transition: all 0.3s;
-        }
-
-        .doctor-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        }
-
-        .doctor-image {
-            height: 240px;
-            overflow: hidden;
-        }
-
-        .doctor-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .doctor-content {
-            padding: 24px;
-            text-align: center;
-        }
-
-        .doctor-content h3 {
+        .feature-card h3 {
             font-family: 'Outfit', sans-serif;
             font-size: 18px;
             font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .doctor-content .specialty {
-            color: var(--primary);
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 12px;
-        }
-
-        .doctor-content p {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        /* Stats Banner */
-        .stats-banner {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 32px;
-            padding: 60px 0;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-item h3 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 48px;
-            font-weight: 800;
-            color: white;
             margin-bottom: 8px;
         }
 
-        .stat-item p {
+        .feature-card p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* Rates Banner */
+        .rates-banner {
+            background: linear-gradient(135deg, var(--secondary) 0%, #059669 100%);
+            border-radius: 24px;
+            padding: 60px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            color: white;
+            margin-top: 80px;
+        }
+
+        .rates-banner h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .rates-banner p {
             font-size: 16px;
-            color: rgba(255,255,255,0.8);
+            opacity: 0.9;
+            margin-bottom: 24px;
+        }
+
+        .rate-display {
+            display: flex;
+            gap: 40px;
+        }
+
+        .rate-item {
+            text-align: center;
+            background: rgba(255,255,255,0.15);
+            padding: 24px 32px;
+            border-radius: 16px;
+        }
+
+        .rate-item .rate-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 48px;
+            font-weight: 800;
+        }
+
+        .rate-item .rate-label {
+            font-size: 14px;
+            opacity: 0.8;
         }
 
         /* About Section */
@@ -669,7 +648,7 @@
 
         .about-image img {
             width: 100%;
-            border-radius: 24px;
+            border-radius: 20px;
         }
 
         .about-content h2 {
@@ -686,34 +665,32 @@
             line-height: 1.8;
         }
 
-        .about-features {
+        .about-stats {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 32px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
         }
 
-        .about-feature {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .about-stat h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 4px;
         }
 
-        .about-feature svg {
-            width: 24px;
-            height: 24px;
-            fill: var(--primary);
-            flex-shrink: 0;
-        }
-
-        .about-feature span {
-            font-size: 15px;
-            font-weight: 500;
+        .about-stat p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin: 0;
         }
 
         /* Support Page */
         .support-hero {
-            background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+            background: var(--bg-light);
             padding: 60px 0;
         }
 
@@ -761,7 +738,7 @@
         .support-stat-card .value.open { color: var(--warning); }
         .support-stat-card .value.pending { color: var(--info); }
         .support-stat-card .value.resolved { color: var(--success); }
-        .support-stat-card .value.total { color: var(--primary); }
+        .support-stat-card .value.total { color: var(--accent); }
 
         .support-stat-card .label {
             font-size: 14px;
@@ -823,7 +800,7 @@
         .case-id {
             font-family: 'Outfit', monospace;
             font-weight: 600;
-            color: var(--primary);
+            color: var(--accent);
         }
 
         .case-subject {
@@ -890,8 +867,8 @@
         }
 
         .case-actions button:hover {
-            background: var(--primary);
-            border-color: var(--primary);
+            background: var(--accent);
+            border-color: var(--accent);
             color: white;
         }
 
@@ -903,7 +880,7 @@
         }
 
         .contact-info {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: var(--primary);
             color: white;
             border-radius: 24px;
             padding: 48px;
@@ -917,7 +894,7 @@
         }
 
         .contact-info > p {
-            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.7);
             margin-bottom: 40px;
         }
 
@@ -931,7 +908,7 @@
         .contact-method-icon {
             width: 48px;
             height: 48px;
-            background: rgba(255,255,255,0.15);
+            background: rgba(14, 165, 233, 0.2);
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -942,7 +919,7 @@
         .contact-method-icon svg {
             width: 24px;
             height: 24px;
-            fill: white;
+            fill: var(--accent-light);
         }
 
         .contact-method h4 {
@@ -953,13 +930,13 @@
 
         .contact-method p {
             font-size: 14px;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.7);
         }
 
         .contact-hours {
             margin-top: 40px;
             padding-top: 32px;
-            border-top: 1px solid rgba(255,255,255,0.15);
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
 
         .contact-hours h4 {
@@ -970,7 +947,7 @@
 
         .contact-hours p {
             font-size: 14px;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.7);
             margin-bottom: 8px;
         }
 
@@ -1023,8 +1000,8 @@
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
         }
 
         .form-group textarea {
@@ -1048,7 +1025,7 @@
         }
 
         .faq-item:hover {
-            border-color: var(--primary);
+            border-color: var(--accent);
         }
 
         .faq-item h3 {
@@ -1063,7 +1040,7 @@
         .faq-item h3 svg {
             width: 20px;
             height: 20px;
-            fill: var(--primary);
+            fill: var(--accent);
         }
 
         .faq-item p {
@@ -1072,7 +1049,7 @@
             line-height: 1.7;
         }
 
-        /* Locations Grid */
+        /* Locations Section */
         .locations-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -1121,7 +1098,7 @@
         }
 
         .location-content a {
-            color: var(--primary);
+            color: var(--accent);
             font-weight: 500;
             text-decoration: none;
             font-size: 14px;
@@ -1129,7 +1106,7 @@
 
         /* Footer */
         .footer {
-            background: var(--text);
+            background: var(--primary);
             color: white;
             padding: 80px 0 40px;
         }
@@ -1216,7 +1193,7 @@
             }
             
             .hero-text h1 {
-                font-size: 42px;
+                font-size: 44px;
             }
             
             .hero-text p {
@@ -1227,7 +1204,7 @@
                 justify-content: center;
             }
             
-            .hero-features {
+            .hero-stats {
                 justify-content: center;
             }
             
@@ -1235,15 +1212,11 @@
                 display: none;
             }
             
-            .services-grid {
+            .products-grid {
                 grid-template-columns: 1fr;
             }
             
-            .specialties-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .doctors-grid {
+            .features-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
             
@@ -1272,10 +1245,6 @@
             .faq-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .stats-banner {
-                grid-template-columns: repeat(2, 1fr);
-            }
         }
     </style>
 </head>
@@ -1283,13 +1252,10 @@
     <!-- Top Bar -->
     <div class="top-bar">
         <div class="top-bar-content">
-            <div class="top-bar-emergency">
-                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-                Emergency: <a href="tel:911">Call 911</a> or visit our <a href="#">Emergency Room</a>
-            </div>
+            <span>🏆 Rated #1 Digital Bank 2026 by Forbes — <a href="#">Learn More</a></span>
             <div class="top-bar-links">
-                <a href="#">Find a Doctor</a>
-                <a href="#">Patient Portal</a>
+                <a href="#">ATM Locator</a>
+                <a href="#">Rates</a>
                 <a href="#">Careers</a>
             </div>
         </div>
@@ -1300,20 +1266,20 @@
         <div class="header-main">
             <a href="#" class="logo" onclick="showPage('home'); return false;">
                 <div class="logo-icon">
-                    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                 </div>
-                <span class="logo-text">Horizon <span>Medical</span></span>
+                <span class="logo-text">Meridian<span>Bank</span></span>
             </a>
             <nav class="nav">
                 <a href="#" class="active" data-page="home">Home</a>
-                <a href="#" data-page="services">Services</a>
+                <a href="#" data-page="products">Products</a>
                 <a href="#" data-page="about">About Us</a>
-                <a href="#" data-page="support">Patient Support</a>
+                <a href="#" data-page="support">Support</a>
                 <a href="#" data-page="contact">Contact</a>
             </nav>
             <div class="header-actions">
-                <a href="#" class="btn btn-outline">Patient Portal</a>
-                <a href="#" class="btn btn-primary">Book Appointment</a>
+                <a href="#" class="btn btn-outline">Sign In</a>
+                <a href="#" class="btn btn-primary">Open Account</a>
             </div>
         </div>
     </header>
@@ -1324,259 +1290,199 @@
         <section class="hero">
             <div class="hero-content">
                 <div class="hero-text">
-                    <h1>Compassionate Care, <span>Advanced Medicine</span></h1>
-                    <p>At Horizon Medical Center, we combine cutting-edge technology with personalized care to help you and your family live healthier lives.</p>
-                    <div class="hero-buttons">
-                        <a href="#" class="btn btn-primary btn-lg" onclick="showPage('services'); return false;">Our Services</a>
-                        <a href="#" class="btn btn-coral btn-lg">Book Appointment</a>
+                    <div class="hero-badge">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        Trusted by 2M+ customers
                     </div>
-                    <div class="hero-features">
-                        <div class="hero-feature">
-                            <div class="hero-feature-icon">
-                                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                            </div>
-                            <div class="hero-feature-text">
-                                <h4>24/7 Emergency</h4>
-                                <p>Always available</p>
-                            </div>
+                    <h1>Banking That <span>Moves With You</span></h1>
+                    <p>Experience the future of banking with Meridian. Smart savings, instant transfers, and world-class security — all in one place.</p>
+                    <div class="hero-buttons">
+                        <a href="#" class="btn btn-primary btn-lg" onclick="showPage('products'); return false;">Explore Products</a>
+                        <a href="#" class="btn btn-outline btn-lg" style="border-color: rgba(255,255,255,0.3); color: white;">Watch Demo</a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <h3>$50B+</h3>
+                            <p>Assets Under Management</p>
                         </div>
-                        <div class="hero-feature">
-                            <div class="hero-feature-icon">
-                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                            </div>
-                            <div class="hero-feature-text">
-                                <h4>Board Certified</h4>
-                                <p>Expert physicians</p>
-                            </div>
+                        <div class="hero-stat">
+                            <h3>2M+</h3>
+                            <p>Happy Customers</p>
+                        </div>
+                        <div class="hero-stat">
+                            <h3>150+</h3>
+                            <p>Branch Locations</p>
                         </div>
                     </div>
                 </div>
                 <div class="hero-image">
-                    <img src="https://images.pexels.com/photos/4386466/pexels-photo-4386466.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Medical team">
-                    <div class="hero-card rating">
-                        <div class="hero-card-icon">
-                            <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                        </div>
-                        <div>
-                            <div class="stars">
-                                <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                                <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                                <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                                <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                                <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                            </div>
-                            <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">4.9 Patient Rating</p>
-                        </div>
+                    <img src="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Team collaboration">
+                    <div class="hero-card rate">
+                        <div class="hero-card-title">Savings APY</div>
+                        <div class="hero-card-value green">4.50%</div>
                     </div>
-                    <div class="hero-card appointment">
-                        <div class="hero-card-text">
-                            <h4>Easy Scheduling</h4>
-                            <p>Book online 24/7</p>
-                        </div>
+                    <div class="hero-card trust">
+                        <div class="hero-card-title">Trust Score</div>
+                        <div class="hero-card-value">98%</div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Services Preview -->
+        <!-- Features -->
         <section class="section">
             <div class="section-container">
                 <div class="section-header">
-                    <h2>World-Class Medical Services</h2>
-                    <p>Comprehensive healthcare services designed to meet all your medical needs under one roof.</p>
+                    <h2>Why Choose Meridian Bank?</h2>
+                    <p>We combine traditional banking values with modern technology to deliver an exceptional experience.</p>
                 </div>
-                <div class="services-grid">
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <svg viewBox="0 0 24 24"><path d="M10.5 13H8v-3h2.5V7.5h3V10H16v3h-2.5v2.5h-3V13zM12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z"/></svg>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
                         </div>
-                        <h3>Emergency Care</h3>
-                        <p>24/7 emergency services with rapid response teams and state-of-the-art trauma facilities.</p>
-                        <a href="#" class="service-link" onclick="showPage('services'); return false;">
-                            Learn More
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-                        </a>
+                        <h3>Bank-Grade Security</h3>
+                        <p>256-bit encryption and multi-factor authentication protect your money 24/7.</p>
                     </div>
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <svg viewBox="0 0 24 24"><path d="M19.5 9.5c-1.03 0-1.9.62-2.29 1.5h-2.92c-.39-.88-1.26-1.5-2.29-1.5s-1.9.62-2.29 1.5H6.79c-.39-.88-1.26-1.5-2.29-1.5C3.12 9.5 2 10.62 2 12s1.12 2.5 2.5 2.5c1.03 0 1.9-.62 2.29-1.5h2.92c.39.88 1.26 1.5 2.29 1.5s1.9-.62 2.29-1.5h2.92c.39.88 1.26 1.5 2.29 1.5 1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5z"/></svg>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
                         </div>
-                        <h3>Primary Care</h3>
-                        <p>Comprehensive primary care services for patients of all ages, from routine checkups to chronic disease management.</p>
-                        <a href="#" class="service-link" onclick="showPage('services'); return false;">
-                            Learn More
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-                        </a>
+                        <h3>No Hidden Fees</h3>
+                        <p>Transparent pricing with no surprise charges. What you see is what you get.</p>
                     </div>
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                         </div>
-                        <h3>Cardiology</h3>
-                        <p>Advanced cardiac care including diagnostics, interventional procedures, and cardiac rehabilitation.</p>
-                        <a href="#" class="service-link" onclick="showPage('services'); return false;">
-                            Learn More
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-                        </a>
+                        <h3>FDIC Insured</h3>
+                        <p>Your deposits are protected up to $250,000 by the Federal Deposit Insurance Corporation.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                        </div>
+                        <h3>24/7 Support</h3>
+                        <p>Our dedicated support team is available around the clock via chat, phone, or email.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Stats -->
-        <section class="section teal">
-            <div class="section-container">
-                <div class="stats-banner">
-                    <div class="stat-item">
-                        <h3>50+</h3>
-                        <p>Years of Excellence</p>
-                    </div>
-                    <div class="stat-item">
-                        <h3>200+</h3>
-                        <p>Expert Physicians</p>
-                    </div>
-                    <div class="stat-item">
-                        <h3>500K+</h3>
-                        <p>Patients Treated</p>
-                    </div>
-                    <div class="stat-item">
-                        <h3>4.9</h3>
-                        <p>Patient Satisfaction</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Specialties -->
+        <!-- Products Preview -->
         <section class="section gray">
             <div class="section-container">
                 <div class="section-header">
-                    <h2>Our Medical Specialties</h2>
-                    <p>Expert care across a wide range of medical disciplines.</p>
+                    <h2>Financial Solutions For Everyone</h2>
+                    <p>From everyday banking to long-term investments, we have the right products for your journey.</p>
                 </div>
-                <div class="specialties-grid">
-                    <div class="specialty-card">
-                        <div class="specialty-icon">
-                            <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                <div class="products-grid">
+                    <div class="product-card">
+                        <div class="product-icon">
+                            <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
                         </div>
-                        <div>
-                            <h4>Cardiology</h4>
-                            <p>Heart & vascular care</p>
-                        </div>
+                        <h3>Personal Checking</h3>
+                        <p>Everyday banking made simple with no monthly fees and unlimited transactions.</p>
+                        <ul class="product-features">
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> No monthly fees</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Free ATM withdrawals</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Mobile check deposit</li>
+                        </ul>
+                        <a href="#" class="product-link" onclick="showPage('products'); return false;">
+                            Learn More
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                        </a>
                     </div>
-                    <div class="specialty-card">
-                        <div class="specialty-icon">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                    <div class="product-card featured">
+                        <div class="product-icon">
+                            <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
                         </div>
-                        <div>
-                            <h4>Neurology</h4>
-                            <p>Brain & spine</p>
-                        </div>
+                        <h3>High-Yield Savings</h3>
+                        <p>Grow your money faster with our industry-leading 4.50% APY savings account.</p>
+                        <ul class="product-features">
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 4.50% APY</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> No minimum balance</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Automatic savings tools</li>
+                        </ul>
+                        <a href="#" class="product-link" onclick="showPage('products'); return false;">
+                            Learn More
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                        </a>
                     </div>
-                    <div class="specialty-card">
-                        <div class="specialty-icon">
-                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z"/></svg>
+                    <div class="product-card">
+                        <div class="product-icon">
+                            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
                         </div>
-                        <div>
-                            <h4>Orthopedics</h4>
-                            <p>Bones & joints</p>
-                        </div>
+                        <h3>Credit Cards</h3>
+                        <p>Earn rewards on every purchase with no annual fee and flexible payment options.</p>
+                        <ul class="product-features">
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 2% cash back</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> No annual fee</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Travel rewards</li>
+                        </ul>
+                        <a href="#" class="product-link" onclick="showPage('products'); return false;">
+                            Learn More
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                        </a>
                     </div>
-                    <div class="specialty-card">
-                        <div class="specialty-icon">
-                            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-                        </div>
-                        <div>
-                            <h4>Ophthalmology</h4>
-                            <p>Eye care</p>
-                        </div>
+                </div>
+
+                <div class="rates-banner">
+                    <div>
+                        <h3>Lock in Today's Best Rates</h3>
+                        <p>Open a Certificate of Deposit and enjoy guaranteed returns with flexible terms from 6 months to 5 years.</p>
+                        <a href="#" class="btn btn-dark" onclick="showPage('products'); return false;">View All CD Rates</a>
                     </div>
-                    <div class="specialty-card">
-                        <div class="specialty-icon">
-                            <svg viewBox="0 0 24 24"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/></svg>
+                    <div class="rate-display">
+                        <div class="rate-item">
+                            <div class="rate-value">4.75%</div>
+                            <div class="rate-label">12-Month CD</div>
                         </div>
-                        <div>
-                            <h4>Oncology</h4>
-                            <p>Cancer treatment</p>
-                        </div>
-                    </div>
-                    <div class="specialty-card">
-                        <div class="specialty-icon">
-                            <svg viewBox="0 0 24 24"><path d="M14.5 12c2.49 0 4.5-2.01 4.5-4.5S16.99 3 14.5 3 10 5.01 10 7.5s2.01 4.5 4.5 4.5zm-7 0c1.93 0 3.5-1.57 3.5-3.5S9.43 5 7.5 5 4 6.57 4 8.5 5.57 12 7.5 12zm7 2c-2.33 0-7 1.17-7 3.5V20h14v-2.5c0-2.33-4.67-3.5-7-3.5zm-7 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V20H0v-2.5c0-2.33 4.67-3.5 7-3.5z"/></svg>
-                        </div>
-                        <div>
-                            <h4>Pediatrics</h4>
-                            <p>Children's health</p>
-                        </div>
-                    </div>
-                    <div class="specialty-card">
-                        <div class="specialty-icon">
-                            <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z"/></svg>
-                        </div>
-                        <div>
-                            <h4>Surgery</h4>
-                            <p>Surgical services</p>
-                        </div>
-                    </div>
-                    <div class="specialty-card">
-                        <div class="specialty-icon">
-                            <svg viewBox="0 0 24 24"><path d="M9 11.75c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zm6 0c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-.29.02-.58.05-.86 2.36-1.05 4.23-2.98 5.21-5.37C11.07 8.33 14.05 10 17.42 10c.78 0 1.53-.09 2.25-.26.21.71.33 1.47.33 2.26 0 4.41-3.59 8-8 8z"/></svg>
-                        </div>
-                        <div>
-                            <h4>Dermatology</h4>
-                            <p>Skin health</p>
+                        <div class="rate-item">
+                            <div class="rate-value">5.00%</div>
+                            <div class="rate-label">24-Month CD</div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Doctors -->
+        <!-- Locations -->
         <section class="section">
             <div class="section-container">
                 <div class="section-header">
-                    <h2>Meet Our Doctors</h2>
-                    <p>Our team of board-certified physicians is dedicated to providing exceptional care.</p>
+                    <h2>Visit Us In Person</h2>
+                    <p>With over 150 branches nationwide, there's always a Meridian Bank near you.</p>
                 </div>
-                <div class="doctors-grid">
-                    <div class="doctor-card">
-                        <div class="doctor-image">
-                            <img src="https://images.pexels.com/photos/5452201/pexels-photo-5452201.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Dr. Sarah Chen">
+                <div class="locations-grid">
+                    <div class="location-card">
+                        <div class="location-image">
+                            <img src="https://images.pexels.com/photos/534216/pexels-photo-534216.jpeg?auto=compress&cs=tinysrgb&w=600" alt="New York Branch">
                         </div>
-                        <div class="doctor-content">
-                            <h3>Dr. Sarah Chen</h3>
-                            <p class="specialty">Chief of Cardiology</p>
-                            <p>20+ years experience</p>
-                        </div>
-                    </div>
-                    <div class="doctor-card">
-                        <div class="doctor-image">
-                            <img src="https://images.pexels.com/photos/5452293/pexels-photo-5452293.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Dr. Michael Torres">
-                        </div>
-                        <div class="doctor-content">
-                            <h3>Dr. Michael Torres</h3>
-                            <p class="specialty">Neurosurgery</p>
-                            <p>15+ years experience</p>
+                        <div class="location-content">
+                            <h3>New York - Manhattan</h3>
+                            <p>100 Financial Center Drive<br>New York, NY 10004</p>
+                            <a href="#">Get Directions →</a>
                         </div>
                     </div>
-                    <div class="doctor-card">
-                        <div class="doctor-image">
-                            <img src="https://images.pexels.com/photos/5407206/pexels-photo-5407206.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Dr. Emily Roberts">
+                    <div class="location-card">
+                        <div class="location-image">
+                            <img src="https://images.pexels.com/photos/1098460/pexels-photo-1098460.jpeg?auto=compress&cs=tinysrgb&w=600" alt="San Francisco Branch">
                         </div>
-                        <div class="doctor-content">
-                            <h3>Dr. Emily Roberts</h3>
-                            <p class="specialty">Pediatrics</p>
-                            <p>12+ years experience</p>
+                        <div class="location-content">
+                            <h3>San Francisco - Downtown</h3>
+                            <p>555 Market Street<br>San Francisco, CA 94105</p>
+                            <a href="#">Get Directions →</a>
                         </div>
                     </div>
-                    <div class="doctor-card">
-                        <div class="doctor-image">
-                            <img src="https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Dr. James Wilson">
+                    <div class="location-card">
+                        <div class="location-image">
+                            <img src="https://images.pexels.com/photos/3184339/pexels-photo-3184339.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Chicago Branch">
                         </div>
-                        <div class="doctor-content">
-                            <h3>Dr. James Wilson</h3>
-                            <p class="specialty">Orthopedics</p>
-                            <p>18+ years experience</p>
+                        <div class="location-content">
+                            <h3>Chicago - The Loop</h3>
+                            <p>200 West Adams Street<br>Chicago, IL 60606</p>
+                            <a href="#">Get Directions →</a>
                         </div>
                     </div>
                 </div>
@@ -1584,117 +1490,105 @@
         </section>
     </div>
 
-    <!-- Services Page -->
-    <div id="page-services" class="page-content">
+    <!-- Products Page -->
+    <div id="page-products" class="page-content">
         <section class="section gray">
             <div class="section-container">
                 <div class="section-header">
-                    <h2>Our Medical Services</h2>
-                    <p>Comprehensive healthcare services with a patient-centered approach.</p>
+                    <h2>Our Products & Services</h2>
+                    <p>Comprehensive financial solutions designed to help you save, grow, and protect your money.</p>
                 </div>
 
-                <div class="services-grid" style="margin-bottom: 48px;">
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <svg viewBox="0 0 24 24"><path d="M10.5 13H8v-3h2.5V7.5h3V10H16v3h-2.5v2.5h-3V13zM12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z"/></svg>
+                <div class="products-grid" style="margin-bottom: 48px;">
+                    <div class="product-card">
+                        <div class="product-icon">
+                            <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
                         </div>
-                        <h3>Emergency Care</h3>
-                        <p>Our Level I Trauma Center provides 24/7 emergency services with rapid response teams, advanced life support, and immediate access to surgical specialists.</p>
-                        <a href="#" class="service-link">
-                            Learn More
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-                        </a>
+                        <h3>Personal Checking</h3>
+                        <p>Your everyday spending account with no monthly fees, unlimited transactions, and instant mobile access.</p>
+                        <ul class="product-features">
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> No monthly maintenance fees</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 60,000+ free ATMs nationwide</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Instant mobile check deposit</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Free bill pay & transfers</li>
+                        </ul>
+                        <a href="#" class="btn btn-primary" style="width: 100%; justify-content: center;">Open Account</a>
                     </div>
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    <div class="product-card featured">
+                        <div class="product-icon">
+                            <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
                         </div>
-                        <h3>Cardiology</h3>
-                        <p>Comprehensive cardiac care including stress testing, echocardiography, cardiac catheterization, pacemaker implantation, and cardiac rehabilitation programs.</p>
-                        <a href="#" class="service-link">
-                            Learn More
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-                        </a>
+                        <h3>High-Yield Savings</h3>
+                        <p>Watch your money grow with our industry-leading APY and automatic savings features.</p>
+                        <ul class="product-features">
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 4.50% APY — Best in class</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> No minimum balance required</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Automatic round-up savings</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> FDIC insured up to $250K</li>
+                        </ul>
+                        <a href="#" class="btn btn-primary" style="width: 100%; justify-content: center; background: var(--secondary);">Open Account</a>
                     </div>
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93z"/></svg>
+                    <div class="product-card">
+                        <div class="product-icon">
+                            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
                         </div>
-                        <h3>Neurology</h3>
-                        <p>Expert diagnosis and treatment of brain and nervous system conditions including stroke, epilepsy, Parkinson's disease, and multiple sclerosis.</p>
-                        <a href="#" class="service-link">
-                            Learn More
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="services-grid" style="margin-bottom: 48px;">
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z"/></svg>
-                        </div>
-                        <h3>Orthopedics</h3>
-                        <p>Complete bone and joint care including sports medicine, joint replacement, spine surgery, and physical therapy rehabilitation.</p>
-                        <a href="#" class="service-link">
-                            Learn More
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-                        </a>
-                    </div>
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <svg viewBox="0 0 24 24"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67z"/></svg>
-                        </div>
-                        <h3>Oncology</h3>
-                        <p>Comprehensive cancer care with medical oncology, radiation therapy, surgical oncology, and integrative supportive services.</p>
-                        <a href="#" class="service-link">
-                            Learn More
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-                        </a>
-                    </div>
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <svg viewBox="0 0 24 24"><path d="M14.5 12c2.49 0 4.5-2.01 4.5-4.5S16.99 3 14.5 3 10 5.01 10 7.5s2.01 4.5 4.5 4.5zm-7 0c1.93 0 3.5-1.57 3.5-3.5S9.43 5 7.5 5 4 6.57 4 8.5 5.57 12 7.5 12z"/></svg>
-                        </div>
-                        <h3>Women's Health</h3>
-                        <p>Complete women's healthcare including obstetrics, gynecology, fertility services, mammography, and menopause management.</p>
-                        <a href="#" class="service-link">
-                            Learn More
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-                        </a>
+                        <h3>Meridian Cash Back Card</h3>
+                        <p>Earn unlimited 2% cash back on every purchase with no annual fee or foreign transaction fees.</p>
+                        <ul class="product-features">
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 2% cash back on everything</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> No annual fee, ever</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> $200 welcome bonus</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Zero fraud liability</li>
+                        </ul>
+                        <a href="#" class="btn btn-primary" style="width: 100%; justify-content: center;">Apply Now</a>
                     </div>
                 </div>
 
-                <div class="services-grid">
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <svg viewBox="0 0 24 24"><path d="M19.5 9.5c-1.03 0-1.9.62-2.29 1.5h-2.92c-.39-.88-1.26-1.5-2.29-1.5s-1.9.62-2.29 1.5H6.79c-.39-.88-1.26-1.5-2.29-1.5C3.12 9.5 2 10.62 2 12s1.12 2.5 2.5 2.5c1.03 0 1.9-.62 2.29-1.5h2.92c.39.88 1.26 1.5 2.29 1.5s1.9-.62 2.29-1.5h2.92c.39.88 1.26 1.5 2.29 1.5 1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5z"/></svg>
+                <div class="products-grid">
+                    <div class="product-card">
+                        <div class="product-icon">
+                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
                         </div>
-                        <h3>Primary Care</h3>
-                        <p>Comprehensive primary care for all ages including wellness exams, vaccinations, chronic disease management, and preventive care.</p>
-                        <a href="#" class="service-link">
+                        <h3>Investment Accounts</h3>
+                        <p>Build your portfolio with our low-cost investment options and expert guidance.</p>
+                        <ul class="product-features">
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> IRAs & brokerage accounts</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Commission-free trading</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Robo-advisor available</li>
+                        </ul>
+                        <a href="#" class="product-link">
                             Learn More
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
                         </a>
                     </div>
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+                    <div class="product-card">
+                        <div class="product-icon">
+                            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
                         </div>
-                        <h3>Imaging & Diagnostics</h3>
-                        <p>Advanced diagnostic imaging including MRI, CT scan, ultrasound, X-ray, PET scan, and nuclear medicine services.</p>
-                        <a href="#" class="service-link">
+                        <h3>Home Mortgages</h3>
+                        <p>Competitive rates and personalized service to help you find your dream home.</p>
+                        <ul class="product-features">
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Fixed & adjustable rates</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> First-time buyer programs</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Quick pre-approval</li>
+                        </ul>
+                        <a href="#" class="product-link">
                             Learn More
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
                         </a>
                     </div>
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <svg viewBox="0 0 24 24"><path d="M9 11.75c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zm6 0c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
+                    <div class="product-card">
+                        <div class="product-icon">
+                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
                         </div>
-                        <h3>Mental Health</h3>
-                        <p>Comprehensive mental health services including psychiatry, counseling, addiction treatment, and stress management programs.</p>
-                        <a href="#" class="service-link">
+                        <h3>Business Banking</h3>
+                        <p>Tailored solutions to help your business manage cash flow and grow.</p>
+                        <ul class="product-features">
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Business checking & savings</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Lines of credit</li>
+                            <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Merchant services</li>
+                        </ul>
+                        <a href="#" class="product-link">
                             Learn More
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
                         </a>
@@ -1710,28 +1604,24 @@
             <div class="section-container">
                 <div class="about-grid">
                     <div class="about-image">
-                        <img src="https://images.pexels.com/photos/247786/pexels-photo-247786.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Hospital building">
+                        <img src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Our team">
                     </div>
                     <div class="about-content">
-                        <h2>Healing Our Community Since 1974</h2>
-                        <p>For over 50 years, Horizon Medical Center has been the trusted healthcare provider for our community. What began as a small community hospital has grown into a comprehensive medical center with over 400 beds and 200+ physicians.</p>
-                        <p>Our mission is simple: to provide exceptional, compassionate care to every patient who walks through our doors. We invest in the latest medical technology, recruit the best physicians, and maintain the highest standards of patient safety.</p>
-                        <div class="about-features">
-                            <div class="about-feature">
-                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                                <span>Joint Commission Accredited</span>
+                        <h2>Banking With Purpose Since 1952</h2>
+                        <p>For over 70 years, Meridian Bank has been helping families and businesses achieve their financial goals. What started as a small community bank has grown into a nationwide institution serving over 2 million customers.</p>
+                        <p>Our mission remains the same: provide exceptional banking services with integrity, innovation, and a personal touch. We believe that banking should be simple, transparent, and accessible to everyone.</p>
+                        <div class="about-stats">
+                            <div class="about-stat">
+                                <h4>70+</h4>
+                                <p>Years of Service</p>
                             </div>
-                            <div class="about-feature">
-                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                                <span>Level I Trauma Center</span>
+                            <div class="about-stat">
+                                <h4>2M+</h4>
+                                <p>Customers</p>
                             </div>
-                            <div class="about-feature">
-                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                                <span>Magnet Recognition for Nursing</span>
-                            </div>
-                            <div class="about-feature">
-                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                                <span>Top 100 Hospital Nationally</span>
+                            <div class="about-stat">
+                                <h4>150+</h4>
+                                <p>Branches</p>
                             </div>
                         </div>
                     </div>
@@ -1739,24 +1629,40 @@
             </div>
         </section>
 
-        <section class="section teal">
+        <section class="section gray">
             <div class="section-container">
-                <div class="stats-banner">
-                    <div class="stat-item">
-                        <h3>50+</h3>
-                        <p>Years Serving Community</p>
+                <div class="section-header">
+                    <h2>Our Values</h2>
+                    <p>The principles that guide everything we do.</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                        </div>
+                        <h3>Customer First</h3>
+                        <p>Every decision starts with our customers' needs.</p>
                     </div>
-                    <div class="stat-item">
-                        <h3>400+</h3>
-                        <p>Hospital Beds</p>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+                        </div>
+                        <h3>Trust & Security</h3>
+                        <p>Your money and data are always protected.</p>
                     </div>
-                    <div class="stat-item">
-                        <h3>3,000+</h3>
-                        <p>Healthcare Professionals</p>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>
+                        </div>
+                        <h3>Innovation</h3>
+                        <p>Constantly improving how banking works.</p>
                     </div>
-                    <div class="stat-item">
-                        <h3>98%</h3>
-                        <p>Patient Satisfaction</p>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        </div>
+                        <h3>Integrity</h3>
+                        <p>Honest and transparent in all we do.</p>
                     </div>
                 </div>
             </div>
@@ -1765,38 +1671,35 @@
         <section class="section">
             <div class="section-container">
                 <div class="section-header">
-                    <h2>Our Locations</h2>
-                    <p>Convenient access to quality care throughout the region.</p>
+                    <h2>Leadership Team</h2>
+                    <p>Meet the people driving Meridian Bank forward.</p>
                 </div>
                 <div class="locations-grid">
                     <div class="location-card">
                         <div class="location-image">
-                            <img src="https://images.pexels.com/photos/668300/pexels-photo-668300.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Main Campus">
+                            <img src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=600" alt="CEO">
                         </div>
                         <div class="location-content">
-                            <h3>Main Hospital Campus</h3>
-                            <p>1000 Medical Center Drive<br>Springfield, IL 62701</p>
-                            <a href="#">Get Directions →</a>
+                            <h3>Michael Chen</h3>
+                            <p>Chief Executive Officer<br>25+ years in banking</p>
                         </div>
                     </div>
                     <div class="location-card">
                         <div class="location-image">
-                            <img src="https://images.pexels.com/photos/263402/pexels-photo-263402.jpeg?auto=compress&cs=tinysrgb&w=600" alt="East Campus">
+                            <img src="https://images.pexels.com/photos/3756679/pexels-photo-3756679.jpeg?auto=compress&cs=tinysrgb&w=600" alt="CFO">
                         </div>
                         <div class="location-content">
-                            <h3>East Side Clinic</h3>
-                            <p>500 Commerce Boulevard<br>Springfield, IL 62704</p>
-                            <a href="#">Get Directions →</a>
+                            <h3>Sarah Williams</h3>
+                            <p>Chief Financial Officer<br>Former Goldman Sachs</p>
                         </div>
                     </div>
                     <div class="location-card">
                         <div class="location-image">
-                            <img src="https://images.pexels.com/photos/236380/pexels-photo-236380.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Urgent Care">
+                            <img src="https://images.pexels.com/photos/3778603/pexels-photo-3778603.jpeg?auto=compress&cs=tinysrgb&w=600" alt="CTO">
                         </div>
                         <div class="location-content">
-                            <h3>24/7 Urgent Care Center</h3>
-                            <p>750 Health Way<br>Springfield, IL 62702</p>
-                            <a href="#">Get Directions →</a>
+                            <h3>David Rodriguez</h3>
+                            <p>Chief Technology Officer<br>Ex-Google Engineering</p>
                         </div>
                     </div>
                 </div>
@@ -1809,12 +1712,12 @@
         <div class="support-hero">
             <div class="support-hero-content">
                 <div>
-                    <h1>Patient Support Center</h1>
-                    <p>Track your inquiries and access patient resources</p>
+                    <h1>Support Center</h1>
+                    <p>Track your cases and find answers to common questions</p>
                 </div>
                 <button class="btn btn-primary" onclick="alert('Opening new case form...')">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                    New Support Request
+                    New Support Case
                 </button>
             </div>
         </div>
@@ -1863,8 +1766,8 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><span class="case-id">#HMC-2026-4521</span></td>
-                                <td><span class="case-subject">Insurance pre-authorization for MRI scan</span></td>
+                                <td><span class="case-id">#MRD-2026-0892</span></td>
+                                <td><span class="case-subject">Unauthorized transaction dispute - $450.00</span></td>
                                 <td><span class="case-status open">● Open</span></td>
                                 <td>
                                     <span class="case-priority">
@@ -1878,8 +1781,8 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td><span class="case-id">#HMC-2026-4498</span></td>
-                                <td><span class="case-subject">Request for medical records transfer</span></td>
+                                <td><span class="case-id">#MRD-2026-0885</span></td>
+                                <td><span class="case-subject">Wire transfer to Europe - status inquiry</span></td>
                                 <td><span class="case-status pending">● Pending</span></td>
                                 <td>
                                     <span class="case-priority">
@@ -1893,13 +1796,13 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td><span class="case-id">#HMC-2026-4472</span></td>
-                                <td><span class="case-subject">Billing inquiry - duplicate charge</span></td>
+                                <td><span class="case-id">#MRD-2026-0871</span></td>
+                                <td><span class="case-subject">Update mailing address request</span></td>
                                 <td><span class="case-status open">● Open</span></td>
                                 <td>
                                     <span class="case-priority">
-                                        <span class="priority-dot medium"></span>
-                                        Medium
+                                        <span class="priority-dot low"></span>
+                                        Low
                                     </span>
                                 </td>
                                 <td><span class="dynamic-date" data-days-ago="5"></span></td>
@@ -1908,38 +1811,8 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td><span class="case-id">#HMC-2026-4445</span></td>
-                                <td><span class="case-subject">Prescription refill authorization</span></td>
-                                <td><span class="case-status resolved">● Resolved</span></td>
-                                <td>
-                                    <span class="case-priority">
-                                        <span class="priority-dot high"></span>
-                                        High
-                                    </span>
-                                </td>
-                                <td><span class="dynamic-date" data-days-ago="8"></span></td>
-                                <td class="case-actions">
-                                    <button onclick="alert('View case details')">View</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="case-id">#HMC-2026-4412</span></td>
-                                <td><span class="case-subject">Appointment rescheduling - cardiology</span></td>
-                                <td><span class="case-status resolved">● Resolved</span></td>
-                                <td>
-                                    <span class="case-priority">
-                                        <span class="priority-dot low"></span>
-                                        Low
-                                    </span>
-                                </td>
-                                <td><span class="dynamic-date" data-days-ago="12"></span></td>
-                                <td class="case-actions">
-                                    <button onclick="alert('View case details')">View</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="case-id">#HMC-2026-4389</span></td>
-                                <td><span class="case-subject">Lab results access issue - patient portal</span></td>
+                                <td><span class="case-id">#MRD-2026-0856</span></td>
+                                <td><span class="case-subject">Credit card limit increase approved</span></td>
                                 <td><span class="case-status resolved">● Resolved</span></td>
                                 <td>
                                     <span class="case-priority">
@@ -1947,22 +1820,52 @@
                                         Medium
                                     </span>
                                 </td>
-                                <td><span class="dynamic-date" data-days-ago="16"></span></td>
+                                <td><span class="dynamic-date" data-days-ago="10"></span></td>
                                 <td class="case-actions">
                                     <button onclick="alert('View case details')">View</button>
                                 </td>
                             </tr>
                             <tr>
-                                <td><span class="case-id">#HMC-2026-4356</span></td>
-                                <td><span class="case-subject">Request specialist referral letter</span></td>
-                                <td><span class="case-status closed">● Closed</span></td>
+                                <td><span class="case-id">#MRD-2026-0842</span></td>
+                                <td><span class="case-subject">Mobile app two-factor authentication issue</span></td>
+                                <td><span class="case-status resolved">● Resolved</span></td>
+                                <td>
+                                    <span class="case-priority">
+                                        <span class="priority-dot high"></span>
+                                        High
+                                    </span>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="14"></span></td>
+                                <td class="case-actions">
+                                    <button onclick="alert('View case details')">View</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="case-id">#MRD-2026-0831</span></td>
+                                <td><span class="case-subject">Interest calculation discrepancy</span></td>
+                                <td><span class="case-status resolved">● Resolved</span></td>
                                 <td>
                                     <span class="case-priority">
                                         <span class="priority-dot low"></span>
                                         Low
                                     </span>
                                 </td>
-                                <td><span class="dynamic-date" data-days-ago="21"></span></td>
+                                <td><span class="dynamic-date" data-days-ago="18"></span></td>
+                                <td class="case-actions">
+                                    <button onclick="alert('View case details')">View</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="case-id">#MRD-2026-0818</span></td>
+                                <td><span class="case-subject">New debit card request - expedited shipping</span></td>
+                                <td><span class="case-status closed">● Closed</span></td>
+                                <td>
+                                    <span class="case-priority">
+                                        <span class="priority-dot medium"></span>
+                                        Medium
+                                    </span>
+                                </td>
+                                <td><span class="dynamic-date" data-days-ago="22"></span></td>
                                 <td class="case-actions">
                                     <button onclick="alert('View case details')">View</button>
                                 </td>
@@ -1977,36 +1880,36 @@
             <div class="section-container">
                 <div class="section-header">
                     <h2>Frequently Asked Questions</h2>
-                    <p>Quick answers to common patient questions.</p>
+                    <p>Quick answers to common questions.</p>
                 </div>
                 <div class="faq-grid">
                     <div class="faq-item">
                         <h3>
                             <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
-                            How do I access my medical records?
+                            How do I reset my online banking password?
                         </h3>
-                        <p>Log into the Patient Portal with your credentials. If you need assistance with portal access, contact our Health Information department at (555) 123-4567.</p>
+                        <p>Click "Forgot Password" on the login page and follow the verification steps. You'll receive a reset link via email or SMS.</p>
                     </div>
                     <div class="faq-item">
                         <h3>
                             <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
-                            What insurance plans do you accept?
+                            What is the daily ATM withdrawal limit?
                         </h3>
-                        <p>We accept most major insurance plans including Medicare, Medicaid, Blue Cross, Aetna, UnitedHealthcare, and Cigna. Contact billing for specific coverage questions.</p>
+                        <p>The standard daily ATM withdrawal limit is $500. Premium members enjoy limits up to $1,000. Contact us to request an increase.</p>
                     </div>
                     <div class="faq-item">
                         <h3>
                             <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
-                            How do I request a prescription refill?
+                            How do I dispute a transaction?
                         </h3>
-                        <p>You can request refills through the Patient Portal, by calling your pharmacy, or by contacting your physician's office directly during business hours.</p>
+                        <p>Open a support case or call us at 1-800-MERIDIAN. Disputes must be filed within 60 days of the transaction date.</p>
                     </div>
                     <div class="faq-item">
                         <h3>
                             <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
-                            What are the visiting hours?
+                            How long do wire transfers take?
                         </h3>
-                        <p>General visiting hours are 10:00 AM - 8:00 PM daily. ICU and specialty units may have different hours. Please check with the nursing station upon arrival.</p>
+                        <p>Domestic wire transfers typically complete same-day. International transfers take 1-5 business days depending on the destination.</p>
                     </div>
                 </div>
             </div>
@@ -2018,31 +1921,21 @@
         <section class="section">
             <div class="section-container">
                 <div class="section-header">
-                    <h2>Contact Us</h2>
-                    <p>We're here to help. Reach out with any questions about our services.</p>
+                    <h2>Get in Touch</h2>
+                    <p>We're here to help. Reach out through any channel that works for you.</p>
                 </div>
                 <div class="contact-grid">
                     <div class="contact-info">
-                        <h2>Get In Touch</h2>
-                        <p>Our patient services team is available to assist you with appointments, records, and general inquiries.</p>
+                        <h2>Contact Information</h2>
+                        <p>Our team is available to assist you with any questions about our products and services.</p>
 
                         <div class="contact-method">
                             <div class="contact-method-icon">
                                 <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
                             </div>
                             <div>
-                                <h4>Main Line</h4>
-                                <p>(555) 123-4567</p>
-                            </div>
-                        </div>
-
-                        <div class="contact-method">
-                            <div class="contact-method-icon">
-                                <svg viewBox="0 0 24 24"><path d="M10.5 13H8v-3h2.5V7.5h3V10H16v3h-2.5v2.5h-3V13zM12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z"/></svg>
-                            </div>
-                            <div>
-                                <h4>Emergency</h4>
-                                <p>911 or (555) 123-9999</p>
+                                <h4>Phone</h4>
+                                <p>1-800-MERIDIAN (637-4342)</p>
                             </div>
                         </div>
 
@@ -2052,7 +1945,7 @@
                             </div>
                             <div>
                                 <h4>Email</h4>
-                                <p>info@horizonmedical.com</p>
+                                <p>support@meridianbank.com</p>
                             </div>
                         </div>
 
@@ -2061,16 +1954,16 @@
                                 <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                             </div>
                             <div>
-                                <h4>Address</h4>
-                                <p>1000 Medical Center Drive<br>Springfield, IL 62701</p>
+                                <h4>Headquarters</h4>
+                                <p>100 Financial Center Drive<br>New York, NY 10004</p>
                             </div>
                         </div>
 
                         <div class="contact-hours">
-                            <h4>Hours of Operation</h4>
-                            <p>Emergency: 24/7</p>
-                            <p>Outpatient Services: Mon-Fri 7AM - 7PM</p>
-                            <p>Visitor Hours: 10AM - 8PM Daily</p>
+                            <h4>Customer Service Hours</h4>
+                            <p>Monday - Friday: 8:00 AM - 9:00 PM EST</p>
+                            <p>Saturday: 9:00 AM - 5:00 PM EST</p>
+                            <p>Sunday: Closed</p>
                         </div>
                     </div>
 
@@ -2096,15 +1989,15 @@
                                 <input type="tel" placeholder="(555) 123-4567">
                             </div>
                             <div class="form-group">
-                                <label>Department</label>
+                                <label>Subject</label>
                                 <select>
-                                    <option>Select a department</option>
-                                    <option>Appointments</option>
-                                    <option>Billing & Insurance</option>
-                                    <option>Medical Records</option>
-                                    <option>Patient Relations</option>
-                                    <option>Pharmacy</option>
-                                    <option>General Inquiry</option>
+                                    <option>Select a topic</option>
+                                    <option>Account Inquiry</option>
+                                    <option>Loan Application</option>
+                                    <option>Credit Card Question</option>
+                                    <option>Technical Support</option>
+                                    <option>Fraud Report</option>
+                                    <option>General Question</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -2124,45 +2017,45 @@
         <div class="footer-content">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <div class="logo-text">Horizon <span>Medical</span></div>
-                    <p>Compassionate care and advanced medicine for our community since 1974. Your health is our mission.</p>
+                    <div class="logo-text">Meridian<span>Bank</span></div>
+                    <p>Banking that moves with you. Serving customers nationwide since 1952 with integrity, innovation, and personalized service.</p>
                 </div>
                 <div class="footer-column">
-                    <h4>Services</h4>
-                    <a href="#">Emergency Care</a>
-                    <a href="#">Primary Care</a>
-                    <a href="#">Cardiology</a>
-                    <a href="#">Orthopedics</a>
-                    <a href="#">Oncology</a>
+                    <h4>Products</h4>
+                    <a href="#">Checking</a>
+                    <a href="#">Savings</a>
+                    <a href="#">Credit Cards</a>
+                    <a href="#">Mortgages</a>
+                    <a href="#">Investments</a>
                 </div>
                 <div class="footer-column">
-                    <h4>Patients</h4>
-                    <a href="#">Patient Portal</a>
-                    <a href="#">Medical Records</a>
-                    <a href="#">Billing & Insurance</a>
-                    <a href="#">Visitor Information</a>
-                </div>
-                <div class="footer-column">
-                    <h4>About Us</h4>
-                    <a href="#">Our Mission</a>
-                    <a href="#">Leadership</a>
+                    <h4>Company</h4>
+                    <a href="#">About Us</a>
                     <a href="#">Careers</a>
-                    <a href="#">Newsroom</a>
+                    <a href="#">Press</a>
+                    <a href="#">Investor Relations</a>
                 </div>
                 <div class="footer-column">
-                    <h4>Quick Links</h4>
-                    <a href="#">Find a Doctor</a>
-                    <a href="#">Locations</a>
-                    <a href="#">Contact Us</a>
-                    <a href="#">Emergency Info</a>
+                    <h4>Resources</h4>
+                    <a href="#">Help Center</a>
+                    <a href="#">Security</a>
+                    <a href="#">Blog</a>
+                    <a href="#">Rates</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Legal</h4>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Cookie Policy</a>
+                    <a href="#">Accessibility</a>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>© 2026 Horizon Medical Center. All rights reserved.</p>
+                <p>© 2026 Meridian Bank. All rights reserved. Member FDIC. Equal Housing Lender.</p>
                 <div class="footer-legal">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Use</a>
-                    <a href="#">HIPAA Notice</a>
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
+                    <a href="#">Sitemap</a>
                 </div>
             </div>
         </div>
@@ -2171,6 +2064,7 @@
     <script>
         // Navigation
         function showPage(pageName) {
+            // Update nav items
             document.querySelectorAll('.nav a').forEach(item => {
                 item.classList.remove('active');
                 if (item.dataset.page === pageName) {
@@ -2178,6 +2072,7 @@
                 }
             });
 
+            // Update page content
             document.querySelectorAll('.page-content').forEach(page => {
                 page.classList.remove('active');
             });
@@ -2186,9 +2081,11 @@
                 targetPage.classList.add('active');
             }
 
+            // Scroll to top
             window.scrollTo(0, 0);
         }
 
+        // Add click handlers to nav items
         document.querySelectorAll('.nav a').forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -2233,11 +2130,12 @@
             }
             
             if (!config) {
+                // Try to load from localStorage (same key as index.html saves to)
                 const savedSettings = localStorage.getItem('chatWidgetSettings');
                 if (savedSettings) {
                     try {
                         config = JSON.parse(savedSettings);
-                        console.log('🏥 Healthcare Portal: Loaded widget config from localStorage:', {
+                        console.log('🏦 Financial Portal: Loaded widget config from localStorage:', {
                             widgetId: config.widgetId,
                             orgId: config.orgId,
                             orgUrl: config.orgUrl
@@ -2249,18 +2147,22 @@
             }
 
             if (config) {
+                // Check widget mode - default to 'custom' if not set
                 const widgetMode = config.widgetMode || 'custom';
                 console.log('🎛️ Widget mode:', widgetMode);
 
                 if (widgetMode === 'custom') {
+                    // Custom mode - load the embedded SDK directly (like a real website would)
                     console.log('✅ Custom widget mode - loading embedded SDK directly');
                     
+                    // Set the global config for the widget SDK
                     window.D365WidgetConfig = {
                         orgId: config.orgId,
                         orgUrl: config.orgUrl,
                         widgetId: config.widgetId
                     };
                     
+                    // Add all the styling/customization options from config
                     if (config.headerTitle) window.D365WidgetConfig.headerTitle = config.headerTitle;
                     if (config.headerSubtitle) window.D365WidgetConfig.headerSubtitle = config.headerSubtitle;
                     if (config.headerTitleColor) window.D365WidgetConfig.headerTitleColor = config.headerTitleColor;
@@ -2351,9 +2253,11 @@
                     document.head.appendChild(script);
                     
                 } else if (widgetMode === 'standard') {
+                    // Standard mode - load the D365 LCW widget
                     if (config.lcwCode) {
                         console.log('✅ Loading standard D365 LCW widget from embed code');
                         
+                        // Parse the lcwCode to extract the script attributes
                         const parser = new DOMParser();
                         const doc = parser.parseFromString(config.lcwCode, 'text/html');
                         const scriptTag = doc.querySelector('script[id="Microsoft_Omnichannel_LCWidget"]');
@@ -2368,8 +2272,9 @@
                             document.head.appendChild(lcwScript);
                             console.log('✅ D365 LCW widget script injected');
                             
+                            // Set up context provider for authentication
                             window.addEventListener("lcw:ready", function handleLivechatReadyEvent() {
-                                console.log('✅ LCW Ready on healthcare portal');
+                                console.log('✅ LCW Ready on financial portal');
                                 
                                 if (config.enableStandardAuth === true && typeof Microsoft !== 'undefined') {
                                     Microsoft.Omnichannel.LiveChatWidget.SDK.setContextProvider(function contextProvider() {
@@ -2389,6 +2294,7 @@
                             console.error('❌ Could not parse LCW code - invalid format');
                         }
                     } else if (config.widgetId && config.orgId && config.orgUrl) {
+                        // Fallback: Build LCW script from individual values
                         console.log('✅ Building LCW widget from individual D365 values');
                         
                         const lcwScript = document.createElement('script');
@@ -2404,8 +2310,9 @@
                             orgUrl: config.orgUrl
                         });
                         
+                        // Set up context provider for authentication
                         window.addEventListener("lcw:ready", function handleLivechatReadyEvent() {
-                            console.log('✅ LCW Ready on healthcare portal');
+                            console.log('✅ LCW Ready on financial portal');
                             
                             if (config.enableStandardAuth === true && typeof Microsoft !== 'undefined') {
                                 Microsoft.Omnichannel.LiveChatWidget.SDK.setContextProvider(function contextProvider() {
