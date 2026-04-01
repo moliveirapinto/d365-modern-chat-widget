@@ -1,12 +1,16 @@
 # 🚀 Modern Dynamics 365 Live Chat Widget
 
+You can access the working solution here: https://lemon-water-0adbcca0f.1.azurestaticapps.net/
+
+Or fork the repo following the details below:
+
 > **A beautiful, modern custom chat widget UI for Microsoft Dynamics 365 Omnichannel** with an intuitive admin panel, advanced session persistence, and contact authentication. This implementation completely replaces the out-of-the-box (OOTB) chat widget with a sleek, contemporary design.
 
 [![D365 Compatible](https://img.shields.io/badge/D365-Omnichannel-0078D4?style=flat-square&logo=microsoft)](https://dynamics.microsoft.com)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 [![Version](https://img.shields.io/badge/version-v2.16.0-blue?style=flat-square)](package.json)
 
-![Chat Widget Preview](preview.png)
+
 
 ---
 
