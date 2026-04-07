@@ -471,6 +471,11 @@
                         window.D365WidgetConfig.contextVariables = config.contextVariables;
                     }
                     
+                    // Authenticated Chat - pass explicit getAuthToken if provided
+                    if (typeof config.getAuthToken === 'function') {
+                        window.D365WidgetConfig.getAuthToken = config.getAuthToken;
+                    }
+                    
                     // Apply background image URL to the live.html page as a scrollable website simulation
                     if (config.backgroundImageUrl) {
                         // Create a full-width scrollable image instead of a fixed CSS background

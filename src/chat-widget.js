@@ -12,7 +12,8 @@ class ModernChatWidget {
             orgUrl: config.orgUrl || '',
             widgetId: config.widgetId || '',
             customBotName: config.customBotName || '',
-            contextVariables: config.contextVariables || {}
+            contextVariables: config.contextVariables || {},
+            getAuthToken: config.getAuthToken || null
         };
 
         this.chatSDK = null;
@@ -173,6 +174,44 @@ class ModernChatWidget {
         await this.initializeSDK();
     }
 
+    /**
+     * Detects Power Pages environment and returns the auth token provider.
+     * On Power Pages, the global `auth.getAuthenticationToken` function is
+     * available when a user is logged in. It uses a callback pattern, so we
+     * wrap it in a Promise for the SDK's async `getAuthToken` interface.
+     */
+    _resolveAuthTokenProvider() {
+        // 1. Explicit getAuthToken passed in config takes priority
+        if (typeof this.config.getAuthToken === 'function') {
+            console.log('🔐 Auth: Using explicitly provided getAuthToken');
+            return this.config.getAuthToken;
+        }
+
+        // 2. Auto-detect Power Pages portal auth
+        if (typeof window.auth !== 'undefined' &&
+            typeof window.auth.getAuthenticationToken === 'function') {
+            console.log('🔐 Auth: Power Pages detected — using auth.getAuthenticationToken');
+            return () => new Promise((resolve, reject) => {
+                try {
+                    window.auth.getAuthenticationToken((token) => {
+                        if (token) {
+                            resolve(token);
+                        } else {
+                            console.warn('🔐 Auth: Power Pages auth returned null token (user may not be logged in)');
+                            resolve(null);
+                        }
+                    });
+                } catch (e) {
+                    console.warn('🔐 Auth: Power Pages auth.getAuthenticationToken threw:', e);
+                    resolve(null);
+                }
+            });
+        }
+
+        // 3. No auth available
+        return null;
+    }
+
     async initializeSDK() {
         try {
             const omnichannelConfig = {
@@ -181,7 +220,15 @@ class ModernChatWidget {
                 widgetId: this.config.widgetId
             };
 
-            this.chatSDK = new OmnichannelChatSDK.default(omnichannelConfig);
+            // Build SDK config with optional authenticated chat support
+            const chatSDKConfig = {};
+            const authTokenProvider = this._resolveAuthTokenProvider();
+            if (authTokenProvider) {
+                chatSDKConfig.getAuthToken = authTokenProvider;
+                console.log('🔐 Auth: Authenticated chat enabled');
+            }
+
+            this.chatSDK = new OmnichannelChatSDK.default(omnichannelConfig, chatSDKConfig);
             await this.chatSDK.initialize();
             console.log("✅ Chat SDK initialized!");
             this.updateStatus("Ready to help");
