@@ -1,7 +1,11 @@
 name: Apply Sources Redesign
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/apply-sources-redesign.yml'
+      - '.github/scripts/apply-sources-redesign.js'
 
 jobs:
   apply:
@@ -37,11 +41,6 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add dist/widget-core.js
-          git rm --cached .github/workflows/apply-sources-patch.yml 2>/dev/null || true
-          git rm --cached .github/scripts/apply-sources-redesign.js 2>/dev/null || true
-          git rm .github/workflows/apply-sources-patch.yml 2>/dev/null || true
-          git rm .github/scripts/apply-sources-redesign.js 2>/dev/null || true
-          git add -A
           git commit -m 'feat: modern Sources section redesign - SVG icon, pill badges, card hover'
           git push
           echo "All done!"
