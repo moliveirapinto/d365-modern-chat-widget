@@ -1,0 +1,47 @@
+name: Apply Sources Redesign
+
+on:
+  workflow_dispatch:
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore original widget-core.js from e780b82
+        run: |
+          git show e780b82:dist/widget-core.js > dist/widget-core.js
+          ORIG_SIZE=$(wc -c < dist/widget-core.js)
+          echo "Restored original file ($ORIG_SIZE bytes)"
+          if [ "$ORIG_SIZE" -lt 100000 ]; then
+            echo "ERROR: Original file too small!"
+            exit 1
+          fi
+
+      - name: Apply sources redesign via Node.js script
+        run: node .github/scripts/apply-sources-redesign.js
+
+      - name: Verify and commit
+        run: |
+          NEW_SIZE=$(wc -c < dist/widget-core.js)
+          echo "New file size: $NEW_SIZE bytes"
+          if [ "$NEW_SIZE" -lt 140000 ]; then
+            echo "ERROR: New file too small! Something went wrong."
+            exit 1
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add dist/widget-core.js
+          git rm --cached .github/workflows/apply-sources-patch.yml 2>/dev/null || true
+          git rm --cached .github/scripts/apply-sources-redesign.js 2>/dev/null || true
+          git rm .github/workflows/apply-sources-patch.yml 2>/dev/null || true
+          git rm .github/scripts/apply-sources-redesign.js 2>/dev/null || true
+          git add -A
+          git commit -m 'feat: modern Sources section redesign - SVG icon, pill badges, card hover'
+          git push
+          echo "All done!"
