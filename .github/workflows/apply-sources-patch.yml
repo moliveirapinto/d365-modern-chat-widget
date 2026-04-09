@@ -1,0 +1,69 @@
+name: Apply Sources Redesign Patch
+
+on:
+  workflow_dispatch:
+
+jobs:
+  apply-patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore original widget-core.js from e780b82
+        run: |
+          git show e780b82:dist/widget-core.js > dist/widget-core.js
+          echo "Restored original file ($(wc -c < dist/widget-core.js) bytes)"
+
+      - name: Write patch file
+        run: |
+          cat > /tmp/sources-redesign.patch << 'PATCHEOF'
+diff --git a/dist/widget-core.js b/dist/widget-core.js
+index 4da8d23..1bd9aac 100644
+--- a/dist/widget-core.js
++++ b/dist/widget-core.js
+@@ -301,14 +301,20 @@
+       '.d365-msg.agent a{color:\'+c.primaryColor+\';text-decoration:none;font-weight:500;transition:color .2s}',
+       '.d365-msg.agent a:hover{text-decoration:underline}',
+       // Sources/References section styling
+-      '.d365-sources{margin-top:16px;padding-top:12px;border-top:1px solid rgba(0,0,0,0.1);font-size:13px}',
+-      '.d365-sources-title{font-weight:600;color:#1f2937;margin-bottom:8px;font-size:13px}',
+-      '.d365-source-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;margin:6px 0;background:rgba(99,102,241,0.05);border-radius:8px;border-left:3px solid \'+c.primaryColor+\';transition:background .2s}',
+-      '.d365-source-item:hover{background:rgba(99,102,241,0.1)}',
+-      '.d365-source-number{color:\'+c.primaryColor+\';font-weight:600;font-size:12px;min-width:20px}',
+-      '.d365-source-content{flex:1;min-width:0}',
+-      '.d365-source-title{color:\'+c.primaryColor+\';font-weight:500;font-size:13px;line-height:1.4;word-break:break-word}',
+-      '.d365-source-domain{color:#64748b;font-size:11px;margin-top:2px}',
++      '.d365-sources{margin-top:14px;padding-top:12px;border-top:1px solid rgba(0,0,0,0.08);font-size:13px}',
++      '.d365-sources-header{display:flex;align-items:center;gap:6px;margin-bottom:8px}',
++      '.d365-sources-icon{width:13px;height:13px;flex-shrink:0;opacity:.55}',
++      '.d365-sources-label{font-weight:700;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:.6px}',
++      '.d365-source-item{display:flex;align-items:center;gap:10px;padding:8px 10px;margin:4px 0;background:rgba(0,0,0,0.025);border-radius:10px;border:1px solid rgba(0,0,0,0.06);text-decoration:none!important;color:inherit;transition:all .2s;cursor:default}',
++      '.d365-source-item:hover{background:\'+c.primaryColor+\'0d;border-color:\'+c.primaryColor+\'33;transform:translateX(2px);box-shadow:0 2px 8px rgba(0,0,0,.06)}',
++      '.d365-source-item.linked{cursor:pointer}',
++      '.d365-source-num{min-width:20px;height:20px;padding:0 5px;border-radius:5px;background:\'+c.primaryColor+\'18;color:\'+c.primaryColor+\';font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}',
++      '.d365-source-info{flex:1;min-width:0}',
++      '.d365-source-name{color:#1e293b;font-weight:500;font-size:13px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
++      '.d365-source-item.linked .d365-source-name{color:\'+c.primaryColor+\'}',
++      '.d365-source-meta{color:#94a3b8;font-size:11px;margin-top:1px}',
++      '.d365-source-arrow{color:\'+c.primaryColor+\';opacity:.4;font-size:13px;flex-shrink:0;transition:opacity .2s}',
++      '.d365-source-item:hover .d365-source-arrow{opacity:.8}',
+PATCHEOF
+          echo "Patch written"
+
+      - name: Apply patch
+        run: |
+          git apply /tmp/sources-redesign.patch
+          echo "Patch applied! File size: $(wc -c < dist/widget-core.js) bytes"
+
+      - name: Commit and push
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add dist/widget-core.js
+          git commit -m 'feat: modern Sources section redesign - SVG icon, pill badges, card hover'
+          git push
+          echo "Done!"
