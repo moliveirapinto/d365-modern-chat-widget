@@ -301,14 +301,20 @@
       '.d365-msg.agent a{color:'+c.primaryColor+';text-decoration:none;font-weight:500;transition:color .2s}',
       '.d365-msg.agent a:hover{text-decoration:underline}',
       // Sources/References section styling
-      '.d365-sources{margin-top:16px;padding-top:12px;border-top:1px solid rgba(0,0,0,0.1);font-size:13px}',
-      '.d365-sources-title{font-weight:600;color:#1f2937;margin-bottom:8px;font-size:13px}',
-      '.d365-source-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;margin:6px 0;background:rgba(99,102,241,0.05);border-radius:8px;border-left:3px solid '+c.primaryColor+';transition:background .2s}',
-      '.d365-source-item:hover{background:rgba(99,102,241,0.1)}',
-      '.d365-source-number{color:'+c.primaryColor+';font-weight:600;font-size:12px;min-width:20px}',
+      '.d365-sources{margin-top:16px;padding-top:12px;border-top:1px solid rgba(0,0,0,0.08);font-size:13px}',
+      '.d365-sources-header{display:flex;align-items:center;gap:6px;margin-bottom:10px}',
+      '.d365-sources-icon{width:14px;height:14px;opacity:.6;flex-shrink:0;fill:#64748b}',
+      '.d365-sources-title{font-weight:600;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:.6px}',
+      '.d365-source-item{display:flex;align-items:center;gap:10px;padding:9px 12px;margin:5px 0;background:rgba(0,0,0,0.03);border-radius:10px;border:1px solid rgba(0,0,0,0.06);transition:all .2s;cursor:default}',
+      '.d365-source-item:hover{background:'+c.primaryColor+'0d;border-color:'+c.primaryColor+'33;transform:translateX(2px)}',
+      '.d365-source-number{width:22px;height:22px;border-radius:6px;background:'+c.primaryColor+'18;color:'+c.primaryColor+';font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}',
       '.d365-source-content{flex:1;min-width:0}',
-      '.d365-source-title{color:'+c.primaryColor+';font-weight:500;font-size:13px;line-height:1.4;word-break:break-word}',
-      '.d365-source-domain{color:#64748b;font-size:11px;margin-top:2px}',
+      '.d365-source-title{color:#1e293b;font-weight:500;font-size:13px;line-height:1.4;word-break:break-word}',
+      '.d365-source-domain{color:#94a3b8;font-size:11px;margin-top:1px;display:flex;align-items:center;gap:3px}',
+      '.d365-source-arrow{margin-left:auto;color:'+c.primaryColor+';opacity:.5;font-size:14px;flex-shrink:0}',
+      '.d365-source-item a{text-decoration:none;color:inherit}',
+      '.d365-source-item a:hover .d365-source-title{color:'+c.primaryColor+'}',
+      '.d365-source-item a:hover .d365-source-arrow{opacity:1}',
       '.d365-msg-time{font-size:10px;color:#94a3b8;padding:0 4px}',
       '.d365-msg-wrap.user .d365-msg-time{text-align:right}',
       '.d365-adaptive-card{background:#fff!important;padding:0!important;overflow:hidden;border-radius:12px}',
@@ -1508,8 +1514,8 @@
       // Handle reference citations
       references.forEach(function(ref) {
         var linkHtml = ref.isCite
-          ? '<span title="' + ref.title + '" style="color:' + config.primaryColor + ';text-decoration:none;font-size:0.75em;vertical-align:super;font-weight:600;cursor:help;">' + ref.num + '</span>'
-          : '<a href="' + ref.url + '" target="_blank" title="' + ref.title + '" style="color:#0078d4;text-decoration:none;font-size:0.75em;vertical-align:super;">' + ref.num + '</a>';
+          ? '<span title="' + ref.title + '" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:4px;background:' + config.primaryColor + '22;color:' + config.primaryColor + ';font-size:10px;font-weight:700;vertical-align:super;cursor:help;margin:0 1px;">' + ref.num + '</span>'
+          : '<a href="' + ref.url + '" target="_blank" title="' + ref.title + '" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:4px;background:#0078d422;color:#0078d4;font-size:10px;font-weight:700;vertical-align:super;text-decoration:none;margin:0 1px;">' + ref.num + '</a>';
         html = html.replace(new RegExp('\\[' + ref.num + '\\]', 'g'), linkHtml);
       });
       
@@ -1527,19 +1533,32 @@
       // Add sources section if references exist
       if (references.length > 0) {
         var sourcesHtml = '<div class="d365-sources">';
-        sourcesHtml += '<div class="d365-sources-title">Sources</div>';
+        sourcesHtml += '<div class="d365-sources-header">';
+        sourcesHtml += '<svg class="d365-sources-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z"/></svg>';
+        sourcesHtml += '<span class="d365-sources-title">Sources</span>';
+        sourcesHtml += '</div>';
         references.forEach(function(ref) {
-          sourcesHtml += '<div class="d365-source-item">';
-          sourcesHtml += '<span class="d365-source-number">[' + ref.num + ']</span>';
-          sourcesHtml += '<div class="d365-source-content">';
           if (ref.isCite) {
-            sourcesHtml += '<span class="d365-source-title">' + ref.title + '</span>';
+            sourcesHtml += '<div class="d365-source-item">';
+            sourcesHtml += '<span class="d365-source-number">' + ref.num + '</span>';
+            sourcesHtml += '<div class="d365-source-content">';
+            sourcesHtml += '<div class="d365-source-title">' + ref.title + '</div>';
+            sourcesHtml += '</div>';
+            sourcesHtml += '<span class="d365-source-arrow">›</span>';
+            sourcesHtml += '</div>';
           } else {
             var domain = ref.url.replace(/https?:\/\/(www\.)?/, '').split('/')[0];
-            sourcesHtml += '<a href="' + ref.url + '" target="_blank" class="d365-source-title">' + ref.title + '</a>';
-            sourcesHtml += '<div class="d365-source-domain">' + domain + '</div>';
+            sourcesHtml += '<div class="d365-source-item">';
+            sourcesHtml += '<span class="d365-source-number">' + ref.num + '</span>';
+            sourcesHtml += '<a href="' + ref.url + '" target="_blank" style="display:flex;flex:1;min-width:0;align-items:center;gap:10px;text-decoration:none;">';
+            sourcesHtml += '<div class="d365-source-content">';
+            sourcesHtml += '<div class="d365-source-title">' + ref.title + '</div>';
+            sourcesHtml += '<div class="d365-source-domain">🔗 ' + domain + '</div>';
+            sourcesHtml += '</div>';
+            sourcesHtml += '<span class="d365-source-arrow">↗</span>';
+            sourcesHtml += '</a>';
+            sourcesHtml += '</div>';
           }
-          sourcesHtml += '</div></div>';
         });
         sourcesHtml += '</div>';
         html += sourcesHtml;
