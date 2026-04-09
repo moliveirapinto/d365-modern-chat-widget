@@ -1468,6 +1468,7 @@
       // Extract references [n]: url "title" at the end
       var references = [];
       var refRegex = /\[(\d+)\]:\s*(https?:\/\/[^\s]+)\s*"([^"]+)"/g;
+      var citeRegex = /\[(\d+)\]:\s*cite:(\d+)\s*"([^"]+)"/g;
       var match;
       var mainContent = text;
       
@@ -1475,8 +1476,16 @@
         references.push({ num: match[1], url: match[2], title: match[3] });
       }
       
+      while ((match = citeRegex.exec(text)) !== null) {
+        var exists = references.some(function(r) { return r.num === match[1]; });
+        if (!exists) {
+          references.push({ num: match[1], url: '', title: match[3], isCite: true });
+        }
+      }
+      
       if (references.length > 0) {
         mainContent = text.replace(/\n?\[(\d+)\]:\s*https?:\/\/[^\s]+\s*"[^"]+"/g, '');
+        mainContent = mainContent.replace(/\n?\[(\d+)\]:\s*cite:\d+\s*"[^"]+"/g, '');
       }
       
       // Convert markdown to HTML
@@ -1498,8 +1507,10 @@
       
       // Handle reference citations
       references.forEach(function(ref) {
-        html = html.replace(new RegExp('\\[' + ref.num + '\\]', 'g'), 
-          '<a href="' + ref.url + '" target="_blank" title="' + ref.title + '" style="color:#0078d4;text-decoration:none;font-size:0.75em;vertical-align:super;">' + ref.num + '</a>');
+        var linkHtml = ref.isCite
+          ? '<span title="' + ref.title + '" style="color:' + config.primaryColor + ';text-decoration:none;font-size:0.75em;vertical-align:super;font-weight:600;cursor:help;">' + ref.num + '</span>'
+          : '<a href="' + ref.url + '" target="_blank" title="' + ref.title + '" style="color:#0078d4;text-decoration:none;font-size:0.75em;vertical-align:super;">' + ref.num + '</a>';
+        html = html.replace(new RegExp('\\[' + ref.num + '\\]', 'g'), linkHtml);
       });
       
       html = html
@@ -1518,12 +1529,16 @@
         var sourcesHtml = '<div class="d365-sources">';
         sourcesHtml += '<div class="d365-sources-title">Sources</div>';
         references.forEach(function(ref) {
-          var domain = ref.url.replace(/https?:\/\/(www\.)?/, '').split('/')[0];
           sourcesHtml += '<div class="d365-source-item">';
           sourcesHtml += '<span class="d365-source-number">[' + ref.num + ']</span>';
           sourcesHtml += '<div class="d365-source-content">';
-          sourcesHtml += '<a href="' + ref.url + '" target="_blank" class="d365-source-title">' + ref.title + '</a>';
-          sourcesHtml += '<div class="d365-source-domain">' + domain + '</div>';
+          if (ref.isCite) {
+            sourcesHtml += '<span class="d365-source-title">' + ref.title + '</span>';
+          } else {
+            var domain = ref.url.replace(/https?:\/\/(www\.)?/, '').split('/')[0];
+            sourcesHtml += '<a href="' + ref.url + '" target="_blank" class="d365-source-title">' + ref.title + '</a>';
+            sourcesHtml += '<div class="d365-source-domain">' + domain + '</div>';
+          }
           sourcesHtml += '</div></div>';
         });
         sourcesHtml += '</div>';
