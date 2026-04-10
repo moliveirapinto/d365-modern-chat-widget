@@ -1513,7 +1513,7 @@
       
       // Handle reference citations
       references.forEach(function(ref) {
-        if (ref.isCite) return;
+        if (ref.isCite) { html = html.replace(new RegExp('\\[' + ref.num + '\\]', 'g'), ''); return; }
         var linkHtml = ref.isCite
           ? '<span title="' + ref.title + '" style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:4px;background:' + config.primaryColor + '22;color:' + config.primaryColor + ';font-size:9.5px;font-weight:700;vertical-align:super;line-height:1;cursor:help;margin:0 1px;">' + ref.num + '</span>'
           : '<a href="' + ref.url + '" target="_blank" title="' + ref.title + '" style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:4px;background:#0078d422;color:#0078d4;font-size:9.5px;font-weight:700;vertical-align:super;line-height:1;text-decoration:none;margin:0 1px;">' + ref.num + '</a>';
