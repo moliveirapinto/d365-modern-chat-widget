@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 // Script to apply Sources redesign changes to widget-core.js
 // Called by the GitHub Actions workflow from .github/scripts/
 
@@ -115,7 +115,7 @@ const newSourcesLines = `        sourcesHtml += '<div class="d365-sources-header
           sourcesHtml += '<div class="d365-source-info">';
           sourcesHtml += '<div class="d365-source-name">' + ref.title + '</div>';
           if (!ref.isCite) {
-            var domain = ref.url.replace(/https?:\/\/(www\.)?/, '').split('/')[0];
+            var domain = ref.url.replace(/https?:\\/\\/(www\\.)?/, '').split('/')[0];
             sourcesHtml += '<div class="d365-source-meta">' + domain + '</div>';
           }
           sourcesHtml += '</div>';

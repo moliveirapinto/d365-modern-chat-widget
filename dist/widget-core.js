@@ -1,4 +1,4 @@
-/**
+﻿/**
  * D365 Modern Chat Widget - Core
  * This is the main widget code that gets loaded via the loader
  * Version: 3.0.0
@@ -1547,7 +1547,7 @@
           sourcesHtml += '<div class="d365-source-info">';
           sourcesHtml += '<div class="d365-source-name">' + ref.title + '</div>';
           if (!ref.isCite) {
-            var domain = ref.url.replace(/https?://(www.)?/, '').split('/')[0];
+            var domain = ref.url.replace(/https?:\/\/(www\.)?/, '').split('/')[0];
             sourcesHtml += '<div class="d365-source-meta">' + domain + '</div>';
           }
           sourcesHtml += '</div>';
