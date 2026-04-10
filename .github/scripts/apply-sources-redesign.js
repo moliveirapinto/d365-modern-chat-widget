@@ -105,24 +105,19 @@ const newSourcesLines = `        sourcesHtml += '<div class="d365-sources-header
         sourcesHtml += '<svg class="d365-sources-icon" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>';
         sourcesHtml += '<span class="d365-sources-label">Sources</span>';
         sourcesHtml += '</div>';
-        references.forEach(function(ref) {
-          if (ref.isCite) {
-            sourcesHtml += '<div class="d365-source-item">';
-          } else {
-            sourcesHtml += '<a href="' + ref.url + '" target="_blank" class="d365-source-item linked">';
-          }
+        var urlRefs = references.filter(function(r) { return !r.isCite; });
+        urlRefs.forEach(function(ref) {
+          
+
           sourcesHtml += '<span class="d365-source-num">' + ref.num + '</span>';
           sourcesHtml += '<div class="d365-source-info">';
           sourcesHtml += '<div class="d365-source-name">' + ref.title + '</div>';
-          if (!ref.isCite && ref.url) {
-            var domain = ref.url.replace(/https?:\\/\\/(www\\.)?/, '').split('/')[0];
+          var domain = ref.url.replace(/https?:\\/\\/(www\\.)?/, '').split('/')[0];
             sourcesHtml += '<div class="d365-source-meta">' + domain + '</div>';
-          } else if (ref.isCite) {
-            sourcesHtml += '<div class="d365-source-meta">Internal reference</div>';
-          }
+
           sourcesHtml += '</div>';
-          sourcesHtml += '<span class="d365-source-arrow">' + (ref.isCite ? '&rsaquo;' : '&#x2197;') + '</span>';
-          sourcesHtml += ref.isCite ? '</div>' : '</a>';
+          sourcesHtml += '<span class="d365-source-arrow">' + '&#x2197;' + '</span>';
+          sourcesHtml += '</a>';
 `;
 
 content = content.substring(0, srcLineStart) + newSourcesLines + content.substring(srcLineEnd);

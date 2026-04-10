@@ -1513,6 +1513,7 @@
       
       // Handle reference citations
       references.forEach(function(ref) {
+        if (ref.isCite) return;
         var linkHtml = ref.isCite
           ? '<span title="' + ref.title + '" style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:4px;background:' + config.primaryColor + '22;color:' + config.primaryColor + ';font-size:9.5px;font-weight:700;vertical-align:super;line-height:1;cursor:help;margin:0 1px;">' + ref.num + '</span>'
           : '<a href="' + ref.url + '" target="_blank" title="' + ref.title + '" style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:4px;background:#0078d422;color:#0078d4;font-size:9.5px;font-weight:700;vertical-align:super;line-height:1;text-decoration:none;margin:0 1px;">' + ref.num + '</a>';
@@ -1531,30 +1532,24 @@
       html = html.replace(/<\/ul>\s*<ul>/g, '');
       
       // Add sources section if references exist
-      if (references.length > 0) {
+      var urlRefs = references.filter(function(r) { return !r.isCite; });
+      if (urlRefs.length > 0) {
         var sourcesHtml = '<div class="d365-sources">';
         sourcesHtml += '<div class="d365-sources-header">';
         sourcesHtml += '<svg class="d365-sources-icon" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>';
         sourcesHtml += '<span class="d365-sources-label">Sources</span>';
         sourcesHtml += '</div>';
-        references.forEach(function(ref) {
-          if (ref.isCite) {
-            sourcesHtml += '<div class="d365-source-item">';
-          } else {
-            sourcesHtml += '<a href="' + ref.url + '" target="_blank" class="d365-source-item linked">';
-          }
+        urlRefs.forEach(function(ref) {
+          sourcesHtml += '<a href="' + ref.url + '" target="_blank" class="d365-source-item linked">';
           sourcesHtml += '<span class="d365-source-num">' + ref.num + '</span>';
           sourcesHtml += '<div class="d365-source-info">';
           sourcesHtml += '<div class="d365-source-name">' + ref.title + '</div>';
-          if (!ref.isCite && ref.url) {
-            var domain = ref.url.replace(/https?:\/\/(www\.)?/, '').split('/')[0];
-            sourcesHtml += '<div class="d365-source-meta">' + domain + '</div>';
-          } else if (ref.isCite) {
-            sourcesHtml += '<div class="d365-source-meta">Internal reference</div>';
-          }
+          var domain = ref.url.replace(/https?:\/\/(www\.)?/, '').split('/')[0];
+          sourcesHtml += '<div class="d365-source-meta">' + domain + '</div>';
+
           sourcesHtml += '</div>';
-          sourcesHtml += '<span class="d365-source-arrow">' + (ref.isCite ? '&rsaquo;' : '&#x2197;') + '</span>';
-          sourcesHtml += ref.isCite ? '</div>' : '</a>';
+          sourcesHtml += '<span class="d365-source-arrow">' + '&#x2197;' + '</span>';
+          sourcesHtml += '</a>';
         });
         sourcesHtml += '</div>';
         html += sourcesHtml;
