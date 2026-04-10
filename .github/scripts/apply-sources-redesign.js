@@ -114,9 +114,11 @@ const newSourcesLines = `        sourcesHtml += '<div class="d365-sources-header
           sourcesHtml += '<span class="d365-source-num">' + ref.num + '</span>';
           sourcesHtml += '<div class="d365-source-info">';
           sourcesHtml += '<div class="d365-source-name">' + ref.title + '</div>';
-          if (!ref.isCite) {
+          if (!ref.isCite && ref.url) {
             var domain = ref.url.replace(/https?:\\/\\/(www\\.)?/, '').split('/')[0];
             sourcesHtml += '<div class="d365-source-meta">' + domain + '</div>';
+          } else if (ref.isCite) {
+            sourcesHtml += '<div class="d365-source-meta">Internal reference</div>';
           }
           sourcesHtml += '</div>';
           sourcesHtml += '<span class="d365-source-arrow">' + (ref.isCite ? '&rsaquo;' : '&#x2197;') + '</span>';
