@@ -4644,14 +4644,23 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v3.0.0';
-        const APP_LAST_UPDATED = 'Apr 1, 2026';
+        const APP_VERSION = 'v3.0.1';
+        const APP_LAST_UPDATED = 'Apr 21, 2026';
         
         const CHANGELOG = [
             {
+                version: 'v3.0.1',
+                date: 'Apr 21, 2026',
+                latest: true,
+                items: [
+                    { type: 'fix', text: 'Downloaded HTML embed: message textarea no longer overflows and gets clipped on the right - added box-sizing: border-box to .d365-message-input and .d365-chat-input-wrapper' },
+                    { type: 'fix', text: 'widget-core.js: .d365-input textarea sizing fixed the same way so the attachment / emoji / mic / send row renders correctly inside the widget bounds' },
+                ],
+            },
+            {
                 version: 'v3.0.0',
                 date: 'Apr 1, 2026',
-                latest: true,
+                latest: false,
                 items: [
                     { type: 'new', text: 'Industry demo pages moved to industries/ folder for better repo organization' },
                     { type: 'improved', text: 'README simplified for business users — reduced from 1500+ lines to ~210 lines' },
@@ -10881,10 +10890,14 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     .d365-chat-input-area.active { display: block; }
     .d365-chat-input-wrapper {
       padding: 12px 16px;
+      box-sizing: border-box;
     }
     .d365-message-input {
-      width: 100%; padding: 10px 14px; background: #f1f5f9; border: none;
-      border-radius: 12px; font-size: 14px; font-family: inherit; outline: none;
+      display: block;
+      width: 100%; box-sizing: border-box;
+      padding: 10px 14px; background: #f1f5f9; border: none;
+      border-radius: 12px; font-size: 14px; line-height: 1.5;
+      font-family: inherit; outline: none;
       resize: none; min-height: 44px; max-height: 120px;
     }
     .d365-message-input:focus { background: #e2e8f0; }

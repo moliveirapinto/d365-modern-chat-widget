@@ -1,7 +1,7 @@
-﻿/**
+/**
  * D365 Modern Chat Widget - Core
  * This is the main widget code that gets loaded via the loader
- * Version: 3.0.0
+ * Version: 3.0.1
  * 
  * ╔═══════════════════════════════════════════════════════════════════════════╗
  * ║  ⚠️  FEATURE PARITY REQUIRED - READ CONTRIBUTING.md                       ║
@@ -357,7 +357,7 @@
       '.d365-input-area{display:none;background:#fff;border-top:1px solid #e2e8f0;flex-direction:column;gap:10px;padding:12px 16px 16px}',
       '.d365-input-area.active{display:flex}',
       '.d365-input-wrap{display:flex;flex-direction:column;gap:10px}',
-      '.d365-input{width:100%;min-height:60px;max-height:120px;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;font-size:14px;resize:none;font-family:inherit;line-height:1.4;overflow-y:auto;background:#fff}',
+      '.d365-input{display:block;width:100%;box-sizing:border-box;min-height:60px;max-height:120px;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;font-size:14px;resize:none;font-family:inherit;line-height:1.4;overflow-y:auto;background:#fff}',
       '.d365-input:focus{outline:none;border-color:'+c.primaryColor+';box-shadow:0 0 0 3px '+c.primaryColor+'1a}',
       '.d365-input::placeholder{color:#a0aec0}',
       '.d365-input-row{display:flex;justify-content:space-between;align-items:center;margin-top:8px}',
