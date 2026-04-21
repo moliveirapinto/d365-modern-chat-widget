@@ -4644,14 +4644,24 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v3.0.1';
+        const APP_VERSION = 'v3.0.2';
         const APP_LAST_UPDATED = 'Apr 21, 2026';
         
         const CHANGELOG = [
             {
-                version: 'v3.0.1',
+                version: 'v3.0.2',
                 date: 'Apr 21, 2026',
                 latest: true,
+                highlights: [
+                    'Fix: compact embed now honors launcher color, send button color, input background/border, system message colors, and header title/subtitle colors (previously only the preview applied them).',
+                    'Fix: user bubble gradient toggle now renders identically in preview and production for older saved profiles.',
+                    'Internal: added sync contract comments between index.html and dist/widget-core.js so new customization fields cannot be silently dropped in future releases.'
+                ]
+            },
+            {
+                version: 'v3.0.1',
+                date: 'Apr 21, 2026',
+                latest: false,
                 items: [
                     { type: 'fix', text: 'Downloaded HTML embed: message textarea no longer overflows and gets clipped on the right - added box-sizing: border-box to .d365-message-input and .d365-chat-input-wrapper' },
                     { type: 'fix', text: 'widget-core.js: .d365-input textarea sizing fixed the same way so the attachment / emoji / mic / send row renders correctly inside the widget bounds' },
@@ -9758,7 +9768,7 @@
                 if (userBubble) {
                     // Bubble gradient uses the same gradient colors but is controlled by its own toggle
                     const bubbleGradient = `linear-gradient(135deg, ${settings.gradientStart} 0%, ${settings.gradientEnd} 100%)`;
-                    userBubble.style.background = settings.useBubbleGradient ? bubbleGradient : settings.userBubbleColor;
+                    userBubble.style.background = (settings.useBubbleGradient !== false) ? bubbleGradient : settings.userBubbleColor;
                     userBubble.style.color = settings.userTextColor;
                 }
 
@@ -10349,6 +10359,9 @@ window.D365WidgetConfig=${configJson};
             showToast('🚀 Compact embed code generated! Only ' + embedCode.length + ' characters!');
         }
         
+        // IMPORTANT: Every color/text field exposed in the admin UI must be emitted here when non-default,
+        // AND referenced in dist/widget-core.js injectStyles/injectHTML. If a key is missing from either side,
+        // the compact embed will silently ignore the user's customization while the preview still shows it.
         function buildCompactConfig() {
             // Only include essential config + non-default customizations to minimize size
             // NOTE: We do NOT include lcwScript in compact mode - the widget-core.js handles SDK loading
@@ -10381,6 +10394,10 @@ window.D365WidgetConfig=${configJson};
             if (settings.customLauncherIcon) config.customLauncherIcon = settings.customLauncherIcon;
             if (settings.badgeColor && settings.badgeColor !== '#ff4757') config.badgeColor = settings.badgeColor;
             if (settings.sendBtnColor && settings.sendBtnColor !== '#667eea') config.sendBtnColor = settings.sendBtnColor;
+            if (settings.inputBgColor && settings.inputBgColor !== '#ffffff') config.inputBgColor = settings.inputBgColor;
+            if (settings.inputBorderColor && settings.inputBorderColor !== '#e2e8f0') config.inputBorderColor = settings.inputBorderColor;
+            if (settings.systemMsgColor && settings.systemMsgColor !== '#e2e8f0') config.systemMsgColor = settings.systemMsgColor;
+            if (settings.systemTextColor && settings.systemTextColor !== '#64748b') config.systemTextColor = settings.systemTextColor;
             // Pre-chat Hero Colors
             if (settings.usePrechatGradient === false) config.usePrechatGradient = false;
             if (settings.prechatSolidColor && settings.prechatSolidColor !== '#667eea') config.prechatSolidColor = settings.prechatSolidColor;

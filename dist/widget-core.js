@@ -1,7 +1,7 @@
 /**
  * D365 Modern Chat Widget - Core
  * This is the main widget code that gets loaded via the loader
- * Version: 3.0.1
+ * Version: 3.0.2
  * 
  * ╔═══════════════════════════════════════════════════════════════════════════╗
  * ║  ⚠️  FEATURE PARITY REQUIRED - READ CONTRIBUTING.md                       ║
@@ -89,6 +89,9 @@
   };
 
   // Default config
+  // NOTE: Keep this object in sync with `defaultSettings` and `buildCompactConfig` in index.html.
+  // Every color/text key that the admin UI exposes MUST be both (a) emitted by buildCompactConfig when non-default
+  // and (b) referenced in injectStyles/injectHTML below; otherwise production (compact embed) will silently ignore it.
   var defaults = {
     headerTitle: 'Support Chat',
     headerSubtitle: "We're here to help",
@@ -104,6 +107,14 @@
     agentTextColor: '#2d3748',
     chatBgColor: '#f8fafc',
     badgeColor: '#ff4757',
+    launcherColor: '',
+    sendBtnColor: '',
+    headerTitleColor: '',
+    headerSubtitleColor: '',
+    inputBgColor: '',
+    inputBorderColor: '',
+    systemMsgColor: '',
+    systemTextColor: '',
     launcherIcon: 'chat_multiple',
     customLauncherIcon: '',
     enablePrechatForm: true,
@@ -203,7 +214,7 @@
       '@keyframes d365spin{to{transform:rotate(360deg)}}',
       '@keyframes d365fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}',
       '@keyframes d365bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}',
-      '.d365-launcher{position:fixed;bottom:24px;right:24px;width:60px;height:60px;border-radius:50%;border:none;cursor:pointer;z-index:999999;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.3);transition:transform .3s,box-shadow .3s;background:'+gradient+';animation:d365pulse 2.5s ease-in-out infinite}',
+      '.d365-launcher{position:fixed;bottom:24px;right:24px;width:60px;height:60px;border-radius:50%;border:none;cursor:pointer;z-index:999999;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.3);transition:transform .3s,box-shadow .3s;background:'+(c.launcherColor||gradient)+';animation:d365pulse 2.5s ease-in-out infinite}',
       '.d365-launcher:hover{transform:scale(1.1);box-shadow:0 6px 30px rgba(0,0,0,.4);animation:none}',
       '.d365-launcher.open{animation:none}',
       '.d365-launcher svg{width:28px;height:28px;fill:#fff}',
@@ -218,8 +229,8 @@
       '.d365-header-avatar svg{width:26px;height:26px;fill:#fff}',
       '.d365-header-avatar img{width:100%;height:100%;object-fit:cover}',
       '.d365-header-info{flex:1}',
-      '.d365-header-title{color:#fff;font-weight:600;font-size:16px}',
-      '.d365-header-status{color:rgba(255,255,255,.8);font-size:12px;margin-top:2px}',
+      '.d365-header-title{color:'+(c.headerTitleColor||'#fff')+';font-weight:600;font-size:16px}',
+      '.d365-header-status{color:'+(c.headerSubtitleColor||'rgba(255,255,255,.8)')+';font-size:12px;margin-top:2px}',
       '.d365-header-actions{display:flex;gap:8px}',
       '.d365-header-btn{background:rgba(255,255,255,.2);border:none;width:32px;height:32px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}',
       '.d365-header-btn:hover{background:rgba(255,255,255,.3)}',
@@ -354,10 +365,10 @@
       '.d365-typing-dots span{width:8px;height:8px;background:#a0aec0;border-radius:50%;animation:d365bounce 1.4s infinite ease-in-out}',
       '.d365-typing-dots span:nth-child(1){animation-delay:-.32s}',
       '.d365-typing-dots span:nth-child(2){animation-delay:-.16s}',
-      '.d365-input-area{display:none;background:#fff;border-top:1px solid #e2e8f0;flex-direction:column;gap:10px;padding:12px 16px 16px}',
+      '.d365-input-area{display:none;background:'+(c.inputBgColor||'#fff')+';border-top:1px solid '+(c.inputBorderColor||'#e2e8f0')+';flex-direction:column;gap:10px;padding:12px 16px 16px}',
       '.d365-input-area.active{display:flex}',
       '.d365-input-wrap{display:flex;flex-direction:column;gap:10px}',
-      '.d365-input{display:block;width:100%;box-sizing:border-box;min-height:60px;max-height:120px;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;font-size:14px;resize:none;font-family:inherit;line-height:1.4;overflow-y:auto;background:#fff}',
+      '.d365-input{display:block;width:100%;box-sizing:border-box;min-height:60px;max-height:120px;padding:12px 14px;border:1px solid '+(c.inputBorderColor||'#e2e8f0')+';border-radius:12px;font-size:14px;resize:none;font-family:inherit;line-height:1.4;overflow-y:auto;background:'+(c.inputBgColor||'#fff')+'}',
       '.d365-input:focus{outline:none;border-color:'+c.primaryColor+';box-shadow:0 0 0 3px '+c.primaryColor+'1a}',
       '.d365-input::placeholder{color:#a0aec0}',
       '.d365-input-row{display:flex;justify-content:space-between;align-items:center;margin-top:8px}',
@@ -392,8 +403,8 @@
       '@keyframes d365wave{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.5)}}',
       '.d365-stop-voice{background:rgba(255,255,255,.2);border:none;padding:6px 12px;border-radius:6px;color:#fff;cursor:pointer;font-size:12px;font-weight:500;transition:background .2s}',
       '.d365-stop-voice:hover{background:rgba(255,255,255,.3)}',
-      '.d365-send-btn{width:40px;height:40px;border-radius:10px;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;color:'+c.primaryColor+'}',
-      '.d365-send-btn:hover{background:'+c.primaryColor+'1a}',
+      '.d365-send-btn{width:40px;height:40px;border-radius:10px;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;color:'+(c.sendBtnColor||c.primaryColor)+'}',
+      '.d365-send-btn:hover{background:'+(c.sendBtnColor||c.primaryColor)+'1a}',
       '.d365-send-btn:active{transform:scale(.95)}',
       '.d365-send-btn svg{width:22px;height:22px;fill:currentColor}',
       '.d365-ended{display:none;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:16px;padding:24px;text-align:center}',
@@ -417,7 +428,7 @@
       '.d365-confirm-btn{padding:10px 24px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;border:none}',
       '.d365-confirm-btn.cancel{background:#e2e8f0;color:#4a5568}',
       '.d365-confirm-btn.end{background:#ef4444;color:#fff}',
-      '.d365-system-msg{text-align:center;padding:8px 16px;color:#64748b;font-size:12px;background:#e2e8f0;border-radius:12px;margin:8px auto;max-width:fit-content}',
+      '.d365-system-msg{text-align:center;padding:8px 16px;color:'+(c.systemTextColor||'#64748b')+';font-size:12px;background:'+(c.systemMsgColor||'#e2e8f0')+';border-radius:12px;margin:8px auto;max-width:fit-content}',
       // Voice/Video Call styles
       '.d365-incoming-call{display:none;background:linear-gradient(135deg,'+c.gradientStart+' 0%,'+c.gradientEnd+' 100%);padding:16px;border-radius:12px;margin:12px;animation:d365fadeIn .3s ease}',
       '.d365-incoming-call.show{display:block}',
