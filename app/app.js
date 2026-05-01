@@ -32,8 +32,27 @@
       editor: $('editorScreen')
     };
     
+    initTheme();
     setupEventListeners();
     checkAuth();
+  }
+
+  // Theme (dark / light)
+  function initTheme() {
+    // Already applied before paint by the inline <head> script;
+    // this just wires up the system-preference listener for live changes.
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+      if (!localStorage.getItem('d365_theme')) {
+        document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+      }
+    });
+  }
+
+  function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme');
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('d365_theme', next);
   }
 
   // Check authentication
@@ -676,7 +695,8 @@ var D365WidgetConfig = ${inlineConfig};
   window.app = {
     editWidget,
     getCode,
-    deleteWidget
+    deleteWidget,
+    toggleTheme
   };
 
   // Start app when DOM is ready

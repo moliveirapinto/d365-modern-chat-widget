@@ -741,3 +741,94 @@ input:checked + .slider:before { transform: translateX(22px); }
   .widgets-grid { grid-template-columns: 1fr; }
   .editor-sidebar { display: none; }
 }
+
+/* ============================================================
+   Dark Theme
+   ============================================================ */
+[data-theme="dark"] {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --border: #334155;
+  --shadow: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -1px rgba(0,0,0,0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.4), 0 4px 6px -2px rgba(0,0,0,0.3);
+  color-scheme: dark;
+}
+
+/* Token box has hardcoded white — override */
+[data-theme="dark"] .token-entry-box {
+  background: var(--surface);
+}
+
+/* Text inputs need explicit background in dark mode */
+[data-theme="dark"] .form-group input[type="text"],
+[data-theme="dark"] .form-group input[type="email"],
+[data-theme="dark"] .form-group textarea {
+  background: var(--bg);
+  color: var(--text);
+}
+
+[data-theme="dark"] .token-input-group input {
+  background: var(--bg);
+  color: var(--text);
+}
+
+[data-theme="dark"] .widget-name-input {
+  color: var(--text);
+}
+
+[data-theme="dark"] .widget-name-input:hover {
+  background: var(--bg);
+}
+
+[data-theme="dark"] .btn-icon-small {
+  background: var(--surface);
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .btn-icon-small:hover {
+  background: var(--bg);
+}
+
+/* Status / badge overrides */
+[data-theme="dark"] .success-badge {
+  background: #064e3b;
+  color: #6ee7b7;
+}
+
+[data-theme="dark"] .token-status.error {
+  background: #450a0a;
+  color: #fca5a5;
+  border-color: #7f1d1d;
+}
+
+[data-theme="dark"] .token-status.success {
+  background: #052e16;
+  color: #86efac;
+  border-color: #14532d;
+}
+
+/* Theme toggle button */
+.btn-theme {
+  color: var(--text-muted);
+}
+
+.btn-theme:hover {
+  color: var(--text);
+}
+
+.icon-sun { display: none; }
+[data-theme="dark"] .icon-moon { display: none; }
+[data-theme="dark"] .icon-sun { display: inline; }
+
+/* Fixed toggle on the login screen */
+.login-theme-btn {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 100;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
