@@ -64,6 +64,42 @@
             --admin-radius-sm: 10px;
         }
 
+        [data-theme="dark"] {
+            --admin-bg: #0f172a;
+            --admin-card: #1e293b;
+            --admin-text: #f1f5f9;
+            --admin-text-light: #94a3b8;
+            --admin-text-muted: #64748b;
+            --admin-border: #334155;
+            --admin-border-light: #1e293b;
+            --admin-primary-light: #312e81;
+            --admin-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            --admin-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -1px rgba(0,0,0,0.2);
+            --admin-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.4), 0 4px 6px -2px rgba(0,0,0,0.2);
+        }
+        [data-theme="dark"] header,
+        [data-theme="dark"] .admin-header {
+            background: #1e293b !important;
+        }
+        [data-theme="dark"] .btn-header-action {
+            background: #334155;
+            border-color: #475569;
+            color: #cbd5e1;
+        }
+        [data-theme="dark"] .btn-header-action:hover {
+            background: #312e81;
+            border-color: var(--admin-primary);
+            color: var(--admin-primary);
+        }
+        [data-theme="dark"] .form-input,
+        [data-theme="dark"] input,
+        [data-theme="dark"] select,
+        [data-theme="dark"] textarea {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f1f5f9 !important;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--admin-bg);
@@ -3294,6 +3330,7 @@
                 <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
                 Sign in
             </button>
+            <button class="btn-header-action" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle dark/light mode">Dark</button>
             <button class="btn-header-action" onclick="document.getElementById('importFile').click()" title="Import settings from JSON">
                 <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
                 Import
@@ -13047,6 +13084,25 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
                 document.removeEventListener('click', closeShareMenuOnOutsideClick);
             }
         }
+        function toggleTheme() {
+            var html = document.documentElement;
+            var current = html.getAttribute('data-theme');
+            var next = (current === 'dark') ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('d365_theme', next);
+            var btn = document.getElementById('themeToggleBtn');
+            if (btn) btn.textContent = (next === 'dark') ? 'Light' : 'Dark';
+        }
+        (function() {
+            var t = localStorage.getItem('d365_theme');
+            if (t === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.addEventListener('DOMContentLoaded', function() {
+                    var btn = document.getElementById('themeToggleBtn');
+                    if (btn) btn.textContent = 'Light';
+                });
+            }
+        })();
     </script>
     
     <!-- Feedback Button -->
