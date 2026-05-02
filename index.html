@@ -13106,26 +13106,16 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     </script>
     
     <!-- Feedback Button -->
-    <button class="feedback-button" onclick="openFeedbackModal()" title="Send Feedback">
+    <a class="feedback-button" href="https://forms.office.com/r/ye88A0WkPp" target="_blank" rel="noopener noreferrer" title="Send Feedback">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
             <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12zM7 9h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"/>
         </svg>
         <span>Feedback</span>
-    </button>
-    
-    <!-- Feedback Modal -->
-    <div id="feedbackModal" class="feedback-modal-overlay" onclick="if(event.target === this) closeFeedbackModal()">
-        <div class="feedback-modal-content">
-            <div class="feedback-modal-header">
-                <h3>Send Feedback</h3>
-                <button class="feedback-modal-close" onclick="closeFeedbackModal()">&times;</button>
-            </div>
-            <iframe id="feedbackIframe" src="" frameborder="0" allowfullscreen></iframe>
-        </div>
-    </div>
+    </a>
     
     <style>
         .feedback-button {
+            text-decoration: none;
             position: fixed;
             bottom: 24px;
             right: 24px;
