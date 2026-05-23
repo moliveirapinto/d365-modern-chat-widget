@@ -4681,18 +4681,41 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v3.0.2';
-        const APP_LAST_UPDATED = 'Apr 21, 2026';
+        const APP_VERSION = 'v3.2.0';
+        const APP_LAST_UPDATED = 'May 22, 2026';
         
         const CHANGELOG = [
             {
+                version: 'v3.2.0',
+                date: 'May 22, 2026',
+                latest: true,
+                items: [
+                    { type: 'new', text: 'GitHub OAuth web sign-in: one-click "Sign in with GitHub" button on the login screen - no more pasting personal access tokens to get started' },
+                    { type: 'new', text: 'PAT paste flow retained as a fallback for users who prefer it or run into OAuth issues' },
+                    { type: 'improve', text: 'OAuth callback handler now correctly derives origin from x-ms-original-url so it works behind the Static Web Apps managed Functions proxy' },
+                    { type: 'improve', text: 'oauth_error query parameter is surfaced as a visible message on the login screen instead of failing silently' },
+                    { type: 'fix', text: 'Changelog popup: hardened the renderer so a release entry missing the items array no longer crashes showChangelog() and prevents the modal from opening' }
+                ]
+            },
+            {
+                version: 'v3.1.0',
+                date: 'May 1, 2026',
+                latest: false,
+                items: [
+                    { type: 'new', text: 'Dark / Light theme toggle across the entire app UI (dashboard header, editor header, and login screen)' },
+                    { type: 'new', text: 'Automatically respects the OS prefers-color-scheme on first visit; user preference persisted to localStorage' },
+                    { type: 'improve', text: 'Anti-FOUC inline script in <head> applies the saved theme before first paint' },
+                    { type: 'improve', text: 'Dark theme variables (--bg, --surface, --text, --text-muted, --border, --shadow) and dark-specific overrides for token entry box, form inputs, status badges, alerts, and icon buttons' }
+                ]
+            },
+            {
                 version: 'v3.0.2',
                 date: 'Apr 21, 2026',
-                latest: true,
-                highlights: [
-                    'Fix: compact embed now honors launcher color, send button color, input background/border, system message colors, and header title/subtitle colors (previously only the preview applied them).',
-                    'Fix: user bubble gradient toggle now renders identically in preview and production for older saved profiles.',
-                    'Internal: added sync contract comments between index.html and dist/widget-core.js so new customization fields cannot be silently dropped in future releases.'
+                latest: false,
+                items: [
+                    { type: 'fix', text: 'Compact embed now honors launcher color, send button color, input background/border, system message colors, and header title/subtitle colors (previously only the preview applied them).' },
+                    { type: 'fix', text: 'User bubble gradient toggle now renders identically in preview and production for older saved profiles.' },
+                    { type: 'improve', text: 'Internal: added sync contract comments between index.html and dist/widget-core.js so new customization fields cannot be silently dropped in future releases.' }
                 ]
             },
             {
@@ -5065,7 +5088,7 @@
                             <span class="changelog-version-date">${release.date}</span>
                         </div>
                         <ul class="changelog-items">
-                            ${release.items.map(item => `
+                            ${(release.items || (release.highlights || []).map(text => ({ type: 'note', text }))).map(item => `
                                 <li class="changelog-item">
                                     <span class="changelog-item-type ${item.type}">${item.type}</span>
                                     <span class="changelog-item-text">${item.text}</span>
