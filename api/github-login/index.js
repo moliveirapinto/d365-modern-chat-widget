@@ -32,9 +32,19 @@ module.exports = async function (context, req) {
         return;
     }
 
-    const host = req.headers['x-forwarded-host'] || req.headers.host || '';
-    const proto = (req.headers['x-forwarded-proto'] || 'https').split(',')[0].trim();
-    const redirectUri = process.env.GITHUB_OAUTH_REDIRECT_URI || `${proto}://${host}/api/github/callback`;
+    // SWA injects the user-facing original URL here; falls back to forwarded host headers
+    // for plain Azure Functions or local dev.
+    let origin = '';
+    const originalUrl = req.headers['x-ms-original-url'];
+    if (originalUrl) {
+        try { origin = new URL(originalUrl).origin; } catch (_) { /* ignore */ }
+    }
+    if (!origin) {
+        const host = req.headers['x-forwarded-host'] || req.headers.host || '';
+        const proto = (req.headers['x-forwarded-proto'] || 'https').split(',')[0].trim();
+        origin = host ? `${proto}://${host}` : '';
+    }
+    const redirectUri = process.env.GITHUB_OAUTH_REDIRECT_URI || `${origin}/api/github/callback`;
 
     // Where to send the user after the callback finishes. Constrained to same origin.
     let returnTo = '/';
