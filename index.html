@@ -6337,12 +6337,55 @@
             document.getElementById('loginOverlay').classList.remove('hidden');
         }
 
-        // GitHub login button - show token entry
+        // ---- GitHub OAuth web flow (preferred) ----
+        function startGitHubOAuth() {
+            const ret = encodeURIComponent(window.location.pathname || '/');
+            window.location.assign('/api/github/login?return_to=' + ret);
+        }
+        // Harvest #gh_token=...&gh_user=... fragment after OAuth callback
+        function consumeOAuthFragment() {
+            try {
+                if (!window.location.hash || window.location.hash.indexOf('gh_token=') === -1) return false;
+                const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+                const token = params.get('gh_token');
+                const userB64 = params.get('gh_user');
+                if (!token || !userB64) return false;
+                const padded = userB64.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((userB64.length + 3) % 4);
+                const user = JSON.parse(atob(padded));
+                localStorage.setItem('d365_github_token', token);
+                localStorage.setItem('d365_user', JSON.stringify(user));
+                // Scrub the fragment so token doesn't linger in URL/history/referrer
+                history.replaceState(null, '', window.location.pathname + window.location.search);
+                return true;
+            } catch (e) { console.warn('OAuth fragment parse failed', e); return false; }
+        }
+        function surfaceOAuthErrorFromQuery() {
+            const q = new URLSearchParams(window.location.search);
+            const code = q.get('oauth_error');
+            if (!code) return;
+            const map = {
+                not_configured: 'GitHub sign-in is not configured on this environment. Use a personal access token below.',
+                state_mismatch: 'Sign-in session expired. Please try again.',
+                exchange_failed: 'GitHub rejected the sign-in. Please try again.',
+                missing_params: 'GitHub returned an incomplete response. Please try again.',
+                no_token: 'GitHub did not return a token. Please try again.'
+            };
+            const msg = map[code] || ('Sign-in failed: ' + code);
+            // Reveal the token-entry fallback and show the error
+            const te = document.getElementById('tokenEntry'); if (te) te.classList.add('show');
+            const statusEl = document.getElementById('tokenStatus');
+            if (statusEl) { statusEl.className = 'token-status error'; statusEl.style.display = ''; statusEl.textContent = msg; }
+            const url = new URL(window.location.href); url.searchParams.delete('oauth_error');
+            history.replaceState(null, '', url.pathname + (url.search ? url.search : '') + url.hash);
+        }
+
+        // GitHub login button -> start OAuth flow (PAT entry stays as fallback below)
         document.addEventListener('DOMContentLoaded', function() {
             const githubLoginBtn = document.getElementById('githubLoginBtn');
             if (githubLoginBtn) {
-                githubLoginBtn.addEventListener('click', function() {
-                    document.getElementById('tokenEntry').classList.add('show');
+                githubLoginBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    startGitHubOAuth();
                 });
             }
         });
@@ -7585,6 +7628,10 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
+            // Harvest OAuth callback fragment + surface any error before checking auth
+            consumeOAuthFragment();
+            surfaceOAuthErrorFromQuery();
+
             // Check for existing GitHub login
             if (!checkExistingLogin()) {
                 // No existing login - show login overlay
