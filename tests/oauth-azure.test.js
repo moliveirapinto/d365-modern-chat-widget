@@ -24,8 +24,8 @@ function loadFresh(modPath) {
 }
 
 async function run() {
-    const loginPath = path.resolve(__dirname, '../github-login/index.js');
-    const cbPath = path.resolve(__dirname, '../github-callback/index.js');
+    const loginPath = path.resolve(__dirname, '../api/github-login/index.js');
+    const cbPath = path.resolve(__dirname, '../api/github-callback/index.js');
 
     // ---------- /api/github/login ----------
 
