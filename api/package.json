@@ -1,0 +1,9 @@
+{
+  "name": "d365-widget-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Azure Static Web Apps managed Functions for the D365 Chat Widget Studio (GitHub OAuth flow).",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

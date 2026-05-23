@@ -39,7 +39,115 @@
     initTheme();
     setupEventListeners();
     initPowerPagesBridge();
+
+    // If we just came back from the GitHub OAuth callback, harvest the token
+    // from the URL fragment BEFORE checkAuth runs so we land straight on the
+    // dashboard. Safe no-op when no fragment is present.
+    const harvested = consumeOAuthFragment();
+    if (harvested) {
+      // Already persisted to localStorage; checkAuth will pick it up.
+    }
+
+    // Surface OAuth errors (e.g. ?oauth_error=not_configured) so the user
+    // gets a clear message instead of silently seeing the PAT screen.
+    surfaceOAuthErrorFromQuery();
+
     checkAuth();
+  }
+
+  // ==========================================
+  // GitHub OAuth web-flow helpers
+  // ==========================================
+
+  // Pull #gh_token=...&gh_user=... out of the URL fragment after a successful
+  // /api/github/callback, persist it using the same localStorage keys the PAT
+  // path uses, then clean the URL so the token never lingers in history.
+  function consumeOAuthFragment() {
+    try {
+      const hash = window.location.hash || '';
+      if (!hash || hash.length < 2) return false;
+      const params = new URLSearchParams(hash.slice(1));
+      const token = params.get('gh_token');
+      if (!token) return false;
+
+      let user = null;
+      const userEncoded = params.get('gh_user');
+      if (userEncoded) {
+        try {
+          // base64url -> base64
+          let b64 = userEncoded.replace(/-/g, '+').replace(/_/g, '/');
+          while (b64.length % 4) b64 += '=';
+          const json = atob(b64);
+          user = JSON.parse(json);
+        } catch (e) {
+          console.warn('Could not decode gh_user payload:', e && e.message);
+        }
+      }
+
+      localStorage.setItem('d365_github_token', token);
+      if (user && user.id) {
+        localStorage.setItem('d365_user', JSON.stringify(user));
+      }
+
+      // Strip the fragment without reloading.
+      try {
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+      } catch (_) {
+        window.location.hash = '';
+      }
+      return true;
+    } catch (e) {
+      console.warn('OAuth fragment harvest failed:', e && e.message);
+      return false;
+    }
+  }
+
+  function surfaceOAuthErrorFromQuery() {
+    try {
+      const q = new URLSearchParams(window.location.search);
+      const err = q.get('oauth_error');
+      if (!err) return;
+      // Clear the param from the URL.
+      q.delete('oauth_error');
+      const newSearch = q.toString();
+      try {
+        history.replaceState(null, '', window.location.pathname + (newSearch ? '?' + newSearch : ''));
+      } catch (_) { /* ignore */ }
+      // Defer until the DOM is settled.
+      setTimeout(function() {
+        const map = {
+          not_configured: 'GitHub sign-in is not yet configured on this deployment. Please use a personal access token below.',
+          state_mismatch: 'GitHub sign-in failed (security check). Please try again.',
+          exchange_failed: 'GitHub sign-in could not complete. Please try again or use a token below.',
+          missing_params: 'GitHub sign-in returned an incomplete response. Please try again.',
+          no_token: 'GitHub did not return an access token. Please try again or use a token below.'
+        };
+        const msg = map[err] || ('GitHub sign-in error: ' + err);
+        const statusEl = document.getElementById('tokenStatus');
+        // If the token entry UI exists, show inline; otherwise alert.
+        if (statusEl) {
+          showTokenEntry();
+          statusEl.className = 'token-status error';
+          statusEl.innerHTML = '❌ ' + msg;
+          statusEl.style.display = 'flex';
+        } else {
+          alert(msg);
+        }
+      }, 0);
+    } catch (e) { /* ignore */ }
+  }
+
+  // Redirect into the OAuth flow. Falls back to PAT entry if /api isn't
+  // reachable (which is the case on environments where the Functions backend
+  // hasn't been deployed yet — e.g. local file:// preview).
+  function startGitHubOAuth() {
+    try {
+      const ret = encodeURIComponent(window.location.pathname || '/');
+      window.location.assign('/api/github/login?return_to=' + ret);
+    } catch (e) {
+      console.warn('OAuth redirect failed, falling back to token entry:', e && e.message);
+      showTokenEntry();
+    }
   }
 
   // Theme (dark / light)
@@ -139,8 +247,12 @@
 
   // Event Listeners
   function setupEventListeners() {
-    // Login
-    $('loginBtn').onclick = showTokenEntry;
+    // Login — primary path is the OAuth web flow (no token copy/paste).
+    // The PAT entry UI is kept as a fallback for advanced users and as the
+    // graceful degradation path when /api isn't deployed/configured.
+    $('loginBtn').onclick = startGitHubOAuth;
+    var usePatLink = $('usePatLink');
+    if (usePatLink) usePatLink.onclick = function(e) { e.preventDefault(); showTokenEntry(); };
     $('logoutBtn').onclick = logout;
     $('cancelTokenBtn').onclick = hideTokenEntry;
     $('connectBtn').onclick = connectWithToken;
