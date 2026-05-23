@@ -16,20 +16,20 @@ module.exports = async function (context, req) {
     const clientSecret = process.env.GITHUB_OAUTH_CLIENT_SECRET;
 
     if (!clientId || !clientSecret) {
-        return redirectToApp(context, '/', { error: 'oauth_not_configured' });
+        return redirectToApp(context, '/', { oauth_error: 'oauth_not_configured' });
     }
 
     const code = req.query && req.query.code;
     const stateRaw = (req.query && req.query.state) || '';
     if (!code || !stateRaw) {
-        return redirectToApp(context, '/', { error: 'missing_params' });
+        return redirectToApp(context, '/', { oauth_error: 'missing_params' });
     }
 
     // CSRF check: the random half of the state must match the cookie we set.
     const cookieState = parseCookie(req.headers.cookie || '', 'gh_oauth_state');
     const [stateNonce, returnEncoded] = String(stateRaw).split('.', 2);
     if (!cookieState || !stateNonce || cookieState !== stateNonce) {
-        return redirectToApp(context, '/', { error: 'state_mismatch' });
+        return redirectToApp(context, '/', { oauth_error: 'state_mismatch' });
     }
 
     let returnTo = '/';
@@ -38,9 +38,22 @@ module.exports = async function (context, req) {
         if (decoded.startsWith('/') && !decoded.startsWith('//')) returnTo = decoded;
     } catch (_) { /* ignore */ }
 
-    const host = req.headers['x-forwarded-host'] || req.headers.host || '';
-    const proto = (req.headers['x-forwarded-proto'] || 'https').split(',')[0].trim();
-    const redirectUri = process.env.GITHUB_OAUTH_REDIRECT_URI || `${proto}://${host}/api/github/callback`;
+    // Derive origin the same way the /login Function does so the redirect_uri
+    // in the access_token exchange matches the one used to obtain the code.
+    // Inside SWA managed Functions req.headers.host points at the internal
+    // *.azurewebsites.net hostname, not the public SWA URL, so we prefer the
+    // SWA-provided x-ms-original-url header.
+    let origin = '';
+    const originalUrl = req.headers['x-ms-original-url'];
+    if (originalUrl) {
+        try { origin = new URL(originalUrl).origin; } catch (_) { /* ignore */ }
+    }
+    if (!origin) {
+        const host = req.headers['x-forwarded-host'] || req.headers.host || '';
+        const proto = (req.headers['x-forwarded-proto'] || 'https').split(',')[0].trim();
+        origin = host ? `${proto}://${host}` : '';
+    }
+    const redirectUri = process.env.GITHUB_OAUTH_REDIRECT_URI || `${origin}/api/github/callback`;
 
     // 1. Exchange the code for an access token.
     let tokenResp;
@@ -61,25 +74,25 @@ module.exports = async function (context, req) {
         });
     } catch (e) {
         context.log.error('Token exchange network error:', e && e.message);
-        return redirectToApp(context, returnTo, { error: 'exchange_failed' });
+        return redirectToApp(context, returnTo, { oauth_error: 'exchange_failed' });
     }
 
     if (!tokenResp.ok) {
         context.log.error('Token exchange HTTP error:', tokenResp.status);
-        return redirectToApp(context, returnTo, { error: 'exchange_failed' });
+        return redirectToApp(context, returnTo, { oauth_error: 'exchange_failed' });
     }
 
     let tokenJson;
     try {
         tokenJson = await tokenResp.json();
     } catch (_) {
-        return redirectToApp(context, returnTo, { error: 'exchange_parse' });
+        return redirectToApp(context, returnTo, { oauth_error: 'exchange_parse' });
     }
 
     const accessToken = tokenJson && tokenJson.access_token;
     if (!accessToken) {
         context.log.error('No access_token in GitHub response:', JSON.stringify(tokenJson));
-        return redirectToApp(context, returnTo, { error: tokenJson.error || 'no_token' });
+        return redirectToApp(context, returnTo, { oauth_error: tokenJson.error || 'no_token' });
     }
 
     // 2. Fetch the user profile so the SPA can show name/avatar without an
