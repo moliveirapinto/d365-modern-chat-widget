@@ -19,7 +19,7 @@
   ],
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/img/*", "/img/Logo/*", "/img/icon/*", "/img/bot/*", "/img/headshots/*", "/img/extra/*", "/dist/*", "/industries/*", "/notification/*", "/app/*", "/*.js", "/*.css", "/*.json", "/*.html", "/*.ico"]
+    "exclude": ["/img/*", "/img/Logo/*", "/img/icon/*", "/img/bot/*", "/img/headshots/*", "/img/extra/*", "/dist/*", "/industries/*", "/notification/*", "/app/*", "/api/*", "/*.js", "/*.css", "/*.json", "/*.html", "/*.ico"]
   },
   "auth": {
     "identityProviders": {
