@@ -1,6 +1,6 @@
 # Modern Dynamics 365 Live Chat Widget
 
-**Live Demo:** [https://zealous-desert-0089d060f.7.azurestaticapps.net/](https://zealous-desert-0089d060f.7.azurestaticapps.net/)
+**Live Demo:** [https://zealous-hill-0409bdc0f.7.azurestaticapps.net/](https://zealous-hill-0409bdc0f.7.azurestaticapps.net/)
 
 > A customizable chat widget for Microsoft Dynamics 365 Omnichannel that replaces the default widget with a modern, branded experience — no coding required. Fork this repo to get started.
 

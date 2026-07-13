@@ -15,7 +15,7 @@
 
 // Allowed origins
 const ALLOWED_ORIGINS = [
-  'https://zealous-desert-0089d060f.7.azurestaticapps.net',
+  'https://zealous-hill-0409bdc0f.7.azurestaticapps.net',
   'http://localhost:8080',
   'http://127.0.0.1:8080',
   'http://localhost:4280' // Azure SWA CLI
