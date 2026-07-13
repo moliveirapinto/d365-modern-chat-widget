@@ -15,21 +15,21 @@
 
 // Allowed origins
 const ALLOWED_ORIGINS = [
-  'https://moliveirapinto.github.io',
-  'https://lemon-water-0adbcca0f.1.azurestaticapps.net',
-  'https://d365-modern-chat-widget.azurewebsites.net',
+  'https://zealous-desert-0089d060f.7.azurestaticapps.net',
   'http://localhost:8080',
   'http://127.0.0.1:8080',
   'http://localhost:4280' // Azure SWA CLI
 ];
 
 function corsHeaders(origin) {
-  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : null;
-  return {
-    'Access-Control-Allow-Origin': allowed || ALLOWED_ORIGINS[0],
+  const headers = {
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
   };
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    headers['Access-Control-Allow-Origin'] = origin;
+  }
+  return headers;
 }
 
 // Generate a friendly 6-character room code
@@ -54,6 +54,9 @@ export default {
     
     // Handle CORS preflight
     if (request.method === 'OPTIONS') {
+      if (!ALLOWED_ORIGINS.includes(origin)) {
+        return new Response(null, { status: 403 });
+      }
       return new Response(null, { headers: corsHeaders(origin) });
     }
 
