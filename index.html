@@ -2970,7 +2970,7 @@
 </head>
 <body>
     <!-- Login Overlay -->
-    <div id="loginOverlay" class="login-overlay">
+    <div id="loginOverlay" class="login-overlay hidden">
         <div class="login-box">
             <div class="login-logo">
                 <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
@@ -4681,7 +4681,7 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v3.2.0';
+        const APP_VERSION = 'v3.2.1';
         const APP_LAST_UPDATED = 'May 22, 2026';
         
         const CHANGELOG = [
@@ -6386,6 +6386,10 @@
             const q = new URLSearchParams(window.location.search);
             const code = q.get('oauth_error');
             if (!code) return;
+            // A sign-in error came back — reveal the (default-hidden) login
+            // overlay so the message and token fallback are actually visible.
+            const _loErr = document.getElementById('loginOverlay');
+            if (_loErr) _loErr.classList.remove('hidden');
             const map = {
                 not_configured: 'GitHub sign-in is not configured on this environment. Use a personal access token below.',
                 state_mismatch: 'Sign-in session expired. Please try again.',
@@ -7655,11 +7659,11 @@
             consumeOAuthFragment();
             surfaceOAuthErrorFromQuery();
 
-            // Check for existing GitHub login
-            if (!checkExistingLogin()) {
-                // No existing login - show login overlay
-                // (user can skip if they want)
-            }
+            // Check for existing GitHub login. If none, do NOT block: the
+            // studio is fully usable without signing in (the login overlay stays
+            // hidden by default and login is available on demand via the header
+            // button or when saving to the cloud).
+            checkExistingLogin();
             
             loadCurrentUser();
             loadProfiles();
