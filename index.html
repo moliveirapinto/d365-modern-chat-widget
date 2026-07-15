@@ -4681,14 +4681,24 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v3.2.1';
-        const APP_LAST_UPDATED = 'May 22, 2026';
+        const APP_VERSION = 'v3.2.2';
+        const APP_LAST_UPDATED = 'July 15, 2026';
         
         const CHANGELOG = [
             {
+                version: 'v3.2.2',
+                date: 'July 15, 2026',
+                latest: true,
+                items: [
+                    { type: 'fix', text: 'Widget scripts work again: the weekend platform migration had disabled GitHub Pages, which every embed and Tampermonkey script loads the widget runtime (widget-core.js) from. Pages is re-enabled, so all previously generated scripts work again with no changes needed.' },
+                    { type: 'improve', text: 'Resilience: embed and Tampermonkey loaders now automatically fall back to the jsDelivr CDN mirror if GitHub Pages is ever unavailable, so a future Pages outage no longer takes the widget down.' },
+                    { type: 'improve', text: 'Added a .nojekyll marker so the GitHub Pages build always publishes the dist/ runtime bundles verbatim.' }
+                ]
+            },
+            {
                 version: 'v3.2.0',
                 date: 'May 22, 2026',
-                latest: true,
+                latest: false,
                 items: [
                     { type: 'new', text: 'GitHub OAuth web sign-in: one-click "Sign in with GitHub" button on the login screen - no more pasting personal access tokens to get started' },
                     { type: 'new', text: 'PAT paste flow retained as a fallback for users who prefer it or run into OAuth issues' },
@@ -10461,7 +10471,7 @@
 <!-- Generated: ${new Date().toLocaleDateString()} | Size: ~1.5KB -->
 <script>
 window.D365WidgetConfig=${configJson};
-(function(){var s=document.createElement('script');s.src='https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js?v=${cacheBuster}';document.head.appendChild(s);})();
+(function(){var p='https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js?v=${cacheBuster}';var f='https://cdn.jsdelivr.net/gh/moliveirapinto/d365-modern-chat-widget@main/dist/widget-core.js?v=${cacheBuster}';function L(u,cb){var s=document.createElement('script');s.src=u;s.onerror=cb;document.head.appendChild(s);}L(p,function(){L(f,null);});})();
 <\/script>`;
             
             document.getElementById('embedCodeOutput').value = embedCode;
@@ -13144,36 +13154,57 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
   // even on pages with strict script-src directives.
   function injectLoader() {
     // If script is already present, skip
-    if (document.querySelector('script[src*="moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js"]')) {
+    if (document.querySelector('script[src*="d365-modern-chat-widget/dist/widget-core.js"]')) {
       return;
     }
 
     const cacheBuster = new Date().getTime();
-    const scriptUrl = 'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js?v=' + cacheBuster;
+    // Primary host is GitHub Pages. jsDelivr is an independent CDN mirror of the
+    // same repo (it does NOT depend on Pages being enabled) used as an automatic
+    // fallback so the widget still loads if Pages is ever unavailable.
+    const primaryUrl = 'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js?v=' + cacheBuster;
+    const fallbackUrl = 'https://cdn.jsdelivr.net/gh/moliveirapinto/d365-modern-chat-widget@main/dist/widget-core.js?v=' + cacheBuster;
 
-    // Prefer GM_addElement for CSP bypass (enables voice/video calling on strict pages)
-    if (typeof GM_addElement === 'function') {
+    function loadCore(url, onError) {
+      // Prefer GM_addElement for CSP bypass (enables voice/video calling on strict pages)
+      if (typeof GM_addElement === 'function') {
+        try {
+          const el = GM_addElement('script', { src: url, type: 'text/javascript' });
+          if (el && el.addEventListener) {
+            el.addEventListener('error', function () {
+              console.warn('[D365 TM] widget-core failed to load from ' + url);
+              if (onError) onError();
+            });
+          }
+          return;
+        } catch (e) {
+          console.warn('GM_addElement failed, falling back to DOM injection:', e);
+        }
+      }
+
+      const s = document.createElement('script');
+      s.src = url;
+      s.async = true;
+      s.crossOrigin = 'anonymous';
+      s.onerror = function () {
+        console.warn('[D365 TM] widget-core failed to load from ' + url);
+        if (onError) onError();
+      };
+
+      // Prefer head, fallback to documentElement (helps if CSP blocks head modifications)
+      const target = document.head || document.getElementsByTagName('head')[0] || document.documentElement;
       try {
-        GM_addElement('script', { src: scriptUrl, type: 'text/javascript' });
-        return;
+        target.appendChild(s);
       } catch (e) {
-        console.warn('GM_addElement failed, falling back to DOM injection:', e);
+        // Last resort fallback
+        document.documentElement.appendChild(s);
       }
     }
 
-    const s = document.createElement('script');
-    s.src = scriptUrl;
-    s.async = true;
-    s.crossOrigin = 'anonymous';
-
-    // Prefer head, fallback to documentElement (helps if CSP blocks head modifications)
-    const target = document.head || document.getElementsByTagName('head')[0] || document.documentElement;
-    try {
-      target.appendChild(s);
-    } catch (e) {
-      // Last resort fallback
-      document.documentElement.appendChild(s);
-    }
+    loadCore(primaryUrl, function () {
+      console.warn('[D365 TM] Retrying widget-core from jsDelivr fallback');
+      loadCore(fallbackUrl, null);
+    });
   }
 
   // Pre-load deps first, then inject widget-core.js. Safe to call early.

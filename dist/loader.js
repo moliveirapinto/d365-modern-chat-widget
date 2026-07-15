@@ -16,13 +16,21 @@
   'use strict';
   
   var WIDGET_CORE_URL = 'https://moliveirapinto.github.io/d365-modern-chat-widget/dist/widget-core.js';
+  // jsDelivr is an independent CDN mirror of the same GitHub repo. It does NOT
+  // depend on GitHub Pages being enabled, so it is used as an automatic fallback
+  // if the primary (Pages) host is ever unavailable.
+  var WIDGET_CORE_FALLBACK_URL = 'https://cdn.jsdelivr.net/gh/moliveirapinto/d365-modern-chat-widget@main/dist/widget-core.js';
   
-  function loadScript(url, callback) {
+  function loadScript(url, callback, fallbackUrl) {
     var script = document.createElement('script');
     script.src = url;
     script.onload = callback;
     script.onerror = function() {
       console.error('D365 Widget: Failed to load', url);
+      if (fallbackUrl) {
+        console.warn('D365 Widget: Retrying from fallback', fallbackUrl);
+        loadScript(fallbackUrl, callback);
+      }
     };
     document.head.appendChild(script);
   }
@@ -31,7 +39,7 @@
     // Config is already set, load the widget core
     loadScript(WIDGET_CORE_URL, function() {
       console.log('D365 Widget: Core loaded');
-    });
+    }, WIDGET_CORE_FALLBACK_URL);
   }
   
   // Check if config is provided inline

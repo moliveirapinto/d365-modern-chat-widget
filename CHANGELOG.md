@@ -6,6 +6,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 
 ---
 
+## [3.2.2] - 2026-07-15
+
+### Fixed
+- **Widget scripts work again after the weekend platform migration.** The migration disabled GitHub Pages on this repository. Every generated embed snippet and Tampermonkey userscript loads the widget runtime (`dist/widget-core.js`) from GitHub Pages (`moliveirapinto.github.io`), so with Pages off **all** scripts — old and newly generated — silently failed to load. Re-enabling GitHub Pages (source: `main` branch, root) restored every distributed script immediately, with no regeneration required.
+
+### Improved
+- **Automatic CDN fallback so this cannot recur.** The embed loader (`dist/loader.js`), the compact embed snippet, and the Tampermonkey loader now fall back to the **jsDelivr** mirror (`cdn.jsdelivr.net/gh/...`) if the primary GitHub Pages host fails. jsDelivr serves the repo directly and does not depend on Pages being enabled. (`dist/widget-core.js` already had multi-source fallback for its own sub-resources.)
+- **Added a `.nojekyll` marker** so the legacy GitHub Pages build always publishes the `dist/` runtime bundles verbatim (never processed/skipped by Jekyll).
+
+---
+
 ## [3.2.0] - 2026-05-22
 
 ### Added
