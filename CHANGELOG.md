@@ -6,6 +6,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 
 ---
 
+## [3.3.0] - 2026-07-15
+
+### Added
+- **New Standard Widget mode.** The former "Standard Widget" mode is now Microsoft's **NextGen Modern Web Messaging** widget, hosted and served by Dynamics 365. Users enter their Widget App ID, Org ID, and Org URL (or paste an existing script tag to auto-extract them), optionally customize the full **BrandConfig** (brand name/logo, primary color and font, header/button/message-bubble colors, text labels, sizing, and display options such as landing page, avatar, agent name, action-button placement, hide button, telemetry, locale, and custom font), then generate a ready-to-embed script and preview it live.
+- The generated script targets the **production CDN** (`https://oc-cdn-ocprod.azureedge.net/livechatwidget/v3/scripts/NextGenLiveChatBootstrapper.js`), includes an `onerror` re-injection fallback, and passes branding inline via `data-customization-callback`. Configuration is persisted to local storage.
+
+### Changed
+- The **Custom Widget** mode is unchanged.
+
+---
+
 ## [3.2.2] - 2026-07-15
 
 ### Fixed

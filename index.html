@@ -3480,10 +3480,10 @@
                             <input type="radio" name="widgetMode" value="standard" id="modeStandard">
                             <div class="mode-card">
                                 <div class="mode-icon">
-                                    <img src="img/icon/git-commit.svg" alt="Standard Widget" style="width: 28px; height: 28px; object-fit: contain;">
+                                    <img src="img/icon/git-commit.svg" alt="New Standard Widget" style="width: 28px; height: 28px; object-fit: contain;">
                                 </div>
-                                <div class="mode-title">Standard Widget</div>
-                                <div class="mode-desc">Use the default D365 Live Chat Widget appearance and behavior</div>
+                                <div class="mode-title">New Standard Widget</div>
+                                <div class="mode-desc">Microsoft's new NextGen Modern Web Messaging widget, hosted by D365 — configure branding and generate the embed script</div>
                             </div>
                         </label>
                         <label class="mode-option" onclick="console.log('Custom clicked'); document.getElementById('modeCustom').checked = true; toggleWidgetMode('custom');">
@@ -3500,9 +3500,191 @@
                 </div>
             </div>
 
-            <!-- Standard Widget Settings Container -->
+            <!-- New Standard Widget Settings Container -->
             <div id="standardWidgetSettings" class="hidden">
-                <!-- Contact Authentication for Standard Mode -->
+
+                <!-- Connection -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <div class="card-header-icon">
+                            <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+                        </div>
+                        <div>
+                            <h2>Connection</h2>
+                            <p>Enter your environment's IDs, or paste an existing widget script to extract them.</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">Paste an existing widget script (optional)</label>
+                            <textarea class="form-input" id="nsw-paste" rows="3" placeholder='&lt;script id="Microsoft_Omnichannel_LCWidget" src="..." data-app-id="..." data-org-id="..." data-org-url="..."&gt;&lt;/script&gt;' style="font-family: monospace; font-size: 12px;"></textarea>
+                            <div style="margin-top: 8px;">
+                                <button type="button" class="btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="nswParseScript()">Extract IDs from Script</button>
+                            </div>
+                            <p class="form-help" id="nsw-parse-result" style="display:none;"></p>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Widget App ID <span style="color:#c50f1f;">*</span></label>
+                            <input type="text" class="form-input" id="nsw-app-id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off" spellcheck="false">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Org ID <span style="color:#c50f1f;">*</span></label>
+                            <input type="text" class="form-input" id="nsw-org-id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off" spellcheck="false">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Org URL <span style="color:#c50f1f;">*</span></label>
+                            <input type="text" class="form-input" id="nsw-org-url" placeholder="https://your-org.omnichannelengagementhub.com" autocomplete="off" spellcheck="false">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Brand Identity -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <div class="card-header-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        </div>
+                        <div>
+                            <h2>Brand &amp; Appearance</h2>
+                            <p>Customize how the widget looks. All fields are optional.</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">Brand Name</label>
+                            <input type="text" class="form-input" id="nsw-brand-name" placeholder="Contoso Support">
+                            <p class="form-help">Used in ARIA labels and the disclaimer text.</p>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Logo URL</label>
+                            <input type="text" class="form-input" id="nsw-logo-url" placeholder="https://example.com/logo.png">
+                            <p class="form-help">Shown in the header. Recommended 28×28px.</p>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Primary Color</label>
+                            <div style="display:flex;gap:8px;align-items:center;">
+                                <input type="color" id="nsw-cp-primary" value="#0078d4" oninput="nswSyncFromPicker('primary')" style="width:38px;height:34px;padding:2px;border:1px solid var(--border,#c8c6c4);border-radius:6px;cursor:pointer;">
+                                <input type="text" class="form-input" id="nsw-primary" placeholder="#0078d4" maxlength="7" oninput="nswSyncFromText('primary')" style="max-width:120px;font-family:monospace;">
+                            </div>
+                            <p class="form-help">Chat button, send button, and accent color.</p>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Font Family</label>
+                            <input type="text" class="form-input" id="nsw-font" placeholder="Segoe UI, -apple-system, sans-serif">
+                            <p class="form-help">Override the font for all widget text.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Colors -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <div class="card-header-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 000 18c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16a5 5 0 005-5c0-4.42-4.03-8-9-8zm-5.5 9a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3-4a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm5 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3 4a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/></svg>
+                        </div>
+                        <div>
+                            <h2>Message Colors</h2>
+                            <p>Fine-tune header, button, and message bubble colors.</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="nsw-color-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;"></div>
+                    </div>
+                </div>
+
+                <!-- Text labels -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <div class="card-header-icon">
+                            <svg viewBox="0 0 24 24"><path d="M2.5 4v3h5v12h3V7h5V4h-13zm19 5h-9v3h3v7h3v-7h3V9z"/></svg>
+                        </div>
+                        <div>
+                            <h2>Text Labels</h2>
+                            <p>Customize the widget's on-screen text.</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group"><label class="form-label">Header Title</label><input type="text" class="form-input" id="nsw-header-title" placeholder="Support Chat"></div>
+                        <div class="form-group"><label class="form-label">Greeting Title</label><input type="text" class="form-input" id="nsw-greeting-title" placeholder="Hey There!"></div>
+                        <div class="form-group"><label class="form-label">Greeting Subtitle</label><input type="text" class="form-input" id="nsw-greeting-sub" placeholder="How can we help you today?"></div>
+                        <div class="form-group"><label class="form-label">Input Placeholder</label><input type="text" class="form-input" id="nsw-input-placeholder" placeholder="Ask us anything..."></div>
+                        <div class="form-group"><label class="form-label">Chat Button Label</label><input type="text" class="form-input" id="nsw-chat-btn-label" placeholder="Chat with Support"></div>
+                        <div class="form-group"><label class="form-label">Powered By Text</label><input type="text" class="form-input" id="nsw-powered-by" placeholder="e.g. Powered by Copilot"></div>
+                        <div class="form-group">
+                            <label class="form-label">Disclaimer Text</label>
+                            <input type="text" class="form-input" id="nsw-disclaimer" placeholder="Leave blank for default; enter a single space to hide it">
+                            <p class="form-help">Use <code>{brandName}</code> and <code>{privacyLink}</code> as placeholders. A single space hides the disclaimer.</p>
+                        </div>
+                        <div class="form-group"><label class="form-label">Privacy URL</label><input type="text" class="form-input" id="nsw-privacy-url" placeholder="https://example.com/privacy"></div>
+                        <div class="form-group"><label class="form-label">Privacy Link Text</label><input type="text" class="form-input" id="nsw-privacy-text" placeholder="privacy and security statement"></div>
+                    </div>
+                </div>
+
+                <!-- Sizing -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <div class="card-header-icon">
+                            <svg viewBox="0 0 24 24"><path d="M3 5v14h18V5H3zm16 12H5V7h14v10zM7 9h2v6H7zm4 0h6v2h-6zm0 4h6v2h-6z"/></svg>
+                        </div>
+                        <div>
+                            <h2>Sizing</h2>
+                            <p>Widget and chat-button dimensions.</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group"><label class="form-label">Widget Width</label><input type="text" class="form-input" id="nsw-width" placeholder="400px"></div>
+                        <div class="form-group"><label class="form-label">Widget Height</label><input type="text" class="form-input" id="nsw-height" placeholder="700px"></div>
+                        <div class="form-group"><label class="form-label">Chat Button Size</label><input type="text" class="form-input" id="nsw-btn-size" placeholder="64px"><p class="form-help">Minimum 44px (WCAG touch target).</p></div>
+                        <div class="form-group"><label class="form-label">Input Font Size</label><input type="text" class="form-input" id="nsw-input-font-size" placeholder="14px"><p class="form-help">Use 16px+ to prevent iOS auto-zoom.</p></div>
+                    </div>
+                </div>
+
+                <!-- Display options -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <div class="card-header-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 12a4.5 4.5 0 110-9 4.5 4.5 0 010 9zm0-7a2.5 2.5 0 100 5 2.5 2.5 0 000-5z"/></svg>
+                        </div>
+                        <div>
+                            <h2>Display &amp; Advanced Options</h2>
+                            <p>Landing page, avatar, action placement, and advanced flags.</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                            <label class="toggle-switch"><input type="checkbox" id="nsw-landing" checked><span class="toggle-slider"></span></label>
+                            <span class="toggle-label">Show Landing Page</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                            <label class="toggle-switch"><input type="checkbox" id="nsw-avatar" checked><span class="toggle-slider"></span></label>
+                            <span class="toggle-label">Show Agent Avatar</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                            <label class="toggle-switch"><input type="checkbox" id="nsw-agent-name" checked><span class="toggle-slider"></span></label>
+                            <span class="toggle-label">Show Agent Name</span>
+                        </div>
+                        <div class="form-group" style="margin-top:6px;">
+                            <label class="form-label">Action Button Placement</label>
+                            <select class="form-input" id="nsw-action-placement">
+                                <option value="bottom">Bottom (End Chat + Minimize below widget)</option>
+                                <option value="header">Header (− and × buttons in title bar)</option>
+                            </select>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:12px;margin:14px 0 12px;">
+                            <label class="toggle-switch"><input type="checkbox" id="nsw-hide-button"><span class="toggle-slider"></span></label>
+                            <span class="toggle-label">Hide Chat Button <span style="color:#94a3b8;font-weight:400;font-size:12px;">(widget still loads)</span></span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                            <label class="toggle-switch"><input type="checkbox" id="nsw-no-telemetry"><span class="toggle-slider"></span></label>
+                            <span class="toggle-label">Disable Telemetry</span>
+                        </div>
+                        <div class="form-group"><label class="form-label">Locale</label><input type="text" class="form-input" id="nsw-locale" placeholder="e.g. en-US, fr-FR"><p class="form-help">Leave blank for the environment default.</p></div>
+                        <div class="form-group"><label class="form-label">Custom Font URL</label><input type="text" class="form-input" id="nsw-custom-font-url" placeholder="https://example.com/font.woff2"><p class="form-help">HTTPS only. Supports .woff2, .woff, .ttf, .otf.</p></div>
+                        <div class="form-group"><label class="form-label">LCW Version</label><input type="text" class="form-input" id="nsw-lcw-version" value="prod" placeholder="prod"></div>
+                    </div>
+                </div>
+
+                <!-- Contact Authentication for New Standard Mode -->
                 <div class="settings-card">
                     <div class="card-header">
                         <div class="card-header-icon">
@@ -3547,6 +3729,33 @@
                                     </ul>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generated script -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <div class="card-header-icon">
+                            <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+                        </div>
+                        <div>
+                            <h2>Embed Script</h2>
+                            <p>Generated from your settings above. Paste this into any page to load the widget.</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div style="margin-bottom:12px;">
+                            <button type="button" class="btn-primary" style="padding:8px 18px;" onclick="nswUpdate(true)">Generate &amp; Preview</button>
+                        </div>
+                        <pre id="nsw-script-output" style="background:#1e1e1e;color:#d4d4d4;padding:14px;border-radius:6px;overflow-x:auto;font-family:monospace;font-size:12px;line-height:1.6;white-space:pre;min-height:40px;">Fill in the App ID, Org ID, and Org URL above, then click Generate &amp; Preview.</pre>
+                        <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
+                            <button type="button" class="btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="nswCopy()">Copy Script</button>
+                            <span id="nsw-copy-confirm" style="font-size:12px;color:#16a34a;display:none;">✓ Copied</span>
+                        </div>
+                        <div class="info-box" style="margin-top:14px;">
+                            <div class="info-icon">🔒</div>
+                            <div style="font-size:12.5px;">The widget is hosted and served by Microsoft Dynamics 365 (<code>oc-cdn-ocprod.azureedge.net</code>). Your branding is passed inline; no data leaves your D365 environment through this tool.</div>
                         </div>
                     </div>
                 </div>
@@ -4528,19 +4737,19 @@
                     <button class="preview-tab" onclick="switchPreviewTab('launcher')">Launcher</button>
                 </div>
                 
-                <!-- Standard Widget Preview Tab (shown when standard mode selected) -->
+                <!-- New Standard Widget Preview Tab (shown when standard mode selected) -->
                 <div class="preview-tabs hidden" id="standardPreviewTabs">
-                    <button class="preview-tab active" onclick="switchPreviewTab('standard')">Standard Widget</button>
+                    <button class="preview-tab active" onclick="switchPreviewTab('standard')">New Standard Widget</button>
                 </div>
                 
                 <!-- Standard Widget Preview -->
                 <div class="preview-content" id="standardPreview">
                     <div class="preview-widget-container" style="background: #e2e8f0; padding: 0; overflow: hidden;">
-                        <!-- Placeholder when no LCW code -->
+                        <!-- Placeholder when not configured -->
                         <div id="standardPreviewPlaceholder" style="height: 450px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center;">
                             <svg width="48" height="48" viewBox="0 0 24 24" fill="#94a3b8" style="margin-bottom: 16px;"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/></svg>
-                            <div style="font-size: 14px; font-weight: 600; color: #475569; margin-bottom: 8px;">No LCW Code Configured</div>
-                            <div style="font-size: 12px; color: #94a3b8; line-height: 1.5; max-width: 260px;">Paste your D365 Live Chat Widget embed code in the "LCW Embed Code" field above to see a live preview.</div>
+                            <div style="font-size: 14px; font-weight: 600; color: #475569; margin-bottom: 8px;">Widget Not Configured</div>
+                            <div style="font-size: 12px; color: #94a3b8; line-height: 1.5; max-width: 260px;">Enter your Widget App ID, Org ID, and Org URL above, then click <strong>Generate &amp; Preview</strong> to load the live widget.</div>
                         </div>
                         <!-- IFrame for actual preview -->
                         <iframe id="standardPreviewIframe" style="width: 100%; height: 450px; border: none; display: none; background: #e2e8f0;" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
@@ -4549,7 +4758,7 @@
                     <div id="standardPreviewFooter" style="display: none; margin-top: 12px; padding: 12px 16px; text-align: center;">
                         <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px;">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="#16a34a"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                            <span style="font-size: 12px; color: #16a34a; font-weight: 500;">Widget loaded from your LCW code</span>
+                            <span style="font-size: 12px; color: #16a34a; font-weight: 500;">Live NextGen widget loaded from your configuration</span>
                         </div>
                         <button onclick="refreshStandardPreview()" style="background: #0078d4; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
@@ -4681,14 +4890,24 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v3.2.2';
+        const APP_VERSION = 'v3.3.0';
         const APP_LAST_UPDATED = 'July 15, 2026';
         
         const CHANGELOG = [
             {
-                version: 'v3.2.2',
+                version: 'v3.3.0',
                 date: 'July 15, 2026',
                 latest: true,
+                items: [
+                    { type: 'new', text: 'New Standard Widget: the Standard Widget mode is now Microsoft\u2019s NextGen Modern Web Messaging widget, hosted by D365. Enter your App ID / Org ID / Org URL (or paste a script to auto-extract), customize brand, colors, text, sizing and display options, then generate a ready-to-embed script and preview it live.' },
+                    { type: 'new', text: 'Full BrandConfig support \u2014 branding is passed inline via data-customization-callback, generated against the production CDN (oc-cdn-ocprod.azureedge.net). Your settings are saved automatically.' },
+                    { type: 'improve', text: 'The Custom Widget mode is unchanged.' }
+                ]
+            },
+            {
+                version: 'v3.2.2',
+                date: 'July 15, 2026',
+                latest: false,
                 items: [
                     { type: 'fix', text: 'Widget scripts work again: the weekend platform migration had disabled GitHub Pages, which every embed and Tampermonkey script loads the widget runtime (widget-core.js) from. Pages is re-enabled, so all previously generated scripts work again with no changes needed.' },
                     { type: 'improve', text: 'Resilience: embed and Tampermonkey loaders now automatically fall back to the jsDelivr CDN mirror if GitHub Pages is ever unavailable, so a future Pages outage no longer takes the widget down.' },
@@ -9300,35 +9519,268 @@
         }
         
         function updateStandardPreview() {
-            const lcwCode = document.getElementById('lcwCode').value.trim();
-            const placeholder = document.getElementById('standardPreviewPlaceholder');
-            const iframe = document.getElementById('standardPreviewIframe');
-            const footer = document.getElementById('standardPreviewFooter');
-            
-            if (!lcwCode) {
-                // Show placeholder if no LCW code
-                placeholder.style.display = 'flex';
-                iframe.style.display = 'none';
-                if (footer) footer.style.display = 'none';
-                return;
-            }
-            
-            // Hide placeholder, show iframe and footer
-            placeholder.style.display = 'none';
-            iframe.style.display = 'block';
-            if (footer) footer.style.display = 'block';
-            
-            // Create HTML document with the LCW code - simple clean background
-            const htmlContent = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>*{margin:0;padding:0}html,body{height:100%;background:#e2e8f0;}</style></head><body>${lcwCode}</body></html>`;
-            
-            // Write to iframe
-            iframe.srcdoc = htmlContent;
+            // The "New Standard Widget" mode is driven entirely by the nsw* config.
+            nswUpdate(false);
         }
         
         function refreshStandardPreview() {
-            updateStandardPreview();
+            nswUpdate(false);
             showToast('Preview refreshed');
         }
+
+        // ============ NEW STANDARD WIDGET (NextGen Modern Web Messaging) ============
+        // Self-contained: configures, generates, and previews Microsoft's NextGen
+        // Live Chat Widget. Ported from the product-team reference harness, pointed
+        // at the PRODUCTION CDN.
+        const NSW_BOOTSTRAPPER = 'https://oc-cdn-ocprod.azureedge.net/livechatwidget/v3/scripts/NextGenLiveChatBootstrapper.js';
+        const NSW_COLORS = [
+            { id: 'header-text', label: 'Header Text', def: '#323130' },
+            { id: 'btn-color',   label: 'Chat Button', def: '#0078d4' },
+            { id: 'user-bg',     label: 'User Message Background', def: '#e8e8e8' },
+            { id: 'user-text',   label: 'User Message Text', def: '#111111' },
+            { id: 'agent-bg',    label: 'Agent Message Background', def: '#f3f2f1' },
+            { id: 'agent-text',  label: 'Agent Message Text', def: '#323130' },
+        ];
+        const NSW_LS = 'nsw-config-v1';
+        const NSW_TEXT_FIELDS = ['nsw-app-id','nsw-org-id','nsw-org-url','nsw-lcw-version','nsw-locale','nsw-custom-font-url','nsw-primary','nsw-font','nsw-brand-name','nsw-logo-url','nsw-header-text','nsw-btn-color','nsw-user-bg','nsw-user-text','nsw-agent-bg','nsw-agent-text','nsw-input-font-size','nsw-header-title','nsw-greeting-title','nsw-greeting-sub','nsw-input-placeholder','nsw-chat-btn-label','nsw-powered-by','nsw-disclaimer','nsw-privacy-url','nsw-privacy-text','nsw-width','nsw-height','nsw-btn-size'];
+        const NSW_CHECK_FIELDS = ['nsw-hide-button','nsw-no-telemetry','nsw-landing','nsw-avatar','nsw-agent-name'];
+        let nswColorGridBuilt = false;
+
+        function nswInitColorGrid() {
+            const grid = document.getElementById('nsw-color-grid');
+            if (!grid || nswColorGridBuilt) return;
+            grid.innerHTML = NSW_COLORS.map(c => `
+                <div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label">${c.label}</label>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <input type="color" id="nsw-cp-${c.id}" value="${c.def}" oninput="nswSyncFromPicker('${c.id}')" style="width:38px;height:34px;padding:2px;border:1px solid #c8c6c4;border-radius:6px;cursor:pointer;">
+                        <input type="text" class="form-input" id="nsw-${c.id}" placeholder="${c.def}" maxlength="7" oninput="nswSyncFromText('${c.id}')" style="max-width:120px;font-family:monospace;">
+                    </div>
+                </div>`).join('');
+            nswColorGridBuilt = true;
+        }
+
+        function nswSyncFromPicker(id) {
+            const t = document.getElementById('nsw-' + id);
+            if (t) t.value = document.getElementById('nsw-cp-' + id).value;
+            nswPersist();
+        }
+        function nswSyncFromText(id) {
+            const v = (document.getElementById('nsw-' + id).value || '').trim();
+            if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+                const p = document.getElementById('nsw-cp-' + id);
+                if (p) p.value = v;
+            }
+            nswPersist();
+        }
+
+        function nswParseScript() {
+            const raw = (document.getElementById('nsw-paste').value || '').trim();
+            const res = document.getElementById('nsw-parse-result');
+            const show = (msg, ok) => { res.style.display = 'block'; res.textContent = msg; res.style.color = ok ? '#107c10' : '#a4262c'; };
+            if (!raw) { show('Paste a script tag first.', false); return; }
+            let appId, orgId, orgUrl, ver;
+            try {
+                const doc = new DOMParser().parseFromString('<body>' + raw + '</body>', 'text/html');
+                const s = doc.querySelector('script');
+                if (!s) throw new Error('No script element found');
+                appId = s.getAttribute('data-app-id');
+                orgId = s.getAttribute('data-org-id');
+                orgUrl = s.getAttribute('data-org-url');
+                ver = s.getAttribute('data-lcw-version');
+            } catch (e) { show('Could not parse script tag: ' + e.message, false); return; }
+            if (!appId || !orgId || !orgUrl) { show('Missing data-app-id, data-org-id, or data-org-url.', false); return; }
+            document.getElementById('nsw-app-id').value = appId;
+            document.getElementById('nsw-org-id').value = orgId;
+            document.getElementById('nsw-org-url').value = orgUrl;
+            if (ver) document.getElementById('nsw-lcw-version').value = ver;
+            show('\u2713 Extracted App ID ' + appId.substring(0, 8) + '\u2026 \u00b7 Org ' + orgId.substring(0, 8) + '\u2026 \u00b7 ' + orgUrl, true);
+            nswPersist();
+        }
+
+        function nswGather() {
+            const g = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+            const raw = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+            const cb = id => { const el = document.getElementById(id); return el ? el.checked : false; };
+            const sel = document.getElementById('nsw-action-placement');
+            return {
+                appId: g('nsw-app-id'), orgId: g('nsw-org-id'), orgUrl: g('nsw-org-url'),
+                lcwVersion: g('nsw-lcw-version') || 'prod', locale: g('nsw-locale'),
+                hideButton: cb('nsw-hide-button'), customFontUrl: g('nsw-custom-font-url'), noTelemetry: cb('nsw-no-telemetry'),
+                colorOverride: g('nsw-primary'), fontOverride: g('nsw-font'),
+                brandName: g('nsw-brand-name'), logoUrl: g('nsw-logo-url'),
+                colorHeaderText: g('nsw-header-text'), colorBtnColor: g('nsw-btn-color'),
+                colorUserBg: g('nsw-user-bg'), colorUserText: g('nsw-user-text'),
+                colorAgentBg: g('nsw-agent-bg'), colorAgentText: g('nsw-agent-text'),
+                inputFontSize: g('nsw-input-font-size'), headerTitle: g('nsw-header-title'),
+                greetingTitle: g('nsw-greeting-title'), greetingSub: g('nsw-greeting-sub'),
+                inputPlaceholder: g('nsw-input-placeholder'), chatBtnLabel: g('nsw-chat-btn-label'),
+                poweredBy: g('nsw-powered-by'), disclaimer: raw('nsw-disclaimer'),
+                privacyUrl: g('nsw-privacy-url'), privacyText: g('nsw-privacy-text'),
+                widgetWidth: g('nsw-width'), widgetHeight: g('nsw-height'), btnSize: g('nsw-btn-size'),
+                showLanding: cb('nsw-landing'), showAvatar: cb('nsw-avatar'), showAgentName: cb('nsw-agent-name'),
+                actionPlacement: sel ? sel.value : 'bottom',
+            };
+        }
+
+        function nswBuildBrand(c) {
+            const brand = {};
+            if (c.brandName) brand.brandName = c.brandName;
+            if (c.logoUrl) brand.logoUrl = c.logoUrl;
+            const colors = {};
+            if (c.colorOverride) colors.primary = c.colorOverride;
+            if (c.colorHeaderText) colors.headerText = c.colorHeaderText;
+            if (c.colorBtnColor) colors.chatButtonColor = c.colorBtnColor;
+            if (c.colorUserBg) colors.userMessageBackground = c.colorUserBg;
+            if (c.colorUserText) colors.userMessageText = c.colorUserText;
+            if (c.colorAgentBg) colors.agentMessageBackground = c.colorAgentBg;
+            if (c.colorAgentText) colors.agentMessageText = c.colorAgentText;
+            if (Object.keys(colors).length) brand.colors = colors;
+            const typo = {};
+            if (c.fontOverride) typo.fontFamily = c.fontOverride;
+            if (c.inputFontSize) typo.inputFontSize = c.inputFontSize;
+            if (Object.keys(typo).length) brand.typography = typo;
+            const text = {};
+            if (c.headerTitle) text.headerTitle = c.headerTitle;
+            if (c.greetingTitle) text.greetingTitle = c.greetingTitle;
+            if (c.greetingSub) text.greetingSubtitle = c.greetingSub;
+            if (c.inputPlaceholder) text.inputPlaceholder = c.inputPlaceholder;
+            if (c.chatBtnLabel) text.chatButtonLabel = c.chatBtnLabel;
+            if (c.disclaimer !== '') text.disclaimerText = c.disclaimer.trim();
+            if (c.privacyUrl) text.privacyUrl = c.privacyUrl;
+            if (c.privacyText) text.privacyLinkText = c.privacyText;
+            if (Object.keys(text).length) brand.text = text;
+            const sizing = {};
+            if (c.widgetWidth) sizing.widgetWidth = c.widgetWidth;
+            if (c.widgetHeight) sizing.widgetHeight = c.widgetHeight;
+            if (c.btnSize) sizing.chatButtonSize = c.btnSize;
+            if (Object.keys(sizing).length) brand.sizing = sizing;
+            const display = {};
+            if (!c.showLanding) display.showLandingPage = false;
+            if (!c.showAvatar) display.showAgentAvatar = false;
+            if (!c.showAgentName) display.showAgentName = false;
+            if (c.actionPlacement === 'header') display.actionButtonPlacement = 'header';
+            if (c.poweredBy) display.poweredByText = c.poweredBy;
+            if (Object.keys(display).length) brand.display = display;
+            return Object.keys(brand).length ? brand : null;
+        }
+
+        function nswGenerate(c, brand) {
+            const lines = [];
+            lines.push('<' + 'script');
+            lines.push('  id="Microsoft_Omnichannel_LCWidget"');
+            lines.push('  src="' + NSW_BOOTSTRAPPER + '"');
+            const oe = [
+                '(function(el){',
+                'el.parentNode.removeChild(el);',
+                "var s=document.createElement('scr'+'ipt');",
+                "s.src='" + NSW_BOOTSTRAPPER + "';",
+                "s.setAttribute('id','Microsoft_Omnichannel_LCWidget');",
+                "s.setAttribute('data-app-id','" + c.appId + "');",
+                "s.setAttribute('data-lcw-version','" + c.lcwVersion + "');",
+                "s.setAttribute('data-org-id','" + c.orgId + "');",
+                "s.setAttribute('data-org-url','" + c.orgUrl + "');",
+                'document.body.appendChild(s);',
+                '})(this);'
+            ].join('');
+            lines.push('  onerror="' + oe.replace(/"/g, '&quot;') + '"');
+            lines.push('  data-app-id="' + c.appId + '"');
+            lines.push('  data-lcw-version="' + c.lcwVersion + '"');
+            lines.push('  data-org-id="' + c.orgId + '"');
+            lines.push('  data-org-url="' + c.orgUrl + '"');
+            if (c.colorOverride && !brand) lines.push('  data-color-override="' + c.colorOverride + '"');
+            if (c.fontOverride && !brand) lines.push('  data-font-family-override="' + c.fontOverride + '"');
+            if (c.locale) lines.push('  data-locale="' + c.locale + '"');
+            if (c.hideButton) lines.push('  data-hide-button="true"');
+            if (c.customFontUrl) lines.push('  data-custom-font-url="' + c.customFontUrl + '"');
+            if (c.noTelemetry) lines.push('  data-disable-telemetry="true"');
+            if (brand) lines.push("  data-customization-callback='" + JSON.stringify(brand) + "'");
+            lines.push('  async');
+            lines.push('><' + '/scr' + 'ipt>');
+            return lines.join('\n');
+        }
+
+        function nswUpdate(scrollToPreview) {
+            nswInitColorGrid();
+            nswPersist();
+            const c = nswGather();
+            const out = document.getElementById('nsw-script-output');
+            const placeholder = document.getElementById('standardPreviewPlaceholder');
+            const iframe = document.getElementById('standardPreviewIframe');
+            const footer = document.getElementById('standardPreviewFooter');
+            if (!c.appId || !c.orgId || !c.orgUrl) {
+                if (out) out.textContent = 'Fill in the App ID, Org ID, and Org URL above, then click Generate & Preview.';
+                if (placeholder) placeholder.style.display = 'flex';
+                if (iframe) iframe.style.display = 'none';
+                if (footer) footer.style.display = 'none';
+                return;
+            }
+            const brand = nswBuildBrand(c);
+            const script = nswGenerate(c, brand);
+            if (out) out.textContent = script;
+            if (placeholder) placeholder.style.display = 'none';
+            if (iframe) iframe.style.display = 'block';
+            if (footer) footer.style.display = 'block';
+            const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>*{margin:0;padding:0}html,body{height:100%;background:#e2e8f0;}</style></head><body>' + script + '</body></html>';
+            if (iframe) iframe.srcdoc = html;
+            if (scrollToPreview) {
+                const el = document.getElementById('standardPreview');
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        function nswCopy() {
+            const t = document.getElementById('nsw-script-output').textContent;
+            if (!t || t.indexOf('<' + 'script') === -1) { showToast('Generate the script first'); return; }
+            const done = () => { const c = document.getElementById('nsw-copy-confirm'); if (c) { c.style.display = 'inline'; setTimeout(() => c.style.display = 'none', 2000); } };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(t).then(done).catch(() => { nswCopyFallback(t); done(); });
+            } else { nswCopyFallback(t); done(); }
+        }
+        function nswCopyFallback(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta); ta.select();
+            try { document.execCommand('copy'); } catch (e) {}
+            document.body.removeChild(ta);
+        }
+
+        function nswPersist() {
+            try {
+                const data = {};
+                NSW_TEXT_FIELDS.forEach(id => { const el = document.getElementById(id); if (el) data[id] = el.value; });
+                NSW_CHECK_FIELDS.forEach(id => { const el = document.getElementById(id); if (el) data[id] = el.checked; });
+                const sel = document.getElementById('nsw-action-placement'); if (sel) data['nsw-action-placement'] = sel.value;
+                localStorage.setItem(NSW_LS, JSON.stringify(data));
+            } catch (e) {}
+        }
+        function nswRestore() {
+            nswInitColorGrid();
+            try {
+                const rawStr = localStorage.getItem(NSW_LS); if (!rawStr) return;
+                const data = JSON.parse(rawStr);
+                Object.keys(data).forEach(id => {
+                    const el = document.getElementById(id); if (!el) return;
+                    if (el.type === 'checkbox') el.checked = !!data[id]; else el.value = data[id];
+                });
+                NSW_COLORS.concat([{ id: 'primary' }]).forEach(c => {
+                    const t = document.getElementById('nsw-' + c.id); const p = document.getElementById('nsw-cp-' + c.id);
+                    if (t && p && /^#[0-9a-fA-F]{6}$/.test((t.value || '').trim())) p.value = t.value.trim();
+                });
+            } catch (e) {}
+        }
+        function nswAttachListeners() {
+            const root = document.getElementById('standardWidgetSettings');
+            if (!root || root.dataset.nswWired) return;
+            root.dataset.nswWired = '1';
+            root.addEventListener('input', nswPersist);
+            root.addEventListener('change', nswPersist);
+        }
+        (function nswBoot() {
+            const go = () => { nswInitColorGrid(); nswRestore(); nswAttachListeners(); };
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go);
+            else go();
+        })();
 
         function updateFontPreview(fontFamily) {
             const previewText = document.getElementById('fontPreviewText');
