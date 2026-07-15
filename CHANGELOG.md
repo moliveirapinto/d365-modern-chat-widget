@@ -6,6 +6,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 
 ---
 
+## [3.5.2] - 2026-07-15
+
+### Changed
+- The New Standard Widget's **Embed Widget Code** section now matches the Custom Widget's exactly — same card layout, output textarea, and **Generate Embed Code / Generate TamperMonkey Code / Copy to Clipboard** buttons.
+
+### Fixed
+- Each mode now shows a single embed section. The shared Custom Widget embed card is hidden while the New Standard Widget is selected, so you no longer see two "Embed Widget Code" cards at once.
+
+---
+
 ## [3.5.1] - 2026-07-15
 
 ### Fixed

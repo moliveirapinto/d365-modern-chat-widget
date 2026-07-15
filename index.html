@@ -3737,35 +3737,63 @@
                     </div>
                 </div>
 
-                <!-- Generated script -->
+                <!-- Embed Widget Code -->
                 <div class="settings-card">
                     <div class="card-header">
                         <div class="card-header-icon">
-                            <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+                            <img src="img/icon/coding.png" alt="Embed Widget Code" style="width: 24px; height: 24px; object-fit: contain;">
                         </div>
                         <div>
-                            <h2>Embed Script</h2>
-                            <p>Generated from your settings above. Paste this into any page to load the widget.</p>
+                            <h2>Embed Widget Code</h2>
+                            <p>Generate script to embed widget on your website</p>
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="form-group">
-                            <label class="form-label">Tampermonkey target site (@match)</label>
-                            <input type="text" class="form-input" id="nsw-tm-match" placeholder="*://*/*" value="*://*/*">
-                            <p class="form-help">Which site(s) the Tampermonkey userscript injects the widget on. Use <code>*://*/*</code> for every site, or a specific pattern like <code>https://contoso.com/*</code>.</p>
+                        <div class="embed-info">
+                            <div class="embed-info-text">
+                                <p>Paste before <code style="background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; font-size: 11px;">&lt;/body&gt;</code></p>
+                            </div>
                         </div>
-                        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
-                            <button type="button" class="btn-primary" style="padding:8px 18px;" onclick="nswUpdate(true)">Generate Embed Script</button>
-                            <button type="button" class="btn-secondary" style="padding:8px 18px;" onclick="nswGenerateTM()">Generate Tampermonkey Script</button>
+
+                        <div class="embed-options">
+                            <div class="embed-option full-width">
+                                <label for="nsw-tm-match" style="min-width: fit-content;">Tampermonkey @match:</label>
+                                <input type="text" id="nsw-tm-match" placeholder="*://*/*" value="*://*/*" style="flex:1;">
+                            </div>
                         </div>
-                        <pre id="nsw-script-output" style="background:#1e1e1e;color:#d4d4d4;padding:14px;border-radius:6px;overflow-x:auto;font-family:monospace;font-size:12px;line-height:1.6;white-space:pre;min-height:40px;">Set a Widget Profile above, then click Generate Embed Script or Generate Tampermonkey Script.</pre>
-                        <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
-                            <button type="button" class="btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="nswCopy()">Copy Script</button>
-                            <span id="nsw-copy-confirm" style="font-size:12px;color:#16a34a;display:none;">✓ Copied</span>
+
+                        <div class="info-box" style="margin-bottom: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px;">
+                            <div style="display: flex; gap: 10px; align-items: flex-start;">
+                                <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: #64748b; flex-shrink: 0; margin-top: 1px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                                <div style="flex: 1;">
+                                    <p style="margin: 0; font-size: 12px; color: #64748b; line-height: 1.5;">
+                                        <strong style="color: #475569;">Hosted by Microsoft D365:</strong> the NextGen widget loads from <code style="padding: 2px 5px; background: #e2e8f0; border-radius: 3px; font-size: 11px; color: #334155;">oc-cdn-ocprod.azureedge.net</code>. Your branding is passed inline; no data leaves your D365 environment through this tool.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="info-box" style="margin-top:14px;">
-                            <div class="info-icon">🔒</div>
-                            <div style="font-size:12.5px;">The widget is hosted and served by Microsoft Dynamics 365 (<code>oc-cdn-ocprod.azureedge.net</code>). Your branding is passed inline; no data leaves your D365 environment through this tool.</div>
+
+                        <div class="embed-code-container">
+                            <textarea id="nsw-script-output" class="embed-code-textarea" readonly placeholder="Click 'Generate Embed Code' to create your widget script..."></textarea>
+                        </div>
+
+                        <div class="embed-code-actions">
+                            <button class="btn btn-primary" onclick="nswUpdate(true)" style="background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);">
+                                <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg>
+                                Generate Embed Code
+                            </button>
+                            <button class="btn btn-primary" onclick="nswGenerateTM()" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-color: #16213e;">
+                                <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                                Generate TamperMonkey Code
+                            </button>
+                            <button class="btn btn-secondary" onclick="nswCopy()">
+                                <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                                Copy to Clipboard
+                            </button>
+                            <span class="copy-success" id="nsw-copy-confirm">
+                                <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                                Copied!
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -4542,7 +4570,7 @@
             </div><!-- End customWidgetSettings -->
 
             <!-- Embed Widget Code Section -->
-            <div class="settings-card">
+            <div class="settings-card" id="customEmbedCard">
                 <div class="card-header">
                     <div class="card-header-icon">
                         <img src="img/icon/coding.png" alt="Embed Widget Code" style="width: 24px; height: 24px; object-fit: contain;">
@@ -4900,14 +4928,23 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v3.5.1';
+        const APP_VERSION = 'v3.5.2';
         const APP_LAST_UPDATED = 'July 15, 2026';
         
         const CHANGELOG = [
             {
-                version: 'v3.5.1',
+                version: 'v3.5.2',
                 date: 'July 15, 2026',
                 latest: true,
+                items: [
+                    { type: 'improve', text: 'The New Standard Widget\u2019s \u201cEmbed Widget Code\u201d section now matches the Custom Widget\u2019s exactly \u2014 same layout, output box, and Generate Embed Code / Generate TamperMonkey Code / Copy to Clipboard buttons.' },
+                    { type: 'fix', text: 'Each mode now shows a single embed section: the shared Custom embed card is hidden while the New Standard Widget is selected, so you no longer see two \u201cEmbed Widget Code\u201d cards at once.' }
+                ]
+            },
+            {
+                version: 'v3.5.1',
+                date: 'July 15, 2026',
+                latest: false,
                 items: [
                     { type: 'fix', text: 'The \u201cconfigure D365 connection first\u201d message when generating embed/Tampermonkey code now points to the right place \u2014 Widget Profiles \u2192 paste your embed code \u2192 Apply to Settings \u2014 instead of a non-existent \u201cD365 Connection tab\u201d.' }
                 ]
@@ -9540,6 +9577,10 @@
             if (mode === 'standard') {
                 customSettings.classList.add('hidden');
                 standardSettings.classList.remove('hidden');
+                // The shared "Embed Widget Code" card belongs to the Custom Widget;
+                // the New Standard Widget has its own embed card, so hide the shared one.
+                const customEmbedCard = document.getElementById('customEmbedCard');
+                if (customEmbedCard) customEmbedCard.classList.add('hidden');
                 // Show standard preview tabs and content
                 if (customPreviewTabs) customPreviewTabs.classList.add('hidden');
                 if (standardPreviewTabs) standardPreviewTabs.classList.remove('hidden');
@@ -9550,6 +9591,8 @@
             } else {
                 customSettings.classList.remove('hidden');
                 standardSettings.classList.add('hidden');
+                const customEmbedCard = document.getElementById('customEmbedCard');
+                if (customEmbedCard) customEmbedCard.classList.remove('hidden');
                 // Show custom preview tabs and content
                 if (customPreviewTabs) customPreviewTabs.classList.remove('hidden');
                 if (standardPreviewTabs) standardPreviewTabs.classList.add('hidden');
@@ -9781,7 +9824,7 @@
             const conn = document.getElementById('nsw-conn-text');
             if (!c.appId || !c.orgId || !c.orgUrl) {
                 if (conn) conn.innerHTML = 'No connection IDs yet. In <strong>Widget Profiles</strong> above, paste your D365 Omnichannel embed code and click <strong>Apply to Settings</strong> \u2014 the New Standard Widget picks the IDs up automatically.';
-                if (out) out.textContent = 'Set a Widget Profile above (App ID / Org ID / Org URL), then click Generate Embed Script or Generate Tampermonkey Script.';
+                if (out) out.value = 'Set a Widget Profile above (App ID / Org ID / Org URL), then click Generate Embed Code or Generate TamperMonkey Code.';
                 if (placeholder) placeholder.style.display = 'flex';
                 if (iframe) iframe.style.display = 'none';
                 if (footer) footer.style.display = 'none';
@@ -9790,7 +9833,7 @@
             if (conn) conn.innerHTML = '\u2713 Using App ID <code>' + c.appId.substring(0, 8) + '\u2026</code>, Org <code>' + c.orgId.substring(0, 8) + '\u2026</code> \u00b7 ' + c.orgUrl;
             const brand = nswBuildBrand(c);
             const script = nswGenerate(c, brand);
-            if (out) out.textContent = script;
+            if (out) out.value = script;
             if (placeholder) placeholder.style.display = 'none';
             if (iframe) iframe.style.display = 'block';
             if (footer) footer.style.display = 'block';
@@ -9866,21 +9909,21 @@
             const c = nswGather();
             const out = document.getElementById('nsw-script-output');
             if (!c.appId || !c.orgId || !c.orgUrl) {
-                if (out) out.textContent = 'Set a Widget Profile above (App ID / Org ID / Org URL) first, then generate the Tampermonkey script.';
+                if (out) out.value = 'Set a Widget Profile above (App ID / Org ID / Org URL) first, then generate the Tampermonkey script.';
                 showToast('Configure a Widget Profile first');
                 return;
             }
             const brand = nswBuildBrand(c);
             const tm = nswGenerateTampermonkey(c, brand);
-            if (out) out.textContent = tm;
+            if (out) out.value = tm;
             showToast('Tampermonkey script generated \u2014 copy it into a new Tampermonkey userscript');
         }
 
         function nswCopy() {
-            const t = document.getElementById('nsw-script-output').textContent;
+            const t = document.getElementById('nsw-script-output').value;
             const looksGenerated = t && (t.indexOf('<' + 'script') !== -1 || t.indexOf('// ==UserScript==') !== -1);
             if (!looksGenerated) { showToast('Generate the script first'); return; }
-            const done = () => { const c = document.getElementById('nsw-copy-confirm'); if (c) { c.style.display = 'inline'; setTimeout(() => c.style.display = 'none', 2000); } };
+            const done = () => { const c = document.getElementById('nsw-copy-confirm'); if (c) { c.classList.add('show'); setTimeout(() => c.classList.remove('show'), 2000); } };
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(t).then(done).catch(() => { nswCopyFallback(t); done(); });
             } else { nswCopyFallback(t); done(); }
