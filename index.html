@@ -3522,61 +3522,61 @@
                     </div>
                 </div>
 
-                <!-- Brand Identity -->
-                <div class="settings-card">
-                    <div class="card-header">
-                        <div class="card-header-icon">
-                            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        </div>
-                        <div>
-                            <h2>Brand &amp; Appearance</h2>
-                            <p>Customize how the widget looks. All fields are optional.</p>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label class="form-label">Brand Name</label>
-                            <input type="text" class="form-input" id="nsw-brand-name" placeholder="Contoso Support">
-                            <p class="form-help">Used in ARIA labels and the disclaimer text.</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Logo URL</label>
-                            <input type="text" class="form-input" id="nsw-logo-url" placeholder="https://example.com/logo.png">
-                            <p class="form-help">Shown in the header. Recommended 28×28px.</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Primary Color</label>
-                            <div style="display:flex;gap:8px;align-items:center;">
-                                <input type="color" id="nsw-cp-primary" value="#0078d4" oninput="nswSyncFromPicker('primary')" style="width:38px;height:34px;padding:2px;border:1px solid var(--border,#c8c6c4);border-radius:6px;cursor:pointer;">
-                                <input type="text" class="form-input" id="nsw-primary" placeholder="#0078d4" maxlength="7" oninput="nswSyncFromText('primary')" style="max-width:120px;font-family:monospace;">
-                            </div>
-                            <p class="form-help">Chat button, send button, and accent color.</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Font Family</label>
-                            <input type="text" class="form-input" id="nsw-font" placeholder="Segoe UI, -apple-system, sans-serif">
-                            <p class="form-help">Override the font for all widget text.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Pre-chat -->
+                <!-- Pre-chat Form -->
                 <div class="settings-card">
                     <div class="card-header">
                         <div class="card-header-icon">
                             <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
                         </div>
                         <div>
-                            <h2>Pre-chat</h2>
-                            <p>Greet the customer and ask for their question before the conversation starts.</p>
+                            <h2>Pre-chat Form</h2>
+                            <p>Customize the initial greeting shown before the conversation starts.</p>
                         </div>
                     </div>
                     <div class="card-body">
-                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
                             <label class="toggle-switch"><input type="checkbox" id="nsw-landing" checked><span class="toggle-slider"></span></label>
                             <span class="toggle-label">Show pre-chat landing page</span>
                         </div>
-                        <p class="form-help">On: the widget opens on a landing page using your <strong>Greeting Title</strong> and <strong>Greeting Subtitle</strong> (see Text Labels), prompting the customer to type their question first. Off: the chat opens directly. Note: a full pre-chat <em>survey</em> (name/email fields) is configured on the workstream in the D365 admin center, not here.</p>
+                        <div class="form-group"><label class="form-label">Greeting Title</label><input type="text" class="form-input" id="nsw-greeting-title" placeholder="Hey There!"></div>
+                        <div class="form-group"><label class="form-label">Greeting Subtitle</label><input type="text" class="form-input" id="nsw-greeting-sub" placeholder="How can we help you today?"></div>
+                        <p class="form-help">When the landing page is on, the widget opens with this greeting and asks the customer for their question first. A full pre-chat <em>survey</em> (name/email fields) is configured on the workstream in the D365 admin center.</p>
+                    </div>
+                </div>
+
+                <!-- Header & Branding -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <div class="card-header-icon">
+                            <svg viewBox="0 0 24 24"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg>
+                        </div>
+                        <div>
+                            <h2>Header &amp; Branding</h2>
+                            <p>Customize the chat header text and logo.</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group"><label class="form-label">Brand Name</label><input type="text" class="form-input" id="nsw-brand-name" placeholder="Contoso Support"><p class="form-help">Used in ARIA labels and the disclaimer text.</p></div>
+                        <div class="form-group"><label class="form-label">Header Title</label><input type="text" class="form-input" id="nsw-header-title" placeholder="Support Chat"></div>
+                        <div class="form-group"><label class="form-label">Logo URL</label><input type="text" class="form-input" id="nsw-logo-url" placeholder="https://example.com/logo.png"><p class="form-help">Shown in the header. Recommended 28×28px.</p></div>
+                    </div>
+                </div>
+
+                <!-- Fonts -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <div class="card-header-icon">
+                            <svg viewBox="0 0 24 24"><path d="M9.93 13.5h4.14L12 7.98zM20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-4.05 16.5l-1.14-3H9.17l-1.12 3H5.96l5.11-13h1.86l5.11 13h-2.09z"/></svg>
+                        </div>
+                        <div>
+                            <h2>Fonts</h2>
+                            <p>Choose the typography for your widget.</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group"><label class="form-label">Font Family</label><input type="text" class="form-input" id="nsw-font" placeholder="Segoe UI, -apple-system, sans-serif"><p class="form-help">Override the font for all widget text.</p></div>
+                        <div class="form-group"><label class="form-label">Input Font Size</label><input type="text" class="form-input" id="nsw-input-font-size" placeholder="14px"><p class="form-help">Use 16px+ to prevent iOS auto-zoom.</p></div>
+                        <div class="form-group"><label class="form-label">Custom Font URL</label><input type="text" class="form-input" id="nsw-custom-font-url" placeholder="https://example.com/font.woff2"><p class="form-help">HTTPS only. Supports .woff2, .woff, .ttf, .otf.</p></div>
                     </div>
                 </div>
 
@@ -3587,71 +3587,32 @@
                             <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 000 18c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16a5 5 0 005-5c0-4.42-4.03-8-9-8zm-5.5 9a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3-4a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm5 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3 4a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/></svg>
                         </div>
                         <div>
-                            <h2>Message Colors</h2>
-                            <p>Fine-tune header, button, and message bubble colors.</p>
+                            <h2>Colors</h2>
+                            <p>Define your widget color scheme.</p>
                         </div>
                     </div>
                     <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">Primary Color</label>
+                            <div style="display:flex;gap:8px;align-items:center;">
+                                <input type="color" id="nsw-cp-primary" value="#0078d4" oninput="nswSyncFromPicker('primary')" style="width:38px;height:34px;padding:2px;border:1px solid var(--border,#c8c6c4);border-radius:6px;cursor:pointer;">
+                                <input type="text" class="form-input" id="nsw-primary" placeholder="#0078d4" maxlength="7" oninput="nswSyncFromText('primary')" style="max-width:120px;font-family:monospace;">
+                            </div>
+                            <p class="form-help">Chat button, send button, and accent color.</p>
+                        </div>
                         <div id="nsw-color-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;"></div>
                     </div>
                 </div>
 
-                <!-- Text labels -->
+                <!-- Avatars -->
                 <div class="settings-card">
                     <div class="card-header">
                         <div class="card-header-icon">
-                            <svg viewBox="0 0 24 24"><path d="M2.5 4v3h5v12h3V7h5V4h-13zm19 5h-9v3h3v7h3v-7h3V9z"/></svg>
+                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                         </div>
                         <div>
-                            <h2>Text Labels</h2>
-                            <p>Customize the widget's on-screen text.</p>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group"><label class="form-label">Header Title</label><input type="text" class="form-input" id="nsw-header-title" placeholder="Support Chat"></div>
-                        <div class="form-group"><label class="form-label">Greeting Title</label><input type="text" class="form-input" id="nsw-greeting-title" placeholder="Hey There!"></div>
-                        <div class="form-group"><label class="form-label">Greeting Subtitle</label><input type="text" class="form-input" id="nsw-greeting-sub" placeholder="How can we help you today?"></div>
-                        <div class="form-group"><label class="form-label">Input Placeholder</label><input type="text" class="form-input" id="nsw-input-placeholder" placeholder="Ask us anything..."></div>
-                        <div class="form-group"><label class="form-label">Chat Button Label</label><input type="text" class="form-input" id="nsw-chat-btn-label" placeholder="Chat with Support"></div>
-                        <div class="form-group"><label class="form-label">Powered By Text</label><input type="text" class="form-input" id="nsw-powered-by" placeholder="e.g. Powered by Copilot"></div>
-                        <div class="form-group">
-                            <label class="form-label">Disclaimer Text</label>
-                            <input type="text" class="form-input" id="nsw-disclaimer" placeholder="Leave blank for default; enter a single space to hide it">
-                            <p class="form-help">Use <code>{brandName}</code> and <code>{privacyLink}</code> as placeholders. A single space hides the disclaimer.</p>
-                        </div>
-                        <div class="form-group"><label class="form-label">Privacy URL</label><input type="text" class="form-input" id="nsw-privacy-url" placeholder="https://example.com/privacy"></div>
-                        <div class="form-group"><label class="form-label">Privacy Link Text</label><input type="text" class="form-input" id="nsw-privacy-text" placeholder="privacy and security statement"></div>
-                    </div>
-                </div>
-
-                <!-- Sizing -->
-                <div class="settings-card">
-                    <div class="card-header">
-                        <div class="card-header-icon">
-                            <svg viewBox="0 0 24 24"><path d="M3 5v14h18V5H3zm16 12H5V7h14v10zM7 9h2v6H7zm4 0h6v2h-6zm0 4h6v2h-6z"/></svg>
-                        </div>
-                        <div>
-                            <h2>Sizing</h2>
-                            <p>Widget and chat-button dimensions.</p>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group"><label class="form-label">Widget Width</label><input type="text" class="form-input" id="nsw-width" placeholder="400px"></div>
-                        <div class="form-group"><label class="form-label">Widget Height</label><input type="text" class="form-input" id="nsw-height" placeholder="700px"></div>
-                        <div class="form-group"><label class="form-label">Chat Button Size</label><input type="text" class="form-input" id="nsw-btn-size" placeholder="64px"><p class="form-help">Minimum 44px (WCAG touch target).</p></div>
-                        <div class="form-group"><label class="form-label">Input Font Size</label><input type="text" class="form-input" id="nsw-input-font-size" placeholder="14px"><p class="form-help">Use 16px+ to prevent iOS auto-zoom.</p></div>
-                    </div>
-                </div>
-
-                <!-- Display options -->
-                <div class="settings-card">
-                    <div class="card-header">
-                        <div class="card-header-icon">
-                            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 12a4.5 4.5 0 110-9 4.5 4.5 0 010 9zm0-7a2.5 2.5 0 100 5 2.5 2.5 0 000-5z"/></svg>
-                        </div>
-                        <div>
-                            <h2>Display &amp; Advanced Options</h2>
-                            <p>Landing page, avatar, action placement, and advanced flags.</p>
+                            <h2>Avatars</h2>
+                            <p>Show or hide the agent avatar and name.</p>
                         </div>
                     </div>
                     <div class="card-body">
@@ -3659,17 +3620,62 @@
                             <label class="toggle-switch"><input type="checkbox" id="nsw-avatar" checked><span class="toggle-slider"></span></label>
                             <span class="toggle-label">Show Agent Avatar</span>
                         </div>
-                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
                             <label class="toggle-switch"><input type="checkbox" id="nsw-agent-name" checked><span class="toggle-slider"></span></label>
                             <span class="toggle-label">Show Agent Name</span>
                         </div>
-                        <div class="form-group" style="margin-top:6px;">
+                        <p class="form-help">The NextGen widget uses the agent's real avatar from D365; custom avatar images are set in the Custom Widget mode.</p>
+                    </div>
+                </div>
+
+                <!-- Localization -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <div class="card-header-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
+                        </div>
+                        <div>
+                            <h2>Localization</h2>
+                            <p>Set the widget locale for international audiences.</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group"><label class="form-label">Locale</label><input type="text" class="form-input" id="nsw-locale" placeholder="e.g. en-US, fr-FR"><p class="form-help">Leave blank for the environment default.</p></div>
+                    </div>
+                </div>
+
+                <!-- NextGen Options -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <div class="card-header-icon">
+                            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                        </div>
+                        <div>
+                            <h2>NextGen Options</h2>
+                            <p>Options specific to the NextGen Modern Web Messaging widget.</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group"><label class="form-label">Input Placeholder</label><input type="text" class="form-input" id="nsw-input-placeholder" placeholder="Ask us anything..."></div>
+                        <div class="form-group"><label class="form-label">Chat Button Label</label><input type="text" class="form-input" id="nsw-chat-btn-label" placeholder="Chat with Support"></div>
+                        <div class="form-group"><label class="form-label">Powered By Text</label><input type="text" class="form-input" id="nsw-powered-by" placeholder="e.g. Powered by Copilot"></div>
+                        <div class="form-group">
                             <label class="form-label">Action Button Placement</label>
                             <select class="form-input" id="nsw-action-placement">
                                 <option value="bottom">Bottom (End Chat + Minimize below widget)</option>
                                 <option value="header">Header (− and × buttons in title bar)</option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label class="form-label">Disclaimer Text</label>
+                            <input type="text" class="form-input" id="nsw-disclaimer" placeholder="Leave blank for default; enter a single space to hide it">
+                            <p class="form-help">Use <code>{brandName}</code> and <code>{privacyLink}</code> as placeholders. A single space hides the disclaimer.</p>
+                        </div>
+                        <div class="form-group"><label class="form-label">Privacy URL</label><input type="text" class="form-input" id="nsw-privacy-url" placeholder="https://example.com/privacy"></div>
+                        <div class="form-group"><label class="form-label">Privacy Link Text</label><input type="text" class="form-input" id="nsw-privacy-text" placeholder="privacy and security statement"></div>
+                        <div class="form-group"><label class="form-label">Widget Width</label><input type="text" class="form-input" id="nsw-width" placeholder="400px"></div>
+                        <div class="form-group"><label class="form-label">Widget Height</label><input type="text" class="form-input" id="nsw-height" placeholder="700px"></div>
+                        <div class="form-group"><label class="form-label">Chat Button Size</label><input type="text" class="form-input" id="nsw-btn-size" placeholder="64px"><p class="form-help">Minimum 44px (WCAG touch target).</p></div>
                         <div style="display:flex;align-items:center;gap:12px;margin:14px 0 12px;">
                             <label class="toggle-switch"><input type="checkbox" id="nsw-hide-button"><span class="toggle-slider"></span></label>
                             <span class="toggle-label">Hide Chat Button <span style="color:#94a3b8;font-weight:400;font-size:12px;">(widget still loads)</span></span>
@@ -3678,8 +3684,6 @@
                             <label class="toggle-switch"><input type="checkbox" id="nsw-no-telemetry"><span class="toggle-slider"></span></label>
                             <span class="toggle-label">Disable Telemetry</span>
                         </div>
-                        <div class="form-group"><label class="form-label">Locale</label><input type="text" class="form-input" id="nsw-locale" placeholder="e.g. en-US, fr-FR"><p class="form-help">Leave blank for the environment default.</p></div>
-                        <div class="form-group"><label class="form-label">Custom Font URL</label><input type="text" class="form-input" id="nsw-custom-font-url" placeholder="https://example.com/font.woff2"><p class="form-help">HTTPS only. Supports .woff2, .woff, .ttf, .otf.</p></div>
                         <div class="form-group"><label class="form-label">LCW Version</label><input type="text" class="form-input" id="nsw-lcw-version" value="prod" placeholder="prod"></div>
                     </div>
                 </div>
@@ -4896,14 +4900,24 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v3.4.0';
+        const APP_VERSION = 'v3.5.0';
         const APP_LAST_UPDATED = 'July 15, 2026';
         
         const CHANGELOG = [
             {
-                version: 'v3.4.0',
+                version: 'v3.5.0',
                 date: 'July 15, 2026',
                 latest: true,
+                items: [
+                    { type: 'improve', text: 'New Standard Widget now uses the same clean card layout as the Custom Widget \u2014 Pre-chat Form, Header & Branding, Fonts, Colors, Avatars, and Localization \u2014 for a consistent, easier-to-scan experience.' },
+                    { type: 'new', text: 'All NextGen-only options (landing page, action-button placement, disclaimer, privacy link, widget sizing, hide button, disable telemetry, LCW version) are grouped in a dedicated \u201cNextGen Options\u201d card.' },
+                    { type: 'improve', text: 'Controls that the NextGen widget can\u2019t set (custom avatar images, time format) are omitted; the show/hide agent avatar and name toggles remain.' }
+                ]
+            },
+            {
+                version: 'v3.4.0',
+                date: 'July 15, 2026',
+                latest: false,
                 items: [
                     { type: 'improve', text: 'New Standard Widget no longer has a separate Connection section \u2014 it reuses the App ID / Org ID / Org URL from your selected Widget Profile automatically, and shows which IDs it is using.' },
                     { type: 'new', text: 'Added a Pre-chat card to the New Standard Widget so you can turn the pre-chat landing page on or off (it uses your Greeting Title/Subtitle to prompt the customer for their question first).' },

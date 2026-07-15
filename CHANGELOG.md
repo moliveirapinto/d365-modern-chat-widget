@@ -6,6 +6,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 
 ---
 
+## [3.5.0] - 2026-07-15
+
+### Changed
+- **New Standard Widget adopts the Custom Widget's card layout.** The settings are now organized into the same clean, icon-led cards — Pre-chat Form, Header & Branding, Fonts, Colors, Avatars, and Localization — for a consistent experience. It keeps its own independent values (a separate copy from the Custom Widget).
+- Controls the NextGen widget can't set (custom avatar image upload, time format) are omitted; the show/hide agent avatar and agent name toggles remain.
+
+### Added
+- A dedicated **NextGen Options** card groups the options specific to the NextGen widget: pre-chat landing page, action-button placement, disclaimer text, privacy link, widget sizing, hide chat button, disable telemetry, and LCW version.
+
+---
+
 ## [3.4.0] - 2026-07-15
 
 ### Changed
