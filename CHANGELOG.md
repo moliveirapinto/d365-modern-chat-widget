@@ -6,6 +6,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 
 ---
 
+## [3.6.0] - 2026-07-15
+
+### Added
+- **Auto-apply on paste.** Pasting your D365 Omnichannel LCW embed code into a Widget Profile (or a room widget) now extracts and applies the Org ID, Org URL, and Widget ID immediately — no need to click "Apply to Settings". (Blurring the field re-applies too, so the values are never accidentally cleared.)
+
+---
+
 ## [3.5.2] - 2026-07-15
 
 ### Changed

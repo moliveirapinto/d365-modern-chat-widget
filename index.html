@@ -4928,14 +4928,22 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v3.5.2';
+        const APP_VERSION = 'v3.6.0';
         const APP_LAST_UPDATED = 'July 15, 2026';
         
         const CHANGELOG = [
             {
-                version: 'v3.5.2',
+                version: 'v3.6.0',
                 date: 'July 15, 2026',
                 latest: true,
+                items: [
+                    { type: 'new', text: 'Pasting your D365 LCW embed code now applies it to settings automatically \u2014 no need to click \u201cApply to Settings\u201d. The Org ID, Org URL, and Widget ID are extracted the moment you paste.' }
+                ]
+            },
+            {
+                version: 'v3.5.2',
+                date: 'July 15, 2026',
+                latest: false,
                 items: [
                     { type: 'improve', text: 'The New Standard Widget\u2019s \u201cEmbed Widget Code\u201d section now matches the Custom Widget\u2019s exactly \u2014 same layout, output box, and Generate Embed Code / Generate TamperMonkey Code / Copy to Clipboard buttons.' },
                     { type: 'fix', text: 'Each mode now shows a single embed section: the shared Custom embed card is hidden while the New Standard Widget is selected, so you no longer see two \u201cEmbed Widget Code\u201d cards at once.' }
@@ -6241,7 +6249,8 @@
                                             <textarea class="profile-embed-code" 
                                                 id="roomWidgetEmbedCode_${room.code}_${widget.id}" 
                                                 onclick="event.stopPropagation()" 
-                                                onchange="updateRoomWidgetEmbedCode('${room.code}', '${widget.id}', this.value)"
+                                                onchange="updateRoomWidgetEmbedCode('${room.code}', '${widget.id}', this.value); parseRoomWidgetEmbedCode('${room.code}', '${widget.id}')"
+                                                onpaste="event.stopPropagation(); var el=this; setTimeout(function(){ updateRoomWidgetEmbedCode('${room.code}', '${widget.id}', el.value); parseRoomWidgetEmbedCode('${room.code}', '${widget.id}'); }, 30)"
                                                 placeholder="Paste your D365 Omnichannel LCW embed code here...">${escapeHtml(widgetLcwCode)}</textarea>
                                             <div class="profile-embed-actions">
                                                 <button class="profile-embed-btn secondary" onclick="event.stopPropagation(); copyRoomWidgetEmbedCode('${room.code}', '${widget.id}')" ${!widgetHasCode ? 'disabled style="opacity: 0.5;"' : ''}>
@@ -8212,7 +8221,8 @@
                         <textarea class="profile-embed-code" 
                             id="profileEmbedCode_${p.id}" 
                             onclick="event.stopPropagation()" 
-                            onchange="updateProfileEmbedCode('${p.id}', this.value)"
+                            onchange="updateProfileEmbedCode('${p.id}', this.value); parseProfileEmbedCode('${p.id}')"
+                            onpaste="event.stopPropagation(); var el=this; setTimeout(function(){ updateProfileEmbedCode('${p.id}', el.value); parseProfileEmbedCode('${p.id}'); }, 30)"
                             placeholder="Paste your D365 Omnichannel LCW embed code here...">${escapeHtml(embedCode)}</textarea>
                         <div class="profile-embed-actions">
                             <button class="profile-embed-btn secondary" onclick="event.stopPropagation(); copyProfileEmbedCode('${p.id}')" ${!hasEmbedCode ? 'disabled style="opacity: 0.5;"' : ''}>
