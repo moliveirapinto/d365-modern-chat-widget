@@ -4900,14 +4900,22 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v3.5.0';
+        const APP_VERSION = 'v3.5.1';
         const APP_LAST_UPDATED = 'July 15, 2026';
         
         const CHANGELOG = [
             {
-                version: 'v3.5.0',
+                version: 'v3.5.1',
                 date: 'July 15, 2026',
                 latest: true,
+                items: [
+                    { type: 'fix', text: 'The \u201cconfigure D365 connection first\u201d message when generating embed/Tampermonkey code now points to the right place \u2014 Widget Profiles \u2192 paste your embed code \u2192 Apply to Settings \u2014 instead of a non-existent \u201cD365 Connection tab\u201d.' }
+                ]
+            },
+            {
+                version: 'v3.5.0',
+                date: 'July 15, 2026',
+                latest: false,
                 items: [
                     { type: 'improve', text: 'New Standard Widget now uses the same clean card layout as the Custom Widget \u2014 Pre-chat Form, Header & Branding, Fonts, Colors, Avatars, and Localization \u2014 for a consistent, easier-to-scan experience.' },
                     { type: 'new', text: 'All NextGen-only options (landing page, action-button placement, disclaimer, privacy link, widget sizing, hide button, disable telemetry, LCW version) are grouped in a dedicated \u201cNextGen Options\u201d card.' },
@@ -11005,8 +11013,8 @@
             
             // Validate required D365 settings
             if (!settings.orgId || !settings.orgUrl || !settings.widgetId) {
-                showToast('Please configure D365 Connection settings first (Org ID, Org URL, Widget ID)');
-                document.getElementById('embedCodeOutput').value = '⚠️ Please configure D365 Connection settings first.\n\nGo to the "D365 Connection" tab and enter your Org ID, Org URL, and Widget ID.';
+                showToast('Please set up your D365 connection first (Org ID, Org URL, Widget ID)');
+                document.getElementById('embedCodeOutput').value = '⚠️ Please set up your D365 connection first.\n\nIn "Widget Profiles" above, paste your D365 Omnichannel LCW embed code and click "Apply to Settings" to load your Org ID, Org URL, and Widget ID.';
                 hideCharCount();
                 return;
             }
@@ -13577,8 +13585,8 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             
             // Validate required D365 settings
             if (!settings.orgId || !settings.orgUrl || !settings.widgetId) {
-                showToast('Please configure D365 Connection settings first (Org ID, Org URL, Widget ID)');
-                document.getElementById('embedCodeOutput').value = '⚠️ Please configure D365 Connection settings first.\n\nGo to the "D365 Connection" tab and enter your Org ID, Org URL, and Widget ID.';
+                showToast('Please set up your D365 connection first (Org ID, Org URL, Widget ID)');
+                document.getElementById('embedCodeOutput').value = '⚠️ Please set up your D365 connection first.\n\nIn "Widget Profiles" above, paste your D365 Omnichannel LCW embed code and click "Apply to Settings" to load your Org ID, Org URL, and Widget ID.';
                 hideCharCount();
                 return;
             }

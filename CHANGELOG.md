@@ -6,6 +6,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 
 ---
 
+## [3.5.1] - 2026-07-15
+
+### Fixed
+- The "configure D365 connection first" message shown when generating the Custom Widget's embed/Tampermonkey code now points to the correct place — **Widget Profiles → paste your D365 embed code → Apply to Settings** — instead of a non-existent "D365 Connection tab".
+
+---
+
 ## [3.5.0] - 2026-07-15
 
 ### Changed
