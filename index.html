@@ -4890,14 +4890,22 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v3.3.0';
+        const APP_VERSION = 'v3.3.1';
         const APP_LAST_UPDATED = 'July 15, 2026';
         
         const CHANGELOG = [
             {
-                version: 'v3.3.0',
+                version: 'v3.3.1',
                 date: 'July 15, 2026',
                 latest: true,
+                items: [
+                    { type: 'fix', text: 'New Standard Widget preview now works with the App ID / Org ID / Org URL you already entered in the connection area \u2014 it auto-fills the widget\u2019s fields and generates the preview instead of showing \u201cWidget Not Configured\u201d. You can still type IDs directly into the New Standard Widget too.' }
+                ]
+            },
+            {
+                version: 'v3.3.0',
+                date: 'July 15, 2026',
+                latest: false,
                 items: [
                     { type: 'new', text: 'New Standard Widget: the Standard Widget mode is now Microsoft\u2019s NextGen Modern Web Messaging widget, hosted by D365. Enter your App ID / Org ID / Org URL (or paste a script to auto-extract), customize brand, colors, text, sizing and display options, then generate a ready-to-embed script and preview it live.' },
                     { type: 'new', text: 'Full BrandConfig support \u2014 branding is passed inline via data-customization-callback, generated against the production CDN (oc-cdn-ocprod.azureedge.net). Your settings are saved automatically.' },
@@ -9574,6 +9582,26 @@
             nswPersist();
         }
 
+        // Reuse the App ID / Org ID / Org URL the user already entered in the
+        // studio's shared connection area (the parsed LCW code). These IDs identify
+        // the D365 org/workstream and are the SAME regardless of widget version, so
+        // the New Standard Widget should not force the user to re-type them. Only
+        // fills a field that is still empty, so manual entry is never overwritten.
+        function nswSyncFromGlobal() {
+            try {
+                if (typeof settings === 'undefined' || !settings) return;
+                const map = [
+                    ['nsw-app-id', settings.widgetId],
+                    ['nsw-org-id', settings.orgId],
+                    ['nsw-org-url', settings.orgUrl],
+                ];
+                map.forEach(pair => {
+                    const el = document.getElementById(pair[0]);
+                    if (el && !el.value.trim() && pair[1]) el.value = pair[1];
+                });
+            } catch (e) {}
+        }
+
         function nswParseScript() {
             const raw = (document.getElementById('nsw-paste').value || '').trim();
             const res = document.getElementById('nsw-parse-result');
@@ -9702,6 +9730,7 @@
 
         function nswUpdate(scrollToPreview) {
             nswInitColorGrid();
+            nswSyncFromGlobal();
             nswPersist();
             const c = nswGather();
             const out = document.getElementById('nsw-script-output');

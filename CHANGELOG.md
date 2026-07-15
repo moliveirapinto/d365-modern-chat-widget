@@ -6,6 +6,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 
 ---
 
+## [3.3.1] - 2026-07-15
+
+### Fixed
+- **New Standard Widget preview now works with the IDs already entered in the connection area.** The mode has its own App ID / Org ID / Org URL fields; it now auto-fills them from the IDs parsed in the shared connection section (and still lets you type them directly), so the live preview generates instead of showing "Widget Not Configured."
+
+---
+
 ## [3.3.0] - 2026-07-15
 
 ### Added
