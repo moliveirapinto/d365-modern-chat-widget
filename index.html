@@ -3503,7 +3503,7 @@
             <!-- New Standard Widget Settings Container -->
             <div id="standardWidgetSettings" class="hidden">
 
-                <!-- Connection -->
+                <!-- Connection (IDs come from the selected Widget Profile) -->
                 <div class="settings-card">
                     <div class="card-header">
                         <div class="card-header-icon">
@@ -3511,29 +3511,13 @@
                         </div>
                         <div>
                             <h2>Connection</h2>
-                            <p>Enter your environment's IDs, or paste an existing widget script to extract them.</p>
+                            <p>Uses the App ID, Org ID, and Org URL from the Widget Profile you configured above.</p>
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="form-group">
-                            <label class="form-label">Paste an existing widget script (optional)</label>
-                            <textarea class="form-input" id="nsw-paste" rows="3" placeholder='&lt;script id="Microsoft_Omnichannel_LCWidget" src="..." data-app-id="..." data-org-id="..." data-org-url="..."&gt;&lt;/script&gt;' style="font-family: monospace; font-size: 12px;"></textarea>
-                            <div style="margin-top: 8px;">
-                                <button type="button" class="btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="nswParseScript()">Extract IDs from Script</button>
-                            </div>
-                            <p class="form-help" id="nsw-parse-result" style="display:none;"></p>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Widget App ID <span style="color:#c50f1f;">*</span></label>
-                            <input type="text" class="form-input" id="nsw-app-id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off" spellcheck="false">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Org ID <span style="color:#c50f1f;">*</span></label>
-                            <input type="text" class="form-input" id="nsw-org-id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off" spellcheck="false">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Org URL <span style="color:#c50f1f;">*</span></label>
-                            <input type="text" class="form-input" id="nsw-org-url" placeholder="https://your-org.omnichannelengagementhub.com" autocomplete="off" spellcheck="false">
+                        <div class="info-box" id="nsw-conn-status">
+                            <div class="info-icon">🔗</div>
+                            <div id="nsw-conn-text" style="font-size:12.5px;">No connection IDs yet. In <strong>Widget Profiles</strong> above, paste your D365 Omnichannel embed code and click <strong>Apply to Settings</strong> — the New Standard Widget picks the IDs up automatically.</div>
                         </div>
                     </div>
                 </div>
@@ -3573,6 +3557,26 @@
                             <input type="text" class="form-input" id="nsw-font" placeholder="Segoe UI, -apple-system, sans-serif">
                             <p class="form-help">Override the font for all widget text.</p>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Pre-chat -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <div class="card-header-icon">
+                            <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+                        </div>
+                        <div>
+                            <h2>Pre-chat</h2>
+                            <p>Greet the customer and ask for their question before the conversation starts.</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                            <label class="toggle-switch"><input type="checkbox" id="nsw-landing" checked><span class="toggle-slider"></span></label>
+                            <span class="toggle-label">Show pre-chat landing page</span>
+                        </div>
+                        <p class="form-help">On: the widget opens on a landing page using your <strong>Greeting Title</strong> and <strong>Greeting Subtitle</strong> (see Text Labels), prompting the customer to type their question first. Off: the chat opens directly. Note: a full pre-chat <em>survey</em> (name/email fields) is configured on the workstream in the D365 admin center, not here.</p>
                     </div>
                 </div>
 
@@ -3651,10 +3655,6 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-                            <label class="toggle-switch"><input type="checkbox" id="nsw-landing" checked><span class="toggle-slider"></span></label>
-                            <span class="toggle-label">Show Landing Page</span>
-                        </div>
                         <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
                             <label class="toggle-switch"><input type="checkbox" id="nsw-avatar" checked><span class="toggle-slider"></span></label>
                             <span class="toggle-label">Show Agent Avatar</span>
@@ -3745,10 +3745,16 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div style="margin-bottom:12px;">
-                            <button type="button" class="btn-primary" style="padding:8px 18px;" onclick="nswUpdate(true)">Generate &amp; Preview</button>
+                        <div class="form-group">
+                            <label class="form-label">Tampermonkey target site (@match)</label>
+                            <input type="text" class="form-input" id="nsw-tm-match" placeholder="*://*/*" value="*://*/*">
+                            <p class="form-help">Which site(s) the Tampermonkey userscript injects the widget on. Use <code>*://*/*</code> for every site, or a specific pattern like <code>https://contoso.com/*</code>.</p>
                         </div>
-                        <pre id="nsw-script-output" style="background:#1e1e1e;color:#d4d4d4;padding:14px;border-radius:6px;overflow-x:auto;font-family:monospace;font-size:12px;line-height:1.6;white-space:pre;min-height:40px;">Fill in the App ID, Org ID, and Org URL above, then click Generate &amp; Preview.</pre>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+                            <button type="button" class="btn-primary" style="padding:8px 18px;" onclick="nswUpdate(true)">Generate Embed Script</button>
+                            <button type="button" class="btn-secondary" style="padding:8px 18px;" onclick="nswGenerateTM()">Generate Tampermonkey Script</button>
+                        </div>
+                        <pre id="nsw-script-output" style="background:#1e1e1e;color:#d4d4d4;padding:14px;border-radius:6px;overflow-x:auto;font-family:monospace;font-size:12px;line-height:1.6;white-space:pre;min-height:40px;">Set a Widget Profile above, then click Generate Embed Script or Generate Tampermonkey Script.</pre>
                         <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
                             <button type="button" class="btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="nswCopy()">Copy Script</button>
                             <span id="nsw-copy-confirm" style="font-size:12px;color:#16a34a;display:none;">✓ Copied</span>
@@ -4890,14 +4896,24 @@
         // ============================================
         // Version & Changelog
         // ============================================
-        const APP_VERSION = 'v3.3.1';
+        const APP_VERSION = 'v3.4.0';
         const APP_LAST_UPDATED = 'July 15, 2026';
         
         const CHANGELOG = [
             {
-                version: 'v3.3.1',
+                version: 'v3.4.0',
                 date: 'July 15, 2026',
                 latest: true,
+                items: [
+                    { type: 'improve', text: 'New Standard Widget no longer has a separate Connection section \u2014 it reuses the App ID / Org ID / Org URL from your selected Widget Profile automatically, and shows which IDs it is using.' },
+                    { type: 'new', text: 'Added a Pre-chat card to the New Standard Widget so you can turn the pre-chat landing page on or off (it uses your Greeting Title/Subtitle to prompt the customer for their question first).' },
+                    { type: 'new', text: 'New Standard Widget can now generate a Tampermonkey userscript (with a configurable @match target) in addition to the embed script, so you can inject the NextGen widget on any site.' }
+                ]
+            },
+            {
+                version: 'v3.3.1',
+                date: 'July 15, 2026',
+                latest: false,
                 items: [
                     { type: 'fix', text: 'New Standard Widget preview now works with the App ID / Org ID / Org URL you already entered in the connection area \u2014 it auto-fills the widget\u2019s fields and generates the preview instead of showing \u201cWidget Not Configured\u201d. You can still type IDs directly into the New Standard Widget too.' }
                 ]
@@ -9550,7 +9566,7 @@
             { id: 'agent-text',  label: 'Agent Message Text', def: '#323130' },
         ];
         const NSW_LS = 'nsw-config-v1';
-        const NSW_TEXT_FIELDS = ['nsw-app-id','nsw-org-id','nsw-org-url','nsw-lcw-version','nsw-locale','nsw-custom-font-url','nsw-primary','nsw-font','nsw-brand-name','nsw-logo-url','nsw-header-text','nsw-btn-color','nsw-user-bg','nsw-user-text','nsw-agent-bg','nsw-agent-text','nsw-input-font-size','nsw-header-title','nsw-greeting-title','nsw-greeting-sub','nsw-input-placeholder','nsw-chat-btn-label','nsw-powered-by','nsw-disclaimer','nsw-privacy-url','nsw-privacy-text','nsw-width','nsw-height','nsw-btn-size'];
+        const NSW_TEXT_FIELDS = ['nsw-lcw-version','nsw-locale','nsw-custom-font-url','nsw-primary','nsw-font','nsw-brand-name','nsw-logo-url','nsw-header-text','nsw-btn-color','nsw-user-bg','nsw-user-text','nsw-agent-bg','nsw-agent-text','nsw-input-font-size','nsw-header-title','nsw-greeting-title','nsw-greeting-sub','nsw-input-placeholder','nsw-chat-btn-label','nsw-powered-by','nsw-disclaimer','nsw-privacy-url','nsw-privacy-text','nsw-width','nsw-height','nsw-btn-size','nsw-tm-match'];
         const NSW_CHECK_FIELDS = ['nsw-hide-button','nsw-no-telemetry','nsw-landing','nsw-avatar','nsw-agent-name'];
         let nswColorGridBuilt = false;
 
@@ -9631,8 +9647,11 @@
             const raw = id => { const el = document.getElementById(id); return el ? el.value : ''; };
             const cb = id => { const el = document.getElementById(id); return el ? el.checked : false; };
             const sel = document.getElementById('nsw-action-placement');
+            // App/Org IDs come from the selected Widget Profile (shared connection),
+            // not a duplicate set of fields in this mode.
+            const S = (typeof settings !== 'undefined' && settings) ? settings : {};
             return {
-                appId: g('nsw-app-id'), orgId: g('nsw-org-id'), orgUrl: g('nsw-org-url'),
+                appId: (S.widgetId || '').trim(), orgId: (S.orgId || '').trim(), orgUrl: (S.orgUrl || '').trim(),
                 lcwVersion: g('nsw-lcw-version') || 'prod', locale: g('nsw-locale'),
                 hideButton: cb('nsw-hide-button'), customFontUrl: g('nsw-custom-font-url'), noTelemetry: cb('nsw-no-telemetry'),
                 colorOverride: g('nsw-primary'), fontOverride: g('nsw-font'),
@@ -9648,6 +9667,7 @@
                 widgetWidth: g('nsw-width'), widgetHeight: g('nsw-height'), btnSize: g('nsw-btn-size'),
                 showLanding: cb('nsw-landing'), showAvatar: cb('nsw-avatar'), showAgentName: cb('nsw-agent-name'),
                 actionPlacement: sel ? sel.value : 'bottom',
+                tmMatch: g('nsw-tm-match') || '*://*/*',
             };
         }
 
@@ -9730,20 +9750,22 @@
 
         function nswUpdate(scrollToPreview) {
             nswInitColorGrid();
-            nswSyncFromGlobal();
             nswPersist();
             const c = nswGather();
             const out = document.getElementById('nsw-script-output');
             const placeholder = document.getElementById('standardPreviewPlaceholder');
             const iframe = document.getElementById('standardPreviewIframe');
             const footer = document.getElementById('standardPreviewFooter');
+            const conn = document.getElementById('nsw-conn-text');
             if (!c.appId || !c.orgId || !c.orgUrl) {
-                if (out) out.textContent = 'Fill in the App ID, Org ID, and Org URL above, then click Generate & Preview.';
+                if (conn) conn.innerHTML = 'No connection IDs yet. In <strong>Widget Profiles</strong> above, paste your D365 Omnichannel embed code and click <strong>Apply to Settings</strong> \u2014 the New Standard Widget picks the IDs up automatically.';
+                if (out) out.textContent = 'Set a Widget Profile above (App ID / Org ID / Org URL), then click Generate Embed Script or Generate Tampermonkey Script.';
                 if (placeholder) placeholder.style.display = 'flex';
                 if (iframe) iframe.style.display = 'none';
                 if (footer) footer.style.display = 'none';
                 return;
             }
+            if (conn) conn.innerHTML = '\u2713 Using App ID <code>' + c.appId.substring(0, 8) + '\u2026</code>, Org <code>' + c.orgId.substring(0, 8) + '\u2026</code> \u00b7 ' + c.orgUrl;
             const brand = nswBuildBrand(c);
             const script = nswGenerate(c, brand);
             if (out) out.textContent = script;
@@ -9758,9 +9780,84 @@
             }
         }
 
+        // Build a Tampermonkey userscript that injects the NextGen widget on the
+        // target site(s). Uses GM_addElement (CSP bypass) when available so the
+        // widget loads even on pages with a strict Content-Security-Policy.
+        function nswGenerateTampermonkey(c, brand) {
+            const attrs = {
+                'id': 'Microsoft_Omnichannel_LCWidget',
+                'src': NSW_BOOTSTRAPPER,
+                'data-app-id': c.appId,
+                'data-lcw-version': c.lcwVersion,
+                'data-org-id': c.orgId,
+                'data-org-url': c.orgUrl,
+            };
+            if (c.colorOverride && !brand) attrs['data-color-override'] = c.colorOverride;
+            if (c.fontOverride && !brand) attrs['data-font-family-override'] = c.fontOverride;
+            if (c.locale) attrs['data-locale'] = c.locale;
+            if (c.hideButton) attrs['data-hide-button'] = 'true';
+            if (c.customFontUrl) attrs['data-custom-font-url'] = c.customFontUrl;
+            if (c.noTelemetry) attrs['data-disable-telemetry'] = 'true';
+            if (brand) attrs['data-customization-callback'] = JSON.stringify(brand);
+            const name = (c.brandName || c.headerTitle || 'D365 New Standard Widget');
+            const header = [
+                '// ==UserScript==',
+                '// @name         ' + name + ' \u2013 D365 NextGen Widget',
+                '// @namespace    https://moliveirapinto.github.io/d365-modern-chat-widget/',
+                '// @version      1.0',
+                '// @description  Injects the Microsoft D365 NextGen Modern Web Messaging widget.',
+                '// @match        ' + (c.tmMatch || '*://*/*'),
+                '// @run-at       document-idle',
+                '// @grant        GM_addElement',
+                '// @connect      oc-cdn-ocprod.azureedge.net',
+                '// @connect      *.dynamics.com',
+                '// @connect      *.omnichannelengagementhub.com',
+                '// @connect      *.communication.azure.com',
+                '// @connect      *.skype.com',
+                '// ==/UserScript==',
+            ].join('\n');
+            const body = [
+                '',
+                '(function () {',
+                "  'use strict';",
+                "  if (document.getElementById('Microsoft_Omnichannel_LCWidget')) return;",
+                '  var attrs = ' + JSON.stringify(attrs, null, 2).split('\n').join('\n  ') + ';',
+                '  function inject() {',
+                "    if (typeof GM_addElement === 'function') {",
+                "      GM_addElement(document.body || document.documentElement, 'scr' + 'ipt', attrs);",
+                '    } else {',
+                "      var s = document.createElement('scr' + 'ipt');",
+                "      Object.keys(attrs).forEach(function (k) { if (k === 'src') { s.src = attrs[k]; } else { s.setAttribute(k, attrs[k]); } });",
+                '      (document.body || document.documentElement).appendChild(s);',
+                '    }',
+                '  }',
+                "  if (document.body) { inject(); } else { document.addEventListener('DOMContentLoaded', inject); }",
+                '})();',
+                '',
+            ].join('\n');
+            return header + '\n' + body;
+        }
+
+        function nswGenerateTM() {
+            nswInitColorGrid();
+            nswPersist();
+            const c = nswGather();
+            const out = document.getElementById('nsw-script-output');
+            if (!c.appId || !c.orgId || !c.orgUrl) {
+                if (out) out.textContent = 'Set a Widget Profile above (App ID / Org ID / Org URL) first, then generate the Tampermonkey script.';
+                showToast('Configure a Widget Profile first');
+                return;
+            }
+            const brand = nswBuildBrand(c);
+            const tm = nswGenerateTampermonkey(c, brand);
+            if (out) out.textContent = tm;
+            showToast('Tampermonkey script generated \u2014 copy it into a new Tampermonkey userscript');
+        }
+
         function nswCopy() {
             const t = document.getElementById('nsw-script-output').textContent;
-            if (!t || t.indexOf('<' + 'script') === -1) { showToast('Generate the script first'); return; }
+            const looksGenerated = t && (t.indexOf('<' + 'script') !== -1 || t.indexOf('// ==UserScript==') !== -1);
+            if (!looksGenerated) { showToast('Generate the script first'); return; }
             const done = () => { const c = document.getElementById('nsw-copy-confirm'); if (c) { c.style.display = 'inline'; setTimeout(() => c.style.display = 'none', 2000); } };
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(t).then(done).catch(() => { nswCopyFallback(t); done(); });

@@ -6,6 +6,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 
 ---
 
+## [3.4.0] - 2026-07-15
+
+### Changed
+- **New Standard Widget reuses the Widget Profile connection.** Removed the duplicate Connection inputs; the mode now takes the App ID / Org ID / Org URL from your selected Widget Profile automatically and shows which IDs it is using.
+
+### Added
+- **Pre-chat card** for the New Standard Widget: toggle the pre-chat landing page on/off (it uses your Greeting Title/Subtitle to prompt the customer for their question before the chat starts). A full pre-chat survey remains a D365 workstream setting.
+- **Tampermonkey userscript generation** for the New Standard Widget, with a configurable `@match` target and the correct `@connect` directives, alongside the existing embed script.
+
+---
+
 ## [3.3.1] - 2026-07-15
 
 ### Fixed
