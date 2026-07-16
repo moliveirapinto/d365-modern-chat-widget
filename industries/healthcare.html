@@ -1292,6 +1292,8 @@
             --paper: #f3faf9; --panel: #ffffff; --mint: #e5f4f2; --mint-2: #d3ebe8; --line: #d8e8e6;
             --coral: #f0655a; --coral-2: #ff8175; --gold: #e2a03b;
             --ok: #14876a; --warn: #c07f24; --bad: #cf4b3d; --blue: #3178a8;
+            /* darken base sky-blue/indigo accent + faint muted so base rules read well */
+            --accent: #0e7c86; --secondary: #0e7c86; --text-muted: #51646c; --text-light: #46586b; --primary: #0b6d76;
             font-family: 'DM Sans', -apple-system, sans-serif; color: var(--ink); background: var(--paper);
             -webkit-font-smoothing: antialiased;
         }
@@ -1379,6 +1381,11 @@
         body.med .footer-bottom, body.med .footer-legal { border-top: 1px solid rgba(255,255,255,.1); color: rgba(188,222,219,.55); }
 
         body.med .section, body.med .stats-banner { animation: medUp .7s both; }
+        /* contrast fixes */
+        body.med .nav a.active { background: transparent; color: var(--teal-2); }
+        body.med .service-link { color: #bf4437; }
+        body.med .specialty { color: var(--teal-2); }
+        body.med .footer .logo-text span, body.med .footer-brand .logo-text span { color: #6fd0c8; }
     </style>
 </head>
 <body class="med">
