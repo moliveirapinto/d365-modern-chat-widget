@@ -1364,8 +1364,120 @@
             }
         }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===================================================================
+           CITY OF RIVERSIDE — Civic / government reskin
+           Palette: authoritative navy + civic gold + cream.
+           Fonts: Libre Baskerville (official serif) + Public Sans (US gov sans).
+           =================================================================== */
+        body.gov {
+            --navy: #10294f; --navy-2: #1c3a66; --navy-deep: #0a1c38; --ink: #1b2733; --ink-2: #4b5a6b;
+            --paper: #f5f2e9; --panel: #ffffff; --cream: #efe9d8; --cream-2: #e6dfca; --line: #ddd6c2;
+            --gold: #b3892f; --gold-2: #c9a53f; --gold-soft: #ecdcae;
+            --ok: #2c6e49; --warn: #b3792a; --bad: #a5372b; --blue: #2f5f96;
+            font-family: 'Public Sans', -apple-system, sans-serif; color: var(--ink); background: var(--paper);
+            -webkit-font-smoothing: antialiased;
+        }
+        body.gov::before { content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background: radial-gradient(1000px 520px at 90% -12%, rgba(179,137,47,.08), transparent 60%); }
+        body.gov > * { position: relative; z-index: 1; }
+        @keyframes govUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+
+        body.gov .gov-banner { background: var(--navy-deep); color: #cdd8e6; font-size: 12px; letter-spacing: .02em; }
+        body.gov .header-top { background: var(--navy); color: #dbe3ee; }
+        body.gov .header-top-content a, body.gov .header-link { color: #dbe3ee; }
+        body.gov .header-link:hover { color: var(--gold-2); }
+        body.gov .search-box, body.gov .header-search input { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); color: #fff; border-radius: 6px; }
+
+        body.gov .header { background: var(--panel); border-bottom: 3px solid var(--gold); }
+        body.gov .logo-seal { background: linear-gradient(135deg, var(--navy), var(--navy-2)); color: var(--gold-2); border: 2px solid var(--gold); border-radius: 50%; }
+        body.gov .logo-text { font-family: 'Libre Baskerville', serif; font-weight: 700; color: var(--navy); }
+        body.gov .nav-bar { background: var(--navy); }
+        body.gov .nav-content { max-width: 1300px; }
+        body.gov .nav { display: flex; gap: 34px; align-items: center; }
+        body.gov .nav a { color: #dbe3ee; font-weight: 600; font-size: 14px; letter-spacing: .02em; border-bottom: 3px solid transparent; padding: 14px 0; transition: all .25s; }
+        body.gov .nav a:hover, body.gov .nav a.active { color: #fff; border-bottom-color: var(--gold); }
+        body.gov .emergency-btn { background: var(--bad); color: #fff; border-radius: 6px; font-weight: 600; }
+
+        body.gov .btn { font-weight: 600; border-radius: 6px; transition: all .26s; }
+        body.gov .btn-navy { background: var(--navy); color: #fff; border: 1px solid var(--navy); }
+        body.gov .btn-navy:hover { background: var(--navy-2); transform: translateY(-2px); }
+        body.gov .btn-gold { background: var(--gold); color: #fff; border: 1px solid var(--gold); }
+        body.gov .btn-gold:hover { background: var(--gold-2); transform: translateY(-2px); box-shadow: 0 12px 26px -14px rgba(179,137,47,.7); }
+
+        body.gov .hero { position: relative; overflow: hidden; background: linear-gradient(160deg, var(--navy-deep), var(--navy) 60%, var(--navy-2)); color: #eaf0f7; }
+        body.gov .hero-bg { opacity: .18; }
+        body.gov .hero::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5; background: radial-gradient(700px 340px at 82% 8%, rgba(201,165,63,.3), transparent 60%); }
+        body.gov .hero-main, body.gov .hero-content { position: relative; animation: govUp .8s both; }
+        body.gov .hero-content h1, body.gov .hero-main h1 { font-family: 'Libre Baskerville', serif; font-weight: 700; font-size: clamp(38px, 4.6vw, 60px); line-height: 1.1; color: #fff; }
+        body.gov .hero p { color: rgba(234,240,247,.8); font-size: 18px; line-height: 1.7; }
+        body.gov .hero-stats { border-top: 1px solid rgba(255,255,255,.14); }
+        body.gov .hero-stat .value, body.gov .hero-stat .label { color: #fff; }
+        body.gov .hero-stat .value { font-family: 'Libre Baskerville', serif; color: var(--gold-soft); }
+        body.gov .hero-stat .label { color: rgba(234,240,247,.65); text-transform: uppercase; letter-spacing: .1em; font-size: 12px; }
+
+        body.gov .quick-services-panel { background: var(--panel); border: 1px solid var(--line); border-top: 4px solid var(--gold); border-radius: 10px; box-shadow: 0 26px 54px -34px rgba(16,41,79,.4); }
+        body.gov .quick-services-header { font-family: 'Libre Baskerville', serif; color: var(--navy); }
+        body.gov .quick-service-item { border-bottom: 1px solid var(--cream); transition: background .2s, padding-left .2s; }
+        body.gov .quick-service-item:hover { background: var(--cream); padding-left: 8px; }
+        body.gov .quick-service-icon { color: var(--gold); }
+        body.gov .quick-service-arrow { color: var(--navy); }
+
+        body.gov .section-container { max-width: 1300px; }
+        body.gov .section-eyebrow { color: var(--gold); text-transform: uppercase; letter-spacing: .16em; font-weight: 700; font-size: 12px; }
+        body.gov .section-header h2 { font-family: 'Libre Baskerville', serif; font-weight: 700; color: var(--navy); font-size: clamp(28px, 3.4vw, 44px); }
+        body.gov .section-header p { color: var(--ink-2); }
+
+        body.gov .service-icon-card, body.gov .dept-card, body.gov .official-card, body.gov .news-item { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; transition: transform .32s, box-shadow .32s, border-color .32s; }
+        body.gov .service-icon-card:hover, body.gov .dept-card:hover, body.gov .official-card:hover, body.gov .news-item:hover { transform: translateY(-5px); box-shadow: 0 26px 50px -32px rgba(16,41,79,.34); border-color: var(--gold); }
+        body.gov .service-icon-card .icon, body.gov .service-icon { background: var(--cream); color: var(--navy); border-radius: 10px; }
+        body.gov .dept-card-link { color: var(--gold); font-weight: 600; }
+        body.gov .dept-card-content h3, body.gov .official-info .title { font-family: 'Libre Baskerville', serif; color: var(--navy); }
+        body.gov .official-info .term { color: var(--ink-2); }
+        body.gov .featured-news { background: var(--navy); color: #eaf0f7; border-radius: 12px; overflow: hidden; }
+        body.gov .news-badge { background: var(--gold); color: #fff; border-radius: 4px; text-transform: uppercase; letter-spacing: .08em; font-size: 11px; font-weight: 700; }
+        body.gov .news-date, body.gov .news-meta { color: var(--gold); font-weight: 600; }
+        body.gov .dynamic-day, body.gov .dynamic-month { font-family: 'Libre Baskerville', serif; }
+
+        body.gov .support-hero { background: linear-gradient(160deg, var(--navy), var(--navy-2)); color: #eaf0f7; }
+        body.gov .support-stat-card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; border-top: 3px solid var(--line); }
+        body.gov .support-stat-card .value { font-family: 'Libre Baskerville', serif; color: var(--navy); }
+        body.gov .support-stat-card.open { border-top-color: var(--blue); }
+        body.gov .support-stat-card.pending { border-top-color: var(--warn); }
+        body.gov .support-stat-card.resolved { border-top-color: var(--ok); }
+
+        body.gov .cases-card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+        body.gov .cases-table th { color: var(--ink-2); text-transform: uppercase; letter-spacing: .06em; font-size: 12px; border-bottom: 2px solid var(--line); }
+        body.gov .cases-table td { border-bottom: 1px solid var(--cream); }
+        body.gov .cases-table tbody tr:hover { background: var(--cream); }
+        body.gov .case-id { font-family: 'Libre Baskerville', serif; color: var(--navy); }
+        body.gov .case-status.open { color: var(--blue); } body.gov .case-status.pending { color: var(--warn); }
+        body.gov .case-status.resolved { color: var(--ok); } body.gov .case-status.closed { color: var(--ink-2); }
+        body.gov .case-actions button { background: transparent; border: 1px solid var(--line); color: var(--navy); border-radius: 6px; transition: all .25s; }
+        body.gov .case-actions button:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+        body.gov .faq-item { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+        body.gov .faq-item h3, body.gov .faq-item h4 { font-family: 'Libre Baskerville', serif; color: var(--navy); }
+
+        body.gov .contact-form-card { background: var(--panel); border: 1px solid var(--line); border-top: 4px solid var(--gold); border-radius: 10px; }
+        body.gov .contact-sidebar { background: var(--navy); color: #eaf0f7; border-radius: 10px; }
+        body.gov .contact-method-icon { background: rgba(255,255,255,.1); color: var(--gold-2); border-radius: 8px; }
+        body.gov .form-group input, body.gov .form-group select, body.gov .form-group textarea { border: 1px solid var(--line); border-radius: 6px; font-family: 'Public Sans', sans-serif; background: var(--paper); }
+        body.gov .form-group input:focus, body.gov .form-group select:focus, body.gov .form-group textarea:focus { outline: none; border-color: var(--gold); }
+
+        body.gov .footer { background: var(--navy-deep); color: #b6c3d4; }
+        body.gov .footer-about, body.gov .footer-brand .logo-text { color: #fff; }
+        body.gov .footer-column h4 { font-family: 'Libre Baskerville', serif; color: #fff; }
+        body.gov .footer-column a { color: rgba(182,195,212,.72); } body.gov .footer-column a:hover { color: var(--gold-2); }
+        body.gov .footer-bottom, body.gov .footer-legal { border-top: 1px solid rgba(255,255,255,.1); color: rgba(182,195,212,.55); }
+
+        body.gov .section, body.gov .quick-services-panel { animation: govUp .7s both; }
+    </style>
 </head>
-<body>
+<body class="gov">
     <!-- Official Government Banner -->
     <div class="gov-banner">
         <div class="gov-banner-content">
