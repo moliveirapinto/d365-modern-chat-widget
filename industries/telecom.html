@@ -1040,8 +1040,110 @@
             .footer-content { grid-template-columns: 1fr; }
         }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===================================================================
+           NOVATEL COMMUNICATIONS — Sleek dark-mode tech reskin
+           Palette: near-black + electric violet + cyan glow.
+           Fonts: Sora (display) + Manrope (body).
+           =================================================================== */
+        body.tel {
+            --bg: #0a0e17; --bg-2: #0e1320; --panel: #141b2b; --panel-2: #1a2338; --line: #243049;
+            --ink: #eaf0fb; --ink-2: #a7b4cc; --ink-3: #7683a0;
+            --violet: #7c5cff; --violet-2: #9a7dff; --cyan: #22d3ee; --cyan-2: #5ee7f7;
+            --ok: #34d399; --warn: #fbbf24; --bad: #fb7185;
+            font-family: 'Manrope', -apple-system, sans-serif; color: var(--ink); background: var(--bg);
+            -webkit-font-smoothing: antialiased;
+        }
+        body.tel::before { content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background: radial-gradient(900px 500px at 82% -10%, rgba(124,92,255,.22), transparent 60%), radial-gradient(760px 460px at -6% 20%, rgba(34,211,238,.14), transparent 55%); }
+        body.tel > * { position: relative; z-index: 1; }
+        @keyframes telUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+
+        body.tel .announcement-bar { background: linear-gradient(90deg, var(--violet), var(--cyan)); color: #06121a; font-weight: 600; letter-spacing: .02em; }
+        body.tel .announcement-bar a { color: #06121a; font-weight: 700; text-decoration: underline; }
+
+        body.tel .header { background: rgba(10,14,23,.72); backdrop-filter: saturate(150%) blur(14px); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 100; }
+        body.tel .logo { font-family: 'Sora', sans-serif; font-weight: 800; color: var(--ink); letter-spacing: -.01em; }
+        body.tel .logo span { color: var(--violet-2); }
+        body.tel .nav a { color: var(--ink-2); font-weight: 600; position: relative; }
+        body.tel .nav a::after { content: ""; position: absolute; left: 0; bottom: -5px; height: 2px; width: 100%; background: linear-gradient(90deg, var(--violet), var(--cyan)); transform: scaleX(0); transform-origin: left; transition: transform .3s; }
+        body.tel .nav a:hover, body.tel .nav a.active { color: #fff; } body.tel .nav a:hover::after, body.tel .nav a.active::after { transform: scaleX(1); }
+        body.tel .btn-signin { color: var(--ink); }
+
+        body.tel .btn, body.tel .btn-shop, body.tel .plan-btn { font-family: 'Manrope', sans-serif; font-weight: 700; border-radius: 10px; transition: all .28s cubic-bezier(.2,.7,.2,1); }
+        body.tel .btn-primary, body.tel .btn-shop, body.tel .plan-btn-primary { background: linear-gradient(120deg, var(--violet), #6d5cff); color: #fff; border: none; box-shadow: 0 12px 30px -14px rgba(124,92,255,.8); }
+        body.tel .btn-primary:hover, body.tel .btn-shop:hover, body.tel .plan-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 18px 40px -14px rgba(124,92,255,.9); filter: brightness(1.06); }
+        body.tel .btn-secondary, body.tel .plan-btn-outline { background: rgba(255,255,255,.04); color: var(--ink); border: 1px solid var(--line); }
+        body.tel .btn-secondary:hover, body.tel .plan-btn-outline:hover { border-color: var(--violet); color: #fff; background: rgba(124,92,255,.12); }
+
+        body.tel .hero { background: transparent; overflow: hidden; }
+        body.tel .hero-content { animation: telUp .8s both; }
+        body.tel .hero-badge { background: rgba(124,92,255,.14); border: 1px solid rgba(124,92,255,.4); color: var(--violet-2); border-radius: 999px; font-weight: 600; letter-spacing: .04em; }
+        body.tel .hero-text h1 { font-family: 'Sora', sans-serif; font-weight: 800; font-size: clamp(42px, 5.4vw, 74px); line-height: 1.02; letter-spacing: -.02em; color: #fff; }
+        body.tel .hero-text h1 span, body.tel .hero-text .speed { background: linear-gradient(90deg, var(--cyan), var(--violet-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        body.tel .hero-text p { color: var(--ink-2); font-size: 18px; line-height: 1.7; }
+        body.tel .hero-float-card { background: rgba(20,27,43,.8); border: 1px solid var(--line); border-radius: 16px; backdrop-filter: blur(10px); box-shadow: 0 30px 60px -30px rgba(0,0,0,.7); }
+        body.tel .card-value { font-family: 'Sora', sans-serif; color: var(--cyan-2); font-weight: 700; }
+        body.tel .card-label { color: var(--ink-3); }
+
+        body.tel .stats-bar { background: linear-gradient(120deg, var(--panel), var(--panel-2)); border-block: 1px solid var(--line); }
+        body.tel .stats-bar-inner { max-width: 1300px; }
+        body.tel .stat-value { font-family: 'Sora', sans-serif; font-weight: 800; background: linear-gradient(90deg, var(--cyan), var(--violet-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        body.tel .stat-label { color: var(--ink-3); text-transform: uppercase; letter-spacing: .1em; font-size: 12px; }
+
+        body.tel .section-header h2 { font-family: 'Sora', sans-serif; font-weight: 700; color: #fff; font-size: clamp(30px, 3.8vw, 50px); }
+        body.tel .section-header p { color: var(--ink-2); }
+
+        body.tel .feature-card, body.tel .plan-card, body.tel .store-card, body.tel .contact-card, body.tel .support-cat { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; transition: transform .35s, box-shadow .35s, border-color .35s; }
+        body.tel .feature-card:hover, body.tel .plan-card:hover, body.tel .store-card:hover, body.tel .support-cat:hover { transform: translateY(-6px); border-color: var(--violet); box-shadow: 0 30px 60px -30px rgba(124,92,255,.5); }
+        body.tel .feature-icon { background: linear-gradient(135deg, var(--violet), var(--cyan)); color: #fff; border-radius: 14px; }
+        body.tel .feature-card h3, body.tel .plan-name { font-family: 'Sora', sans-serif; color: #fff; font-weight: 700; }
+        body.tel .feature-card.featured, body.tel .plan-card.featured { border-color: var(--violet); background: linear-gradient(165deg, var(--panel-2), rgba(124,92,255,.14)); box-shadow: 0 30px 70px -34px rgba(124,92,255,.6); }
+        body.tel .badge { background: linear-gradient(90deg, var(--violet), var(--cyan)); color: #06121a; border-radius: 999px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; font-size: 11px; }
+        body.tel .plan-price { font-family: 'Sora', sans-serif; color: #fff; font-weight: 800; }
+        body.tel .plan-desc, body.tel .plan-features li { color: var(--ink-2); }
+        body.tel .plan-features li::marker { color: var(--cyan); }
+
+        body.tel .coverage-section { background: var(--bg-2); }
+        body.tel .coverage-inner { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; }
+        body.tel .coverage-text h2 { font-family: 'Sora', sans-serif; color: #fff; }
+        body.tel .cov-val { font-family: 'Sora', sans-serif; color: var(--cyan-2); font-weight: 700; }
+        body.tel .cov-label { color: var(--ink-3); }
+
+        body.tel .tickets-section, body.tel .ticket { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; }
+        body.tel .ticket-info h4 { font-family: 'Sora', sans-serif; color: #fff; }
+        body.tel .ticket-status.status-open { background: rgba(34,211,238,.14); color: var(--cyan-2); border-radius: 999px; }
+        body.tel .ticket-status.status-pending { background: rgba(251,191,36,.14); color: var(--warn); border-radius: 999px; }
+        body.tel .ticket-status.status-resolved { background: rgba(52,211,153,.14); color: var(--ok); border-radius: 999px; }
+
+        body.tel .faq-list .faq-item { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+        body.tel .faq-question { font-family: 'Sora', sans-serif; color: #fff; }
+        body.tel .faq-answer { color: var(--ink-2); }
+
+        body.tel .store-card-info h3 { font-family: 'Sora', sans-serif; color: #fff; }
+        body.tel .store-hours { color: var(--ink-3); }
+
+        body.tel .contact-form { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; }
+        body.tel .form-group label { color: var(--ink-2); }
+        body.tel .form-group input, body.tel .form-group select, body.tel .form-group textarea { background: var(--bg-2); border: 1px solid var(--line); color: var(--ink); border-radius: 10px; font-family: 'Manrope', sans-serif; }
+        body.tel .form-group input::placeholder, body.tel .form-group textarea::placeholder { color: var(--ink-3); }
+        body.tel .form-group input:focus, body.tel .form-group select:focus, body.tel .form-group textarea:focus { outline: none; border-color: var(--violet); }
+
+        body.tel .footer { background: var(--bg-2); color: var(--ink-2); border-top: 1px solid var(--line); }
+        body.tel .footer-brand .logo { color: #fff; }
+        body.tel .footer-column h4 { font-family: 'Sora', sans-serif; color: #fff; }
+        body.tel .footer-column a { color: var(--ink-3); } body.tel .footer-column a:hover { color: var(--cyan-2); }
+        body.tel .footer-socials a { border: 1px solid var(--line); border-radius: 10px; color: var(--ink-2); transition: all .3s; }
+        body.tel .footer-socials a:hover { border-color: var(--violet); color: #fff; transform: translateY(-3px); }
+        body.tel .footer-bottom, body.tel .footer-legal { border-top: 1px solid var(--line); color: var(--ink-3); }
+
+        body.tel .section, body.tel .stats-bar { animation: telUp .7s both; }
+    </style>
 </head>
-<body>
+<body class="tel">
     <!-- Announcement Bar -->
     <div class="announcement-bar">
         🚀 5G Now Available in 500+ Cities | <a href="#">Switch &amp; Save up to $200</a>
