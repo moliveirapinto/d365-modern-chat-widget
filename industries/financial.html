@@ -1247,8 +1247,120 @@
             }
         }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,500&family=Libre+Franklin:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===================================================================
+           MERIDIAN BANK — Private-bank / fintech reskin
+           Palette: deep navy + emerald + ivory + gold hairline.
+           Fonts: Spectral (trust serif) + Libre Franklin (precise sans).
+           =================================================================== */
+        body.fin {
+            --navy: #0e2a45; --navy-2: #163a5c; --ink: #12212f; --ink-2: #46596b;
+            --paper: #f5f7fa; --panel: #ffffff; --mist: #eef2f7; --line: #dde5ee;
+            --emerald: #0f7a5c; --emerald-2: #15a074; --gold: #c2a04a; --gold-soft: #eadfbf;
+            --ok: #0f7a5c; --warn: #b3792a; --bad: #b23b2e; --blue: #2f6dae;
+            font-family: 'Libre Franklin', -apple-system, sans-serif; color: var(--ink); background: var(--paper);
+            -webkit-font-smoothing: antialiased;
+        }
+        body.fin::before { content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background: radial-gradient(1100px 560px at 90% -14%, rgba(21,160,116,.08), transparent 60%), radial-gradient(900px 500px at -8% 12%, rgba(14,42,69,.06), transparent 55%); }
+        body.fin > * { position: relative; z-index: 1; }
+        @keyframes finUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+
+        body.fin .top-bar { background: var(--navy); color: #cfe0ee; font-size: 13px; }
+        body.fin .top-bar-content { max-width: 1340px; }
+        body.fin .top-bar-links a { color: #cfe0ee; }
+        body.fin .top-bar-links a:hover { color: var(--gold); }
+
+        body.fin .header { background: rgba(255,255,255,.9); backdrop-filter: saturate(140%) blur(12px); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 100; }
+        body.fin .header-main { max-width: 1340px; }
+        body.fin .logo-icon { background: linear-gradient(135deg, var(--navy), var(--emerald)); color: #fff; border-radius: 10px; box-shadow: 0 8px 20px -10px rgba(14,42,69,.6); }
+        body.fin .logo-text { font-family: 'Spectral', serif; font-weight: 600; color: var(--navy); letter-spacing: .2px; }
+        body.fin .nav a { color: var(--ink-2); font-weight: 600; font-size: 14px; position: relative; }
+        body.fin .nav a::after { content: ""; position: absolute; left: 0; bottom: -4px; height: 2px; width: 100%; background: var(--emerald); transform: scaleX(0); transform-origin: left; transition: transform .3s; }
+        body.fin .nav a:hover, body.fin .nav a.active { color: var(--navy); }
+        body.fin .nav a:hover::after, body.fin .nav a.active::after { transform: scaleX(1); }
+
+        body.fin .btn { font-weight: 600; letter-spacing: .02em; border-radius: 8px; transition: all .28s cubic-bezier(.2,.7,.2,1); }
+        body.fin .btn-primary { background: var(--emerald); color: #fff; border: 1px solid var(--emerald); }
+        body.fin .btn-primary:hover { background: var(--emerald-2); transform: translateY(-2px); box-shadow: 0 14px 30px -14px rgba(15,122,92,.7); }
+        body.fin .btn-dark { background: var(--navy); color: #fff; border: 1px solid var(--navy); }
+        body.fin .btn-dark:hover { background: var(--navy-2); transform: translateY(-2px); }
+        body.fin .btn-outline { background: transparent; color: var(--navy); border: 1px solid var(--line); }
+        body.fin .btn-outline:hover { border-color: var(--navy); background: var(--navy); color: #fff; }
+
+        body.fin .hero { background: linear-gradient(160deg, #0e2a45 0%, #124063 55%, #0f5a4b 120%); color: #eaf2f8; overflow: hidden; position: relative; }
+        body.fin .hero::after { content: ""; position: absolute; inset: 0; opacity: .5; background: radial-gradient(700px 360px at 80% 0%, rgba(21,160,116,.35), transparent 60%); pointer-events: none; }
+        body.fin .hero-content { position: relative; max-width: 1340px; animation: finUp .8s both; }
+        body.fin .hero-badge { background: rgba(194,160,74,.16); color: var(--gold-soft); border: 1px solid rgba(194,160,74,.4); border-radius: 999px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; font-size: 12px; }
+        body.fin .hero-text h1 { font-family: 'Spectral', serif; font-weight: 600; font-size: clamp(40px, 5vw, 66px); line-height: 1.04; letter-spacing: -.01em; color: #fff; }
+        body.fin .hero-text p { color: rgba(234,242,248,.78); font-size: 18px; line-height: 1.7; }
+        body.fin .hero-stats { border-top: 1px solid rgba(255,255,255,.12); }
+        body.fin .hero-stat .value, body.fin .hero-stat .rate { font-family: 'Spectral', serif; color: var(--gold-soft); font-weight: 600; }
+        body.fin .hero-stat .label { color: rgba(234,242,248,.6); text-transform: uppercase; letter-spacing: .1em; font-size: 12px; }
+        body.fin .hero-card { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); border-radius: 16px; backdrop-filter: blur(8px); box-shadow: 0 30px 60px -30px rgba(0,0,0,.5); }
+        body.fin .hero-card-title { color: rgba(234,242,248,.7); }
+        body.fin .hero-card-value { font-family: 'Spectral', serif; color: #fff; }
+
+        body.fin .rates-banner { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 24px 50px -34px rgba(14,42,69,.4); }
+        body.fin .rate-value, body.fin .rate-display { font-family: 'Spectral', serif; color: var(--emerald); font-weight: 600; }
+        body.fin .rate-label { color: var(--ink-2); text-transform: uppercase; letter-spacing: .08em; font-size: 12px; }
+
+        body.fin .section-container { max-width: 1340px; }
+        body.fin .section-header h2 { font-family: 'Spectral', serif; font-weight: 600; color: var(--navy); font-size: clamp(30px, 3.6vw, 46px); }
+        body.fin .section-header p { color: var(--ink-2); }
+
+        body.fin .feature-card, body.fin .product-card, body.fin .location-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; transition: transform .35s, box-shadow .35s, border-color .35s; }
+        body.fin .feature-card:hover, body.fin .product-card:hover, body.fin .location-card:hover { transform: translateY(-6px); box-shadow: 0 30px 56px -34px rgba(14,42,69,.36); border-color: var(--emerald); }
+        body.fin .feature-card.featured { background: linear-gradient(160deg, var(--navy), var(--navy-2)); color: #eaf2f8; border-color: var(--navy); }
+        body.fin .feature-card.featured h3 { color: #fff; }
+        body.fin .feature-icon, body.fin .product-icon { background: linear-gradient(135deg, var(--emerald), var(--emerald-2)); color: #fff; border-radius: 12px; }
+        body.fin .feature-card.featured .feature-icon { background: rgba(255,255,255,.14); }
+        body.fin .feature-card h3, body.fin .product-card h3 { font-family: 'Spectral', serif; color: var(--navy); font-weight: 600; }
+        body.fin .product-features li { color: var(--ink-2); }
+        body.fin .product-link { color: var(--emerald); font-weight: 600; }
+        body.fin .about-stat .value { font-family: 'Spectral', serif; color: var(--emerald); font-weight: 600; }
+        body.fin .about-stat .label { color: var(--ink-2); }
+
+        body.fin .support-hero { background: linear-gradient(160deg, var(--navy), var(--navy-2)); color: #eaf2f8; }
+        body.fin .support-stat-card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; border-top: 3px solid var(--line); }
+        body.fin .support-stat-card .value { font-family: 'Spectral', serif; color: var(--navy); font-weight: 600; }
+        body.fin .support-stat-card.open { border-top-color: var(--blue); }
+        body.fin .support-stat-card.pending { border-top-color: var(--warn); }
+        body.fin .support-stat-card.resolved { border-top-color: var(--ok); }
+
+        body.fin .cases-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; }
+        body.fin .cases-table th { color: var(--ink-2); text-transform: uppercase; letter-spacing: .08em; font-size: 12px; border-bottom: 1px solid var(--line); }
+        body.fin .cases-table td { border-bottom: 1px solid var(--mist); }
+        body.fin .cases-table tbody tr:hover { background: var(--mist); }
+        body.fin .case-id { font-family: 'Spectral', serif; color: var(--navy); font-weight: 600; }
+        body.fin .case-status.open { color: var(--blue); } body.fin .case-status.pending { color: var(--warn); }
+        body.fin .case-status.resolved { color: var(--ok); } body.fin .case-status.closed { color: var(--ink-2); }
+        body.fin .priority-dot.high { background: var(--bad); } body.fin .priority-dot.medium { background: var(--warn); } body.fin .priority-dot.low { background: var(--ok); }
+        body.fin .case-actions button { background: transparent; border: 1px solid var(--line); color: var(--navy); border-radius: 6px; transition: all .25s; }
+        body.fin .case-actions button:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+        body.fin .faq-item { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+        body.fin .faq-item h3, body.fin .faq-item h4 { font-family: 'Spectral', serif; color: var(--navy); }
+
+        body.fin .contact-form { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; }
+        body.fin .contact-method-icon { background: linear-gradient(135deg, var(--emerald), var(--emerald-2)); color: #fff; border-radius: 12px; }
+        body.fin .form-group input, body.fin .form-group select, body.fin .form-group textarea { border: 1px solid var(--line); border-radius: 8px; font-family: 'Libre Franklin', sans-serif; background: var(--paper); }
+        body.fin .form-group input:focus, body.fin .form-group select:focus, body.fin .form-group textarea:focus { outline: none; border-color: var(--emerald); }
+
+        body.fin .footer { background: var(--navy); color: #b9cbdb; }
+        body.fin .footer-brand .logo-text { color: #fff; }
+        body.fin .footer-column h4 { font-family: 'Spectral', serif; color: #fff; }
+        body.fin .footer-column a { color: rgba(185,203,219,.72); }
+        body.fin .footer-column a:hover { color: var(--gold-soft); }
+        body.fin .footer-bottom, body.fin .footer-legal { border-top: 1px solid rgba(255,255,255,.1); color: rgba(185,203,219,.55); }
+
+        body.fin .section, body.fin .rates-banner { animation: finUp .7s both; }
+    </style>
 </head>
-<body>
+<body class="fin">
     <!-- Top Bar -->
     <div class="top-bar">
         <div class="top-bar-content">
