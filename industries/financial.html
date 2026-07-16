@@ -1261,6 +1261,9 @@
             --paper: #f5f7fa; --panel: #ffffff; --mist: #eef2f7; --line: #dde5ee;
             --emerald: #0f7a5c; --emerald-2: #15a074; --gold: #c2a04a; --gold-soft: #eadfbf;
             --ok: #0f7a5c; --warn: #b3792a; --bad: #b23b2e; --blue: #2f6dae;
+            /* override base sky-blue/muted/gold vars so every base rule that uses them reads well */
+            --accent: #0f7a5c; --accent-dark: #0b5f48; --accent-light: #12855f;
+            --text-muted: #5a6b7d; --text-light: #46596b;
             font-family: 'Libre Franklin', -apple-system, sans-serif; color: var(--ink); background: var(--paper);
             -webkit-font-smoothing: antialiased;
         }
@@ -1304,9 +1307,10 @@
         body.fin .hero-card-title { color: rgba(234,242,248,.7); }
         body.fin .hero-card-value { font-family: 'Spectral', serif; color: #fff; }
 
-        body.fin .rates-banner { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 24px 50px -34px rgba(14,42,69,.4); }
-        body.fin .rate-value, body.fin .rate-display { font-family: 'Spectral', serif; color: var(--emerald); font-weight: 600; }
-        body.fin .rate-label { color: var(--ink-2); text-transform: uppercase; letter-spacing: .08em; font-size: 12px; }
+        body.fin .rates-banner { background: linear-gradient(120deg, var(--navy), var(--navy-2)); border: 1px solid var(--navy); border-radius: 16px; color: #eaf2f8; box-shadow: 0 24px 50px -34px rgba(14,42,69,.5); }
+        body.fin .rates-banner h2, body.fin .rates-banner h3, body.fin .rates-banner p { color: #fff; }
+        body.fin .rate-value, body.fin .rate-display { font-family: 'Spectral', serif; color: var(--gold-soft); font-weight: 600; }
+        body.fin .rate-label { color: rgba(234,242,248,.75); text-transform: uppercase; letter-spacing: .08em; font-size: 12px; }
 
         body.fin .section-container { max-width: 1340px; }
         body.fin .section-header h2 { font-family: 'Spectral', serif; font-weight: 600; color: var(--navy); font-size: clamp(30px, 3.6vw, 46px); }
@@ -1358,6 +1362,14 @@
         body.fin .footer-bottom, body.fin .footer-legal { border-top: 1px solid rgba(255,255,255,.1); color: rgba(185,203,219,.55); }
 
         body.fin .section, body.fin .rates-banner { animation: finUp .7s both; }
+        /* contrast fixes: leftover base sky-blue links + faint slate text */
+        body.fin a { color: var(--emerald); }
+        body.fin .logo-text span { color: var(--emerald); }
+        body.fin .product-card.featured .product-link { color: var(--emerald) !important; }
+        body.fin .hero-text h1 span, body.fin .hero h1 span { color: var(--gold-soft); }
+        body.fin .feature-card.featured a, body.fin .feature-card.featured .product-link { color: #eaf2f8 !important; }
+        body.fin .location-content, body.fin .location-content p, body.fin .location-content span { color: var(--ink-2); }
+        body.fin .hero .location-content p { color: rgba(234,242,248,.82); }
     </style>
 </head>
 <body class="fin">
