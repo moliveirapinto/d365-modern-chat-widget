@@ -1378,6 +1378,8 @@
             --paper: #f5f2e9; --panel: #ffffff; --cream: #efe9d8; --cream-2: #e6dfca; --line: #ddd6c2;
             --gold: #b3892f; --gold-2: #c9a53f; --gold-soft: #ecdcae;
             --ok: #2c6e49; --warn: #b3792a; --bad: #a5372b; --blue: #2f5f96;
+            /* darken base faint muted text so base rules read well */
+            --text-muted: #55616f; --text-light: #46586b;
             font-family: 'Public Sans', -apple-system, sans-serif; color: var(--ink); background: var(--paper);
             -webkit-font-smoothing: antialiased;
         }
@@ -1475,6 +1477,16 @@
         body.gov .footer-bottom, body.gov .footer-legal { border-top: 1px solid rgba(255,255,255,.1); color: rgba(182,195,212,.55); }
 
         body.gov .section, body.gov .quick-services-panel { animation: govUp .7s both; }
+        /* contrast fixes */
+        body.gov .header-top .logo-text, body.gov .header-top .logo-text span, body.gov .header-top .logo { color: #fff; }
+        body.gov .section-eyebrow { color: #7d5f1c; }
+        body.gov .dept-card-link, body.gov .quick-service-arrow { color: #7d5f1c; }
+        body.gov .news-badge { background: var(--navy); color: #fff; }
+        body.gov .quick-services-panel, body.gov .quick-services-panel h2, body.gov .quick-services-panel h3,
+        body.gov .quick-services-panel h4, body.gov .quick-services-panel p, body.gov .quick-services-panel span,
+        body.gov .quick-services-panel a, body.gov .quick-service-text { color: var(--ink); }
+        body.gov .quick-service-icon { color: var(--gold); }
+        body.gov .footer .logo-text span, body.gov .footer-brand .logo-text span { color: var(--gold-2); }
     </style>
 </head>
 <body class="gov">
