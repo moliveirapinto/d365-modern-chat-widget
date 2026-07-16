@@ -5629,12 +5629,12 @@
         // ============ COLLABORATION ROOMS (No GitHub Required!) ============
         
         const COLLAB_API_URL = 'https://d365-widget-collab.mauricio-o-pinto.workers.dev';
-        let savedRooms = JSON.parse(localStorage.getItem('d365_collab_rooms') || '[]'); // Array of {code, name, createdBy, joinedAt, widgets}
+        let savedRooms = (function(){ try { return JSON.parse(localStorage.getItem('d365_collab_rooms') || '[]'); } catch(e){ console.warn('Corrupt d365_collab_rooms, resetting'); return []; } })(); // Array of {code, name, createdBy, joinedAt, widgets}
         let activeRoomCode = localStorage.getItem('d365_collab_active_room') || null;
         let activeRoomWidgetId = localStorage.getItem('d365_collab_active_widget') || null;
         let currentRoomVersion = null;
         let collabUserName = localStorage.getItem('d365_collab_user') || '';
-        let expandedRooms = JSON.parse(localStorage.getItem('d365_expanded_rooms') || '{}'); // Track which rooms are expanded
+        let expandedRooms = (function(){ try { return JSON.parse(localStorage.getItem('d365_expanded_rooms') || '{}'); } catch(e){ console.warn('Corrupt d365_expanded_rooms, resetting'); return {}; } })(); // Track which rooms are expanded
         
         // Migration from old single-room format
         (function migrateOldRoomFormat() {
@@ -5714,7 +5714,7 @@
             // Show item name if provided
             if (options.itemName) {
                 const itemIcon = options.itemIcon || '<svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6z"/></svg>';
-                itemName.innerHTML = itemIcon + '<span>' + options.itemName + '</span>';
+                itemName.innerHTML = itemIcon + '<span>' + escapeHtml(options.itemName) + '</span>';
                 itemName.style.display = 'flex';
             } else {
                 itemName.style.display = 'none';
@@ -8042,7 +8042,8 @@
         
         function restoreCollapsedStates() {
             const saved = localStorage.getItem('cardCollapsedStates');
-            const states = saved ? JSON.parse(saved) : {};
+            let states = {};
+            try { states = saved ? JSON.parse(saved) : {}; } catch(e){ states = {}; }
             
             // By default, collapse all cards. Only expand if user explicitly expanded them (saved as false)
             document.querySelectorAll('.settings-card').forEach(card => {
