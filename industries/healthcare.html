@@ -2218,6 +2218,86 @@
         }
 
         // Widget Loading - Same as retail.html
+        // Build + inject Microsoft's NextGen Modern Web Messaging ("New Standard
+        // Widget") from the studio's saved NextGen config (localStorage key
+        // 'nsw-config-v1') plus the D365 connection IDs. Returns true when injected.
+        function loadNextGenStandardWidget(config) {
+            var NSW_BOOTSTRAPPER = 'https://oc-cdn-ocprod.azureedge.net/livechatwidget/v3/scripts/NextGenLiveChatBootstrapper.js';
+            var appId = config.widgetId, orgId = config.orgId, orgUrl = config.orgUrl;
+            if ((!appId || !orgId || !orgUrl) && config.lcwCode) {
+                try {
+                    var d = new DOMParser().parseFromString(config.lcwCode, 'text/html');
+                    var st = d.querySelector('script[id="Microsoft_Omnichannel_LCWidget"]') || d.querySelector('script');
+                    if (st) {
+                        appId = appId || st.getAttribute('data-app-id');
+                        orgId = orgId || st.getAttribute('data-org-id');
+                        orgUrl = orgUrl || st.getAttribute('data-org-url');
+                    }
+                } catch (e) {}
+            }
+            if (!appId || !orgId || !orgUrl) {
+                console.warn('\u26A0\uFE0F New Standard Widget needs App ID / Org ID / Org URL \u2014 set a Widget Profile in the studio.');
+                return false;
+            }
+            var nsw = {};
+            try { nsw = JSON.parse(localStorage.getItem('nsw-config-v1') || '{}') || {}; } catch (e) {}
+            var g = function (k) { var v = nsw[k]; return (v === undefined || v === null) ? '' : ('' + v).trim(); };
+            var cb = function (k) { return nsw[k] === true; };
+            var brand = {};
+            if (g('nsw-brand-name')) brand.brandName = g('nsw-brand-name');
+            if (g('nsw-logo-url')) brand.logoUrl = g('nsw-logo-url');
+            var colors = {};
+            if (g('nsw-primary')) colors.primary = g('nsw-primary');
+            if (g('nsw-header-text')) colors.headerText = g('nsw-header-text');
+            if (g('nsw-btn-color')) colors.chatButtonColor = g('nsw-btn-color');
+            if (g('nsw-user-bg')) colors.userMessageBackground = g('nsw-user-bg');
+            if (g('nsw-user-text')) colors.userMessageText = g('nsw-user-text');
+            if (g('nsw-agent-bg')) colors.agentMessageBackground = g('nsw-agent-bg');
+            if (g('nsw-agent-text')) colors.agentMessageText = g('nsw-agent-text');
+            if (Object.keys(colors).length) brand.colors = colors;
+            var typo = {};
+            if (g('nsw-font')) typo.fontFamily = g('nsw-font');
+            if (g('nsw-input-font-size')) typo.inputFontSize = g('nsw-input-font-size');
+            if (Object.keys(typo).length) brand.typography = typo;
+            var text = {};
+            if (g('nsw-header-title')) text.headerTitle = g('nsw-header-title');
+            if (g('nsw-greeting-title')) text.greetingTitle = g('nsw-greeting-title');
+            if (g('nsw-greeting-sub')) text.greetingSubtitle = g('nsw-greeting-sub');
+            if (g('nsw-input-placeholder')) text.inputPlaceholder = g('nsw-input-placeholder');
+            if (g('nsw-chat-btn-label')) text.chatButtonLabel = g('nsw-chat-btn-label');
+            if (g('nsw-disclaimer')) text.disclaimerText = g('nsw-disclaimer');
+            if (g('nsw-privacy-url')) text.privacyUrl = g('nsw-privacy-url');
+            if (g('nsw-privacy-text')) text.privacyLinkText = g('nsw-privacy-text');
+            if (Object.keys(text).length) brand.text = text;
+            var sizing = {};
+            if (g('nsw-width')) sizing.widgetWidth = g('nsw-width');
+            if (g('nsw-height')) sizing.widgetHeight = g('nsw-height');
+            if (g('nsw-btn-size')) sizing.chatButtonSize = g('nsw-btn-size');
+            if (Object.keys(sizing).length) brand.sizing = sizing;
+            var display = {};
+            if (nsw['nsw-landing'] === false) display.showLandingPage = false;
+            if (nsw['nsw-avatar'] === false) display.showAgentAvatar = false;
+            if (nsw['nsw-agent-name'] === false) display.showAgentName = false;
+            if (g('nsw-powered-by')) display.poweredByText = g('nsw-powered-by');
+            if (Object.keys(display).length) brand.display = display;
+            var s = document.createElement('script');
+            s.id = 'Microsoft_Omnichannel_LCWidget';
+            s.src = NSW_BOOTSTRAPPER;
+            s.setAttribute('data-app-id', appId);
+            s.setAttribute('data-lcw-version', g('nsw-lcw-version') || 'prod');
+            s.setAttribute('data-org-id', orgId);
+            s.setAttribute('data-org-url', orgUrl);
+            if (g('nsw-locale')) s.setAttribute('data-locale', g('nsw-locale'));
+            if (cb('nsw-hide-button')) s.setAttribute('data-hide-button', 'true');
+            if (g('nsw-custom-font-url')) s.setAttribute('data-custom-font-url', g('nsw-custom-font-url'));
+            if (cb('nsw-no-telemetry')) s.setAttribute('data-disable-telemetry', 'true');
+            if (Object.keys(brand).length) s.setAttribute('data-customization-callback', JSON.stringify(brand));
+            s.async = true;
+            document.body.appendChild(s);
+            console.log('\u2705 New Standard Widget (NextGen) injected \u2014 App ' + appId.substring(0, 8) + '\u2026');
+            return true;
+        }
+
         function loadWidget() {
             const urlParams = new URLSearchParams(window.location.search);
             const configParam = urlParams.get('config');
@@ -2351,6 +2431,12 @@
                     document.head.appendChild(script);
                     
                 } else if (widgetMode === 'standard') {
+                    // New Standard Widget (NextGen Modern Web Messaging). The legacy
+                    // LiveChatBootstrapper path below is intentionally bypassed so the
+                    // page never shows the old widget.
+                    loadNextGenStandardWidget(config);
+                    return;
+                } else if (widgetMode === '__legacy_standard_disabled__') {
                     if (config.lcwCode) {
                         console.log('✅ Loading standard D365 LCW widget from embed code');
                         
