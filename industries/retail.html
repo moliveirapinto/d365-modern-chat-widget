@@ -994,6 +994,8 @@
             --gold: #a67c3d; --gold-2: #c8a15e; --gold-soft: #e7d3ab;
             --line: #e6dcc8; --line-2: #d9ccb2;
             --ok: #3f7d5e; --warn: #b3792a; --bad: #a5462f; --muted-blue: #4a6b86;
+            /* darken base faint gold/muted so base rules read well */
+            --accent: #a67c3d; --accent-dark: #8a6531; --text-muted: #6b6156; --text-light: #57503f;
             font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             color: var(--ink); background: var(--paper);
             -webkit-font-smoothing: antialiased; letter-spacing: .1px;
@@ -1194,7 +1196,7 @@
         body.lux .case-subject { color: var(--ink); }
         body.lux .case-status { font-weight: 600; font-size: 13px; }
         body.lux .case-status.open { color: var(--muted-blue); }
-        body.lux .case-status.pending { color: var(--warn); }
+        body.lux .case-status.pending { color: #855a17; }
         body.lux .case-status.resolved { color: var(--ok); }
         body.lux .case-status.closed { color: var(--ink-3); }
         body.lux .priority-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
