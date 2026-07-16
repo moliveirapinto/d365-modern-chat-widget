@@ -810,8 +810,104 @@
             .footer-content { grid-template-columns: 1fr; }
         }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,500&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===================================================================
+           CRESTWOOD UNIVERSITY — Vibrant academic reskin
+           Palette: deep indigo/plum + amber/gold + warm cream + ivy green.
+           Fonts: Newsreader (academic serif) + Figtree (body).
+           =================================================================== */
+        body.edu {
+            --indigo: #34246b; --indigo-2: #46308c; --indigo-deep: #241748; --ink: #241f30; --ink-2: #5a5470;
+            --paper: #f7f3ea; --panel: #ffffff; --cream: #efe8d7; --line: #e2d9c6;
+            --amber: #eaa019; --amber-2: #ffb733; --amber-soft: #f6dca2; --green: #2f9e6b;
+            --ok: #2f9e6b; --warn: #c07f24; --bad: #c34b3b; --blue: #3a6ea5;
+            font-family: 'Figtree', -apple-system, sans-serif; color: var(--ink); background: var(--paper);
+            -webkit-font-smoothing: antialiased;
+        }
+        body.edu::before { content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background: radial-gradient(1000px 540px at 88% -12%, rgba(234,160,25,.12), transparent 60%), radial-gradient(820px 460px at -8% 16%, rgba(52,36,107,.08), transparent 55%); }
+        body.edu > * { position: relative; z-index: 1; }
+        @keyframes eduUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+
+        body.edu .top-bar { background: var(--indigo-deep); color: #dcd4ee; font-size: 13px; }
+        body.edu .top-bar-links a { color: #dcd4ee; } body.edu .top-bar-links a:hover { color: var(--amber-2); }
+
+        body.edu .header { background: rgba(255,255,255,.9); backdrop-filter: saturate(140%) blur(12px); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 100; }
+        body.edu .logo-shield { background: linear-gradient(135deg, var(--indigo), var(--indigo-2)); color: var(--amber-2); border-radius: 12px 12px 12px 4px; box-shadow: 0 10px 22px -10px rgba(52,36,107,.6); }
+        body.edu .logo-text { font-family: 'Newsreader', serif; font-weight: 600; color: var(--indigo); }
+        body.edu .nav a { color: var(--ink-2); font-weight: 600; position: relative; }
+        body.edu .nav a::after { content: ""; position: absolute; left: 0; bottom: -5px; height: 2px; width: 100%; background: var(--amber); transform: scaleX(0); transform-origin: left; transition: transform .3s; }
+        body.edu .nav a:hover, body.edu .nav a.active { color: var(--indigo); } body.edu .nav a:hover::after, body.edu .nav a.active::after { transform: scaleX(1); }
+
+        body.edu .btn, body.edu .btn-portal, body.edu .btn-apply { font-family: 'Figtree', sans-serif; font-weight: 700; border-radius: 10px; transition: all .28s cubic-bezier(.2,.7,.2,1); }
+        body.edu .btn-gold, body.edu .btn-apply { background: var(--amber); color: #2a1c05; border: 1px solid var(--amber); }
+        body.edu .btn-gold:hover, body.edu .btn-apply:hover { background: var(--amber-2); transform: translateY(-2px); box-shadow: 0 14px 30px -14px rgba(234,160,25,.7); }
+        body.edu .btn-green { background: var(--green); color: #fff; border: 1px solid var(--green); }
+        body.edu .btn-green:hover { filter: brightness(1.06); transform: translateY(-2px); }
+        body.edu .btn-portal { background: var(--indigo); color: #fff; border: 1px solid var(--indigo); }
+        body.edu .btn-portal:hover { background: var(--indigo-2); transform: translateY(-2px); }
+        body.edu .btn-white-outline { background: rgba(255,255,255,.1); color: #fff; border: 1px solid rgba(255,255,255,.5); }
+        body.edu .btn-white-outline:hover { background: #fff; color: var(--indigo); }
+
+        body.edu .hero { background: linear-gradient(160deg, var(--indigo-deep) 0%, var(--indigo) 55%, var(--indigo-2) 120%); color: #efe9fb; overflow: hidden; position: relative; }
+        body.edu .hero::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .55; background: radial-gradient(680px 340px at 84% 6%, rgba(234,160,25,.34), transparent 60%); }
+        body.edu .hero-content { position: relative; animation: eduUp .8s both; }
+        body.edu .hero-badge { background: rgba(234,160,25,.16); border: 1px solid rgba(234,160,25,.44); color: var(--amber-soft); border-radius: 999px; font-weight: 600; letter-spacing: .04em; }
+        body.edu .hero-text h1 { font-family: 'Newsreader', serif; font-weight: 600; font-size: clamp(42px, 5.2vw, 70px); line-height: 1.04; letter-spacing: -.01em; color: #fff; }
+        body.edu .hero-text h1 span { color: var(--amber-2); font-style: italic; }
+        body.edu .hero-text p { color: rgba(239,233,251,.8); font-size: 18px; line-height: 1.7; }
+
+        body.edu .stats-bar { background: var(--panel); border-block: 1px solid var(--line); }
+        body.edu .stats-inner { max-width: 1300px; }
+        body.edu .stat-value { font-family: 'Newsreader', serif; font-weight: 600; color: var(--indigo); }
+        body.edu .stat-label { color: var(--ink-2); text-transform: uppercase; letter-spacing: .08em; font-size: 12px; }
+
+        body.edu .section-header h2 { font-family: 'Newsreader', serif; font-weight: 600; color: var(--indigo); font-size: clamp(30px, 3.6vw, 48px); }
+        body.edu .section-header p { color: var(--ink-2); }
+        body.edu .badge { background: var(--amber); color: #2a1c05; border-radius: 999px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; font-size: 11px; }
+
+        body.edu .program-card, body.edu .service-card, body.edu .step-card, body.edu .deadline-card, body.edu .contact-card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; transition: transform .35s, box-shadow .35s, border-color .35s; }
+        body.edu .program-card:hover, body.edu .service-card:hover, body.edu .step-card:hover, body.edu .deadline-card:hover { transform: translateY(-6px); box-shadow: 0 30px 56px -34px rgba(52,36,107,.34); border-color: var(--amber); }
+        body.edu .program-tag { background: var(--cream); color: var(--indigo); border-radius: 999px; font-weight: 600; font-size: 12px; }
+        body.edu .program-info h3, body.edu .service-card h3, body.edu .step-card h3 { font-family: 'Newsreader', serif; color: var(--indigo); font-weight: 600; }
+        body.edu .program-link { color: var(--amber); font-weight: 700; }
+        body.edu .step-number { font-family: 'Newsreader', serif; background: linear-gradient(135deg, var(--indigo), var(--indigo-2)); color: var(--amber-2); border-radius: 50%; font-weight: 600; }
+        body.edu .deadline-card .date { font-family: 'Newsreader', serif; color: var(--amber); font-weight: 600; }
+        body.edu .campus-section { background: var(--cream); }
+        body.edu .campus-inner { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; }
+        body.edu .campus-text h2 { font-family: 'Newsreader', serif; color: var(--indigo); }
+        body.edu .campus-feature { color: var(--ink-2); }
+
+        body.edu .tickets-section, body.edu .ticket { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; }
+        body.edu .ticket-info h4 { font-family: 'Newsreader', serif; color: var(--indigo); }
+        body.edu .ticket-status.status-open { background: rgba(58,110,165,.12); color: var(--blue); border-radius: 999px; }
+        body.edu .ticket-status.status-pending { background: rgba(192,127,36,.14); color: var(--warn); border-radius: 999px; }
+        body.edu .ticket-status.status-resolved { background: rgba(47,158,107,.14); color: var(--ok); border-radius: 999px; }
+
+        body.edu .faq-list .faq-item { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+        body.edu .faq-question { font-family: 'Newsreader', serif; color: var(--indigo); }
+        body.edu .faq-answer { color: var(--ink-2); }
+
+        body.edu .contact-form { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; }
+        body.edu .form-group label { color: var(--ink-2); }
+        body.edu .form-group input, body.edu .form-group select, body.edu .form-group textarea { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; font-family: 'Figtree', sans-serif; color: var(--ink); }
+        body.edu .form-group input:focus, body.edu .form-group select:focus, body.edu .form-group textarea:focus { outline: none; border-color: var(--amber); }
+
+        body.edu .footer { background: var(--indigo-deep); color: #c4bce0; }
+        body.edu .footer-brand .logo-text { color: #fff; }
+        body.edu .footer-column h4 { font-family: 'Newsreader', serif; color: #fff; }
+        body.edu .footer-column a { color: rgba(196,188,224,.72); } body.edu .footer-column a:hover { color: var(--amber-2); }
+        body.edu .footer-socials a { border: 1px solid rgba(255,255,255,.16); border-radius: 10px; color: #c4bce0; transition: all .3s; }
+        body.edu .footer-socials a:hover { border-color: var(--amber); color: #fff; transform: translateY(-3px); }
+        body.edu .footer-bottom, body.edu .footer-legal { border-top: 1px solid rgba(255,255,255,.1); color: rgba(196,188,224,.55); }
+
+        body.edu .section, body.edu .stats-bar { animation: eduUp .7s both; }
+    </style>
 </head>
-<body>
+<body class="edu">
     <!-- Top Bar -->
     <div class="top-bar">
         <div class="top-bar-inner">
