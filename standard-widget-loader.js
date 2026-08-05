@@ -30,7 +30,7 @@
         }
     }
 
-    function buildBrand(value, isDisabled) {
+    function buildBrand(value, rawValue, isDisabled) {
         const brand = {};
         if (value('nsw-brand-name')) brand.brandName = value('nsw-brand-name');
         if (value('nsw-logo-url')) brand.logoUrl = value('nsw-logo-url');
@@ -56,7 +56,8 @@
         if (value('nsw-greeting-sub')) text.greetingSubtitle = value('nsw-greeting-sub');
         if (value('nsw-input-placeholder')) text.inputPlaceholder = value('nsw-input-placeholder');
         if (value('nsw-chat-btn-label')) text.chatButtonLabel = value('nsw-chat-btn-label');
-        if (value('nsw-disclaimer')) text.disclaimerText = value('nsw-disclaimer');
+        // A lone space is the studio's way to hide the disclaimer, so test before trimming.
+        if (rawValue('nsw-disclaimer') !== '') text.disclaimerText = rawValue('nsw-disclaimer').trim();
         if (value('nsw-privacy-url')) text.privacyUrl = value('nsw-privacy-url');
         if (value('nsw-privacy-text')) text.privacyLinkText = value('nsw-privacy-text');
         if (Object.keys(text).length) brand.text = text;
@@ -71,6 +72,7 @@
         if (isDisabled('nsw-landing')) display.showLandingPage = false;
         if (isDisabled('nsw-avatar')) display.showAgentAvatar = false;
         if (isDisabled('nsw-agent-name')) display.showAgentName = false;
+        if (value('nsw-action-placement') === 'header') display.actionButtonPlacement = 'header';
         if (value('nsw-powered-by')) display.poweredByText = value('nsw-powered-by');
         if (Object.keys(display).length) brand.display = display;
 
@@ -88,10 +90,11 @@
         if (!appId || !orgId || !orgUrl) return null;
 
         const settings = readNextGenSettings();
-        const value = key => {
+        const rawValue = key => {
             const setting = settings[key];
-            return setting === undefined || setting === null ? '' : String(setting).trim();
+            return setting === undefined || setting === null ? '' : String(setting);
         };
+        const value = key => rawValue(key).trim();
         const isEnabled = key => settings[key] === true;
         const isDisabled = key => settings[key] === false;
 
@@ -111,7 +114,7 @@
         widgetScript.setAttribute('data-org-id', orgId);
         widgetScript.setAttribute('data-org-url', orgUrl);
 
-        const brand = buildBrand(value, isDisabled);
+        const brand = buildBrand(value, rawValue, isDisabled);
         if (!brand && value('nsw-primary')) widgetScript.setAttribute('data-color-override', value('nsw-primary'));
         if (!brand && value('nsw-font')) widgetScript.setAttribute('data-font-family-override', value('nsw-font'));
         if (value('nsw-locale')) widgetScript.setAttribute('data-locale', value('nsw-locale'));
