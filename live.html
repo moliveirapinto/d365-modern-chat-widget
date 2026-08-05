@@ -20,6 +20,7 @@
     
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZP59BHHH9F"></script>
+    <script src="standard-widget-loader.js"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -539,79 +540,12 @@
                     document.head.appendChild(script);
                     
                 } else if (widgetMode === 'standard') {
-                    // Standard D365 LCW widget mode
-                    if (config.lcwCode) {
-                        console.log('✅ Loading standard D365 LCW widget from embed code');
-                        
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(config.lcwCode, 'text/html');
-                        const scriptTag = doc.querySelector('script[id="Microsoft_Omnichannel_LCWidget"]');
-                        
-                        if (scriptTag) {
-                            const lcwScript = document.createElement('script');
-                            lcwScript.id = 'Microsoft_Omnichannel_LCWidget';
-                            lcwScript.src = scriptTag.getAttribute('src');
-                            lcwScript.setAttribute('data-app-id', scriptTag.getAttribute('data-app-id'));
-                            lcwScript.setAttribute('data-org-id', scriptTag.getAttribute('data-org-id'));
-                            lcwScript.setAttribute('data-org-url', scriptTag.getAttribute('data-org-url'));
-                            document.head.appendChild(lcwScript);
-                            console.log('✅ D365 LCW widget script injected');
-                            
-                            window.addEventListener("lcw:ready", function handleLivechatReadyEvent() {
-                                console.log('✅ LCW Ready on live demo');
-                                
-                                if (config.enableStandardAuth === true && typeof Microsoft !== 'undefined') {
-                                    Microsoft.Omnichannel.LiveChatWidget.SDK.setContextProvider(function contextProvider() {
-                                        const authName = config.standardAuthName || 'Anonymous User';
-                                        const authEmail = config.standardAuthEmail || 'anonymous@example.com';
-                                        console.log('🔒 Using auto-authentication:', { authName, authEmail });
-                                        
-                                        return {
-                                            'emailaddress1': authEmail,
-                                            'Name': { value: authName, isDisplayable: true },
-                                            'Authenticated': { value: 'Authenticated', isDisplayable: true }
-                                        };
-                                    });
-                                }
-                            });
-                        } else {
-                            console.error('❌ Could not parse LCW code - invalid format');
+                    window.D365StandardWidgetLoader.load(config, {
+                        pageName: 'Your Background',
+                        onMissingConfiguration: function () {
+                            document.getElementById('noConfigNotice').classList.add('show');
                         }
-                    } else if (config.widgetId && config.orgId && config.orgUrl) {
-                        console.log('✅ Building LCW widget from individual D365 values');
-                        
-                        const lcwScript = document.createElement('script');
-                        lcwScript.id = 'Microsoft_Omnichannel_LCWidget';
-                        lcwScript.src = 'https://oc-cdn-ocprod.azureedge.net/livechatwidget/scripts/LiveChatBootstrapper.js';
-                        lcwScript.setAttribute('data-app-id', config.widgetId);
-                        lcwScript.setAttribute('data-org-id', config.orgId);
-                        lcwScript.setAttribute('data-org-url', config.orgUrl);
-                        document.head.appendChild(lcwScript);
-                        console.log('✅ D365 LCW widget loaded with:', {
-                            appId: config.widgetId,
-                            orgId: config.orgId,
-                            orgUrl: config.orgUrl
-                        });
-                        
-                        window.addEventListener("lcw:ready", function handleLivechatReadyEvent() {
-                            console.log('✅ LCW Ready on live demo');
-                            
-                            if (config.enableStandardAuth === true && typeof Microsoft !== 'undefined') {
-                                Microsoft.Omnichannel.LiveChatWidget.SDK.setContextProvider(function contextProvider() {
-                                    const authName = config.standardAuthName || 'Anonymous User';
-                                    const authEmail = config.standardAuthEmail || 'anonymous@example.com';
-                                    return {
-                                        'emailaddress1': authEmail,
-                                        'Name': { value: authName, isDisplayable: true },
-                                        'Authenticated': { value: 'Authenticated', isDisplayable: true }
-                                    };
-                                });
-                            }
-                        });
-                    } else {
-                        console.warn('⚠️ Standard mode requires lcwCode OR (widgetId + orgId + orgUrl)');
-                        document.getElementById('noConfigNotice').classList.add('show');
-                    }
+                    });
                 }
             } else {
                 console.log('ℹ️ No widget configuration found. Configure in Chat Widget Studio first and save.');
