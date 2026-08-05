@@ -686,13 +686,31 @@ input:checked + .toggle-slider,
 
 /* ─── Preview ────────────────────────────────────────────────────────────── */
 
-.preview-panel { top: 108px !important; width: 400px !important; height: calc(100vh - 148px) !important; }
+.preview-panel { top: 100px !important; width: 400px !important; height: calc(100vh - 124px) !important; }
 .preview-card {
     background: var(--at-surface) !important;
     border: 1px solid var(--at-line) !important;
     border-radius: var(--at-r-lg) !important;
     box-shadow: var(--at-shadow-lg) !important;
+    /* Fill the panel so the widget gets the leftover height instead of a fixed 450px. */
+    display: flex !important;
+    flex-direction: column;
+    height: 100%;
 }
+.preview-card > .card-header,
+.preview-card > .preview-tabs { flex: 0 0 auto; }
+.preview-card > .preview-content.active {
+    flex: 1 1 auto;
+    display: flex !important;
+    flex-direction: column;
+    min-height: 0;
+}
+.preview-content.active > .preview-widget-container {
+    flex: 1 1 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+}
+.preview-content.active > .preview-widget-container > iframe { height: 100% !important; }
 .preview-panel .card-header,
 .preview-panel .card-header:hover {
     background: linear-gradient(135deg, var(--at-primary) 0%, #0a3f37 100%) !important;
