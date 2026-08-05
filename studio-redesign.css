@@ -1,0 +1,567 @@
+/* ============================================================================
+   Chat Widget Studio — "Atelier" interface
+   Warm editorial console: paper surfaces, ink type, one deep-teal accent.
+   Loaded after the inline stylesheet so it re-skins the existing markup.
+   ========================================================================== */
+
+:root {
+    --at-paper:        #f4f1ea;
+    --at-paper-deep:   #ebe6db;
+    --at-surface:      #fffdf9;
+    --at-surface-2:    #faf7f0;
+    --at-ink:          #1c1a16;
+    --at-ink-soft:     #4a453c;
+    --at-muted:        #6e675c;
+    --at-faint:        #9a9285;
+    --at-line:         #e3dcce;
+    --at-line-soft:    #efeae0;
+    --at-primary:      #0e5a4f;
+    --at-primary-hi:   #14776a;
+    --at-primary-soft: #dceae6;
+    --at-accent:       #c0761f;
+    --at-accent-soft:  #f7ead8;
+    --at-danger:       #a8341f;
+
+    --at-shadow-sm: 0 1px 2px rgba(28, 26, 22, .05);
+    --at-shadow:    0 2px 8px rgba(28, 26, 22, .06);
+    --at-shadow-lg: 0 18px 40px -18px rgba(28, 26, 22, .28);
+
+    --at-r-sm: 6px;
+    --at-r:    10px;
+    --at-r-lg: 14px;
+
+    --at-sans: 'Work Sans', ui-sans-serif, system-ui, sans-serif;
+    --at-display: 'Playfair Display', Georgia, serif;
+    --at-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+    --at-rail: 236px;
+
+    /* Re-point the original tokens so untouched components inherit the new palette. */
+    --admin-primary: var(--at-primary);
+    --admin-primary-dark: #0a4239;
+    --admin-primary-light: var(--at-primary-soft);
+    --admin-bg: var(--at-paper);
+    --admin-card: var(--at-surface);
+    --admin-text: var(--at-ink);
+    --admin-text-light: var(--at-muted);
+    --admin-text-muted: var(--at-faint);
+    --admin-border: var(--at-line);
+    --admin-border-light: var(--at-line-soft);
+    --admin-shadow: var(--at-shadow-sm);
+    --admin-shadow-md: var(--at-shadow);
+    --admin-shadow-lg: var(--at-shadow-lg);
+    --admin-radius: var(--at-r-lg);
+    --admin-radius-sm: var(--at-r);
+}
+
+[data-theme="dark"] {
+    --at-paper:        #14140f;
+    --at-paper-deep:   #100f0b;
+    --at-surface:      #1c1c16;
+    --at-surface-2:    #22221b;
+    --at-ink:          #f2eee4;
+    --at-ink-soft:     #d8d3c6;
+    --at-muted:        #9a9385;
+    --at-faint:        #7b7566;
+    --at-line:         #2e2e25;
+    --at-line-soft:    #26261e;
+    --at-primary:      #4fb3a1;
+    --at-primary-hi:   #6ac9b7;
+    --at-primary-soft: #17332e;
+    --at-accent:       #e0a050;
+    --at-accent-soft:  #33281a;
+    --at-danger:       #e0705a;
+
+    --at-shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
+    --at-shadow:    0 2px 10px rgba(0, 0, 0, .45);
+    --at-shadow-lg: 0 20px 44px -18px rgba(0, 0, 0, .75);
+
+    --admin-primary-dark: #7fdccb;
+}
+
+/* ─── Canvas ─────────────────────────────────────────────────────────────── */
+
+body {
+    font-family: var(--at-sans) !important;
+    background: var(--at-paper) !important;
+    color: var(--at-ink) !important;
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Warm atmosphere: a soft light source behind the masthead + paper grain. */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 460px;
+    background:
+        radial-gradient(1100px 420px at 22% -8%, rgba(14, 90, 79, .10), transparent 62%),
+        radial-gradient(760px 320px at 88% -12%, rgba(192, 118, 31, .09), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+}
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: .32;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+}
+[data-theme="dark"] body::after { opacity: .18; }
+
+/* The header, preview, toast and feedback button are already positioned with
+   their own z-index; only the container needs lifting above the atmosphere. */
+.admin-container { position: relative; z-index: 1; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+    background: var(--at-line);
+    border: 3px solid var(--at-paper);
+    border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--at-faint); }
+
+/* ─── Masthead ───────────────────────────────────────────────────────────── */
+
+.admin-header {
+    background: color-mix(in srgb, var(--at-paper) 82%, transparent) !important;
+    backdrop-filter: saturate(1.4) blur(14px);
+    border-bottom: 1px solid var(--at-line) !important;
+}
+.admin-header-main { padding: 16px 34px !important; }
+
+.admin-header h1 {
+    font-family: var(--at-display) !important;
+    font-size: 25px !important;
+    font-weight: 600 !important;
+    letter-spacing: -.015em !important;
+    color: var(--at-ink);
+}
+.admin-header p {
+    font-size: 12px !important;
+    color: var(--at-muted) !important;
+    letter-spacing: .055em;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+.admin-logo { width: 42px !important; height: 42px !important; }
+
+.btn-header-action {
+    background: transparent !important;
+    border: 1px solid var(--at-line) !important;
+    color: var(--at-ink-soft) !important;
+    border-radius: 999px !important;
+    padding: 7px 14px !important;
+    font-size: 12.5px !important;
+    font-weight: 500 !important;
+    letter-spacing: .01em;
+    transition: background .18s ease, border-color .18s ease, color .18s ease;
+}
+.btn-header-action:hover {
+    background: var(--at-primary-soft) !important;
+    border-color: var(--at-primary) !important;
+    color: var(--at-primary) !important;
+}
+
+/* ─── Workspace: rail + settings + fixed preview ──────────────────────────── */
+
+.admin-container {
+    max-width: 1560px !important;
+    padding: 26px 34px 72px !important;
+    padding-right: 452px !important;
+    display: grid;
+    grid-template-columns: var(--at-rail) minmax(0, 1fr);
+    align-items: start;
+    gap: 30px;
+}
+
+.settings-panel { gap: 14px !important; min-width: 0; }
+
+/* ─── Section rail ───────────────────────────────────────────────────────── */
+
+.at-rail {
+    position: sticky;
+    top: 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.at-rail-eyebrow {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--at-faint);
+    padding: 0 12px 10px;
+}
+.at-rail-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    width: 100%;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: var(--at-r);
+    background: transparent;
+    color: var(--at-muted);
+    font: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    position: relative;
+    transition: background .16s ease, color .16s ease;
+}
+.at-rail-item:hover { background: var(--at-surface-2); color: var(--at-ink); }
+.at-rail-item .at-rail-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--at-line);
+    flex-shrink: 0;
+    transition: background .16s ease, transform .16s ease;
+}
+.at-rail-item[aria-current="true"] {
+    background: var(--at-surface);
+    color: var(--at-ink);
+    font-weight: 600;
+    box-shadow: var(--at-shadow-sm);
+}
+.at-rail-item[aria-current="true"] .at-rail-dot { background: var(--at-primary); transform: scale(1.3); }
+.at-rail-item[aria-current="true"]::before {
+    content: '';
+    position: absolute;
+    left: -10px; top: 50%;
+    width: 3px; height: 20px;
+    transform: translateY(-50%);
+    border-radius: 99px;
+    background: var(--at-primary);
+}
+.at-rail-count {
+    margin-left: auto;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--at-faint);
+}
+
+.at-rail-sep {
+    height: 1px;
+    background: var(--at-line);
+    margin: 14px 12px;
+}
+.at-rail-note {
+    padding: 0 12px;
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--at-faint);
+}
+.at-rail-note strong { color: var(--at-muted); font-weight: 600; }
+
+/* Only the active group renders. Scoped to the settings panel so the preview
+   card is never affected, and kept flat so the show rule out-ranks the hide. */
+body[data-studio-group] .settings-panel .settings-card { display: none; }
+body[data-studio-group="setup"]      .settings-panel .settings-card[data-group="setup"],
+body[data-studio-group="appearance"] .settings-panel .settings-card[data-group="appearance"],
+body[data-studio-group="content"]    .settings-panel .settings-card[data-group="content"],
+body[data-studio-group="advanced"]   .settings-panel .settings-card[data-group="advanced"],
+body[data-studio-group]              .settings-panel .settings-card[data-group="always"] { display: block; }
+
+/* The global action bar reads as a footer, not another setting. */
+.settings-card[data-group="always"] {
+    background: transparent !important;
+    border: 0 !important;
+    border-top: 1px solid var(--at-line) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    margin-top: 8px;
+}
+.settings-card[data-group="always"]:hover { box-shadow: none !important; }
+
+/* ─── Section heading above the cards ────────────────────────────────────── */
+
+.at-section-head { margin: 2px 2px 16px; }
+.at-section-head h2 {
+    font-family: var(--at-display);
+    font-size: 27px;
+    font-weight: 600;
+    letter-spacing: -.02em;
+    color: var(--at-ink);
+    line-height: 1.15;
+}
+.at-section-head p {
+    margin-top: 5px;
+    font-size: 13px;
+    color: var(--at-muted);
+    max-width: 62ch;
+}
+
+/* ─── Cards ──────────────────────────────────────────────────────────────── */
+
+.settings-card {
+    background: var(--at-surface) !important;
+    border: 1px solid var(--at-line) !important;
+    border-radius: var(--at-r-lg) !important;
+    box-shadow: none !important;
+    transition: border-color .2s ease, box-shadow .2s ease;
+    animation: at-rise .34s cubic-bezier(.22, 1, .36, 1) backwards;
+}
+.settings-card:hover { border-color: var(--at-line); box-shadow: var(--at-shadow) !important; }
+.settings-card:not(.collapsed) { box-shadow: var(--at-shadow) !important; }
+
+/* Staggered reveal when a section opens. */
+.settings-card:nth-of-type(1) { animation-delay: .02s; }
+.settings-card:nth-of-type(2) { animation-delay: .06s; }
+.settings-card:nth-of-type(3) { animation-delay: .10s; }
+.settings-card:nth-of-type(4) { animation-delay: .14s; }
+.settings-card:nth-of-type(5) { animation-delay: .18s; }
+@keyframes at-rise {
+    from { opacity: 0; transform: translateY(9px); }
+    to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .settings-card { animation: none; }
+}
+
+.card-header { padding: 15px 18px !important; gap: 13px !important; }
+.card-header:hover { background: var(--at-surface-2) !important; }
+.card-header h2 {
+    font-size: 14.5px !important;
+    font-weight: 600 !important;
+    letter-spacing: -.005em !important;
+    color: var(--at-ink);
+}
+.card-header p { font-size: 12px !important; color: var(--at-faint) !important; }
+
+.card-header-icon {
+    width: 34px !important; height: 34px !important;
+    border-radius: 9px !important;
+    background: var(--at-primary-soft) !important;
+    border: 1px solid color-mix(in srgb, var(--at-primary) 18%, transparent);
+}
+.card-header-icon svg { fill: var(--at-primary) !important; width: 17px !important; height: 17px !important; }
+
+.settings-card .card-body { border-top: 1px solid var(--at-line-soft) !important; padding-top: 2px; }
+
+/* ─── Forms ──────────────────────────────────────────────────────────────── */
+
+.form-label {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    letter-spacing: .035em;
+    text-transform: uppercase;
+    color: var(--at-muted) !important;
+}
+.form-help, .form-hint { font-size: 11.5px !important; color: var(--at-faint) !important; }
+
+.form-input, input[type="text"], input[type="url"], input[type="email"],
+input[type="number"], select, textarea {
+    background: var(--at-surface-2) !important;
+    border: 1px solid var(--at-line) !important;
+    border-radius: var(--at-r) !important;
+    color: var(--at-ink) !important;
+    font-family: var(--at-sans) !important;
+    font-size: 13.5px !important;
+    transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
+}
+.form-input:focus, input:focus, select:focus, textarea:focus {
+    outline: none !important;
+    background: var(--at-surface) !important;
+    border-color: var(--at-primary) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--at-primary) 16%, transparent) !important;
+}
+.form-input::placeholder, textarea::placeholder { color: var(--at-faint) !important; }
+
+textarea, .color-hex-input, code, pre, .embed-code {
+    font-family: var(--at-mono) !important;
+    font-size: 12px !important;
+}
+
+/* ─── Buttons ────────────────────────────────────────────────────────────── */
+
+.btn {
+    border-radius: var(--at-r) !important;
+    font-family: var(--at-sans) !important;
+    font-weight: 500 !important;
+    font-size: 13px !important;
+    letter-spacing: .01em;
+    transition: transform .12s ease, background .18s ease, border-color .18s ease, color .18s ease;
+}
+.btn:active { transform: translateY(1px); }
+
+.btn-primary {
+    background: var(--at-primary) !important;
+    border: 1px solid var(--at-primary) !important;
+    color: #fdfcf8 !important;
+    box-shadow: none !important;
+}
+.btn-primary:hover { background: var(--at-primary-hi) !important; border-color: var(--at-primary-hi) !important; }
+[data-theme="dark"] .btn-primary { color: #10201d !important; }
+
+.btn-secondary, .btn-small, .btn-outline {
+    background: transparent !important;
+    border: 1px solid var(--at-line) !important;
+    color: var(--at-ink-soft) !important;
+}
+.btn-secondary:hover, .btn-small:hover, .btn-outline:hover {
+    background: var(--at-primary-soft) !important;
+    border-color: var(--at-primary) !important;
+    color: var(--at-primary) !important;
+}
+
+/* ─── Toggles ────────────────────────────────────────────────────────────── */
+
+.toggle-slider { background: var(--at-line) !important; }
+input:checked + .toggle-slider,
+.toggle-switch input:checked + .toggle-slider { background: var(--at-primary) !important; }
+.toggle-label { font-size: 13px !important; color: var(--at-ink-soft) !important; }
+
+/* ─── Colour + swatch controls ───────────────────────────────────────────── */
+
+.color-item { background: var(--at-surface-2) !important; border-radius: var(--at-r) !important; }
+.color-picker-wrapper { border-radius: 8px !important; overflow: hidden; border: 1px solid var(--at-line); }
+.color-hex-input {
+    background: var(--at-surface) !important;
+    border: 1px solid var(--at-line) !important;
+    text-transform: uppercase;
+}
+.palette-card {
+    border: 1px solid var(--at-line) !important;
+    border-radius: var(--at-r) !important;
+    background: var(--at-surface-2) !important;
+    transition: border-color .16s ease, transform .16s ease;
+}
+.palette-card:hover { border-color: var(--at-primary) !important; transform: translateY(-2px); }
+.palette-name { font-size: 11.5px !important; color: var(--at-muted) !important; }
+
+.info-box {
+    background: var(--at-accent-soft) !important;
+    border: 1px solid color-mix(in srgb, var(--at-accent) 28%, transparent) !important;
+    border-radius: var(--at-r) !important;
+    color: var(--at-ink-soft) !important;
+    font-size: 12.5px !important;
+}
+
+.widget-launch-option, .embed-option, .image-upload-area {
+    border: 1px solid var(--at-line) !important;
+    border-radius: var(--at-r) !important;
+    background: var(--at-surface-2) !important;
+    transition: border-color .16s ease, background .16s ease;
+}
+.widget-launch-option:hover, .embed-option:hover, .image-upload-area:hover {
+    border-color: var(--at-primary) !important;
+    background: var(--at-primary-soft) !important;
+}
+.widget-launch-option.active, .embed-option.active {
+    border-color: var(--at-primary) !important;
+    background: var(--at-primary-soft) !important;
+}
+.widget-launch-option-title { font-size: 13px !important; font-weight: 600 !important; }
+.widget-launch-option-desc { font-size: 11.5px !important; color: var(--at-faint) !important; }
+
+/* ─── Tabs ───────────────────────────────────────────────────────────────── */
+
+.tab-btn {
+    border-radius: 999px !important;
+    font-size: 12.5px !important;
+    font-weight: 500 !important;
+    color: var(--at-muted) !important;
+    border: 1px solid transparent !important;
+    background: transparent !important;
+}
+.tab-btn.active {
+    background: var(--at-primary-soft) !important;
+    border-color: color-mix(in srgb, var(--at-primary) 30%, transparent) !important;
+    color: var(--at-primary) !important;
+}
+
+/* ─── Preview ────────────────────────────────────────────────────────────── */
+
+.preview-panel { top: 108px !important; width: 400px !important; height: calc(100vh - 148px) !important; }
+.preview-card {
+    background: var(--at-surface) !important;
+    border: 1px solid var(--at-line) !important;
+    border-radius: var(--at-r-lg) !important;
+    box-shadow: var(--at-shadow-lg) !important;
+}
+.preview-panel .card-header,
+.preview-panel .card-header:hover {
+    background: linear-gradient(135deg, var(--at-primary) 0%, #0a3f37 100%) !important;
+    border-radius: var(--at-r-lg) var(--at-r-lg) 0 0 !important;
+    border-bottom: 0 !important;
+}
+[data-theme="dark"] .preview-panel .card-header,
+[data-theme="dark"] .preview-panel .card-header:hover {
+    background: linear-gradient(135deg, #17453d 0%, #0d2a25 100%) !important;
+}
+.preview-panel .card-header h2 { color: #f7f4ec !important; font-family: var(--at-sans) !important; }
+.preview-panel .card-header p { color: rgba(247, 244, 236, .72) !important; }
+.preview-tabs { border-bottom: 1px solid var(--at-line) !important; }
+.preview-tab {
+    font-size: 13px !important;
+    color: var(--at-muted) !important;
+    padding: 12px 18px !important;
+    border-bottom: 2px solid transparent !important;
+}
+.preview-tab:hover { color: var(--at-ink) !important; background: var(--at-surface-2) !important; }
+.preview-tab.active {
+    color: var(--at-primary) !important;
+    font-weight: 600 !important;
+    background: transparent !important;
+    border-image: none !important;
+    border-bottom: 2px solid var(--at-primary) !important;
+}
+
+/* ─── Chrome ─────────────────────────────────────────────────────────────── */
+
+.feedback-button {
+    background: var(--at-ink) !important;
+    color: var(--at-paper) !important;
+    border-radius: 999px !important;
+    box-shadow: var(--at-shadow-lg) !important;
+    font-size: 12.5px !important;
+    font-weight: 500 !important;
+}
+[data-theme="dark"] .feedback-button { background: var(--at-primary) !important; color: #10201d !important; }
+
+.toast {
+    background: var(--at-ink) !important;
+    color: var(--at-paper) !important;
+    border-radius: var(--at-r) !important;
+    font-size: 13px !important;
+    box-shadow: var(--at-shadow-lg) !important;
+}
+
+.save-modal, .confirm-modal, .changelog-modal, .login-modal {
+    background: var(--at-surface) !important;
+    border: 1px solid var(--at-line) !important;
+    border-radius: var(--at-r-lg) !important;
+    box-shadow: var(--at-shadow-lg) !important;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 1200px) {
+    .admin-container {
+        grid-template-columns: 1fr;
+        padding-right: 34px !important;
+        gap: 20px;
+    }
+    .at-rail {
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding-bottom: 4px;
+    }
+    .at-rail-eyebrow, .at-rail-sep, .at-rail-note, .at-rail-count { display: none; }
+    .at-rail-item { width: auto; border: 1px solid var(--at-line); }
+    .at-rail-item[aria-current="true"]::before { display: none; }
+}
+
+@media (max-width: 640px) {
+    .admin-header-main { padding: 14px 18px !important; }
+    .admin-container { padding: 20px 18px 56px !important; }
+    .at-section-head h2 { font-size: 22px; }
+}
