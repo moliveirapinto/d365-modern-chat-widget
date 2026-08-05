@@ -314,19 +314,40 @@
 
     var SAMPLE = 'The quick brown fox';
 
-    function allFonts() {
+    // Custom mode stores a font key ("inter") rather than a stack, so the preview
+    // family is derived from the option label instead.
+    function stackFor(name, groupLabel) {
+        if (!name || /system default/i.test(name)) return '';
+        var group = (groupLabel || '').toLowerCase();
+        var fallback = 'sans-serif';
+        if (group.indexOf('mono') !== -1) fallback = 'monospace';
+        else if (group.indexOf('serif') !== -1 && group.indexOf('sans') === -1) fallback = 'serif';
+        return (/\s/.test(name) ? '"' + name + '"' : name) + ', ' + fallback;
+    }
+
+    function groupsFromSelect(select) {
+        var groups = [];
+        Array.prototype.forEach.call(select.querySelectorAll('optgroup'), function (optgroup) {
+            groups.push({
+                label: /system/i.test(optgroup.label) ? '' : optgroup.label,
+                items: Array.prototype.map.call(optgroup.querySelectorAll('option'), function (option) {
+                    var name = option.textContent.trim();
+                    return { name: name, value: option.value, stack: stackFor(name, optgroup.label) };
+                })
+            });
+        });
+        return groups;
+    }
+
+    function flatten(groups) {
         var out = [];
-        FONT_GROUPS.forEach(function (g) { out = out.concat(g.items); });
+        groups.forEach(function (g) { out = out.concat(g.items); });
         return out;
     }
 
-    function fontName(stack) {
-        var match = allFonts().filter(function (f) { return f.stack === stack; })[0];
-        if (match) return match.name;
-        return stack ? 'Custom' : 'Widget default';
-    }
+    function buildPicker(control, groups, allowCustom) {
+        var items = flatten(groups);
 
-    function buildFontPicker(input) {
         var wrap = document.createElement('div');
         wrap.className = 'at-fontpick';
 
@@ -342,7 +363,7 @@
         menu.setAttribute('role', 'listbox');
         menu.hidden = true;
 
-        FONT_GROUPS.forEach(function (group) {
+        groups.forEach(function (group) {
             if (group.label) {
                 var heading = document.createElement('div');
                 heading.className = 'at-fontpick-group';
@@ -354,10 +375,10 @@
                 option.type = 'button';
                 option.className = 'at-fontpick-option';
                 option.setAttribute('role', 'option');
-                option.setAttribute('data-stack', font.stack);
+                option.setAttribute('data-value', font.value);
                 option.innerHTML =
                     '<span class="at-fontpick-name">' + font.name + '</span>' +
-                    '<span class="at-fontpick-sample">' + (font.stack ? SAMPLE : 'Uses the widget default') + '</span>';
+                    '<span class="at-fontpick-sample">' + (font.stack ? SAMPLE : 'Uses the system font') + '</span>';
                 if (font.stack) {
                     option.querySelector('.at-fontpick-name').style.fontFamily = font.stack;
                     option.querySelector('.at-fontpick-sample').style.fontFamily = font.stack;
@@ -366,28 +387,37 @@
             });
         });
 
-        // Keeps the custom-font-URL workflow reachable now that free text is gone.
-        var custom = document.createElement('button');
-        custom.type = 'button';
-        custom.className = 'at-fontpick-option at-fontpick-custom';
-        custom.setAttribute('role', 'option');
-        custom.innerHTML = '<span class="at-fontpick-name">Custom…</span><span class="at-fontpick-sample">Type your own CSS font stack</span>';
-        menu.appendChild(custom);
+        var custom = null;
+        if (allowCustom) {
+            // Keeps the custom-font-URL workflow reachable now that free text is gone.
+            custom = document.createElement('button');
+            custom.type = 'button';
+            custom.className = 'at-fontpick-option at-fontpick-custom';
+            custom.setAttribute('role', 'option');
+            custom.innerHTML = '<span class="at-fontpick-name">Custom…</span><span class="at-fontpick-sample">Type your own CSS font stack</span>';
+            menu.appendChild(custom);
+        }
 
-        input.parentNode.insertBefore(wrap, input);
+        control.parentNode.insertBefore(wrap, control);
         wrap.appendChild(trigger);
         wrap.appendChild(menu);
-        wrap.appendChild(input);
-        input.classList.add('at-fontpick-input');
+        wrap.appendChild(control);
+        control.classList.add('at-fontpick-input');
+
+        function current() {
+            var value = control.value;
+            return items.filter(function (i) { return i.value === value; })[0] || null;
+        }
 
         function render() {
-            var stack = (input.value || '').trim();
-            var label = fontName(stack);
-            var current = trigger.querySelector('.at-fontpick-current');
-            current.textContent = label + (stack && label !== 'Custom' ? '  ·  ' + SAMPLE : '');
-            current.style.fontFamily = stack || '';
+            var item = current();
+            var label = item ? item.name : (control.value ? 'Custom' : 'Default');
+            var stack = item ? item.stack : control.value;
+            var el = trigger.querySelector('.at-fontpick-current');
+            el.textContent = label + (stack ? '  ·  ' + SAMPLE : '');
+            el.style.fontFamily = stack || '';
             Array.prototype.forEach.call(menu.querySelectorAll('.at-fontpick-option'), function (o) {
-                o.setAttribute('aria-selected', o.getAttribute('data-stack') === stack ? 'true' : 'false');
+                o.setAttribute('aria-selected', o.getAttribute('data-value') === control.value ? 'true' : 'false');
             });
         }
 
@@ -403,10 +433,10 @@
             if (selected) selected.focus();
         }
 
-        function choose(stack) {
-            input.value = stack;
-            input.dispatchEvent(new Event('input', { bubbles: true }));
-            input.dispatchEvent(new Event('change', { bubbles: true }));
+        function choose(value) {
+            control.value = value;
+            control.dispatchEvent(new Event('input', { bubbles: true }));
+            control.dispatchEvent(new Event('change', { bubbles: true }));
             try { if (typeof window.nswUpdate === 'function') window.nswUpdate(); } catch (e) {}
             render();
             close();
@@ -418,13 +448,13 @@
         menu.addEventListener('click', function (event) {
             var option = event.target.closest('.at-fontpick-option');
             if (!option) return;
-            if (option === custom) {
+            if (custom && option === custom) {
                 close();
-                input.classList.add('at-fontpick-input-visible');
-                input.focus();
+                control.classList.add('at-fontpick-input-visible');
+                control.focus();
                 return;
             }
-            choose(option.getAttribute('data-stack'));
+            choose(option.getAttribute('data-value'));
         });
 
         menu.addEventListener('keydown', function (event) {
@@ -446,15 +476,31 @@
             if (!wrap.contains(event.target)) close();
         });
 
-        input.addEventListener('input', render);
+        control.addEventListener('input', render);
+        control.addEventListener('change', render);
         render();
     }
 
     function wireFontPicker() {
-        var input = document.getElementById('nsw-font');
-        if (!input || input.getAttribute('data-at-picker')) return;
-        input.setAttribute('data-at-picker', '1');
-        buildFontPicker(input);
+        var nextGen = document.getElementById('nsw-font');
+        if (nextGen && !nextGen.getAttribute('data-at-picker')) {
+            nextGen.setAttribute('data-at-picker', '1');
+            // NextGen stores the stack itself, so value and stack are the same.
+            buildPicker(nextGen, FONT_GROUPS.map(function (group) {
+                return {
+                    label: group.label,
+                    items: group.items.map(function (font) {
+                        return { name: font.name, value: font.stack, stack: font.stack };
+                    })
+                };
+            }), true);
+        }
+
+        var custom = document.getElementById('fontFamily');
+        if (custom && !custom.getAttribute('data-at-picker')) {
+            custom.setAttribute('data-at-picker', '1');
+            buildPicker(custom, groupsFromSelect(custom), false);
+        }
     }
 
     /* ── Display options in one place ────────────────────────────────────────
