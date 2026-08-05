@@ -265,6 +265,198 @@
         });
     }
 
+    /* ── Font picker with live previews ──────────────────────────────────────
+       The NextGen font field was a free-text box, so you had to know the exact
+       CSS stack. It becomes a listbox that renders every option in its own
+       typeface. The original input stays as the value holder so the studio's
+       existing persistence keeps working. */
+
+    var FONT_GROUPS = [
+        { label: '', items: [{ name: 'Widget default', stack: '' }] },
+        { label: 'Sans-serif', items: [
+            { name: 'Inter', stack: 'Inter, sans-serif' },
+            { name: 'Roboto', stack: 'Roboto, sans-serif' },
+            { name: 'Open Sans', stack: '"Open Sans", sans-serif' },
+            { name: 'Lato', stack: 'Lato, sans-serif' },
+            { name: 'Poppins', stack: 'Poppins, sans-serif' },
+            { name: 'Montserrat', stack: 'Montserrat, sans-serif' },
+            { name: 'Nunito', stack: 'Nunito, sans-serif' },
+            { name: 'Source Sans Pro', stack: '"Source Sans Pro", sans-serif' },
+            { name: 'Raleway', stack: 'Raleway, sans-serif' },
+            { name: 'Ubuntu', stack: 'Ubuntu, sans-serif' },
+            { name: 'Rubik', stack: 'Rubik, sans-serif' },
+            { name: 'Work Sans', stack: '"Work Sans", sans-serif' },
+            { name: 'Fira Sans', stack: '"Fira Sans", sans-serif' },
+            { name: 'DM Sans', stack: '"DM Sans", sans-serif' },
+            { name: 'Manrope', stack: 'Manrope, sans-serif' },
+            { name: 'Plus Jakarta Sans', stack: '"Plus Jakarta Sans", sans-serif' },
+            { name: 'Outfit', stack: 'Outfit, sans-serif' },
+            { name: 'Lexend', stack: 'Lexend, sans-serif' }
+        ]},
+        { label: 'Serif', items: [
+            { name: 'Playfair Display', stack: '"Playfair Display", serif' },
+            { name: 'Merriweather', stack: 'Merriweather, serif' },
+            { name: 'Lora', stack: 'Lora, serif' },
+            { name: 'Crimson Text', stack: '"Crimson Text", serif' },
+            { name: 'Libre Baskerville', stack: '"Libre Baskerville", serif' }
+        ]},
+        { label: 'Monospace', items: [
+            { name: 'JetBrains Mono', stack: '"JetBrains Mono", monospace' },
+            { name: 'Fira Code', stack: '"Fira Code", monospace' },
+            { name: 'Source Code Pro', stack: '"Source Code Pro", monospace' }
+        ]},
+        { label: 'Display', items: [
+            { name: 'Quicksand', stack: 'Quicksand, sans-serif' },
+            { name: 'Comfortaa', stack: 'Comfortaa, cursive' },
+            { name: 'Righteous', stack: 'Righteous, cursive' }
+        ]}
+    ];
+
+    var SAMPLE = 'The quick brown fox';
+
+    function allFonts() {
+        var out = [];
+        FONT_GROUPS.forEach(function (g) { out = out.concat(g.items); });
+        return out;
+    }
+
+    function fontName(stack) {
+        var match = allFonts().filter(function (f) { return f.stack === stack; })[0];
+        if (match) return match.name;
+        return stack ? 'Custom' : 'Widget default';
+    }
+
+    function buildFontPicker(input) {
+        var wrap = document.createElement('div');
+        wrap.className = 'at-fontpick';
+
+        var trigger = document.createElement('button');
+        trigger.type = 'button';
+        trigger.className = 'at-fontpick-trigger';
+        trigger.setAttribute('aria-haspopup', 'listbox');
+        trigger.setAttribute('aria-expanded', 'false');
+        trigger.innerHTML = '<span class="at-fontpick-current"></span><span class="at-fontpick-chevron">▾</span>';
+
+        var menu = document.createElement('div');
+        menu.className = 'at-fontpick-menu';
+        menu.setAttribute('role', 'listbox');
+        menu.hidden = true;
+
+        FONT_GROUPS.forEach(function (group) {
+            if (group.label) {
+                var heading = document.createElement('div');
+                heading.className = 'at-fontpick-group';
+                heading.textContent = group.label;
+                menu.appendChild(heading);
+            }
+            group.items.forEach(function (font) {
+                var option = document.createElement('button');
+                option.type = 'button';
+                option.className = 'at-fontpick-option';
+                option.setAttribute('role', 'option');
+                option.setAttribute('data-stack', font.stack);
+                option.innerHTML =
+                    '<span class="at-fontpick-name">' + font.name + '</span>' +
+                    '<span class="at-fontpick-sample">' + (font.stack ? SAMPLE : 'Uses the widget default') + '</span>';
+                if (font.stack) {
+                    option.querySelector('.at-fontpick-name').style.fontFamily = font.stack;
+                    option.querySelector('.at-fontpick-sample').style.fontFamily = font.stack;
+                }
+                menu.appendChild(option);
+            });
+        });
+
+        // Keeps the custom-font-URL workflow reachable now that free text is gone.
+        var custom = document.createElement('button');
+        custom.type = 'button';
+        custom.className = 'at-fontpick-option at-fontpick-custom';
+        custom.setAttribute('role', 'option');
+        custom.innerHTML = '<span class="at-fontpick-name">Custom…</span><span class="at-fontpick-sample">Type your own CSS font stack</span>';
+        menu.appendChild(custom);
+
+        input.parentNode.insertBefore(wrap, input);
+        wrap.appendChild(trigger);
+        wrap.appendChild(menu);
+        wrap.appendChild(input);
+        input.classList.add('at-fontpick-input');
+
+        function render() {
+            var stack = (input.value || '').trim();
+            var label = fontName(stack);
+            var current = trigger.querySelector('.at-fontpick-current');
+            current.textContent = label + (stack && label !== 'Custom' ? '  ·  ' + SAMPLE : '');
+            current.style.fontFamily = stack || '';
+            Array.prototype.forEach.call(menu.querySelectorAll('.at-fontpick-option'), function (o) {
+                o.setAttribute('aria-selected', o.getAttribute('data-stack') === stack ? 'true' : 'false');
+            });
+        }
+
+        function close() {
+            menu.hidden = true;
+            trigger.setAttribute('aria-expanded', 'false');
+        }
+
+        function open() {
+            menu.hidden = false;
+            trigger.setAttribute('aria-expanded', 'true');
+            var selected = menu.querySelector('[aria-selected="true"]') || menu.querySelector('.at-fontpick-option');
+            if (selected) selected.focus();
+        }
+
+        function choose(stack) {
+            input.value = stack;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+            try { if (typeof window.nswUpdate === 'function') window.nswUpdate(); } catch (e) {}
+            render();
+            close();
+            trigger.focus();
+        }
+
+        trigger.addEventListener('click', function () { menu.hidden ? open() : close(); });
+
+        menu.addEventListener('click', function (event) {
+            var option = event.target.closest('.at-fontpick-option');
+            if (!option) return;
+            if (option === custom) {
+                close();
+                input.classList.add('at-fontpick-input-visible');
+                input.focus();
+                return;
+            }
+            choose(option.getAttribute('data-stack'));
+        });
+
+        menu.addEventListener('keydown', function (event) {
+            var options = Array.prototype.slice.call(menu.querySelectorAll('.at-fontpick-option'));
+            var index = options.indexOf(document.activeElement);
+            if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                event.preventDefault();
+                var next = index + (event.key === 'ArrowDown' ? 1 : -1);
+                if (next < 0) next = options.length - 1;
+                if (next >= options.length) next = 0;
+                options[next].focus();
+            } else if (event.key === 'Escape') {
+                close();
+                trigger.focus();
+            }
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!wrap.contains(event.target)) close();
+        });
+
+        input.addEventListener('input', render);
+        render();
+    }
+
+    function wireFontPicker() {
+        var input = document.getElementById('nsw-font');
+        if (!input || input.getAttribute('data-at-picker')) return;
+        input.setAttribute('data-at-picker', '1');
+        buildFontPicker(input);
+    }
+
     function init() {
         var container = document.querySelector('.admin-container');
         var panel = document.querySelector('.settings-panel');
@@ -275,6 +467,7 @@
         buildHeading(panel);
         wirePasteRecognition();
         watchConnectionCard();
+        wireFontPicker();
 
         var saved = null;
         try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) {}
