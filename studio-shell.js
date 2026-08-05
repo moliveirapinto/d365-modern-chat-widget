@@ -457,12 +457,62 @@
         buildFontPicker(input);
     }
 
+    /* ── Display options in one place ────────────────────────────────────────
+       "Show Landing Page" lived in Pre-chat Form while the avatar/name toggles
+       and action placement sat in two other cards, so it was easy to miss.
+       Microsoft's reference groups all four under Display Options; match it.
+       Everything stays inside #standardWidgetSettings so the studio's own
+       change listeners keep firing. */
+
+    function findCard(root, title) {
+        return Array.prototype.filter.call(root.querySelectorAll('.settings-card'), function (card) {
+            var h = card.querySelector('.card-header h2');
+            return h && h.textContent.trim() === title;
+        })[0];
+    }
+
+    function rowFor(el) {
+        var node = el;
+        while (node && node.parentElement && !node.parentElement.classList.contains('card-body')) {
+            node = node.parentElement;
+        }
+        return node && node.parentElement && node.parentElement.classList.contains('card-body') ? node : null;
+    }
+
+    function consolidateDisplayOptions() {
+        var root = document.getElementById('standardWidgetSettings');
+        if (!root) return;
+
+        var target = findCard(root, 'Avatars');
+        if (!target || target.getAttribute('data-at-display')) return;
+
+        var body = target.querySelector('.card-body');
+        if (!body) return;
+        target.setAttribute('data-at-display', '1');
+
+        var landingRow = rowFor(document.getElementById('nsw-landing'));
+        if (landingRow) {
+            body.insertBefore(landingRow, body.firstChild);
+            var label = landingRow.querySelector('.toggle-label');
+            if (label) label.textContent = 'Show Landing Page';
+        }
+
+        var placementRow = rowFor(document.getElementById('nsw-action-placement'));
+        if (placementRow) body.appendChild(placementRow);
+
+        var heading = target.querySelector('.card-header h2');
+        var blurb = target.querySelector('.card-header p');
+        if (heading) heading.textContent = 'Display Options';
+        if (blurb) blurb.textContent = 'Landing page, agent avatar and name, and where the action buttons sit.';
+    }
+
     function init() {
         var container = document.querySelector('.admin-container');
         var panel = document.querySelector('.settings-panel');
         if (!container || !panel || document.querySelector('.at-rail')) return;
 
         tagCards();
+        consolidateDisplayOptions();
         buildRail(container);
         buildHeading(panel);
         wirePasteRecognition();
