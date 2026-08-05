@@ -506,6 +506,74 @@
         if (blurb) blurb.textContent = 'Landing page, agent avatar and name, and where the action buttons sit.';
     }
 
+    /* ── Card icons ──────────────────────────────────────────────────────────
+       A few cards still use full-colour PNG tiles that ignore the palette.
+       Swap them for duotone glyphs that inherit the accent like the inline
+       SVG icons the other cards already use. */
+
+    var GLYPHS = {
+        'Widget Profiles':
+            '<rect x="3" y="5" width="18" height="14" rx="2.5" opacity=".26"/>' +
+            '<circle cx="9" cy="11" r="2.4"/>' +
+            '<path d="M5.6 16.7c.6-1.6 1.9-2.5 3.4-2.5s2.8.9 3.4 2.5a.6.6 0 0 1-.6.8H6.2a.6.6 0 0 1-.6-.8z"/>' +
+            '<rect x="14" y="9.6" width="5" height="1.6" rx=".8"/>' +
+            '<rect x="14" y="13" width="5" height="1.6" rx=".8"/>',
+        'Demo Website Background':
+            '<rect x="2.5" y="4.5" width="19" height="13" rx="2.5" opacity=".26"/>' +
+            '<path d="M5.2 15.3l3.2-4 2.3 2.8 2.6-3.4 3.7 4.6z"/>' +
+            '<circle cx="8" cy="8.4" r="1.5"/>' +
+            '<rect x="9" y="19" width="6" height="1.8" rx=".9"/>',
+        'Widget Mode':
+            '<rect x="3" y="4" width="18" height="16" rx="2.5" opacity=".26"/>' +
+            '<rect x="5.5" y="6.5" width="7" height="11" rx="1.5"/>' +
+            '<rect x="14.5" y="6.5" width="4" height="4.6" rx="1.2"/>' +
+            '<rect x="14.5" y="12.9" width="4" height="4.6" rx="1.2"/>',
+        'Embed Widget Code':
+            '<rect x="2.5" y="4" width="19" height="16" rx="2.5" opacity=".26"/>' +
+            '<path d="M9.4 9.2 6 12.4l3.4 3.2 1.2-1.3-2.1-1.9 2.1-1.9zM14.6 9.2l-1.2 1.3 2.1 1.9-2.1 1.9 1.2 1.3L18 12.4z"/>',
+        'Pre-chat Form':
+            '<rect x="5" y="3" width="14" height="18" rx="2.5" opacity=".26"/>' +
+            '<rect x="8" y="7.2" width="8" height="1.8" rx=".9"/>' +
+            '<rect x="8" y="11.1" width="8" height="1.8" rx=".9"/>' +
+            '<rect x="8" y="15" width="5" height="1.8" rx=".9"/>',
+        'Header & Branding':
+            '<path d="M6.5 3h11A1.5 1.5 0 0 1 19 4.5v15.8a.8.8 0 0 1-1.2.7L12 17.6l-5.8 3.4a.8.8 0 0 1-1.2-.7V4.5A1.5 1.5 0 0 1 6.5 3z" opacity=".26"/>' +
+            '<rect x="8" y="7.4" width="8" height="1.8" rx=".9"/>' +
+            '<rect x="8" y="11" width="5" height="1.8" rx=".9"/>',
+        'Fonts':
+            '<rect x="3" y="3.5" width="18" height="17" rx="3.5" opacity=".26"/>' +
+            '<path d="M12 6.6 7.4 17.4h2.2l.9-2.3h3l.9 2.3h2.2L12 6.6zm-1 6.9L12 10.7l1 2.8h-2z"/>',
+        'Colors':
+            '<path d="M12 3.2c3.6 3.9 5.6 6.8 5.6 9.2a5.6 5.6 0 1 1-11.2 0c0-2.4 2-5.3 5.6-9.2z" opacity=".26"/>' +
+            '<circle cx="9.7" cy="13.6" r="1.5"/>' +
+            '<circle cx="13.5" cy="11.7" r="1.5"/>' +
+            '<circle cx="13.9" cy="15.7" r="1.5"/>',
+        'Avatars':
+            '<circle cx="12" cy="12" r="9" opacity=".26"/>' +
+            '<circle cx="12" cy="10" r="3.2"/>' +
+            '<path d="M6.3 18.3c1-2.7 3.1-4.1 5.7-4.1s4.7 1.4 5.7 4.1A8.96 8.96 0 0 1 12 21a8.96 8.96 0 0 1-5.7-2.7z"/>'
+    };
+
+    function replaceCardIcons() {
+        var tiles = document.querySelectorAll('.card-header-icon');
+        Array.prototype.forEach.call(tiles, function (tile) {
+            var img = tile.querySelector('img');
+            if (!img) return;
+
+            var header = tile.closest('.card-header');
+            var heading = header && header.querySelector('h2');
+            var glyph = heading ? GLYPHS[heading.textContent.trim()] : null;
+            if (!glyph) return;
+
+            var holder = document.createElement('div');
+            holder.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + glyph + '</svg>';
+            var svg = holder.firstElementChild;
+            if (!svg) return;
+
+            tile.replaceChild(svg, img);
+        });
+    }
+
     function init() {
         var container = document.querySelector('.admin-container');
         var panel = document.querySelector('.settings-panel');
@@ -513,6 +581,7 @@
 
         tagCards();
         consolidateDisplayOptions();
+        replaceCardIcons();
         buildRail(container);
         buildHeading(panel);
         wirePasteRecognition();
