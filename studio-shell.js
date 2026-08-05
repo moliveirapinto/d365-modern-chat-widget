@@ -65,7 +65,7 @@
         var cards = document.querySelectorAll('.settings-panel .settings-card[data-group="' + id + '"]');
         var n = 0;
         for (var i = 0; i < cards.length; i++) {
-            if (!cards[i].closest('.hidden')) n++;
+            if (!cards[i].closest('.hidden') && cards[i].getAttribute('data-connection-ok') !== 'true') n++;
         }
         return n;
     }
@@ -241,6 +241,30 @@
         box.addEventListener('paste', run);
     }
 
+    /* ── Hide the Connection card once it is just an echo ────────────────────
+       It holds no inputs — only a status line. Connected, it repeats what the
+       profile above already shows; unconnected, it explains what to do. */
+
+    function syncConnectionCard() {
+        var status = document.getElementById('nsw-conn-text');
+        if (!status) return;
+        var card = status.closest('.settings-card');
+        if (!card) return;
+        var connected = /^\s*✓/.test(status.textContent || '');
+        card.setAttribute('data-connection-ok', connected ? 'true' : 'false');
+        refreshCounts();
+    }
+
+    function watchConnectionCard() {
+        var status = document.getElementById('nsw-conn-text');
+        if (!status || status.getAttribute('data-at-watched')) return;
+        status.setAttribute('data-at-watched', '1');
+        syncConnectionCard();
+        new MutationObserver(syncConnectionCard).observe(status, {
+            childList: true, characterData: true, subtree: true
+        });
+    }
+
     function init() {
         var container = document.querySelector('.admin-container');
         var panel = document.querySelector('.settings-panel');
@@ -250,6 +274,7 @@
         buildRail(container);
         buildHeading(panel);
         wirePasteRecognition();
+        watchConnectionCard();
 
         var saved = null;
         try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) {}
