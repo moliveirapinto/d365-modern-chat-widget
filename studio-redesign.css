@@ -177,6 +177,8 @@ body::after {
     grid-template-columns: var(--at-rail) minmax(0, 1fr);
     align-items: start;
     gap: 30px;
+    /* overflow-x:hidden would force overflow-y to auto, trapping the sticky rail. */
+    overflow: visible !important;
 }
 
 .settings-panel { gap: 14px !important; min-width: 0; }
