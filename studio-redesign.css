@@ -443,6 +443,29 @@ input:checked + .toggle-slider,
     font-size: 12.5px !important;
 }
 
+/* Feedback for a pasted embed code. */
+.at-paste-status {
+    margin-top: 8px;
+    font-size: 12px;
+    line-height: 1.45;
+    display: none;
+    padding: 8px 11px;
+    border-radius: var(--at-r);
+    border: 1px solid transparent;
+}
+.at-paste-status[data-state="ok"] {
+    display: block;
+    color: var(--at-primary);
+    background: var(--at-primary-soft);
+    border-color: color-mix(in srgb, var(--at-primary) 26%, transparent);
+}
+.at-paste-status[data-state="warn"] {
+    display: block;
+    color: var(--at-danger);
+    background: color-mix(in srgb, var(--at-danger) 10%, transparent);
+    border-color: color-mix(in srgb, var(--at-danger) 28%, transparent);
+}
+
 .widget-launch-option, .embed-option, .image-upload-area {
     border: 1px solid var(--at-line) !important;
     border-radius: var(--at-r) !important;

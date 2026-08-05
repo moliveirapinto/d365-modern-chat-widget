@@ -166,6 +166,81 @@
         });
     }
 
+    /* ── Recognise a pasted embed code immediately ───────────────────────────
+       The paste box was only read when "Save" was clicked, so pasting a code
+       looked like nothing happened. Parse it as it lands, apply the connection
+       IDs and refresh the preview. */
+
+    function readCode(code) {
+        var pick = function (attr) {
+            var m = code.match(new RegExp('data-' + attr + '\\s*=\\s*["\']([^"\']+)["\']', 'i'));
+            return m ? m[1] : '';
+        };
+        return { appId: pick('app-id'), orgId: pick('org-id'), orgUrl: pick('org-url') };
+    }
+
+    function setStatus(el, state, message) {
+        el.setAttribute('data-state', state);
+        el.textContent = message;
+    }
+
+    function applyPastedCode(box, status) {
+        var code = (box.value || '').trim();
+
+        if (!code) {
+            setStatus(status, 'idle', '');
+            return;
+        }
+
+        var parts = readCode(code);
+        if (!parts.appId || !parts.orgId || !parts.orgUrl) {
+            setStatus(status, 'warn', 'That does not look like a complete embed code — it needs data-app-id, data-org-id and data-org-url.');
+            return;
+        }
+
+        // Mirror into the canonical field so a later save keeps the code.
+        var canonical = document.getElementById('lcwCode');
+        if (canonical) canonical.value = code;
+
+        try {
+            if (typeof window.parseLCWCode === 'function') window.parseLCWCode(code);
+        } catch (e) {}
+
+        try {
+            var stored = JSON.parse(localStorage.getItem('chatWidgetSettings') || '{}') || {};
+            stored.widgetId = parts.appId;
+            stored.orgId = parts.orgId;
+            stored.orgUrl = parts.orgUrl;
+            stored.lcwCode = code;
+            localStorage.setItem('chatWidgetSettings', JSON.stringify(stored));
+        } catch (e) {}
+
+        ['nswSyncFromGlobal', 'updatePreview', 'nswUpdate', 'updateStandardPreview'].forEach(function (fn) {
+            try { if (typeof window[fn] === 'function') window[fn](); } catch (e) {}
+        });
+
+        setStatus(status, 'ok', 'Connected to App ID ' + parts.appId.slice(0, 8) + '… · Org ' + parts.orgId.slice(0, 8) + '… — name it above and press Save to keep it as a profile.');
+    }
+
+    function wirePasteRecognition() {
+        var box = document.getElementById('newProfileLcwCode');
+        if (!box || box.getAttribute('data-at-wired')) return;
+        box.setAttribute('data-at-wired', '1');
+
+        var status = document.createElement('p');
+        status.className = 'at-paste-status';
+        status.setAttribute('data-state', 'idle');
+        box.parentNode.insertBefore(status, box.nextSibling);
+
+        var timer;
+        var run = function () {
+            clearTimeout(timer);
+            timer = setTimeout(function () { applyPastedCode(box, status); }, 300);
+        };
+        box.addEventListener('input', run);
+        box.addEventListener('paste', run);
+    }
+
     function init() {
         var container = document.querySelector('.admin-container');
         var panel = document.querySelector('.settings-panel');
@@ -174,6 +249,7 @@
         tagCards();
         buildRail(container);
         buildHeading(panel);
+        wirePasteRecognition();
 
         var saved = null;
         try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) {}
