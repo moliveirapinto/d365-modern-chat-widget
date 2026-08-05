@@ -504,6 +504,104 @@ input:checked + .toggle-slider,
     color: var(--at-primary) !important;
 }
 
+/* ─── Widget mode choice ─────────────────────────────────────────────────── */
+
+.widget-mode-selector {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+    gap: 12px !important;
+}
+
+.mode-option { cursor: pointer; display: block; }
+.mode-option input[type="radio"] {
+    position: absolute !important;
+    opacity: 0 !important;
+    width: 1px !important;
+    height: 1px !important;
+    pointer-events: none;
+}
+
+.mode-option .mode-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    align-items: start;
+    gap: 13px;
+    height: 100%;
+    padding: 15px 16px !important;
+    background: var(--at-surface-2) !important;
+    border: 1px solid var(--at-line) !important;
+    border-radius: var(--at-r) !important;
+    box-shadow: none !important;
+    transition: border-color .18s ease, background .18s ease, transform .18s ease;
+}
+.mode-option:hover .mode-card { border-color: var(--at-faint) !important; transform: translateY(-1px); }
+.mode-option input:focus-visible + .mode-card {
+    outline: none;
+    border-color: var(--at-primary) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--at-primary) 18%, transparent) !important;
+}
+
+.mode-option .mode-icon {
+    width: 40px !important;
+    height: 40px !important;
+    margin: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px !important;
+    /* Icons are white glyphs, so the tile stays dark to keep them legible. */
+    background: var(--at-ink-soft) !important;
+    transition: background .18s ease;
+}
+.mode-option .mode-icon img {
+    width: 20px !important;
+    height: 20px !important;
+    filter: brightness(0) invert(1);
+}
+
+.mode-option .mode-title {
+    font-size: 14.5px !important;
+    font-weight: 600 !important;
+    letter-spacing: -.005em;
+    color: var(--at-ink) !important;
+    text-align: left !important;
+    margin: 1px 0 0 !important;
+}
+.mode-option .mode-desc {
+    font-size: 12.5px !important;
+    line-height: 1.45 !important;
+    color: var(--at-muted) !important;
+    text-align: left !important;
+    margin-top: 4px !important;
+    grid-column: 2;
+}
+
+/* Selected */
+.mode-option input:checked + .mode-card {
+    background: var(--at-primary-soft) !important;
+    border-color: var(--at-primary) !important;
+}
+.mode-option input:checked + .mode-card .mode-icon { background: var(--at-primary) !important; }
+.mode-option input:checked + .mode-card .mode-title { color: var(--at-primary) !important; }
+.mode-option input:checked + .mode-card::after {
+    content: '✓';
+    position: absolute;
+    top: 12px;
+    right: 13px;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    line-height: 1;
+    border-radius: 50%;
+    background: var(--at-primary);
+    color: var(--at-surface);
+}
+[data-theme="dark"] .mode-option input:checked + .mode-card::after { color: #10201d; }
+
 /* ─── Font picker ────────────────────────────────────────────────────────── */
 
 .at-fontpick { position: relative; }
