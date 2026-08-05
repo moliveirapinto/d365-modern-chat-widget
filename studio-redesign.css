@@ -167,6 +167,10 @@ body::after {
     color: var(--at-primary) !important;
 }
 
+/* Some of these glyphs carry an inline fill:white, invisible on the light header. */
+.btn-header-action svg,
+.btn-header-action svg path { fill: currentColor !important; }
+
 /* ─── Workspace: rail + settings + fixed preview ──────────────────────────── */
 
 .admin-container {
