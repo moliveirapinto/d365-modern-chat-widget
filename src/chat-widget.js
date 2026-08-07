@@ -1151,8 +1151,9 @@ class ModernChatWidget {
         
         if (message.sender?.type === 'Agent' || role === 'bot' || role === 'Bot' || role === 'agent' || role === 'Agent') {
             const senderName = message.sender?.displayName || message.senderDisplayName || 'Agent';
-            // Use customBotName if configured for all bot/agent messages
-            if (this.config.customBotName) {
+            // customBotName renames the bot only - a human agent keeps their own name
+            const isBotMsg = role === 'bot' || role === 'Bot' || this.isBotSender(senderName);
+            if (isBotMsg && this.config.customBotName) {
                 this.state.agentName = this.config.customBotName;
             } else {
                 this.state.agentName = senderName;
@@ -1473,12 +1474,14 @@ class ModernChatWidget {
         return formatted;
     }
 
-    // Check if the sender name indicates a bot/virtual assistant
+    // Check if the sender name indicates a bot/virtual assistant.
+    // Word-ish matching: substring matching wrongly flagged human names (e.g. "Claire" contains "ai")
     isBotSender(senderName) {
         if (!senderName) return false;
-        const name = senderName.toLowerCase();
-        return name.includes('bot') || name.includes('copilot') || name.includes('virtual') || 
-               name.includes('assistant') || name.includes('ai');
+        const name = String(senderName).toLowerCase().trim();
+        if (name === 'cps') return true;
+        if (/bot$/.test(name)) return true;
+        return /(^|[^a-z])(bot|copilot|virtual|assistant|ai)([^a-z]|$)/.test(name);
     }
 }
 

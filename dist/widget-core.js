@@ -723,6 +723,9 @@
   function initWidget(config) {
     var chatSDK = null, chatStarted = false, userName = '', userEmail = '';
     var processedMsgs = {};
+    // Identity tracking so echoes of the customer's own messages are never rendered as agent messages
+    var selfSenderIds = {};
+    var sentMessageIds = {};
     var conversationParticipantType = '';
     var humanAgentJoined = false;
     var lastConversationDetailsFetch = 0;
@@ -1219,6 +1222,54 @@
       return senderName || 'Agent';
     }
 
+    function escapeText(text) {
+      if (text === null || text === undefined) return '';
+      return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function normalizeName(name) {
+      return (name === null || name === undefined ? '' : String(name)).trim().toLowerCase();
+    }
+
+    function getSenderId(msg) {
+      var s = msg.senderId || msg.sender;
+      if (s && typeof s === 'object') return s.id || s.userId || s.senderId || '';
+      return typeof s === 'string' ? s : '';
+    }
+
+    // True when the message originated from this customer (locally sent, or echoed back by the service).
+    // The v2 (ACS) SDK does not set a role on messages, so identity has to come from the sender.
+    function isOwnMessage(msg, senderName) {
+      var role = msg.role || msg.senderRole;
+      if (role === 'user' || role === 'User' || role === 1) return true;
+
+      var id = msg.messageId || msg.id || msg.clientmessageid || msg.messageid;
+      if (id && sentMessageIds[id]) return true;
+
+      var sid = getSenderId(msg);
+      if (sid && selfSenderIds[sid]) return true;
+      // Same rule the chat SDK itself uses to classify customer messages
+      if (sid && (sid.indexOf('contacts/8:') !== -1 || sid === 'customer')) return true;
+      if (normalizeName(senderName) === 'customer') return true;
+
+      var tags = msg.tags;
+      tags = Array.isArray(tags) ? tags.join(',') : (typeof tags === 'string' ? tags : '');
+      if (/fromcustomer/i.test(tags)) return true;
+
+      var self = normalizeName(userName);
+      if (self && self !== 'anonymous' && normalizeName(senderName) === self) return true;
+
+      return false;
+    }
+
+    function rememberOwnMessage(sent) {
+      if (!sent || typeof sent !== 'object') return;
+      var sid = getSenderId(sent);
+      if (sid) selfSenderIds[sid] = true;
+      var mid = sent.messageId || sent.id || sent.clientmessageid;
+      if (mid) { sentMessageIds[mid] = true; processedMsgs[mid] = true; }
+    }
+
     // Get timestamp from a message for sorting (priority: messageId > sequenceId > timestamp)
     function getMessageTimestamp(msg, logResult) {
       var ts = null;
@@ -1303,7 +1354,7 @@
       // A sender we have not seen before usually means the conversation changed hands
       // (bot -> human agent), so re-read who owns it before labelling the message
       var hasNewSender = sortedMessages.some(function(m) {
-        var n = (m.senderDisplayName || (m.sender && m.sender.displayName) || '').trim().toLowerCase();
+        var n = normalizeName(m.senderDisplayName || (m.sender && m.sender.displayName));
         return n && !seenSenderNames[n];
       });
       if (hasNewSender) await refreshConversationDetails(true);
@@ -1629,13 +1680,13 @@
       else avatar.textContent = getInitials(isUser ? userName : senderName);
 
       // Format bot/agent messages with markdown, user messages as plain text
-      var formattedText = isUser ? text : formatBotMessage(text);
+      var formattedText = isUser ? escapeText(text) : formatBotMessage(text);
 
       var displayName = getDisplayName(senderName, isUser, isBotAvatar);
       
       var content = document.createElement('div');
       content.className = 'd365-msg-content';
-      content.innerHTML = '<div class="d365-msg-sender">'+displayName+'</div>'+
+      content.innerHTML = '<div class="d365-msg-sender">'+escapeText(displayName)+'</div>'+
         '<div class="d365-msg '+(isUser?'user':'agent')+'">'+formattedText+'</div>'+
         '<div class="d365-msg-time">'+formatTime(new Date())+'</div>';
 
@@ -1851,7 +1902,8 @@
                 chatSDK.sendMessage({ 
                   content: sendContent,
                   metadata: { 'microsoft.azure.communication.chat.bot.contenttype': 'azurebotservice.adaptivecard' }
-                }).then(function() {
+                }).then(function(sent) {
+                  rememberOwnMessage(sent);
                   console.log('Message sent successfully');
                   addMessage(actionLabel, true, userName);
                 }).catch(function(err) {
@@ -1958,7 +2010,8 @@
               btnsDiv.querySelectorAll('button').forEach(function(b) { b.disabled = true; });
               card.style.opacity = '0.7';
               
-              chatSDK.sendMessage({ content: value }).then(function() {
+              chatSDK.sendMessage({ content: value }).then(function(sent) {
+                rememberOwnMessage(sent);
                 addMessage(btn.title || value, true, userName);
               }).catch(function(err) {
                 console.error('Error sending hero card response:', err);
@@ -2118,7 +2171,8 @@
             if (chatSDK && chatStarted) {
               // Disable all buttons
               actionsDiv.querySelectorAll('button').forEach(function(b) { b.disabled = true; });
-              chatSDK.sendMessage({ content: val }).then(function() {
+              chatSDK.sendMessage({ content: val }).then(function(sent) {
+                rememberOwnMessage(sent);
                 addMessage(val, true, userName);
               });
             }
@@ -2176,8 +2230,13 @@
         content: content ? content.substring(0, 100) + '...' : content
       });
 
-      // Skip user messages
-      if (role === 'user' || role === 'User' || role === 1) return;
+      // The customer's own messages are rendered locally on send; echoes must never be
+      // re-rendered as an agent message (that put them on the left with the agent/bot name)
+      if (isOwnMessage(msg, senderName)) {
+        var ownSenderId = getSenderId(msg);
+        if (ownSenderId) selfSenderIds[ownSenderId] = true;
+        return;
+      }
 
       // Handle system messages (centered, no avatar)
       var isSystem = role === 'system' || role === 'System' || role === 0;
@@ -2188,7 +2247,7 @@
 
       // Detect bot by role, by who currently owns the conversation, then by sender name
       var isBotMsg = isBotMessage(role, senderName);
-      seenSenderNames[String(senderName || '').trim().toLowerCase()] = true;
+      seenSenderNames[normalizeName(senderName)] = true;
 
       // Save to chat messages for session persistence
       chatMessages.push({
@@ -2330,7 +2389,8 @@
         
         if (question) {
           addMessage(question, true, name);
-          await chatSDK.sendMessage({ content: question });
+          var sentQuestion = await chatSDK.sendMessage({ content: question });
+          rememberOwnMessage(sentQuestion);
           // Save user message to session
           chatMessages.push({ content: question, isUser: true, senderName: name, timestamp: Date.now() });
           saveChatSession();
@@ -2353,8 +2413,11 @@
       // Save user message to session
       chatMessages.push({ content: text, isUser: true, senderName: userName, timestamp: Date.now() });
       saveChatSession();
-      try { await chatSDK.sendMessage({ content: text }); } catch(e) {
-        addMessage('Failed to send. Try again.', false, 'System');
+      try {
+        var sent = await chatSDK.sendMessage({ content: text });
+        rememberOwnMessage(sent);
+      } catch(e) {
+        addSystemMessage('Failed to send. Try again.');
       }
     }
 
