@@ -12097,6 +12097,10 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     var soundEnabled = true;
     var cachedSurveyContext = null;
     var processedMessageIds = {}; // Track processed message IDs to avoid duplicates
+    var conversationParticipantType = '';
+    var humanAgentJoined = false;
+    var lastConversationDetailsFetch = 0;
+    var seenSenderNames = {};
     
     // Message queue for batching and sorting messages
     var messageQueue = [];
@@ -12187,7 +12191,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     }
     
     // Process queued messages in sorted order
-    function processMessageQueue() {
+    async function processMessageQueue() {
         if (messageQueue.length === 0) return;
         
         // Sort messages by timestamp (oldest first), with messageId and arrival order as tiebreakers
@@ -12224,6 +12228,14 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
         // Clear queue before processing
         messageQueue = [];
         messageQueueTimer = null;
+        
+        // A sender we have not seen before usually means the conversation changed hands
+        // (bot -> human agent), so re-read who owns it before labelling the message
+        var hasNewSender = sortedMessages.some(function(m) {
+            var n = (m.senderDisplayName || (m.sender && m.sender.displayName) || '').trim().toLowerCase();
+            return n && !seenSenderNames[n];
+        });
+        if (hasNewSender) await refreshConversationDetails(true);
         
         // Process each message in sorted order
         sortedMessages.forEach(function(msg) {
@@ -12335,34 +12347,50 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
     
+    // Word-ish matching: substring matching wrongly flagged human names
+    // ("Claire" contains "ai", and every human agent contains "agent")
     function isBotSender(senderName) {
       if (!senderName) return false;
-      var name = senderName.toLowerCase();
-      return name.includes('bot') || name.includes('copilot') || name.includes('virtual') || 
-             name.includes('assistant') || name.includes('ai') || name.includes('agent');
+      var n = String(senderName).toLowerCase().trim();
+      if (n === 'cps') return true;
+      if (/bot$/.test(n)) return true;
+      return /(^|[^a-z])(bot|copilot|virtual|assistant|ai)([^a-z]|$)/.test(n);
     }
-    
-    // Get display name - uses customBotName for ALL non-user messages when configured
-    function getDisplayName(senderName, isUser) {
-      console.log('🏷️ getDisplayName called:', {
-        senderName: senderName,
-        isUser: isUser,
-        customBotName: config.customBotName,
-        customBotNameTrimmed: config.customBotName ? config.customBotName.trim() : null,
-        userName: userName
-      });
-      
-      if (isUser) {
-        console.log('🏷️ Returning userName:', userName);
-        return userName;
-      }
-      // If customBotName is set, ALWAYS use it for all non-user messages (bot/agent)
-      // This replaces whatever name comes from D365/Copilot Studio
-      if (config.customBotName && config.customBotName.trim() !== '') {
-        console.log('🏷️ Using customBotName for non-user message:', config.customBotName);
+
+    function isBotRole(role) {
+      return role === 'bot' || role === 'Bot' || role === 2;
+    }
+
+    async function refreshConversationDetails(force) {
+      if (!chatSDK || !chatStarted) return;
+      if (!force && Date.now() - lastConversationDetailsFetch < 20000) return;
+      lastConversationDetailsFetch = Date.now();
+      try {
+        var details = await chatSDK.getConversationDetails();
+        if (!details) return;
+        if (details.participantType) conversationParticipantType = details.participantType;
+        if (details.agentAcceptedOn) humanAgentJoined = true;
+      } catch (e) {}
+    }
+
+    // Decide whether a non-customer message came from the bot or from a human agent.
+    // The live work item's participantType is authoritative; the name heuristic is only a fallback.
+    function isBotMessage(role, senderName) {
+      if (isBotRole(role)) return true;
+      var pt = (conversationParticipantType || '').toLowerCase();
+      if (pt === 'user' || pt === 'agent') return false;
+      if (pt === 'bot') return true;
+      if (humanAgentJoined) return false;
+      return isBotSender(senderName);
+    }
+
+    // customBotName renames the bot only; a human agent keeps the name D365 sends,
+    // and an unnamed bot falls back to its Copilot Studio display name.
+    function getDisplayName(senderName, isUser, isBotMsg) {
+      if (isUser) return userName;
+      if (isBotMsg && config.customBotName && config.customBotName.trim() !== '') {
         return config.customBotName;
       }
-      console.log('🏷️ Returning original senderName:', senderName || 'Agent');
       return senderName || 'Agent';
     }
     
@@ -12431,15 +12459,15 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       return html;
     }
     
-    function addMessage(text, isUser, senderName) {
+    function addMessage(text, isUser, senderName, isBotMsg) {
       var now = new Date();
-      chatMessages.push({ content: text, isUser: isUser, senderName: senderName, timestamp: now });
+      var isBot = !isUser && (isBotMsg === undefined ? isBotSender(senderName) : !!isBotMsg);
+      chatMessages.push({ content: text, isUser: isUser, senderName: senderName, isBotMsg: isBot, timestamp: now });
       
       var wrapper = document.createElement('div');
       wrapper.className = 'd365-message-wrapper ' + (isUser ? 'user' : 'agent');
       
       var avatar = document.createElement('div');
-      var isBot = !isUser && isBotSender(senderName);
       avatar.className = 'd365-message-avatar ' + (isUser ? 'user' : (isBot ? 'bot' : 'agent'));
       
       if (isUser && config.customerAvatar) {
@@ -12457,7 +12485,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       
       var content = document.createElement('div');
       content.className = 'd365-message-content';
-      content.innerHTML = '<div class="d365-message-sender">' + getDisplayName(senderName, isUser) + '</div>' +
+      content.innerHTML = '<div class="d365-message-sender">' + getDisplayName(senderName, isUser, isBot) + '</div>' +
         '<div class="d365-message ' + (isUser ? 'user' : 'agent') + '">' + formattedText + '</div>' +
         '<div class="d365-message-time">' + formatTime(now) + '</div>';
       
@@ -12504,7 +12532,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       transcript += '='.repeat(50) + '\\n\\n';
       chatMessages.forEach(function(msg) {
         var time = formatTime(msg.timestamp);
-        var sender = getDisplayName(msg.senderName, msg.isUser);
+        var sender = getDisplayName(msg.senderName, msg.isUser, msg.isBotMsg);
         transcript += '[' + time + '] ' + sender + ':\\n' + msg.content + '\\n\\n';
       });
       transcript += '='.repeat(50) + '\\nEnd of transcript';
@@ -13009,7 +13037,8 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
         chatSDK.onNewMessage(function(msg) {
           console.log('New message received:', msg);
           if (msg && msg.content) {
-            addMessage(msg.content, false, msg.senderDisplayName || 'Agent');
+            var sn = msg.senderDisplayName || 'Agent';
+            addMessage(msg.content, false, sn, isBotMessage(msg.role || msg.senderRole, sn));
           }
         });
         
@@ -13133,14 +13162,15 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     }
     
     // Render Adaptive Card
-    function addAdaptiveCardMessage(content, senderName) {
+    function addAdaptiveCardMessage(content, senderName, isBotMsg) {
       var now = new Date();
+      var isBot = isBotMsg === undefined ? isBotSender(senderName) : !!isBotMsg;
       var wrapper = document.createElement('div');
       wrapper.className = 'd365-message-wrapper agent';
       
       var avatar = document.createElement('div');
-      avatar.className = 'd365-message-avatar ' + (isBotSender(senderName) ? 'bot' : 'agent');
-      if (isBotSender(senderName) && config.botAvatar) {
+      avatar.className = 'd365-message-avatar ' + (isBot ? 'bot' : 'agent');
+      if (isBot && config.botAvatar) {
         avatar.innerHTML = '<img src="' + config.botAvatar + '" alt="Bot">';
       } else if (config.agentAvatar) {
         avatar.innerHTML = '<img src="' + config.agentAvatar + '" alt="Agent">';
@@ -13153,7 +13183,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       
       var senderDiv = document.createElement('div');
       senderDiv.className = 'd365-message-sender';
-      senderDiv.textContent = getDisplayName(senderName, false);
+      senderDiv.textContent = getDisplayName(senderName, false, isBot);
       
       var cardContainer = document.createElement('div');
       cardContainer.className = 'd365-message agent d365-adaptive-card';
@@ -13327,14 +13357,15 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     }
     
     // Render Suggested Actions message
-    function addSuggestedActionsMessage(content, senderName) {
+    function addSuggestedActionsMessage(content, senderName, isBotMsg) {
       var now = new Date();
+      var isBot = isBotMsg === undefined ? isBotSender(senderName) : !!isBotMsg;
       var wrapper = document.createElement('div');
       wrapper.className = 'd365-message-wrapper agent';
       
       var avatar = document.createElement('div');
-      avatar.className = 'd365-message-avatar ' + (isBotSender(senderName) ? 'bot' : 'agent');
-      if (isBotSender(senderName) && config.botAvatar) {
+      avatar.className = 'd365-message-avatar ' + (isBot ? 'bot' : 'agent');
+      if (isBot && config.botAvatar) {
         avatar.innerHTML = '<img src="' + config.botAvatar + '" alt="Bot">';
       } else if (config.agentAvatar) {
         avatar.innerHTML = '<img src="' + config.agentAvatar + '" alt="Agent">';
@@ -13347,7 +13378,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       
       var senderDiv = document.createElement('div');
       senderDiv.className = 'd365-message-sender';
-      senderDiv.textContent = getDisplayName(senderName, false);
+      senderDiv.textContent = getDisplayName(senderName, false, isBot);
       
       try {
         var parsed = JSON.parse(content);
@@ -13394,7 +13425,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
         contentDiv.appendChild(timeDiv);
       } catch (e) {
         console.error('Error rendering suggested actions:', e);
-        contentDiv.innerHTML = '<div class="d365-message-sender">' + getDisplayName(senderName, false) + '</div>' +
+        contentDiv.innerHTML = '<div class="d365-message-sender">' + getDisplayName(senderName, false, isBot) + '</div>' +
           '<div class="d365-message agent">' + content + '</div>' +
           '<div class="d365-message-time">' + formatTime(now) + '</div>';
       }
@@ -13403,7 +13434,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       wrapper.appendChild(contentDiv);
       typingIndicator.parentNode.insertBefore(wrapper, typingIndicator);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      chatMessages.push({ content: messageText || content, isUser: false, senderName: senderName, timestamp: now });
+      chatMessages.push({ content: messageText || content, isUser: false, senderName: senderName, isBotMsg: isBot, timestamp: now });
       
       if (!chatContainer.classList.contains('open')) {
         unreadCount++; badge.textContent = unreadCount; badge.classList.add('show');
@@ -13454,27 +13485,31 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
         console.log('Skipping user message');
         return;
       }
+
+      var isBotMsg = isBotMessage(role, senderName);
+      seenSenderNames[String(senderName || '').trim().toLowerCase()] = true;
       
       // Check for Adaptive Cards
       if (isAdaptiveCardContent(content)) {
         console.log('\ud83d\udccb Detected Adaptive Card');
-        addAdaptiveCardMessage(content, senderName);
+        addAdaptiveCardMessage(content, senderName, isBotMsg);
         return;
       }
       
       // Check for Suggested Actions
       if (isSuggestedActionsContent(content)) {
         console.log('\ud83d\udcac Detected Suggested Actions');
-        addSuggestedActionsMessage(content, senderName);
+        addSuggestedActionsMessage(content, senderName, isBotMsg);
         return;
       }
       
       // Add regular text messages
-      addMessage(content, false, senderName);
+      addMessage(content, false, senderName, isBotMsg);
     }
     
     async function pollMessages() {
       if (!chatSDK || !chatStarted) return;
+      refreshConversationDetails();
       try {
         var messages = await chatSDK.getMessages();
         console.log('Polled messages:', messages);

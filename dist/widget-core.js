@@ -723,6 +723,10 @@
   function initWidget(config) {
     var chatSDK = null, chatStarted = false, userName = '', userEmail = '';
     var processedMsgs = {};
+    var conversationParticipantType = '';
+    var humanAgentJoined = false;
+    var lastConversationDetailsFetch = 0;
+    var seenSenderNames = {};
     var unreadCount = 0;
     var cachedSurveyContext = null;
     
@@ -1169,40 +1173,50 @@
       return new Date(d).toLocaleTimeString([], options);
     }
 
+    // Word-ish matching: substring matching wrongly flagged human names (e.g. "Claire" contains "ai")
     function isBot(name) {
       if (!name) return false;
-      var n = name.toLowerCase();
-      return n.includes('bot') || n.includes('copilot') || n.includes('virtual') || 
-             n.includes('assistant') || n.includes('ai') || n === 'cps';
-    }
-
-    // Get display name - uses customBotName for ALL non-user messages if configured
-    function getDisplayName(senderName, isUser) {
-      console.log('🏷️ getDisplayName called:', {
-        senderName: senderName,
-        isUser: isUser,
-        customBotName: config.customBotName,
-        customBotNameTrimmed: config.customBotName ? config.customBotName.trim() : null,
-        userName: userName
-      });
-      
-      if (isUser) {
-        console.log('🏷️ Returning userName:', userName);
-        return userName;
-      }
-      
-      // If customBotName is set (and not empty), use it for ALL non-user messages
-      if (config.customBotName && config.customBotName.trim() !== '') {
-        console.log('🏷️ Using customBotName for non-user message:', config.customBotName);
-        return config.customBotName;
-      }
-      
-      console.log('🏷️ Returning original senderName:', senderName || 'Agent');
-      return senderName || 'Agent';
+      var n = String(name).toLowerCase().trim();
+      if (n === 'cps') return true;
+      if (/bot$/.test(n)) return true;
+      return /(^|[^a-z])(bot|copilot|virtual|assistant|ai)([^a-z]|$)/.test(n);
     }
 
     function isBotRole(role) {
       return role === 'bot' || role === 'Bot' || role === 2;
+    }
+
+    async function refreshConversationDetails(force) {
+      if (!chatSDK || !chatStarted) return;
+      if (!force && Date.now() - lastConversationDetailsFetch < 20000) return;
+      lastConversationDetailsFetch = Date.now();
+      try {
+        var details = await chatSDK.getConversationDetails();
+        if (!details) return;
+        if (details.participantType) conversationParticipantType = details.participantType;
+        if (details.agentAcceptedOn) humanAgentJoined = true;
+      } catch (e) {}
+    }
+
+    // Decide whether a non-customer message came from the bot or from a human agent.
+    // The live work item's participantType is authoritative; the name heuristic is only a fallback.
+    function isBotMessage(role, senderName) {
+      if (isBotRole(role)) return true;
+      var pt = (conversationParticipantType || '').toLowerCase();
+      if (pt === 'user' || pt === 'agent') return false;
+      if (pt === 'bot') return true;
+      if (humanAgentJoined) return false;
+      return isBot(senderName);
+    }
+
+    // customBotName renames the bot only; a human agent keeps the name D365 sends,
+    // and an unnamed bot falls back to its Copilot Studio display name.
+    function getDisplayName(senderName, isUser, isBotMsg) {
+      if (isUser) return userName;
+      if (isBotMsg && config.customBotName && config.customBotName.trim() !== '') {
+        return config.customBotName;
+      }
+      return senderName || 'Agent';
     }
 
     // Get timestamp from a message for sorting (priority: messageId > sequenceId > timestamp)
@@ -1263,7 +1277,7 @@
     }
 
     // Process queued messages in sorted order
-    function processMessageQueue() {
+    async function processMessageQueue() {
       if (messageQueue.length === 0) return;
       
       var sortedMessages = messageQueue.slice().sort(function(a, b) {
@@ -1285,6 +1299,14 @@
       
       messageQueue = [];
       messageQueueTimer = null;
+
+      // A sender we have not seen before usually means the conversation changed hands
+      // (bot -> human agent), so re-read who owns it before labelling the message
+      var hasNewSender = sortedMessages.some(function(m) {
+        var n = (m.senderDisplayName || (m.sender && m.sender.displayName) || '').trim().toLowerCase();
+        return n && !seenSenderNames[n];
+      });
+      if (hasNewSender) await refreshConversationDetails(true);
       
       sortedMessages.forEach(function(msg) {
         processMessageImmediate(msg);
@@ -1389,6 +1411,7 @@
         
         chatStarted = true;
         showView('chat');
+        await refreshConversationDetails(true);
         
         // Restore messages to UI
         chatMessages.forEach(function(msg) {
@@ -1596,7 +1619,7 @@
       wrap.className = 'd365-msg-wrap ' + (isUser ? 'user' : 'agent');
 
       var avatar = document.createElement('div');
-      var isBotAvatar = isBotMsg || isBot(senderName);
+      var isBotAvatar = isBotMsg === undefined ? isBot(senderName) : !!isBotMsg;
       var avatarType = isUser ? 'user' : (isBotAvatar ? 'bot' : 'agent');
       avatar.className = 'd365-msg-avatar ' + avatarType;
 
@@ -1608,9 +1631,7 @@
       // Format bot/agent messages with markdown, user messages as plain text
       var formattedText = isUser ? text : formatBotMessage(text);
 
-      // Log what display name will be used
-      var displayName = getDisplayName(senderName, isUser);
-      console.log('📝 addMessage using displayName:', displayName);
+      var displayName = getDisplayName(senderName, isUser, isBotAvatar);
       
       var content = document.createElement('div');
       content.className = 'd365-msg-content';
@@ -1672,7 +1693,7 @@
       wrap.className = 'd365-msg-wrap agent';
 
       var avatar = document.createElement('div');
-      var isBotAvatar = isBotMsg || isBot(senderName);
+      var isBotAvatar = isBotMsg === undefined ? isBot(senderName) : !!isBotMsg;
       avatar.className = 'd365-msg-avatar ' + (isBotAvatar ? 'bot' : 'agent');
       
       if (isBotAvatar && config.botAvatar) avatar.innerHTML = '<img src="'+config.botAvatar+'">';
@@ -1685,7 +1706,7 @@
       // Create sender div
       var senderDiv = document.createElement('div');
       senderDiv.className = 'd365-msg-sender';
-      senderDiv.textContent = getDisplayName(senderName, false);
+      senderDiv.textContent = getDisplayName(senderName, false, isBotAvatar);
       contentDiv.appendChild(senderDiv);
 
       var cardBox = document.createElement('div');
@@ -1962,7 +1983,7 @@
         var parsed = JSON.parse(content);
         var heroCards = [];
         var isCarousel = false;
-        var isBotAvatar = isBotMsg || isBot(senderName);
+        var isBotAvatar = isBotMsg === undefined ? isBot(senderName) : !!isBotMsg;
         
         // Extract hero cards from different formats
         if (parsed.contentType === 'application/vnd.microsoft.card.hero' && parsed.content) {
@@ -2001,7 +2022,7 @@
 
         var senderDiv = document.createElement('div');
         senderDiv.className = 'd365-msg-sender';
-        senderDiv.textContent = getDisplayName(senderName, false);
+        senderDiv.textContent = getDisplayName(senderName, false, isBotAvatar);
         contentDiv.appendChild(senderDiv);
 
         if (isCarousel) {
@@ -2062,7 +2083,7 @@
         var parsed = JSON.parse(content);
         var text = parsed.text || '';
         var actions = parsed.suggestedActions.actions;
-        var isBotAvatar = isBotMsg || isBot(senderName);
+        var isBotAvatar = isBotMsg === undefined ? isBot(senderName) : !!isBotMsg;
 
         var wrap = document.createElement('div');
         wrap.className = 'd365-msg-wrap agent';
@@ -2079,7 +2100,7 @@
 
         var senderDiv = document.createElement('div');
         senderDiv.className = 'd365-msg-sender';
-        senderDiv.textContent = getDisplayName(senderName, false);
+        senderDiv.textContent = getDisplayName(senderName, false, isBotAvatar);
         contentDiv.appendChild(senderDiv);
 
         var bubble = document.createElement('div');
@@ -2165,9 +2186,9 @@
         return;
       }
 
-      // Detect bot by role OR by sender name
-      var isBotMsg = isBotRole(role) || isBot(senderName);
-      console.log('🤖 Bot detection result:', { isBotMsg: isBotMsg, isBotRole: isBotRole(role), isBotName: isBot(senderName) });
+      // Detect bot by role, by who currently owns the conversation, then by sender name
+      var isBotMsg = isBotMessage(role, senderName);
+      seenSenderNames[String(senderName || '').trim().toLowerCase()] = true;
 
       // Save to chat messages for session persistence
       chatMessages.push({
@@ -2209,6 +2230,7 @@
 
     async function pollMessages() {
       if (!chatSDK || !chatStarted) return;
+      refreshConversationDetails();
       try {
         var msgs = await chatSDK.getMessages();
         if (msgs && msgs.length) {
@@ -2294,6 +2316,7 @@
         
         chatStarted = true;
         showView('chat');
+        await refreshConversationDetails(true);
         
         // Pre-cache post-chat survey context while session is active
         preCacheSurveyContext();
