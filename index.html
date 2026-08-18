@@ -2355,6 +2355,18 @@
             color: var(--admin-primary);
             font-weight: 600;
         }
+        .token-note {
+            font-size: 13px;
+            color: var(--admin-text-light);
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+        .token-note code {
+            font-family: monospace;
+            background: var(--admin-border);
+            padding: 1px 5px;
+            border-radius: 4px;
+        }
         .token-input-row {
             display: flex;
             gap: 8px;
@@ -3006,6 +3018,7 @@
                     <li>Select <strong>gist</strong> and <strong>read:user</strong> scopes</li>
                     <li>Click "Generate token" and paste below:</li>
                 </ol>
+                <p class="token-note">Must be a <strong>classic</strong> token (starts with <code>ghp_</code>). Fine-grained tokens (<code>github_pat_</code>) cannot create gists.</p>
                 <div class="token-input-row">
                     <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx">
                     <button id="tokenConnectBtn">Connect</button>
@@ -5485,6 +5498,44 @@
             if (syncAllBtn) syncAllBtn.style.display = 'none';
         }
 
+        // Classic tokens report their granted scopes in the X-OAuth-Scopes header
+        function hasGistScope(scopeHeader) {
+            return String(scopeHeader || '').split(',').map(s => s.trim()).includes('gist');
+        }
+
+        function isFineGrainedToken(token) {
+            return String(token || '').startsWith('github_pat_');
+        }
+
+        // GitHub answers 403 for several unrelated reasons - say which one it actually is
+        function gistForbiddenMessage(res, errorText) {
+            let apiMessage = '';
+            try { apiMessage = (JSON.parse(errorText || '{}').message) || ''; } catch (e) { /* not JSON */ }
+
+            if (res.headers.get('X-GitHub-SSO')) {
+                return '⚠️ Your GitHub token must be authorized for your organization\'s SSO. Open GitHub → Settings → Developer settings → Tokens (classic) and click "Configure SSO" on the token.';
+            }
+            if (/rate limit/i.test(apiMessage)) {
+                return '⚠️ GitHub rate limit reached. Wait a minute and try again - your changes are still saved locally.';
+            }
+            if (isFineGrainedToken(cloudToken) || /not accessible by (personal access token|integration)/i.test(apiMessage)) {
+                return '⚠️ Fine-grained GitHub tokens cannot create gists. Create a CLASSIC token (Settings → Developer settings → Personal access tokens → Tokens (classic)) with the "gist" scope, then sign in again.';
+            }
+            if (!hasGistScope(res.headers.get('X-OAuth-Scopes'))) {
+                return '⚠️ Your GitHub token is missing the "gist" scope. Create a new classic token with "gist" + "read:user" and sign in again.';
+            }
+            return '⚠️ GitHub refused the save (403)' + (apiMessage ? ': ' + apiMessage : '') + '. Your changes are still saved locally.';
+        }
+
+        // Bulk sync can hit the same 403 on every profile - only tell the user once
+        let lastForbiddenToastAt = 0;
+        function showGistForbiddenToast(res, errorText) {
+            const msg = gistForbiddenMessage(res, errorText);
+            if (Date.now() - lastForbiddenToastAt < 10000) return;
+            lastForbiddenToastAt = Date.now();
+            showToast(msg, 8000);
+        }
+
         // ============================================
         // Team Mode - Repository-based collaboration
         // ============================================
@@ -6791,12 +6842,20 @@
                 
                 const user = await userRes.json();
                 
-                // Check gist scope
-                const gistRes = await fetch('https://api.github.com/gists', {
-                    headers: { 'Authorization': 'token ' + token }
-                });
+                if (isFineGrainedToken(token)) {
+                    throw new Error('Fine-grained tokens cannot create gists - create a classic token with the "gist" scope');
+                }
                 
-                if (!gistRes.ok) throw new Error('Token needs "gist" scope');
+                const scopeHeader = userRes.headers.get('X-OAuth-Scopes');
+                if (scopeHeader !== null) {
+                    if (!hasGistScope(scopeHeader)) throw new Error('Token needs the "gist" scope');
+                } else {
+                    // Header unavailable - fall back to probing the gists API
+                    const gistRes = await fetch('https://api.github.com/gists', {
+                        headers: { 'Authorization': 'token ' + token }
+                    });
+                    if (!gistRes.ok) throw new Error('Token needs "gist" scope');
+                }
                 
                 // Success
                 cloudUser = {
@@ -6896,6 +6955,14 @@
                 }
                 
                 if (!res.ok) throw new Error('Failed to fetch gists');
+                
+                // Reading gists works without write access - warn now instead of at save time
+                const scopeHeader = res.headers.get('X-OAuth-Scopes');
+                if (isFineGrainedToken(cloudToken)) {
+                    showToast('⚠️ Fine-grained GitHub tokens cannot save to the cloud. Sign in again with a CLASSIC token that has the "gist" scope.', 8000);
+                } else if (scopeHeader !== null && !hasGistScope(scopeHeader)) {
+                    showToast('⚠️ Your GitHub token is missing the "gist" scope, so widgets can only be saved locally. Sign in again with a classic token that has "gist" + "read:user".', 8000);
+                }
                 
                 const gists = await res.json();
                 const widgetGists = gists.filter(g => g.description && g.description.startsWith(GIST_PREFIX));
@@ -7444,6 +7511,7 @@
             try {
                 // Check if this profile already has a cloud ID
                 let existingGistId = profile.cloudId || null;
+                const originalGistId = existingGistId;
                 console.log('☁️ Existing gist ID:', existingGistId);
                 
                 let res;
@@ -7494,17 +7562,19 @@
                     return;
                 }
                 
-                // 403 on POST means token lacks gist scope
                 if (res.status === 403 && !existingGistId) {
                     const errorText = await res.text();
-                    console.error('☁️ Token lacks gist scope:', errorText);
-                    showToast('⚠️ Your GitHub token needs the "gist" scope. Please create a new token with gist permissions.', 8000);
+                    console.error('☁️ Cloud save forbidden:', errorText);
+                    profile.cloudId = originalGistId; // a token problem must not orphan the existing gist
+                    updateCloudSyncStatus('error');
+                    showGistForbiddenToast(res, errorText);
                     return;
                 }
                 
                 if (!res.ok) {
                     const errorText = await res.text();
                     console.error('☁️ Save failed:', res.status, errorText);
+                    profile.cloudId = originalGistId;
                     throw new Error('Failed to save: ' + res.status);
                 }
                 
@@ -7595,6 +7665,7 @@
             
             let res;
             let existingGistId = profile.cloudId || null;
+            const originalGistId = existingGistId;
             
             if (existingGistId) {
                 // Try to update existing gist
@@ -7642,17 +7713,18 @@
                 throw new Error('Token expired');
             }
             
-            // 403 on POST means token lacks gist scope
             if (res.status === 403 && !existingGistId) {
                 const errorText = await res.text();
-                console.error('☁️ Token lacks gist scope:', errorText);
-                showToast('⚠️ Your GitHub token needs the "gist" scope. Please create a new token with gist permissions.', 8000);
-                throw new Error('Token missing gist scope');
+                console.error('☁️ Cloud sync forbidden:', errorText);
+                profile.cloudId = originalGistId;
+                showGistForbiddenToast(res, errorText);
+                throw new Error('Cloud sync forbidden (403)');
             }
             
             if (!res.ok) {
                 const errorText = await res.text();
                 console.error('☁️ Sync failed:', res.status, errorText);
+                profile.cloudId = originalGistId;
                 throw new Error('Failed to save: ' + res.status);
             }
             
@@ -7713,6 +7785,13 @@
                 
                 if (res.status === 401) {
                     handleTokenInvalidation();
+                    return;
+                }
+                
+                if (res.status === 403) {
+                    const errorText = await res.text();
+                    console.error('☁️ Widget save forbidden:', errorText);
+                    showGistForbiddenToast(res, errorText);
                     return;
                 }
                 
@@ -14045,11 +14124,15 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
         // ============ UTILITY ============
         // Note: escapeHtml is defined in the GitHub Cloud Sync section above
 
-        function showToast(message) {
+        var toastTimer = null; // var: showToast is hoisted and may run before this line is reached
+        function showToast(message, duration = 3000) {
             const toast = document.getElementById('toast');
             document.getElementById('toastMessage').textContent = message;
+            const icon = toast.querySelector('svg');
+            if (icon) icon.style.display = message.indexOf('⚠️') === 0 ? 'none' : ''; // don't show a checkmark on a warning
             toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('show'), duration);
         }
 
         // Share dropdown menu toggle
