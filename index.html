@@ -13912,7 +13912,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             return `// ==UserScript==
 // @name         ${scriptName} – D365 Chat Widget Injector
 // @namespace    https://moliveirapinto.github.io/d365-modern-chat-widget/
-// @version      1.1
+// @version      1.2
 // @description  Injects the D365 Modern Chat Widget with voice/video calling support.
 // @author       D365 Chat Widget Generator
 // @match        ${targetUrl}
@@ -13920,6 +13920,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
 // @grant        GM_addElement
 // @grant        GM_xmlhttpRequest
 // @grant        unsafeWindow
+// @connect      *
 // @connect      moliveirapinto.github.io
 // @connect      raw.githubusercontent.com
 // @connect      cdnjs.cloudflare.com
@@ -13987,6 +13988,56 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
         });
       });
     };
+  }
+
+  // --- Pre-fetch config images as data: URIs (CSP img-src bypass) ---
+  // GM_addElement cannot help here: the <img> tags are built by widget-core.js in the page,
+  // so a strict img-src (e.g. "img-src 'self' data: ...") blocks the logo/avatars outright.
+  // Nearly every such policy still allows data:, so inline the bytes before the widget loads.
+  var IMAGE_KEYS = ['headerLogo', 'agentAvatar', 'customerAvatar', 'botAvatar', 'customLauncherIcon'];
+  function preloadImages(done) {
+    var cfg = pageWindow.D365WidgetConfig || {};
+    if (typeof GM_xmlhttpRequest !== 'function') { done(); return; }
+    var keys = IMAGE_KEYS.filter(function (k) {
+      return typeof cfg[k] === 'string' && /^https?:/i.test(cfg[k]);
+    });
+    if (!keys.length) { done(); return; }
+
+    var pending = keys.length;
+    var finished = false;
+    // Never let a slow or dead image URL hold the widget back
+    var guard = setTimeout(finish, 6000);
+    function finish() {
+      if (finished) return;
+      finished = true;
+      clearTimeout(guard);
+      done();
+    }
+    function maybeDone() { if (--pending <= 0) finish(); }
+
+    keys.forEach(function (key) {
+      try {
+        GM_xmlhttpRequest({
+          method: 'GET',
+          url: cfg[key],
+          responseType: 'blob',
+          onload: function (r) {
+            if (!r.response) { maybeDone(); return; }
+            var reader = new FileReader();
+            reader.onloadend = function () {
+              if (typeof reader.result === 'string' && reader.result.indexOf('data:image') === 0) {
+                cfg[key] = reader.result;
+              }
+              maybeDone();
+            };
+            reader.onerror = function () { maybeDone(); };
+            reader.readAsDataURL(r.response);
+          },
+          onerror: function () { console.warn('[D365 TM] image preload failed: ' + key); maybeDone(); },
+          ontimeout: function () { maybeDone(); }
+        });
+      } catch (e) { maybeDone(); }
+    });
   }
 
   // --- Pre-fetch the notification sound as a blob URL (CSP media-src bypass) ---
@@ -14089,9 +14140,9 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     });
   }
 
-  // Pre-load deps first, then inject widget-core.js. Safe to call early.
+  // Inline images, pre-load deps, then inject widget-core.js. Safe to call early.
   function start() {
-    preloadDeps(function () { injectLoader(); });
+    preloadImages(function () { preloadDeps(function () { injectLoader(); }); });
   }
 
   // Inject as early as possible; if DOM not ready, retry shortly
