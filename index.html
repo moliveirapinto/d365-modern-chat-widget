@@ -13912,7 +13912,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             return `// ==UserScript==
 // @name         ${scriptName} – D365 Chat Widget Injector
 // @namespace    https://moliveirapinto.github.io/d365-modern-chat-widget/
-// @version      1.6
+// @version      1.7
 // @description  Injects the D365 Modern Chat Widget with voice/video calling support.
 // @author       D365 Chat Widget Generator
 // @match        ${targetUrl}
@@ -14024,7 +14024,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
 
   function parseHeaderBlock(raw) {
     var out = {};
-    String(raw || '').trim().split(/[\r\n]+/).forEach(function (line) {
+    String(raw || '').trim().split(/[\\r\\n]+/).forEach(function (line) {
       var i = line.indexOf(':');
       if (i > 0) out[line.slice(0, i).trim().toLowerCase()] = line.slice(i + 1).trim();
     });
