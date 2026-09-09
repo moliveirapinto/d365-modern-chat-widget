@@ -13912,7 +13912,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             return `// ==UserScript==
 // @name         ${scriptName} – D365 Chat Widget Injector
 // @namespace    https://moliveirapinto.github.io/d365-modern-chat-widget/
-// @version      1.4
+// @version      1.5
 // @description  Injects the D365 Modern Chat Widget with voice/video calling support.
 // @author       D365 Chat Widget Generator
 // @match        ${targetUrl}
@@ -14084,17 +14084,16 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       this.__resHeaders = '';
       this.__listeners = {};
       this.__aborted = false;
-      this.readyState = 0;
-      this.status = 0;
-      this.statusText = '';
-      this.responseText = '';
-      this.response = '';
-      this.responseURL = '';
-      this.responseType = '';
-      this.timeout = 0;
-      this.withCredentials = false;
-      this.responseXML = null;
-      this.upload = this.__x.upload;
+      // Plain assignment would reach the inherited native accessors and throw Illegal invocation,
+      // so give the instance its own data properties that shadow them.
+      var own = {
+        readyState: 0, status: 0, statusText: '', responseText: '', response: '',
+        responseURL: '', responseXML: null, responseType: '', timeout: 0,
+        withCredentials: false, upload: this.__x.upload
+      };
+      Object.keys(own).forEach(function (k) {
+        Object.defineProperty(self, k, { value: own[k], writable: true, enumerable: true, configurable: true });
+      });
       EVENTS.forEach(function (t) {
         self.__x.addEventListener(t, function () {
           if (self.__proxy) return;
