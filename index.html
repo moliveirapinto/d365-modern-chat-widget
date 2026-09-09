@@ -13893,6 +13893,18 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             // Surface the version so a stale studio tab is obvious before the script is installed.
             const tmVersion = (tamperMonkeyCode.match(/@version\s+(\S+)/) || [])[1] || '?';
             showToast('🐒 TamperMonkey script v' + tmVersion + ' generated! Copy and paste into TamperMonkey.', 6000);
+
+            // A studio tab opened before a deploy keeps generating the old script with no visible
+            // clue, so compare against the copy on the server before it gets installed.
+            fetch(location.pathname + '?studioVersionCheck=' + Date.now(), { cache: 'no-store' })
+                .then(res => res.text())
+                .then(text => {
+                    const live = (text.match(/^\/\/ @version\s+(\S+)$/m) || [])[1];
+                    if (live && tmVersion !== '?' && live !== tmVersion) {
+                        showToast('⚠️ This page is out of date: it generated v' + tmVersion + ' but v' + live + ' is published. Press Ctrl+F5 and generate again.', 20000);
+                    }
+                })
+                .catch(() => {});
         }
         
         function generateTamperMonkeyScript(config, configJson, targetUrl) {
@@ -13914,7 +13926,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             return `// ==UserScript==
 // @name         ${scriptName} – D365 Chat Widget Injector
 // @namespace    https://moliveirapinto.github.io/d365-modern-chat-widget/
-// @version      1.8
+// @version      1.9
 // @description  Injects the D365 Modern Chat Widget with voice/video calling support.
 // @author       D365 Chat Widget Generator
 // @match        ${targetUrl}
@@ -14309,7 +14321,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             reader.onerror = function () { maybeDone(); };
             reader.readAsDataURL(r.response);
           },
-          onerror: function () { console.warn('[D365 TM] image preload failed: ' + key); maybeDone(); },
+          onerror: function () { console.warn('[D365 TM] image preload failed for ' + key + ' - if Tampermonkey asked about the image domain, choose "Always allow all domains"'); maybeDone(); },
           ontimeout: function () { maybeDone(); }
         });
       } catch (e) { maybeDone(); }
