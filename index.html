@@ -13912,7 +13912,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             return `// ==UserScript==
 // @name         ${scriptName} – D365 Chat Widget Injector
 // @namespace    https://moliveirapinto.github.io/d365-modern-chat-widget/
-// @version      1.5
+// @version      1.6
 // @description  Injects the D365 Modern Chat Widget with voice/video calling support.
 // @author       D365 Chat Widget Generator
 // @match        ${targetUrl}
@@ -14091,6 +14091,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
         responseURL: '', responseXML: null, responseType: '', timeout: 0,
         withCredentials: false, upload: this.__x.upload
       };
+      EVENTS.forEach(function (t) { own['on' + t] = null; });
       Object.keys(own).forEach(function (k) {
         Object.defineProperty(self, k, { value: own[k], writable: true, enumerable: true, configurable: true });
       });
