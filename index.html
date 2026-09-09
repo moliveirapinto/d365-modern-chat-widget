@@ -13890,7 +13890,9 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             document.getElementById('embedCodeOutput').value = tamperMonkeyCode;
             showCharCount(tamperMonkeyCode.length);
             document.getElementById('downloadHtmlBtn').style.display = 'none'; // Hide download button for TamperMonkey
-            showToast('🐒 TamperMonkey script generated! Copy and paste into TamperMonkey.');
+            // Surface the version so a stale studio tab is obvious before the script is installed.
+            const tmVersion = (tamperMonkeyCode.match(/@version\s+(\S+)/) || [])[1] || '?';
+            showToast('🐒 TamperMonkey script v' + tmVersion + ' generated! Copy and paste into TamperMonkey.', 6000);
         }
         
         function generateTamperMonkeyScript(config, configJson, targetUrl) {
