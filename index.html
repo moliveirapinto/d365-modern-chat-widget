@@ -13912,7 +13912,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             return `// ==UserScript==
 // @name         ${scriptName} – D365 Chat Widget Injector
 // @namespace    https://moliveirapinto.github.io/d365-modern-chat-widget/
-// @version      1.7
+// @version      1.8
 // @description  Injects the D365 Modern Chat Widget with voice/video calling support.
 // @author       D365 Chat Widget Generator
 // @match        ${targetUrl}
@@ -13921,6 +13921,14 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
 // @grant        GM_xmlhttpRequest
 // @grant        unsafeWindow
 // @connect      *
+// @connect      *.omnichannelengagementhub.com
+// @connect      *.communication.microsoft.com
+// @connect      *.trouter.teams.microsoft.com
+// @connect      *.trouter.io
+// @connect      *.aria.microsoft.com
+// @connect      *.customervoice.microsoft.com
+// @connect      *.forms.office.com
+// @connect      *.azureedge.net
 // @connect      moliveirapinto.github.io
 // @connect      raw.githubusercontent.com
 // @connect      cdnjs.cloudflare.com
@@ -13954,6 +13962,11 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
   const INJECTION_FLAG = '__d365_widget_injected__';
   if (pageWindow[INJECTION_FLAG]) return;
   pageWindow[INJECTION_FLAG] = true;
+
+  // Single place to confirm which build is actually running: type D365TM in the console.
+  var TM_VERSION = '1.8';
+  pageWindow.D365TM = { version: TM_VERSION, proxyInstalled: false, imagesInlined: 0 };
+  console.log('[D365 TM] userscript v' + TM_VERSION + ' starting on ' + location.hostname);
 
   // --- Widget Configuration ---
   // Set on pageWindow so widget-core.js (running in page context) can read it
@@ -14243,6 +14256,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     try {
       installFetchProxy();
       installXhrProxy();
+      if (pageWindow.D365TM) pageWindow.D365TM.proxyInstalled = true;
       console.log('[D365 TM] Network proxy installed for Omnichannel hosts');
     } catch (e) {
       console.warn('[D365 TM] Network proxy install failed', e);
@@ -14286,6 +14300,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             reader.onloadend = function () {
               if (typeof reader.result === 'string' && reader.result.indexOf('data:image') === 0) {
                 cfg[key] = reader.result;
+                if (pageWindow.D365TM) pageWindow.D365TM.imagesInlined++;
               }
               maybeDone();
             };
