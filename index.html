@@ -13926,7 +13926,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             return `// ==UserScript==
 // @name         ${scriptName} – D365 Chat Widget Injector
 // @namespace    https://moliveirapinto.github.io/d365-modern-chat-widget/
-// @version      1.10
+// @version      1.11
 // @description  Injects the D365 Modern Chat Widget with voice/video calling support.
 // @author       D365 Chat Widget Generator
 // @match        ${targetUrl}
@@ -13978,7 +13978,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
   pageWindow[INJECTION_FLAG] = true;
 
   // Single place to confirm which build is actually running: type D365TM in the console.
-  var TM_VERSION = '1.8';
+  var TM_VERSION = (typeof GM_info !== 'undefined' && GM_info.script && GM_info.script.version) || '?';
   pageWindow.D365TM = { version: TM_VERSION, proxyInstalled: false, imagesInlined: 0 };
   console.log('[D365 TM] userscript v' + TM_VERSION + ' starting on ' + location.hostname);
 
