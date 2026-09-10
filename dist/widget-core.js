@@ -749,6 +749,9 @@
     var pendingSystemMsgEl = null;
     // Only for the latency log below.
     var lastSendAt = 0;
+    // True from the moment the user sends until anything comes back, so the poll loop can
+    // prioritise message delivery over every other call.
+    var awaitingReply = false;
     // Set once the survey context proves unreachable, so the end-chat path doesn't pay the
     // timeout a second time for a call we already know won't answer.
     var surveyContextUnavailable = false;
@@ -777,44 +780,59 @@
     // VoiceVideo keepalive state
     var voiceVideoKeepaliveInterval = null;
     var lastTokenRefresh = Date.now();
-    // Message poll loop - guarded so repeated restore/init calls (e.g. an auto-restored
-    // session followed by the user starting chat again) never stack concurrent pollers,
-    // each independently hammering getMessages()/getConversationDetails() every 3s.
-    var pollInterval = null;
-    var pollDelayMs = 0;
+    // Measured on a Tampermonkey host: an interval-driven loop stacked getMessages calls
+    // behind each other (durations stepped 40s/34s/28s/22s/13s/4s and all resolved at the
+    // same instant - head-of-line blocking), turning one reply into an 84s wait. Requests
+    // through the GM bridge serialize, so the loop is now SEQUENTIAL: exactly one fetch in
+    // flight, the next scheduled only after it settles.
+    var pollTimer = null;
+    var pollRunning = false;
     var pollStartedAt = 0;
-    // Where Trouter's push socket is CSP-blocked, polling is the ONLY way a reply ever
-    // arrives, so poll hard while the user is staring at an empty thread waiting for the
-    // bot's first message, then settle down once the conversation is under way.
     var FAST_POLL_MS = 800;
     var STEADY_POLL_MS = 3000;
     var FAST_POLL_WINDOW_MS = 20000;
+    // Only so a call that never settles cannot stall the loop for good.
+    var POLL_WATCHDOG_MS = 45000;
 
-    function setPollRate(ms) {
-      if (pollInterval && pollDelayMs === ms) return;
-      pollDelayMs = ms;
-      if (pollInterval) clearInterval(pollInterval);
-      pollInterval = setInterval(function () {
-        if (pollDelayMs === FAST_POLL_MS && Date.now() - pollStartedAt > FAST_POLL_WINDOW_MS) {
-          setPollRate(STEADY_POLL_MS);
-          return;
-        }
-        pollMessages();
-      }, ms);
+    function scheduleNextPoll() {
+      if (pollTimer) clearTimeout(pollTimer);
+      // Stay fast for the WHOLE wait. The 20s window is anchored at chat start, so a bot that
+      // thinks for longer than that used to drop to the 3s rate exactly when the user was
+      // most impatient.
+      var fast = awaitingReply || (Date.now() - pollStartedAt < FAST_POLL_WINDOW_MS);
+      pollTimer = setTimeout(runPollCycle, fast ? FAST_POLL_MS : STEADY_POLL_MS);
+    }
+
+    function runPollCycle() {
+      if (!chatSDK || !chatStarted || pollRunning) return;
+      pollRunning = true;
+      var settled = false;
+      var watchdog = setTimeout(function () {
+        if (settled) return;
+        pollRunning = false;
+        scheduleNextPoll();
+      }, POLL_WATCHDOG_MS);
+      pollMessages().catch(function () {}).then(function () {
+        settled = true;
+        clearTimeout(watchdog);
+        pollRunning = false;
+        scheduleNextPoll();
+      });
     }
 
     function startMessagePolling() {
       pollStartedAt = Date.now();
-      setPollRate(FAST_POLL_MS);
-      pollMessages();  // setInterval alone would idle a full tick before the first fetch
+      runPollCycle();
     }
 
     // The fast window is anchored at chat start, so by the time a user asks a follow-up the
     // loop has long since settled to the steady rate - restart it whenever they are waiting.
     function boostPolling() {
       pollStartedAt = Date.now();
-      setPollRate(FAST_POLL_MS);
-      pollMessages();
+      if (!pollRunning) {
+        if (pollTimer) clearTimeout(pollTimer);
+        runPollCycle();
+      }
     }
     var TOKEN_REFRESH_INTERVAL = 4 * 60 * 1000;  // 4 minutes
     var KEEPALIVE_CHECK_INTERVAL = 30 * 1000;    // 30 seconds
@@ -1830,6 +1848,7 @@
       messages.scrollTop = messages.scrollHeight;
 
       if (!isUser) {
+        awaitingReply = false;
         if (lastSendAt) {
           console.log('⏱️ reply rendered ' + (Date.now() - lastSendAt) + 'ms after send');
           lastSendAt = 0;
@@ -2436,17 +2455,12 @@
       return msg;
     }
 
-    var pollInFlight = false;
-
     async function pollMessages() {
-      if (!chatSDK || !chatStarted || pollInFlight) return;
-      pollInFlight = true;
-      refreshConversationDetails();
-      // Release the lock on a timer rather than by racing the request. Racing CANCELLED slow
-      // calls, and through the Tampermonkey bridge every call exceeded the budget - so replies
-      // still on their way were thrown away. Now a slow reply still lands when it arrives.
-      var done = false;
-      var unlock = setTimeout(function () { if (!done) pollInFlight = false; }, GET_MESSAGES_TIMEOUT);
+      if (!chatSDK || !chatStarted) return;
+      // Every call shares one serialized channel through the Tampermonkey bridge, so a
+      // conversation-details fetch here costs a full round trip AHEAD of the next getMessages.
+      // While the user is waiting on a reply, messages are the only thing that matters.
+      if (!awaitingReply) refreshConversationDetails();
       try {
         var pollStart = Date.now();
         var msgs = await chatSDK.getMessages();
@@ -2472,10 +2486,6 @@
         }
       } catch(e) {
         console.log('⚠️ Poll failed:', (e && e.message) || e);
-      } finally {
-        done = true;
-        clearTimeout(unlock);
-        pollInFlight = false;
       }
     }
 
@@ -2591,6 +2601,7 @@
       input.value = '';
       addMessage(text, true, userName);
       lastSendAt = Date.now();
+      awaitingReply = true;
       boostPolling();
       // Save user message to session
       chatMessages.push({ content: text, isUser: true, senderName: userName, timestamp: Date.now() });
