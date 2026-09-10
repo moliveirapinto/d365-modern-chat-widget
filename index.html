@@ -13926,7 +13926,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             return `// ==UserScript==
 // @name         ${scriptName} – D365 Chat Widget Injector
 // @namespace    https://moliveirapinto.github.io/d365-modern-chat-widget/
-// @version      1.13
+// @version      1.14
 // @description  Injects the D365 Modern Chat Widget with voice/video calling support.
 // @author       D365 Chat Widget Generator
 // @match        ${targetUrl}
@@ -14041,9 +14041,21 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     'forms.office.com'
   ];
 
+  // Trouter's push channel is socket.io long-polling once the WebSocket is stubbed out: it
+  // PARKS a request open for ~40s waiting to be handed a notification. Everything the widget
+  // does shares this one GM channel, so that parked request sat in front of getMessages and
+  // made every poll take ~40s (measured on conduent.com: 39880ms, 42227ms, 40580ms...).
+  // Push is redundant here - widget-core polls - so leave the long-poll to CSP and keep the
+  // channel free for the calls that actually deliver messages.
+  function isPushLongPoll(url) {
+    var u = String(url || '').toLowerCase();
+    return u.indexOf('/socket.io/') !== -1 || u.indexOf('transport=polling') !== -1;
+  }
+
   function shouldProxy(url) {
     // Also match ws(s): so installWebSocketProxy can share this same host check.
     if (typeof url !== 'string' || !/^(https?|wss?):/i.test(url)) return false;
+    if (isPushLongPoll(url)) return false;
     var host;
     try { host = new pageWindow.URL(url).hostname.toLowerCase(); } catch (e) { return false; }
     for (var i = 0; i < PROXY_HOSTS.length; i++) {
@@ -14051,6 +14063,22 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       if (host === s || host.slice(-(s.length + 1)) === '.' + s) return true;
     }
     return false;
+  }
+
+  // Reports how long each proxied call took and how many were sharing the channel, so a slow
+  // reply can be blamed on the right thing without guessing.
+  var gmInFlight = 0;
+  function gmBegin(url) {
+    gmInFlight++;
+    return { url: String(url || ''), at: Date.now(), peak: gmInFlight };
+  }
+  function gmFinish(rec) {
+    gmInFlight--;
+    if (!rec) return;
+    var ms = Date.now() - rec.at;
+    if (ms > 1500) {
+      console.log('[D365 TM] ' + ms + 'ms, ' + rec.peak + ' in flight <- ' + rec.url.split('?')[0]);
+    }
   }
 
   function parseHeaderBlock(raw) {
@@ -14220,6 +14248,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       }
       var wantBinary = this.responseType === 'blob' || this.responseType === 'arraybuffer';
       this.__emit('loadstart');
+      var timing = gmBegin(this.__url);
       this.__gm = GM_xmlhttpRequest({
         method: this.__method || 'GET',
         url: this.__url,
@@ -14228,6 +14257,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
         timeout: this.timeout || undefined,
         responseType: wantBinary ? this.responseType : undefined,
         onload: function (r) {
+          gmFinish(timing);
           if (self.__aborted) return;
           self.status = r.status || 0;
           self.statusText = r.statusText || '';
@@ -14247,6 +14277,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
           self.__emit('loadend');
         },
         onerror: function () {
+          gmFinish(timing);
           if (self.__aborted) return;
           self.readyState = 4;
           self.__emit('readystatechange');
@@ -14254,6 +14285,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
           self.__emit('loadend');
         },
         ontimeout: function () {
+          gmFinish(timing);
           if (self.__aborted) return;
           self.readyState = 4;
           self.__emit('timeout');
