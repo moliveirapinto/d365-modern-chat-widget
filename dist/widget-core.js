@@ -833,6 +833,19 @@
 
     // ============ VOICE/VIDEO CALLING FUNCTIONS ============
     
+    // sdk.getVoiceVideoCalling() can hang forever instead of rejecting when its internal
+    // CallingBundle.js script tag is blocked by the host page's own CSP (e.g. TamperMonkey on a
+    // strict site) - a try/catch around a bare await cannot protect against a promise that never
+    // settles, which stalled the ENTIRE chat init indefinitely. Race it against a timeout.
+    function withTimeout(promise, ms, label) {
+      return Promise.race([
+        promise,
+        new Promise(function (_, reject) {
+          setTimeout(function () { reject(new Error(label + ' timed out after ' + ms + 'ms')); }, ms);
+        })
+      ]);
+    }
+
     async function preloadVoiceVideoCallingSDK(sdk) {
       console.log('📞 Pre-loading VoiceVideoCallingSDK...');
       try {
@@ -870,7 +883,7 @@
           console.log('📞 Set widgetSnippetBaseUrl to:', cdnBase);
         }
         
-        VoiceVideoCallingSDK = await sdk.getVoiceVideoCalling();
+        VoiceVideoCallingSDK = await withTimeout(sdk.getVoiceVideoCalling(), 8000, 'getVoiceVideoCalling');
         console.log('📞 VoiceVideoCallingSDK pre-loaded:', VoiceVideoCallingSDK ? 'Yes' : 'No');
         
         if (!VoiceVideoCallingSDK) {
@@ -901,19 +914,19 @@
       }
       
       try {
-        var chatToken = await sdk.getChatToken();
+        var chatToken = await withTimeout(sdk.getChatToken(), 8000, 'getChatToken');
         console.log('📞 Chat token obtained:', chatToken ? 'Yes' : 'No');
         if (!chatToken) {
           console.error('❌ Failed to get chat token for VoiceVideoCalling');
           return;
         }
         
-        await VoiceVideoCallingSDK.initialize({
+        await withTimeout(VoiceVideoCallingSDK.initialize({
           chatToken: chatToken,
           selfVideoHTMLElementId: 'd365LocalVideo',
           remoteVideoHTMLElementId: 'd365RemoteVideo',
           OCClient: sdk.OCClient
-        });
+        }), 8000, 'VoiceVideoCallingSDK.initialize');
         console.log('✅ VoiceVideoCallingSDK initialized successfully');
         
         // Set up incoming call listener
