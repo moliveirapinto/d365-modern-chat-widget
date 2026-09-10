@@ -551,9 +551,9 @@
               '<div class="d365-prechat-hero-content">',
                 '<div class="d365-prechat-status"><div class="d365-prechat-status-dot"></div><span>Online</span></div>',
                 '<div class="d365-prechat-avatar-group">',
-                  '<div class="d365-prechat-avatar"><img src="'+(c.agentAvatar||'https://raw.githubusercontent.com/moliveirapinto/d365-modern-chat-widget/main/img/headshots/headshot_female1.png')+'" alt="Support"></div>',
-                  '<div class="d365-prechat-avatar"><img src="'+(c.botAvatar||'https://raw.githubusercontent.com/moliveirapinto/d365-modern-chat-widget/main/img/headshots/headshot_male1.png')+'" alt="Bot"></div>',
-                  '<div class="d365-prechat-avatar"><img src="'+(c.customerAvatar||'https://raw.githubusercontent.com/moliveirapinto/d365-modern-chat-widget/main/img/headshots/headshot_female2.png')+'" alt="You"></div>',
+                  '<div class="d365-prechat-avatar"><img id="d365PrechatAgentImg" src="'+(c.agentAvatar||'https://raw.githubusercontent.com/moliveirapinto/d365-modern-chat-widget/main/img/headshots/headshot_female1.png')+'" alt="Support"></div>',
+                  '<div class="d365-prechat-avatar"><img id="d365PrechatBotImg" src="'+(c.botAvatar||'https://raw.githubusercontent.com/moliveirapinto/d365-modern-chat-widget/main/img/headshots/headshot_male1.png')+'" alt="Bot"></div>',
+                  '<div class="d365-prechat-avatar"><img id="d365PrechatCustomerImg" src="'+(c.customerAvatar||'https://raw.githubusercontent.com/moliveirapinto/d365-modern-chat-widget/main/img/headshots/headshot_female2.png')+'" alt="You"></div>',
                 '</div>',
                 '<div class="d365-prechat-hero-title">'+(c.welcomeTitle||'Start a conversation')+'</div>',
                 '<div class="d365-prechat-hero-subtitle">'+(c.welcomeMessage||"We're here to help!<br>Fill out the form below to chat with our team.")+'</div>',
@@ -635,6 +635,15 @@
     container.className = 'wp-exclude-emoji';
     container.innerHTML = html;
     document.body.appendChild(container);
+
+    // Wired here, synchronously, rather than in initWidget(): these images start loading the
+    // instant they're inserted above, but initWidget() only runs after two external SDK scripts
+    // finish loading. A fast failure (e.g. DNS/CSP block) fires and is gone long before that -
+    // wiring onerror this late never catches it, so the broken-image icon still shows.
+    ['d365PrechatAgentImg', 'd365PrechatBotImg', 'd365PrechatCustomerImg'].forEach(function (id) {
+      var img = container.querySelector('#' + id);
+      if (img) img.onerror = function () { img.style.display = 'none'; };
+    });
   }
 
   function loadDependencies(callback) {
@@ -1886,10 +1895,18 @@
       var avatarType = isUser ? 'user' : (isBotAvatar ? 'bot' : 'agent');
       avatar.className = 'd365-msg-avatar ' + avatarType;
 
-      if (isUser && config.customerAvatar) avatar.innerHTML = '<img src="'+config.customerAvatar+'">';
-      else if (!isUser && isBotAvatar && config.botAvatar) avatar.innerHTML = '<img src="'+config.botAvatar+'">';
-      else if (!isUser && !isBotAvatar && config.agentAvatar) avatar.innerHTML = '<img src="'+config.agentAvatar+'">';
-      else avatar.textContent = getInitials(isUser ? userName : senderName);
+      var avatarUrl = isUser ? config.customerAvatar : (isBotAvatar ? config.botAvatar : config.agentAvatar);
+      var avatarInitials = getInitials(isUser ? userName : senderName);
+      if (avatarUrl) {
+        var avatarImg = document.createElement('img');
+        // The configured avatar CDN isn't always reachable through a strict host img-src CSP -
+        // fall back to initials instead of leaving the browser's broken-image icon in the bubble.
+        avatarImg.onerror = function () { avatar.textContent = avatarInitials; };
+        avatarImg.src = avatarUrl;
+        avatar.appendChild(avatarImg);
+      } else {
+        avatar.textContent = avatarInitials;
+      }
 
       // Format bot/agent messages with markdown, user messages as plain text
       var formattedText = isUser ? escapeText(text) : formatBotMessage(text);
