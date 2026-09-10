@@ -1475,11 +1475,17 @@
         // Pre-cache post-chat survey context while session is active
         preCacheSurveyContext();
         
-        // Pre-load and initialize voice/video calling SDK for restored session
-        await preloadVoiceVideoCallingSDK(chatSDK);
-        await initializeVoiceVideoCallingSDK(chatSDK);
-        startVoiceVideoKeepalive(chatSDK);
-        setupVisibilityHandler(chatSDK);
+        // Same as initChat: never let the optional voice/video preload gate the restored
+        // conversation from rendering.
+        preloadVoiceVideoCallingSDK(chatSDK)
+          .then(function () { return initializeVoiceVideoCallingSDK(chatSDK); })
+          .then(function () {
+            startVoiceVideoKeepalive(chatSDK);
+            setupVisibilityHandler(chatSDK);
+          })
+          .catch(function (err) {
+            console.log('ℹ️ Voice/video setup skipped:', (err && err.message) || err);
+          });
         
         chatStarted = true;
         showView('chat');
@@ -2349,8 +2355,11 @@
         chatSDK = new SDKClass({ orgId: config.orgId, orgUrl: config.orgUrl, widgetId: config.widgetId });
         await chatSDK.initialize();
         
-        // Pre-load voice/video calling SDK BEFORE startChat
-        await preloadVoiceVideoCallingSDK(chatSDK);
+        // Voice/video is optional and must NEVER gate chat startup: where the SDK's
+        // CallingBundle.js is CSP-blocked this always runs to the full timeout, which
+        // previously delayed startChat - and so the first bot message - by that entire
+        // amount for zero benefit. Kick it off now, wire it up later, off the hot path.
+        var voiceVideoReady = preloadVoiceVideoCallingSDK(chatSDK);
 
         chatSDK.onNewMessage(function(m) {
           if (m) processMessage(m);
@@ -2401,12 +2410,16 @@
         // Pre-cache post-chat survey context while session is active
         preCacheSurveyContext();
         
-        // Initialize voice/video calling SDK AFTER startChat (chat token now valid)
-        await initializeVoiceVideoCallingSDK(chatSDK);
-        
-        // Start keepalive and visibility handlers for video calls
-        startVoiceVideoKeepalive(chatSDK);
-        setupVisibilityHandler(chatSDK);
+        // Finish voice/video wiring in the background - see voiceVideoReady above.
+        voiceVideoReady
+          .then(function () { return initializeVoiceVideoCallingSDK(chatSDK); })
+          .then(function () {
+            startVoiceVideoKeepalive(chatSDK);
+            setupVisibilityHandler(chatSDK);
+          })
+          .catch(function (err) {
+            console.log('ℹ️ Voice/video setup skipped:', (err && err.message) || err);
+          });
         
         if (question) {
           addMessage(question, true, name);
