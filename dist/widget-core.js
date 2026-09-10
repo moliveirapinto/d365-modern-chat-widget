@@ -322,7 +322,11 @@
       '.d365-msg.agent a{color:'+c.primaryColor+'!important;text-decoration:none;font-weight:500;transition:color .2s}',
       '.d365-msg.agent a:hover{text-decoration:underline}',
       // Sources/References section styling
-      '.d365-sources{margin-top:16px;padding-top:12px;border-top:1px solid rgba(0,0,0,0.1);font-size:13px}',
+      '.d365-sources{margin-top:20px;padding-top:14px;border-top:1px solid rgba(0,0,0,0.1);font-size:13px}',
+      // The blanket ".d365-msg.agent *{margin:0!important}" reset (for headings/paragraphs)
+      // also strips this block's own spacing since it's a descendant too - restate it with
+      // higher specificity so Sources doesn't collapse against the text right above it.
+      '.d365-msg.agent .d365-sources{margin-top:20px!important;padding-top:14px!important}',
       '.d365-sources-header{display:flex;align-items:center;gap:6px;margin-bottom:8px}',
       '.d365-sources-icon{width:13px;height:13px;flex-shrink:0;opacity:.55}',
       '.d365-sources-label{font-weight:700;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:.6px}',
