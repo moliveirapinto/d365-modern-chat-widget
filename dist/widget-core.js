@@ -302,7 +302,7 @@
       // Copilot Studio mixes ## through ##### freely, so sizing each level rendered a single
       // answer at four different sizes - and h5/h6 had no rule at all, falling back to browser
       // defaults SMALLER than body text. Uniform size; hierarchy comes from weight and spacing.
-      '.d365-msg.agent h1,.d365-msg.agent h2,.d365-msg.agent h3,.d365-msg.agent h4,.d365-msg.agent h5,.d365-msg.agent h6{margin:10px 0 4px!important;font-size:1em;font-weight:700;line-height:1.4}',
+      '.d365-msg.agent h1,.d365-msg.agent h2,.d365-msg.agent h3,.d365-msg.agent h4,.d365-msg.agent h5,.d365-msg.agent h6{margin:18px 0 5px!important;font-size:1em;font-weight:700;line-height:1.4}',
       '.d365-msg.agent h1:first-child,.d365-msg.agent h2:first-child,.d365-msg.agent h3:first-child,.d365-msg.agent h4:first-child,.d365-msg.agent h5:first-child,.d365-msg.agent h6:first-child{margin-top:0}',
       '.d365-msg.agent p{margin:4px 0!important}',
       '.d365-msg.agent p:first-child{margin-top:0}',
@@ -791,6 +791,8 @@
     var FAST_POLL_MS = 800;
     var STEADY_POLL_MS = 3000;
     var FAST_POLL_WINDOW_MS = 20000;
+    var MIN_POLL_GAP_MS = 250;
+    var lastPollMs = 0;
     // Only so a call that never settles cannot stall the loop for good.
     var POLL_WATCHDOG_MS = 45000;
 
@@ -800,7 +802,13 @@
       // thinks for longer than that used to drop to the 3s rate exactly when the user was
       // most impatient.
       var fast = awaitingReply || (Date.now() - pollStartedAt < FAST_POLL_WINDOW_MS);
-      pollTimer = setTimeout(runPollCycle, fast ? FAST_POLL_MS : STEADY_POLL_MS);
+      var target = fast ? FAST_POLL_MS : STEADY_POLL_MS;
+      // Count the round trip itself against the interval. Through the Tampermonkey bridge a
+      // single getMessages already costs several seconds, so sleeping another full interval
+      // on top was pure dead time; here it falls through to the floor and polls back-to-back.
+      // On a fast connection the subtraction is negligible and the cadence is unchanged.
+      var delay = Math.min(target, Math.max(MIN_POLL_GAP_MS, target - lastPollMs));
+      pollTimer = setTimeout(runPollCycle, delay);
     }
 
     function runPollCycle() {
@@ -1774,6 +1782,13 @@
       html = html.replace(/(<li>[\s\S]*?<\/li>)(\s*<li>)/g, '$1$2');
       html = html.replace(/(<li>[\s\S]*?<\/li>)(?!\s*<li>)/g, '<ul>$1</ul>');
       html = html.replace(/<\/ul>\s*<ul>/g, '');
+
+      // The \n\n -> <br> pass leaves a stray break on each side of a block element. Below a
+      // heading that reads as a blank line, so the heading ended up hugging the paragraph
+      // above it and floating away from its own text. Margins own this spacing, not breaks.
+      html = html
+        .replace(/(?:<br\s*\/?>\s*)+(?=<(?:h[1-6]|ul|ol|hr)\b)/g, '')
+        .replace(/(<\/(?:h[1-6]|ul|ol)>|<hr\s*\/?>)(?:\s*<br\s*\/?>)+/g, '$1');
       
       // Add sources section if references exist
       var urlRefs = references.filter(function(r) { return !r.isCite; });
@@ -2465,6 +2480,7 @@
         var pollStart = Date.now();
         var msgs = await chatSDK.getMessages();
         var pollMs = Date.now() - pollStart;
+        lastPollMs = pollMs;
         if (pollMs > 1500) console.log('⏱️ getMessages took ' + pollMs + 'ms');
         if (msgs && msgs.length) {
           // Sort messages by timestamp/sequence to ensure correct order
@@ -2485,6 +2501,7 @@
           msgs.forEach(processMessage);
         }
       } catch(e) {
+        lastPollMs = pollStart ? Date.now() - pollStart : 0;
         console.log('⚠️ Poll failed:', (e && e.message) || e);
       }
     }
