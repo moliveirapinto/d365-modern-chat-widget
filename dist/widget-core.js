@@ -1546,6 +1546,20 @@
       } catch (e) {
         console.error('❌ Session restore failed:', e);
         localStorage.removeItem('d365ChatSession');
+        // This SDK already completed initialize(), so it holds a live Trouter connection
+        // that keeps retrying even though we're abandoning it - under Tampermonkey that
+        // churn shares the GM_xmlhttpRequest bridge with the fresh SDK initChat builds next.
+        // closeChat, not endChat: tear down the client, don't destroy a conversation.
+        var deadSDK = chatSDK;
+        chatSDK = null;
+        if (deadSDK) {
+          try {
+            if (typeof deadSDK.stopPolling === 'function') deadSDK.stopPolling();
+            if (typeof deadSDK.closeChat === 'function') Promise.resolve(deadSDK.closeChat()).catch(function () {});
+          } catch (cleanupErr) {
+            console.log('ℹ️ Abandoned SDK cleanup skipped:', (cleanupErr && cleanupErr.message) || cleanupErr);
+          }
+        }
         showView('prechat');
         return false;
       }
