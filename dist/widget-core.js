@@ -298,22 +298,23 @@
       // The host page's own stylesheet targets bare p/li/h2 and wins over our bubble rules,
       // which is what made one answer render in several sizes, colours and typefaces.
       // Lock typography down for everything inside the bubble; exceptions below out-specify this.
-      '.d365-msg.agent *{font-family:inherit!important;font-size:inherit!important;line-height:inherit!important;color:inherit!important;letter-spacing:normal!important;text-transform:none!important}',
+      '.d365-msg.agent *{font-family:inherit!important;font-size:inherit!important;line-height:inherit!important;color:inherit!important;letter-spacing:normal!important;text-transform:none!important;margin:0!important;padding:0!important}',
       // Copilot Studio mixes ## through ##### freely, so sizing each level rendered a single
       // answer at four different sizes - and h5/h6 had no rule at all, falling back to browser
       // defaults SMALLER than body text. Uniform size; hierarchy comes from weight and spacing.
-      '.d365-msg.agent h1,.d365-msg.agent h2,.d365-msg.agent h3,.d365-msg.agent h4,.d365-msg.agent h5,.d365-msg.agent h6{margin:10px 0 4px;font-size:1em;font-weight:700;line-height:1.4}',
+      '.d365-msg.agent h1,.d365-msg.agent h2,.d365-msg.agent h3,.d365-msg.agent h4,.d365-msg.agent h5,.d365-msg.agent h6{margin:10px 0 4px!important;font-size:1em;font-weight:700;line-height:1.4}',
       '.d365-msg.agent h1:first-child,.d365-msg.agent h2:first-child,.d365-msg.agent h3:first-child,.d365-msg.agent h4:first-child,.d365-msg.agent h5:first-child,.d365-msg.agent h6:first-child{margin-top:0}',
-      '.d365-msg.agent p{margin:4px 0}',
+      '.d365-msg.agent p{margin:4px 0!important}',
       '.d365-msg.agent p:first-child{margin-top:0}',
       '.d365-msg.agent p:last-child{margin-bottom:0}',
       '.d365-msg.agent p:empty{display:none}',
       '.d365-msg.agent br{display:block;content:"";margin:2px 0}',
-      '.d365-msg.agent ul,.d365-msg.agent ol{margin:4px 0;padding-left:1.5em}',
-      '.d365-msg.agent li{margin:2px 0;line-height:1.5}',
-      '.d365-msg.agent blockquote{margin:4px 0;padding-left:12px;border-left:3px solid '+c.primaryColor+';color:#64748b}',
+      '.d365-msg.agent ul,.d365-msg.agent ol{margin:4px 0!important;padding-left:1.4em!important}',
+      '.d365-msg.agent li{margin:1px 0!important;line-height:1.5}',
+      '.d365-msg.agent li p{margin:0!important}',
+      '.d365-msg.agent blockquote{margin:4px 0!important;padding-left:12px!important;border-left:3px solid '+c.primaryColor+';color:#64748b}',
       '.d365-msg.agent code{background:rgba(0,0,0,0.06);padding:2px 6px;border-radius:4px;font-family:monospace!important;font-size:0.9em!important}',
-      '.d365-msg.agent pre{background:rgba(0,0,0,0.06);padding:12px;border-radius:8px;overflow-x:auto;margin:0.5em 0}',
+      '.d365-msg.agent pre{background:rgba(0,0,0,0.06);padding:12px!important;border-radius:8px;overflow-x:auto;margin:0.5em 0!important}',
       '.d365-msg.agent pre code{background:none;padding:0}',
       '.d365-msg.agent strong{font-weight:600}',
       '.d365-msg.agent em{font-style:italic}',
@@ -746,6 +747,8 @@
     // The locally shown "agent will be with you" line, held so the server's own system
     // message can replace it in place instead of appending a duplicate.
     var pendingSystemMsgEl = null;
+    // Only for the latency log below.
+    var lastSendAt = 0;
     // Set once the survey context proves unreachable, so the end-chat path doesn't pay the
     // timeout a second time for a call we already know won't answer.
     var surveyContextUnavailable = false;
@@ -1443,7 +1446,11 @@
       // those adds nothing - and the bot greeting is precisely the message users wait on.
       var hasNewSender = sortedMessages.some(function(m) {
         var n = normalizeName(m.senderDisplayName || (m.sender && m.sender.displayName));
-        return n && !seenSenderNames[n] && !isBotRole(m.role);
+        // System notices are centred and unlabelled, so they never need the participant
+        // lookup - and re-queuing one on every poll was forcing a round trip each time.
+        var role = m.role || m.senderRole;
+        var isSystemMsg = role === 'system' || role === 'System' || role === 0;
+        return n && !seenSenderNames[n] && !isBotRole(m.role) && !isSystemMsg;
       });
       if (hasNewSender) await refreshConversationDetails(true);
       
@@ -1777,6 +1784,18 @@
       return html;
     }
 
+    // twemoji checks doNotParse on child elements as it DESCENDS and never on the root it is
+    // handed, so marking only the wrapper let it walk straight in and swap emoji for remote
+    // images the host CSP then blocks. Mark every node in the subtree.
+    function blockEmojiRewrite(root) {
+      if (!root || !root.classList) return;
+      root.classList.add('wp-exclude-emoji');
+      var all = root.querySelectorAll('*');
+      for (var i = 0; i < all.length; i++) {
+        if (all[i].classList) all[i].classList.add('wp-exclude-emoji');
+      }
+    }
+
     function addMessage(text, isUser, senderName, isBotMsg) {
       console.log('📝 addMessage called:', { text: text ? text.substring(0, 50) + '...' : text, isUser: isUser, senderName: senderName, isBotMsg: isBotMsg });
       
@@ -1803,6 +1822,7 @@
       content.innerHTML = '<div class="d365-msg-sender">'+escapeText(displayName)+'</div>'+
         '<div class="d365-msg '+(isUser?'user':'agent')+'">'+formattedText+'</div>'+
         '<div class="d365-msg-time">'+formatTime(new Date())+'</div>';
+      blockEmojiRewrite(content);
 
       wrap.appendChild(avatar);
       wrap.appendChild(content);
@@ -1810,6 +1830,10 @@
       messages.scrollTop = messages.scrollHeight;
 
       if (!isUser) {
+        if (lastSendAt) {
+          console.log('⏱️ reply rendered ' + (Date.now() - lastSendAt) + 'ms after send');
+          lastSendAt = 0;
+        }
         playNotificationSound();
         if (!container.classList.contains('open')) {
           unreadCount++;
@@ -2424,7 +2448,10 @@
       var done = false;
       var unlock = setTimeout(function () { if (!done) pollInFlight = false; }, GET_MESSAGES_TIMEOUT);
       try {
+        var pollStart = Date.now();
         var msgs = await chatSDK.getMessages();
+        var pollMs = Date.now() - pollStart;
+        if (pollMs > 1500) console.log('⏱️ getMessages took ' + pollMs + 'ms');
         if (msgs && msgs.length) {
           // Sort messages by timestamp/sequence to ensure correct order
           msgs.sort(function(a, b) {
@@ -2563,6 +2590,7 @@
       if (!text || !chatSDK || !chatStarted) return;
       input.value = '';
       addMessage(text, true, userName);
+      lastSendAt = Date.now();
       boostPolling();
       // Save user message to session
       chatMessages.push({ content: text, isUser: true, senderName: userName, timestamp: Date.now() });
