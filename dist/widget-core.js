@@ -896,6 +896,9 @@
     var SURVEY_CONTEXT_TIMEOUT = 2500;
     var END_CHAT_TIMEOUT = 2500;
     var RESTORE_TIMEOUT = 6000;
+    // Bounds the in-flight guard below, never the message flow: getMessages returns the full
+    // list every time, so abandoning a slow one costs nothing - the next poll refetches it.
+    var GET_MESSAGES_TIMEOUT = 6000;
 
     async function preloadVoiceVideoCallingSDK(sdk) {
       console.log('📞 Pre-loading VoiceVideoCallingSDK...');
@@ -2393,7 +2396,10 @@
       pollInFlight = true;
       refreshConversationDetails();
       try {
-        var msgs = await chatSDK.getMessages();
+        // Must be time-boxed: pollInFlight is already latched, so a promise that never settles
+        // would skip the finally and silently kill polling - and with push blocked that is the
+        // only way replies ever arrive.
+        var msgs = await withTimeout(chatSDK.getMessages(), GET_MESSAGES_TIMEOUT, 'getMessages');
         if (msgs && msgs.length) {
           // Sort messages by timestamp/sequence to ensure correct order
           msgs.sort(function(a, b) {
@@ -2412,7 +2418,9 @@
           });
           msgs.forEach(processMessage);
         }
-      } catch(e) {} finally { pollInFlight = false; }
+      } catch(e) {
+        console.log('⚠️ Poll skipped:', (e && e.message) || e);
+      } finally { pollInFlight = false; }
     }
 
     async function initChat(name, email, question) {
