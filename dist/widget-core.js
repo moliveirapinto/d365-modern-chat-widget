@@ -148,6 +148,7 @@
     // Localization & Time Settings
     timeFormat: '12h',
     textConnecting: 'Connecting you with an agent...',
+    textAgentWaiting: 'An agent will be with you in a moment.',
     textChatEndedTitle: 'Chat Ended',
     textChatEndedMessage: 'Thank you for chatting!',
     textStartNewChat: 'Start New Chat',
@@ -739,6 +740,9 @@
     var seenSenderNames = {};
     var unreadCount = 0;
     var cachedSurveyContext = null;
+    // The locally shown "agent will be with you" line, held so the server's own system
+    // message can replace it in place instead of appending a duplicate.
+    var pendingSystemMsgEl = null;
     // Set once the survey context proves unreachable, so the end-chat path doesn't pay the
     // timeout a second time for a call we already know won't answer.
     var surveyContextUnavailable = false;
@@ -2327,6 +2331,13 @@
       // Handle system messages (centered, no avatar)
       var isSystem = role === 'system' || role === 'System' || role === 0;
       if (isSystem) {
+        // Adopt the placeholder shown at chat start rather than appending a near-identical
+        // second line; the server's wording is authoritative.
+        if (pendingSystemMsgEl && content) {
+          pendingSystemMsgEl.textContent = content;
+          pendingSystemMsgEl = null;
+          return;
+        }
         addSystemMessage(content);
         return;
       }
@@ -2374,10 +2385,10 @@
       wrapper.appendChild(msg);
       typing.parentNode.insertBefore(wrapper, typing);
       messages.scrollTop = messages.scrollHeight;
+      return msg;
     }
 
-    var pollInFlight = false;
-    async function pollMessages() {
+    var pollInFlight = false;    async function pollMessages() {
       if (!chatSDK || !chatStarted || pollInFlight) return;
       pollInFlight = true;
       refreshConversationDetails();
@@ -2469,6 +2480,9 @@
         
         chatStarted = true;
         showView('chat');
+        // Shown locally because with push blocked the server's copy of this only arrives in
+        // the same poll batch as the bot greeting, so it would land too late to reassure.
+        if (config.textAgentWaiting) pendingSystemMsgEl = addSystemMessage(config.textAgentWaiting);
         // Agent/queue metadata is cosmetic - awaiting it here delayed the first getMessages
         // call, and with push blocked that call is the only way the greeting can arrive.
         refreshConversationDetails(true);
@@ -2657,6 +2671,7 @@
       processedMsgs = {};
       chatMessages = [];
       liveChatContext = null;
+      pendingSystemMsgEl = null;
       stopVoiceVideoKeepalive();
       localStorage.removeItem('d365ChatSession');
       // Reset survey state
