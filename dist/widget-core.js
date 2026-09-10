@@ -884,6 +884,7 @@
     // degraded case, where the user has already asked to leave and shouldn't be made to wait.
     var SURVEY_CONTEXT_TIMEOUT = 2500;
     var END_CHAT_TIMEOUT = 2500;
+    var RESTORE_TIMEOUT = 6000;
 
     async function preloadVoiceVideoCallingSDK(sdk) {
       console.log('📞 Pre-loading VoiceVideoCallingSDK...');
@@ -1406,10 +1407,12 @@
       messageQueueTimer = null;
 
       // A sender we have not seen before usually means the conversation changed hands
-      // (bot -> human agent), so re-read who owns it before labelling the message
+      // (bot -> human agent), so re-read who owns it before labelling the message.
+      // role==='bot' already short-circuits isBotMessage, so waiting on the round trip for
+      // those adds nothing - and the bot greeting is precisely the message users wait on.
       var hasNewSender = sortedMessages.some(function(m) {
         var n = normalizeName(m.senderDisplayName || (m.sender && m.sender.displayName));
-        return n && !seenSenderNames[n];
+        return n && !seenSenderNames[n] && !isBotRole(m.role);
       });
       if (hasNewSender) await refreshConversationDetails(true);
       
@@ -1502,7 +1505,9 @@
           handlePostChatSurvey();
         });
         
-        await chatSDK.startChat({ liveChatContext: session.liveChatContext });
+        // Bounded: restore runs at page load behind showView('connecting'), so a call that
+        // never settles would leave the widget stuck on Connecting with no way forward.
+        await withTimeout(chatSDK.startChat({ liveChatContext: session.liveChatContext }), RESTORE_TIMEOUT, 'restore startChat');
         console.log('✅ Reconnected to existing chat session!');
         
         // Pre-cache post-chat survey context while session is active
@@ -1522,7 +1527,7 @@
         
         chatStarted = true;
         showView('chat');
-        await refreshConversationDetails(true);
+        refreshConversationDetails(true);
         
         // Restore messages to UI
         chatMessages.forEach(function(msg) {
@@ -2535,6 +2540,9 @@
           catch(e) { console.log('⚠️ endChat did not confirm, closing anyway:', e.message || e); }
         }
       } finally {
+        // The conversation is over server-side; leaving it saved makes the next page load
+        // burn an initialize()+startChat() round trip that can only fail as ClosedConversation.
+        localStorage.removeItem('d365ChatSession');
         handlePostChatSurvey();
       }
     };
