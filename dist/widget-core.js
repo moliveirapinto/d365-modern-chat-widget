@@ -594,7 +594,11 @@
             '<iframe id="d365SurveyFrame" style="display:none" title="Post-chat survey"></iframe>',
           '</div>',
           '<div class="d365-ended" id="d365Ended">',
-            '<div style="font-size:48px">👋</div>',
+            // Inline SVG, not a wave emoji: host emoji scripts rewrite emoji characters into
+            // remote images (WordPress -> s.w.org) that the same host's img-src CSP then blocks.
+            '<div style="font-size:48px;line-height:1" role="img" aria-label="Goodbye">',
+              '<svg viewBox="0 0 24 24" width="48" height="48" fill="#f6b73c" aria-hidden="true"><path d="M11.5 2.5a1.25 1.25 0 0 1 2.5 0v6h.5v-7a1.25 1.25 0 0 1 2.5 0v7h.5v-5a1.25 1.25 0 0 1 2.5 0v9.25c0 3.9-3.1 7.25-7 7.25a7.1 7.1 0 0 1-5.6-2.75L3.6 13.4a1.3 1.3 0 0 1 .3-1.9 1.35 1.35 0 0 1 1.8.3l2.3 2.7V4.25a1.25 1.25 0 0 1 2.5 0v4.25h.5z"/></svg>',
+            '</div>',
             '<div style="font-size:18px;font-weight:600;color:#2d3748">'+(c.textChatEndedTitle||'Chat Ended')+'</div>',
             '<div style="font-size:14px;color:#718096">'+(c.textChatEndedMessage||'Thank you for chatting!')+'</div>',
             '<button class="d365-new-btn" id="d365NewBtn">'+(c.textStartNewChat||'Start New Chat')+'</button>',
@@ -615,6 +619,9 @@
 
     var container = document.createElement('div');
     container.id = 'd365WidgetRoot';
+    // Opts the whole widget out of WordPress's emoji-to-remote-image rewriting, which the
+    // host's own img-src CSP then blocks. Applies to this node and all sub-nodes.
+    container.className = 'wp-exclude-emoji';
     container.innerHTML = html;
     document.body.appendChild(container);
   }
@@ -1746,7 +1753,7 @@
       console.log('📝 addMessage called:', { text: text ? text.substring(0, 50) + '...' : text, isUser: isUser, senderName: senderName, isBotMsg: isBotMsg });
       
       var wrap = document.createElement('div');
-      wrap.className = 'd365-msg-wrap ' + (isUser ? 'user' : 'agent');
+      wrap.className = 'd365-msg-wrap wp-exclude-emoji ' + (isUser ? 'user' : 'agent');
 
       var avatar = document.createElement('div');
       var isBotAvatar = isBotMsg === undefined ? isBot(senderName) : !!isBotMsg;
@@ -1820,7 +1827,7 @@
 
     function addAdaptiveCard(content, senderName, isBotMsg) {
       var wrap = document.createElement('div');
-      wrap.className = 'd365-msg-wrap agent';
+      wrap.className = 'd365-msg-wrap agent wp-exclude-emoji';
 
       var avatar = document.createElement('div');
       var isBotAvatar = isBotMsg === undefined ? isBot(senderName) : !!isBotMsg;
@@ -2352,6 +2359,9 @@
 
     function addSystemMessage(text) {
       var wrapper = document.createElement('div');
+      // Repeated per dynamically added node: the emoji observer parses added nodes directly,
+      // so the root's exclusion does not cover them.
+      wrapper.className = 'wp-exclude-emoji';
       wrapper.style.display = 'flex';
       wrapper.style.justifyContent = 'center';
       wrapper.style.width = '100%';
@@ -2742,7 +2752,7 @@
         var isMac = navigator.platform.indexOf('Mac') > -1;
         
         var tooltip = document.createElement('div');
-        tooltip.style.cssText = 'position:fixed;bottom:120px;right:30px;background:#1e293b;color:white;padding:12px 16px;border-radius:8px;font-size:13px;z-index:10000;box-shadow:0 4px 20px rgba(0,0,0,0.3);';
+      tooltip.className = 'wp-exclude-emoji';
         
         if (isWindows) {
           tooltip.innerHTML = '<strong>💡 Tip:</strong> Press <kbd style="background:#374151;padding:2px 6px;border-radius:4px;margin:0 2px;">Win</kbd> + <kbd style="background:#374151;padding:2px 6px;border-radius:4px;margin:0 2px;">.</kbd> for emojis';
