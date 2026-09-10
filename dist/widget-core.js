@@ -429,6 +429,7 @@
       '.d365-survey iframe{flex:1;width:100%;border:none}',
       '.d365-survey-loading{flex:1;display:flex;align-items:center;justify-content:center;color:#64748b;font-size:14px}',
       '.d365-survey-error{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center;color:#64748b;font-size:14px}',
+      '.d365-survey-open-btn{color:#fff;border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;background:'+gradient+'}',
       '.d365-confirm{position:absolute;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:200}',
       '.d365-confirm.show{display:flex}',
       '.d365-confirm-box{background:#fff;padding:24px;border-radius:16px;text-align:center;max-width:280px;margin:20px}',
@@ -597,6 +598,7 @@
             '</div>',
             '<div class="d365-survey-loading" id="d365SurveyLoading">Loading survey...</div>',
             '<iframe id="d365SurveyFrame" style="display:none" title="Post-chat survey"></iframe>',
+            '<div class="d365-survey-error" id="d365SurveyError" style="display:none"></div>',
           '</div>',
           '<div class="d365-ended" id="d365Ended">',
             // Inline SVG, not a wave emoji: host emoji scripts rewrite emoji characters into
@@ -862,6 +864,35 @@
     var survey = $('d365Survey');
     var surveyFrame = $('d365SurveyFrame');
     var surveyLoading = $('d365SurveyLoading');
+    var surveyError = $('d365SurveyError');
+
+    // Some host CSPs (e.g. conduent.com) don't allowlist the survey provider in frame-src, so the
+    // iframe silently swaps in the browser's own "This content is blocked" page and still fires
+    // 'load' - onload alone can't tell a broken embed from a working one. The browser DOES fire a
+    // real securitypolicyviolation event on this document even for a blocked cross-origin frame,
+    // so use that actual signal instead of guessing from timing.
+    var surveyBlockedHost = null;
+    document.addEventListener('securitypolicyviolation', function (e) {
+      if (!/frame-src|child-src|default-src/.test(e.violatedDirective || '')) return;
+      try { surveyBlockedHost = new URL(e.blockedURI).hostname; } catch (err) { surveyBlockedHost = e.blockedURI; }
+    });
+
+    function showSurveyFallback(link) {
+      surveyFrame.onload = null;
+      surveyFrame.src = '';
+      surveyFrame.style.display = 'none';
+      surveyLoading.style.display = 'none';
+      surveyError.innerHTML = '';
+      var msg = document.createElement('div');
+      msg.textContent = "This site can't display the survey inline, but you can still take it:";
+      var btn = document.createElement('a');
+      btn.href = link; btn.target = '_blank'; btn.rel = 'noopener';
+      btn.className = 'd365-survey-open-btn';
+      btn.textContent = 'Open Survey';
+      surveyError.appendChild(msg);
+      surveyError.appendChild(btn);
+      surveyError.style.display = 'flex';
+    }
     var confirm = $('d365Confirm');
     var soundBtn = $('d365Sound');
     
@@ -1261,11 +1292,22 @@
       console.log('📋 Post-chat survey context:', surveyContext);
       if (surveyContext && surveyContext.surveyInviteLink) {
         showView('survey');
+        var link = surveyContext.surveyInviteLink;
+        var linkHost; try { linkHost = new URL(link).hostname; } catch (e) { linkHost = ''; }
+        surveyBlockedHost = null;
         surveyFrame.onload = function() {
+          if (linkHost && surveyBlockedHost === linkHost) { showSurveyFallback(link); return; }
           surveyLoading.style.display = 'none';
           surveyFrame.style.display = 'block';
         };
-        surveyFrame.src = surveyContext.surveyInviteLink;
+        surveyFrame.src = link;
+        // securitypolicyviolation fires synchronously before 'load' in Chromium, but this covers
+        // any browser/ordering where a blocked frame never fires 'load' at all.
+        setTimeout(function() {
+          if (surveyFrame.style.display === 'none' && linkHost && surveyBlockedHost === linkHost) {
+            showSurveyFallback(link);
+          }
+        }, 1200);
       } else {
         console.log('📋 No post-chat survey configured');
         showView('ended');
@@ -2683,6 +2725,7 @@
 
     $('d365SurveySkip').onclick = function() {
       surveyFrame.src = '';
+      surveyError.style.display = 'none';
       showView('ended');
     };
 
@@ -2774,6 +2817,7 @@
       surveyFrame.src = '';
       surveyFrame.style.display = 'none';
       surveyLoading.style.display = '';
+      surveyError.style.display = 'none';
       $('d365StartBtn').disabled = false;
       $('d365StartBtn').textContent = config.startBtnText;
       $('d365Name').value = '';
