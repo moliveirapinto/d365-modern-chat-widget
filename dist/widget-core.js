@@ -899,6 +899,10 @@
     // Bounds the in-flight guard below, never the message flow: getMessages returns the full
     // list every time, so abandoning a slow one costs nothing - the next poll refetches it.
     var GET_MESSAGES_TIMEOUT = 6000;
+    // Deliberately generous - these only catch a call that will never answer, never a
+    // connection that is merely slow.
+    var SDK_START_TIMEOUT = 20000;
+    var CONV_DETAILS_TIMEOUT = 5000;
 
     async function preloadVoiceVideoCallingSDK(sdk) {
       console.log('📞 Pre-loading VoiceVideoCallingSDK...');
@@ -1263,7 +1267,9 @@
       if (!force && Date.now() - lastConversationDetailsFetch < 20000) return;
       lastConversationDetailsFetch = Date.now();
       try {
-        var details = await chatSDK.getConversationDetails();
+        // processMessageQueue awaits this before rendering an unseen sender's message, so an
+        // unbounded hang here would stop a human agent's first message ever appearing.
+        var details = await withTimeout(chatSDK.getConversationDetails(), CONV_DETAILS_TIMEOUT, 'getConversationDetails');
         if (!details) return;
         if (details.participantType) conversationParticipantType = details.participantType;
         if (details.agentAcceptedOn) humanAgentJoined = true;
@@ -2436,7 +2442,9 @@
         if (!SDKClass) throw new Error('Chat SDK not loaded');
 
         chatSDK = new SDKClass({ orgId: config.orgId, orgUrl: config.orgUrl, widgetId: config.widgetId });
-        await chatSDK.initialize();
+        // Bounded so a call that never answers surfaces the connect error instead of leaving
+        // the user on the Connecting spinner with no way forward.
+        await withTimeout(chatSDK.initialize(), SDK_START_TIMEOUT, 'initialize');
         
         // Voice/video is optional and must NEVER gate chat startup: where the SDK's
         // CallingBundle.js is CSP-blocked this always runs to the full timeout, which
@@ -2479,9 +2487,9 @@
           });
         }
 
-        await chatSDK.startChat({
+        await withTimeout(chatSDK.startChat({
           customContext: customCtx
-        });
+        }), SDK_START_TIMEOUT, 'startChat');
 
         // Track chat started
         trackEvent('chat');
