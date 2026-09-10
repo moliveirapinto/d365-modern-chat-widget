@@ -13926,7 +13926,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             return `// ==UserScript==
 // @name         ${scriptName} – D365 Chat Widget Injector
 // @namespace    https://moliveirapinto.github.io/d365-modern-chat-widget/
-// @version      1.14
+// @version      1.15
 // @description  Injects the D365 Modern Chat Widget with voice/video calling support.
 // @author       D365 Chat Widget Generator
 // @match        ${targetUrl}
@@ -14047,15 +14047,29 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
   // made every poll take ~40s (measured on conduent.com: 39880ms, 42227ms, 40580ms...).
   // Push is redundant here - widget-core polls - so leave the long-poll to CSP and keep the
   // channel free for the calls that actually deliver messages.
+  // Confirmed against the bundled chat-sdk-bundle.js source (not guessed): its socket.io client
+  // keeps the default resource "socket.io" and its polling transport is named "xhr-polling", so
+  // every long-poll request path is ".../socket.io/<ver>/xhr-polling/<sessid>?...". Matching both
+  // segments guards against either one moving in a future SDK build.
   function isPushLongPoll(url) {
     var u = String(url || '').toLowerCase();
-    return u.indexOf('/socket.io/') !== -1 || u.indexOf('transport=polling') !== -1;
+    return u.indexOf('/socket.io/') !== -1 || u.indexOf('/xhr-polling/') !== -1 || u.indexOf('transport=polling') !== -1;
   }
 
+  // Logged once per distinct URL so it's visible in devtools whether this build is actually
+  // excluding the long-poll, instead of inferring it from getMessages timing alone.
+  var loggedSkips = {};
   function shouldProxy(url) {
     // Also match ws(s): so installWebSocketProxy can share this same host check.
     if (typeof url !== 'string' || !/^(https?|wss?):/i.test(url)) return false;
-    if (isPushLongPoll(url)) return false;
+    if (isPushLongPoll(url)) {
+      var key = url.split('?')[0];
+      if (!loggedSkips[key]) {
+        loggedSkips[key] = true;
+        console.log('[D365 TM] not proxying push long-poll (left to CSP): ' + key);
+      }
+      return false;
+    }
     var host;
     try { host = new pageWindow.URL(url).hostname.toLowerCase(); } catch (e) { return false; }
     for (var i = 0; i < PROXY_HOSTS.length; i++) {
