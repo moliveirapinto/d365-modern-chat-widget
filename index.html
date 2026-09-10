@@ -13926,7 +13926,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             return `// ==UserScript==
 // @name         ${scriptName} – D365 Chat Widget Injector
 // @namespace    https://moliveirapinto.github.io/d365-modern-chat-widget/
-// @version      1.12
+// @version      1.13
 // @description  Injects the D365 Modern Chat Widget with voice/video calling support.
 // @author       D365 Chat Widget Generator
 // @match        ${targetUrl}
@@ -14268,10 +14268,85 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     pageWindow.XMLHttpRequest = ProxyXHR;
   }
 
+  // --- Fail WebSocket connections to chat hosts fast instead of letting them retry forever ---
+  // GM_xmlhttpRequest is HTTP-only - there is no GM API to tunnel a WebSocket, so Trouter's
+  // real-time push channel can never work here; the page's own CSP blocks the raw connection
+  // attempt every time. Left alone, the SDK's own reconnect logic retries in a tight loop
+  // (every attempt re-triggers the CSP violation AND crashes Tampermonkey's own instrumentation
+  // in content.js), which visibly slows the whole tab down. Since we can't make it work, make
+  // it fail cleanly and immediately - no real connection attempt, no CSP violation, no crash -
+  // so the SDK backs off normally instead of hammering the page. Chat still works via the
+  // existing 3s message poll; this only removes wasted retry churn, it does not add push.
+  function installWebSocketProxy() {
+    var NativeWS = pageWindow.WebSocket;
+    if (typeof NativeWS !== 'function') return;
+
+    function ProxyWebSocket(url, protocols) {
+      if (!shouldProxy(url)) {
+        // Not a chat host - hand back a real, unmodified native WebSocket.
+        return protocols === undefined ? new NativeWS(url) : new NativeWS(url, protocols);
+      }
+
+      var self = this;
+      this.__listeners = {};
+      // Own data properties (not inherited accessors) - see the XHR proxy above for why.
+      var own = {
+        url: String(url), protocol: '', extensions: '', bufferedAmount: 0,
+        binaryType: 'blob', readyState: NativeWS.CONNECTING,
+        onopen: null, onmessage: null, onerror: null, onclose: null
+      };
+      Object.keys(own).forEach(function (k) {
+        Object.defineProperty(self, k, { value: own[k], writable: true, enumerable: true, configurable: true });
+      });
+
+      setTimeout(function () {
+        self.readyState = NativeWS.CLOSED;
+        self.__emit('error', new pageWindow.Event('error'));
+        var closeEvt;
+        try { closeEvt = new pageWindow.CloseEvent('close', { code: 1006, reason: 'blocked by page CSP', wasClean: false }); }
+        catch (e) { closeEvt = { type: 'close', code: 1006, reason: 'blocked by page CSP', wasClean: false }; }
+        self.__emit('close', closeEvt);
+      }, 0);
+    }
+
+    ProxyWebSocket.prototype = Object.create(NativeWS.prototype);
+    ProxyWebSocket.prototype.constructor = ProxyWebSocket;
+
+    ProxyWebSocket.prototype.__emit = function (type, evt) {
+      var handler = this['on' + type];
+      if (typeof handler === 'function') { try { handler.call(this, evt); } catch (e) { console.warn('[D365 TM] ws handler', e); } }
+      var list = (this.__listeners[type] || []).slice();
+      for (var i = 0; i < list.length; i++) {
+        try { list[i].call(this, evt); } catch (e) { console.warn('[D365 TM] ws listener', e); }
+      }
+    };
+    ProxyWebSocket.prototype.addEventListener = function (type, fn) {
+      if (typeof fn !== 'function') return;
+      (this.__listeners[type] = this.__listeners[type] || []).push(fn);
+    };
+    ProxyWebSocket.prototype.removeEventListener = function (type, fn) {
+      var list = this.__listeners[type];
+      if (!list) return;
+      var i = list.indexOf(fn);
+      if (i >= 0) list.splice(i, 1);
+    };
+    ProxyWebSocket.prototype.dispatchEvent = function (evt) { this.__emit(evt && evt.type, evt); return true; };
+    // Our synthetic socket never reaches OPEN, so send()/close() are always safe no-ops.
+    ProxyWebSocket.prototype.send = function () {};
+    ProxyWebSocket.prototype.close = function () {};
+
+    ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'].forEach(function (name, i) {
+      ProxyWebSocket[name] = i;
+    });
+
+    pageWindow.WebSocket = ProxyWebSocket;
+  }
+
   if (typeof GM_xmlhttpRequest === 'function') {
     try {
       installFetchProxy();
       installXhrProxy();
+      installWebSocketProxy();
       if (pageWindow.D365TM) pageWindow.D365TM.proxyInstalled = true;
       console.log('[D365 TM] Network proxy installed for Omnichannel hosts');
     } catch (e) {
