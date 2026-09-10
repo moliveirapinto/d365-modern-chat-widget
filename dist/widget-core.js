@@ -291,10 +291,14 @@
       '.d365-msg-content{display:flex;flex-direction:column;gap:4px;min-width:0}',
       '.d365-msg-sender{font-size:12px;font-weight:600;color:#64748b;padding:0 4px}',
       '.d365-msg-wrap.user .d365-msg-sender{text-align:right}',
-      '.d365-msg{padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.5;word-wrap:break-word}',
+      '.d365-msg{padding:12px 16px;border-radius:16px;font-size:14px!important;font-family:inherit!important;line-height:1.5!important;word-wrap:break-word}',
       '.d365-msg.agent{background:'+c.agentBubbleColor+';color:'+c.agentTextColor+';border-bottom-left-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.08)}',
       '.d365-msg.user{background:'+(c.useBubbleGradient!==false?'linear-gradient(135deg,'+c.gradientStart+' 0%,'+c.gradientEnd+' 100%)':c.userBubbleColor)+';color:'+c.userTextColor+'!important;border-bottom-right-radius:4px;white-space:pre-wrap}',
       // Markdown styles for bot messages
+      // The host page's own stylesheet targets bare p/li/h2 and wins over our bubble rules,
+      // which is what made one answer render in several sizes, colours and typefaces.
+      // Lock typography down for everything inside the bubble; exceptions below out-specify this.
+      '.d365-msg.agent *{font-family:inherit!important;font-size:inherit!important;line-height:inherit!important;color:inherit!important;letter-spacing:normal!important;text-transform:none!important}',
       // Copilot Studio mixes ## through ##### freely, so sizing each level rendered a single
       // answer at four different sizes - and h5/h6 had no rule at all, falling back to browser
       // defaults SMALLER than body text. Uniform size; hierarchy comes from weight and spacing.
@@ -308,13 +312,13 @@
       '.d365-msg.agent ul,.d365-msg.agent ol{margin:4px 0;padding-left:1.5em}',
       '.d365-msg.agent li{margin:2px 0;line-height:1.5}',
       '.d365-msg.agent blockquote{margin:4px 0;padding-left:12px;border-left:3px solid '+c.primaryColor+';color:#64748b}',
-      '.d365-msg.agent code{background:rgba(0,0,0,0.06);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:0.9em}',
+      '.d365-msg.agent code{background:rgba(0,0,0,0.06);padding:2px 6px;border-radius:4px;font-family:monospace!important;font-size:0.9em!important}',
       '.d365-msg.agent pre{background:rgba(0,0,0,0.06);padding:12px;border-radius:8px;overflow-x:auto;margin:0.5em 0}',
       '.d365-msg.agent pre code{background:none;padding:0}',
       '.d365-msg.agent strong{font-weight:600}',
       '.d365-msg.agent em{font-style:italic}',
       '.d365-msg.agent hr{border:none;border-top:1px solid rgba(0,0,0,0.1);margin:0.75em 0}',
-      '.d365-msg.agent a{color:'+c.primaryColor+';text-decoration:none;font-weight:500;transition:color .2s}',
+      '.d365-msg.agent a{color:'+c.primaryColor+'!important;text-decoration:none;font-weight:500;transition:color .2s}',
       '.d365-msg.agent a:hover{text-decoration:underline}',
       // Sources/References section styling
       '.d365-sources{margin-top:16px;padding-top:12px;border-top:1px solid rgba(0,0,0,0.1);font-size:13px}',
@@ -2408,15 +2412,19 @@
       return msg;
     }
 
-    var pollInFlight = false;    async function pollMessages() {
+    var pollInFlight = false;
+
+    async function pollMessages() {
       if (!chatSDK || !chatStarted || pollInFlight) return;
       pollInFlight = true;
       refreshConversationDetails();
+      // Release the lock on a timer rather than by racing the request. Racing CANCELLED slow
+      // calls, and through the Tampermonkey bridge every call exceeded the budget - so replies
+      // still on their way were thrown away. Now a slow reply still lands when it arrives.
+      var done = false;
+      var unlock = setTimeout(function () { if (!done) pollInFlight = false; }, GET_MESSAGES_TIMEOUT);
       try {
-        // Must be time-boxed: pollInFlight is already latched, so a promise that never settles
-        // would skip the finally and silently kill polling - and with push blocked that is the
-        // only way replies ever arrive.
-        var msgs = await withTimeout(chatSDK.getMessages(), GET_MESSAGES_TIMEOUT, 'getMessages');
+        var msgs = await chatSDK.getMessages();
         if (msgs && msgs.length) {
           // Sort messages by timestamp/sequence to ensure correct order
           msgs.sort(function(a, b) {
@@ -2436,8 +2444,12 @@
           msgs.forEach(processMessage);
         }
       } catch(e) {
-        console.log('⚠️ Poll skipped:', (e && e.message) || e);
-      } finally { pollInFlight = false; }
+        console.log('⚠️ Poll failed:', (e && e.message) || e);
+      } finally {
+        done = true;
+        clearTimeout(unlock);
+        pollInFlight = false;
+      }
     }
 
     async function initChat(name, email, question) {
