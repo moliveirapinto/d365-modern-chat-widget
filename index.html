@@ -14042,7 +14042,8 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
   ];
 
   function shouldProxy(url) {
-    if (typeof url !== 'string' || !/^https?:/i.test(url)) return false;
+    // Also match ws(s): so installWebSocketProxy can share this same host check.
+    if (typeof url !== 'string' || !/^(https?|wss?):/i.test(url)) return false;
     var host;
     try { host = new pageWindow.URL(url).hostname.toLowerCase(); } catch (e) { return false; }
     for (var i = 0; i < PROXY_HOSTS.length; i++) {
