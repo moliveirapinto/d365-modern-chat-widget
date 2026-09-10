@@ -732,6 +732,9 @@
     var seenSenderNames = {};
     var unreadCount = 0;
     var cachedSurveyContext = null;
+    // Set once the survey context proves unreachable, so the end-chat path doesn't pay the
+    // timeout a second time for a call we already know won't answer.
+    var surveyContextUnavailable = false;
     
     // Message queue for batching and sorting (like live.html)
     var messageQueue = [];
@@ -853,6 +856,11 @@
         })
       ]);
     }
+
+    // Both are fast calls when the service is reachable; these budgets only bound the
+    // degraded case, where the user has already asked to leave and shouldn't be made to wait.
+    var SURVEY_CONTEXT_TIMEOUT = 2500;
+    var END_CHAT_TIMEOUT = 2500;
 
     async function preloadVoiceVideoCallingSDK(sdk) {
       console.log('📞 Pre-loading VoiceVideoCallingSDK...');
@@ -1149,9 +1157,10 @@
     async function preCacheSurveyContext() {
       try {
         if (!chatSDK) return;
-        cachedSurveyContext = await chatSDK.getPostChatSurveyContext();
+        cachedSurveyContext = await withTimeout(chatSDK.getPostChatSurveyContext(), SURVEY_CONTEXT_TIMEOUT, 'getPostChatSurveyContext');
         console.log('📋 Pre-cached post-chat survey context:', cachedSurveyContext);
       } catch (e) {
+        surveyContextUnavailable = true;
         console.log('📋 Could not pre-cache survey context:', e.message || e);
       }
     }
@@ -1159,10 +1168,11 @@
     // Post-chat survey handler
     async function handlePostChatSurvey() {
       var surveyContext = cachedSurveyContext;
-      if (!surveyContext) {
+      if (!surveyContext && !surveyContextUnavailable) {
         try {
-          if (chatSDK) surveyContext = await chatSDK.getPostChatSurveyContext();
+          if (chatSDK) surveyContext = await withTimeout(chatSDK.getPostChatSurveyContext(), SURVEY_CONTEXT_TIMEOUT, 'getPostChatSurveyContext');
         } catch (e) {
+          surveyContextUnavailable = true;
           console.log('📋 Post-chat survey not available:', e.message || e);
         }
       }
@@ -2485,12 +2495,21 @@
     $('d365ConfirmNo').onclick = function() { confirm.classList.remove('show'); };
     $('d365ConfirmYes').onclick = async function() {
       confirm.classList.remove('show');
-      // Fetch survey context BEFORE ending chat (session must be active)
-      if (chatSDK && !cachedSurveyContext) {
-        try { cachedSurveyContext = await chatSDK.getPostChatSurveyContext(); } catch(e) { console.log('📋 Could not get survey context before end:', e.message || e); }
+      // Every step here is time-boxed and the terminal view is shown in a finally: a hung SDK
+      // call must never strand the user on a chat they just asked to end.
+      try {
+        // Fetch survey context BEFORE ending chat (session must be active)
+        if (chatSDK && !cachedSurveyContext && !surveyContextUnavailable) {
+          try { cachedSurveyContext = await withTimeout(chatSDK.getPostChatSurveyContext(), SURVEY_CONTEXT_TIMEOUT, 'getPostChatSurveyContext'); }
+          catch(e) { surveyContextUnavailable = true; console.log('📋 Could not get survey context before end:', e.message || e); }
+        }
+        if (chatSDK) {
+          try { await withTimeout(chatSDK.endChat(), END_CHAT_TIMEOUT, 'endChat'); }
+          catch(e) { console.log('⚠️ endChat did not confirm, closing anyway:', e.message || e); }
+        }
+      } finally {
+        handlePostChatSurvey();
       }
-      if (chatSDK) try { await chatSDK.endChat(); } catch(e) {}
-      handlePostChatSurvey();
     };
 
     $('d365SurveySkip').onclick = function() {
