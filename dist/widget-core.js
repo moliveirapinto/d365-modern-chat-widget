@@ -764,9 +764,32 @@
     // session followed by the user starting chat again) never stack concurrent pollers,
     // each independently hammering getMessages()/getConversationDetails() every 3s.
     var pollInterval = null;
-    function startMessagePolling() {
+    var pollDelayMs = 0;
+    var pollStartedAt = 0;
+    // Where Trouter's push socket is CSP-blocked, polling is the ONLY way a reply ever
+    // arrives, so poll hard while the user is staring at an empty thread waiting for the
+    // bot's first message, then settle down once the conversation is under way.
+    var FAST_POLL_MS = 800;
+    var STEADY_POLL_MS = 3000;
+    var FAST_POLL_WINDOW_MS = 20000;
+
+    function setPollRate(ms) {
+      if (pollInterval && pollDelayMs === ms) return;
+      pollDelayMs = ms;
       if (pollInterval) clearInterval(pollInterval);
-      pollInterval = setInterval(pollMessages, 3000);
+      pollInterval = setInterval(function () {
+        if (pollDelayMs === FAST_POLL_MS && Date.now() - pollStartedAt > FAST_POLL_WINDOW_MS) {
+          setPollRate(STEADY_POLL_MS);
+          return;
+        }
+        pollMessages();
+      }, ms);
+    }
+
+    function startMessagePolling() {
+      pollStartedAt = Date.now();
+      setPollRate(FAST_POLL_MS);
+      pollMessages();  // setInterval alone would idle a full tick before the first fetch
     }
     var TOKEN_REFRESH_INTERVAL = 4 * 60 * 1000;  // 4 minutes
     var KEEPALIVE_CHECK_INTERVAL = 30 * 1000;    // 30 seconds
@@ -2324,8 +2347,10 @@
       messages.scrollTop = messages.scrollHeight;
     }
 
+    var pollInFlight = false;
     async function pollMessages() {
-      if (!chatSDK || !chatStarted) return;
+      if (!chatSDK || !chatStarted || pollInFlight) return;
+      pollInFlight = true;
       refreshConversationDetails();
       try {
         var msgs = await chatSDK.getMessages();
@@ -2347,7 +2372,7 @@
           });
           msgs.forEach(processMessage);
         }
-      } catch(e) {}
+      } catch(e) {} finally { pollInFlight = false; }
     }
 
     async function initChat(name, email, question) {
@@ -2415,7 +2440,9 @@
         
         chatStarted = true;
         showView('chat');
-        await refreshConversationDetails(true);
+        // Agent/queue metadata is cosmetic - awaiting it here delayed the first getMessages
+        // call, and with push blocked that call is the only way the greeting can arrive.
+        refreshConversationDetails(true);
         
         // Pre-cache post-chat survey context while session is active
         preCacheSurveyContext();
