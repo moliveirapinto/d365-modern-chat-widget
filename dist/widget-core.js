@@ -295,12 +295,11 @@
       '.d365-msg.agent{background:'+c.agentBubbleColor+';color:'+c.agentTextColor+';border-bottom-left-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.08)}',
       '.d365-msg.user{background:'+(c.useBubbleGradient!==false?'linear-gradient(135deg,'+c.gradientStart+' 0%,'+c.gradientEnd+' 100%)':c.userBubbleColor)+';color:'+c.userTextColor+'!important;border-bottom-right-radius:4px;white-space:pre-wrap}',
       // Markdown styles for bot messages
-      '.d365-msg.agent h1,.d365-msg.agent h2,.d365-msg.agent h3,.d365-msg.agent h4{margin:8px 0 4px;font-weight:600;line-height:1.3}',
-      '.d365-msg.agent h1:first-child,.d365-msg.agent h2:first-child,.d365-msg.agent h3:first-child,.d365-msg.agent h4:first-child{margin-top:0}',
-      '.d365-msg.agent h1{font-size:1.3em}',
-      '.d365-msg.agent h2{font-size:1.2em}',
-      '.d365-msg.agent h3{font-size:1.1em}',
-      '.d365-msg.agent h4{font-size:1em}',
+      // Copilot Studio mixes ## through ##### freely, so sizing each level rendered a single
+      // answer at four different sizes - and h5/h6 had no rule at all, falling back to browser
+      // defaults SMALLER than body text. Uniform size; hierarchy comes from weight and spacing.
+      '.d365-msg.agent h1,.d365-msg.agent h2,.d365-msg.agent h3,.d365-msg.agent h4,.d365-msg.agent h5,.d365-msg.agent h6{margin:10px 0 4px;font-size:1em;font-weight:700;line-height:1.4}',
+      '.d365-msg.agent h1:first-child,.d365-msg.agent h2:first-child,.d365-msg.agent h3:first-child,.d365-msg.agent h4:first-child,.d365-msg.agent h5:first-child,.d365-msg.agent h6:first-child{margin-top:0}',
       '.d365-msg.agent p{margin:4px 0}',
       '.d365-msg.agent p:first-child{margin-top:0}',
       '.d365-msg.agent p:last-child{margin-bottom:0}',
@@ -801,6 +800,14 @@
       pollStartedAt = Date.now();
       setPollRate(FAST_POLL_MS);
       pollMessages();  // setInterval alone would idle a full tick before the first fetch
+    }
+
+    // The fast window is anchored at chat start, so by the time a user asks a follow-up the
+    // loop has long since settled to the steady rate - restart it whenever they are waiting.
+    function boostPolling() {
+      pollStartedAt = Date.now();
+      setPollRate(FAST_POLL_MS);
+      pollMessages();
     }
     var TOKEN_REFRESH_INTERVAL = 4 * 60 * 1000;  // 4 minutes
     var KEEPALIVE_CHECK_INTERVAL = 30 * 1000;    // 30 seconds
@@ -1705,6 +1712,10 @@
         .replace(/>/g, '&gt;')
         .replace(/```(\w*)\n?([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
         .replace(/`([^`]+)`/g, '<code>$1</code>')
+        // Longest first, and h5/h6 included: Copilot Studio emits them, and without a rule
+        // they fell through to the user as literal ##### hashes.
+        .replace(/^######\s+(.+)$/gm, '<h6>$1</h6>')
+        .replace(/^#####\s+(.+)$/gm, '<h5>$1</h5>')
         .replace(/^####\s+(.+)$/gm, '<h4>$1</h4>')
         .replace(/^###\s+(.+)$/gm, '<h3>$1</h3>')
         .replace(/^##\s+(.+)$/gm, '<h2>$1</h2>')
@@ -2540,6 +2551,7 @@
       if (!text || !chatSDK || !chatStarted) return;
       input.value = '';
       addMessage(text, true, userName);
+      boostPolling();
       // Save user message to session
       chatMessages.push({ content: text, isUser: true, senderName: userName, timestamp: Date.now() });
       saveChatSession();
