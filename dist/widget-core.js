@@ -757,6 +757,14 @@
     // VoiceVideo keepalive state
     var voiceVideoKeepaliveInterval = null;
     var lastTokenRefresh = Date.now();
+    // Message poll loop - guarded so repeated restore/init calls (e.g. an auto-restored
+    // session followed by the user starting chat again) never stack concurrent pollers,
+    // each independently hammering getMessages()/getConversationDetails() every 3s.
+    var pollInterval = null;
+    function startMessagePolling() {
+      if (pollInterval) clearInterval(pollInterval);
+      pollInterval = setInterval(pollMessages, 3000);
+    }
     var TOKEN_REFRESH_INTERVAL = 4 * 60 * 1000;  // 4 minutes
     var KEEPALIVE_CHECK_INTERVAL = 30 * 1000;    // 30 seconds
     var voiceVideoVisibilityHandler = null;
@@ -1488,7 +1496,7 @@
           }
         });
         
-        setInterval(pollMessages, 3000);
+        startMessagePolling();
         return true;
         
       } catch (e) {
@@ -2408,7 +2416,7 @@
           chatMessages.push({ content: question, isUser: true, senderName: name, timestamp: Date.now() });
           saveChatSession();
         }
-        setInterval(pollMessages, 3000);
+        startMessagePolling();
       } catch(e) {
         console.error('D365 Widget init error:', e);
         alert('Failed to connect: ' + e.message);
