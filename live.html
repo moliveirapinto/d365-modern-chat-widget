@@ -369,6 +369,43 @@
     </div>
 
     <script>
+        // Shared by custom and standard widget modes.
+        function applyBackgroundImage(config) {
+            // Apply background image URL to the live.html page as a scrollable website simulation
+            if (config.backgroundImageUrl) {
+                // Create a full-width scrollable image instead of a fixed CSS background
+                const bgImg = document.createElement('img');
+                bgImg.src = config.backgroundImageUrl;
+                bgImg.style.cssText = 'display:block; width:100%; height:auto; position:relative; z-index:0;';
+                bgImg.alt = 'Website simulation background';
+                bgImg.draggable = false;
+                
+                // Remove default body background and allow scrolling
+                document.body.style.background = 'none';
+                document.body.style.backgroundColor = '#f0f0f0';
+                document.body.style.margin = '0';
+                document.body.style.padding = '0';
+                document.body.style.overflow = 'auto';
+                
+                // Hide all demo content - show ONLY background image + chat widget
+                const demoContainer = document.querySelector('.demo-container');
+                if (demoContainer) {
+                    demoContainer.style.display = 'none';
+                }
+                
+                // Hide the gradient overlay pseudo-element
+                const style = document.createElement('style');
+                style.textContent = 'body::before { display: none !important; }';
+                document.head.appendChild(style);
+                
+                // Insert the image as the first child of body
+                document.body.insertBefore(bgImg, document.body.firstChild);
+                
+                console.log('🖼️ Applied scrollable background image to page:', config.backgroundImageUrl);
+                console.log('🙈 Demo content hidden - showing only background image + chat widget');
+            }
+        }
+
         // Widget Loading - Same pattern as industry templates (healthcare.html, retail.html, etc.)
         function loadWidget() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -404,6 +441,7 @@
             }
 
             if (config) {
+                applyBackgroundImage(config);
                 const widgetMode = config.widgetMode || 'custom';
                 console.log('🎛️ Widget mode:', widgetMode);
 
@@ -496,39 +534,6 @@
                         window.D365WidgetConfig.getAuthToken = config.getAuthToken;
                     }
                     
-                    // Apply background image URL to the live.html page as a scrollable website simulation
-                    if (config.backgroundImageUrl) {
-                        // Create a full-width scrollable image instead of a fixed CSS background
-                        const bgImg = document.createElement('img');
-                        bgImg.src = config.backgroundImageUrl;
-                        bgImg.style.cssText = 'display:block; width:100%; height:auto; position:relative; z-index:0;';
-                        bgImg.alt = 'Website simulation background';
-                        bgImg.draggable = false;
-                        
-                        // Remove default body background and allow scrolling
-                        document.body.style.background = 'none';
-                        document.body.style.backgroundColor = '#f0f0f0';
-                        document.body.style.margin = '0';
-                        document.body.style.padding = '0';
-                        document.body.style.overflow = 'auto';
-                        
-                        // Hide all demo content - show ONLY background image + chat widget
-                        const demoContainer = document.querySelector('.demo-container');
-                        if (demoContainer) {
-                            demoContainer.style.display = 'none';
-                        }
-                        
-                        // Hide the gradient overlay pseudo-element
-                        const style = document.createElement('style');
-                        style.textContent = 'body::before { display: none !important; }';
-                        document.head.appendChild(style);
-                        
-                        // Insert the image as the first child of body
-                        document.body.insertBefore(bgImg, document.body.firstChild);
-                        
-                        console.log('🖼️ Applied scrollable background image to page:', config.backgroundImageUrl);
-                        console.log('🙈 Demo content hidden - showing only background image + chat widget');
-                    }
                     
                     console.log('📦 Widget config set:', window.D365WidgetConfig);
                     
