@@ -5,6 +5,18 @@
  * Free tier: 100,000 writes/day, 5M reads/day, 500MB storage
  */
 
+
+// Constant-time check of "Authorization: Bearer <ADMIN_TOKEN>"; disabled when ADMIN_TOKEN is unset.
+function isAdmin(request, env) {
+  const expected = env.ADMIN_TOKEN;
+  const header = request.headers.get('Authorization') || '';
+  const given = header.startsWith('Bearer ') ? header.slice(7) : '';
+  if (!expected || given.length !== expected.length) return false;
+  let diff = 0;
+  for (let i = 0; i < expected.length; i++) diff |= expected.charCodeAt(i) ^ given.charCodeAt(i);
+  return diff === 0;
+}
+
 export default {
   async fetch(request, env) {
     const corsHeaders = {
@@ -114,8 +126,14 @@ export default {
       }
     }
 
-    // POST /reset - Delete all events
+    // POST /reset - Delete all events (requires ADMIN_TOKEN bearer)
     if (url.pathname === '/reset' && request.method === 'POST') {
+      if (!isAdmin(request, env)) {
+        return new Response(JSON.stringify({ error: 'Forbidden' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
       try {
         await env.DB.prepare('DELETE FROM events').run();
         return new Response(JSON.stringify({ success: true, message: 'All events deleted' }), {

@@ -11,6 +11,18 @@
  * 4. Update widget-core.js and live.html with your worker URL
  */
 
+
+// Constant-time check of "Authorization: Bearer <ADMIN_TOKEN>"; disabled when ADMIN_TOKEN is unset.
+function isAdmin(request, env) {
+  const expected = env.ADMIN_TOKEN;
+  const header = request.headers.get('Authorization') || '';
+  const given = header.startsWith('Bearer ') ? header.slice(7) : '';
+  if (!expected || given.length !== expected.length) return false;
+  let diff = 0;
+  for (let i = 0; i < expected.length; i++) diff |= expected.charCodeAt(i) ^ given.charCodeAt(i);
+  return diff === 0;
+}
+
 export default {
   async fetch(request, env) {
     // CORS headers to allow requests from any domain
@@ -89,8 +101,14 @@ export default {
       }
     }
 
-    // GET /analytics/reset - Reset analytics (admin only - protect this!)
+    // POST /analytics/reset - Reset analytics (requires ADMIN_TOKEN bearer)
     if (url.pathname === '/analytics/reset' && request.method === 'POST') {
+      if (!isAdmin(request, env)) {
+        return new Response(JSON.stringify({ error: 'Forbidden' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
       const emptyData = {
         totalLoads: 0,
         totalChats: 0,

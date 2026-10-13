@@ -35,7 +35,7 @@ class ModernChatWidget {
         this.messageQueueTimer = null;
         this.MESSAGE_BATCH_DELAY = 150; // ms to wait for batching messages
         this.messageArrivalCounter = 0; // Track arrival order for stable sorting
-        this.DEBUG_MSG_SORTING = true; // Set to false to disable debug logs
+        this.DEBUG_MSG_SORTING = false; // Set to true to enable debug logs
 
         this.elements = {};
         this.init();

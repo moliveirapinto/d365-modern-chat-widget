@@ -92,7 +92,7 @@ module.exports = async function (context, req) {
     const accessToken = tokenJson && tokenJson.access_token;
     if (!accessToken) {
         context.log.error('No access_token in GitHub response:', JSON.stringify(tokenJson));
-        return redirectToApp(context, returnTo, { oauth_error: tokenJson.error || 'no_token' });
+        return redirectToApp(context, returnTo, { oauth_error: (tokenJson && tokenJson.error) || 'no_token' });
     }
 
     // 2. Fetch the user profile so the SPA can show name/avatar without an
@@ -141,7 +141,10 @@ function parseCookie(header, name) {
     for (const p of parts) {
         const eq = p.indexOf('=');
         if (eq === -1) continue;
-        if (p.slice(0, eq) === name) return decodeURIComponent(p.slice(eq + 1));
+        if (p.slice(0, eq) === name) {
+            try { return decodeURIComponent(p.slice(eq + 1)); }
+            catch (_) { return p.slice(eq + 1); }
+        }
     }
     return null;
 }

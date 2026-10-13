@@ -71,7 +71,7 @@ export async function onRequestGet(context) {
     const accessToken = tokenJson && tokenJson.access_token;
     if (!accessToken) {
         console.error('No access_token in GitHub response:', JSON.stringify(tokenJson));
-        return redirectToApp(returnTo, { error: tokenJson.error || 'no_token' });
+        return redirectToApp(returnTo, { error: (tokenJson && tokenJson.error) || 'no_token' });
     }
 
     // 2. Fetch the user profile.

@@ -128,7 +128,7 @@
         if (statusEl) {
           showTokenEntry();
           statusEl.className = 'token-status error';
-          statusEl.innerHTML = '❌ ' + msg;
+          statusEl.textContent = '❌ ' + msg;
           statusEl.style.display = 'flex';
         } else {
           alert(msg);
