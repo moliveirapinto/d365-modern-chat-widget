@@ -13926,7 +13926,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             return `// ==UserScript==
 // @name         ${scriptName} – D365 Chat Widget Injector
 // @namespace    https://moliveirapinto.github.io/d365-modern-chat-widget/
-// @version      1.16
+// @version      1.17
 // @description  Injects the D365 Modern Chat Widget with voice/video calling support.
 // @author       D365 Chat Widget Generator
 // @match        ${targetUrl}
@@ -13980,8 +13980,10 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
 
   // Single place to confirm which build is actually running: type D365TM in the console.
   var TM_VERSION = (typeof GM_info !== 'undefined' && GM_info.script && GM_info.script.version) || '?';
-  pageWindow.D365TM = { version: TM_VERSION, proxyInstalled: false, imagesInlined: 0 };
+  var TM_MANAGER_VERSION = (typeof GM_info !== 'undefined' && GM_info.version) || '?';
+  pageWindow.D365TM = { version: TM_VERSION, managerVersion: TM_MANAGER_VERSION, proxyInstalled: false, imagesInlined: 0 };
   console.log('[D365 TM] userscript v' + TM_VERSION + ' starting on ' + location.hostname);
+  console.log('[D365 TM] Tampermonkey v' + TM_MANAGER_VERSION);
 
   // --- Widget Configuration ---
   // Set on pageWindow so widget-core.js (running in page context) can read it
@@ -14118,22 +14120,33 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     var nativeFetch = pageWindow.fetch;
     if (typeof nativeFetch !== 'function') return;
     pageWindow.fetch = function (input, init) {
-      var url = typeof input === 'string' ? input : (input && input.url);
+      var url = typeof input === 'string' ? input : ((input && input.url) || String(input));
       if (!shouldProxy(url)) return nativeFetch.apply(pageWindow, arguments);
       var req = init || {};
-      var src = (input && typeof input === 'object') ? input : {};
-      var signal = req.signal !== undefined ? req.signal : src.signal;
+      var signal;
       return new Promise(function (resolve, reject) {
         var done = false;
         var gm;
         var timer;
         var timing;
+        var request;
+        var reader;
         function finish(error, response) {
           if (done) return;
           done = true;
           clearTimeout(timer);
           if (signal) signal.removeEventListener('abort', onAbort);
           if (timing) gmFinish(timing);
+          if (reader) {
+            var pendingReader = reader;
+            reader = null;
+            pendingReader.cancel(error).then(function () {
+              pendingReader.releaseLock();
+            }, function (e) {
+              pendingReader.releaseLock();
+              console.warn('[D365 TM] body reader cleanup failed', e);
+            });
+          }
           if (error) {
             if (error.name !== 'AbortError') console.warn('[D365 TM] fetch failed: ' + url.split('?')[0], error);
             reject(error);
@@ -14149,25 +14162,30 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
           }
         }
         function onAbort() { cancel(new pageWindow.DOMException('The operation was aborted.', 'AbortError')); }
+        try {
+          request = new pageWindow.Request(input, init);
+          signal = request.signal;
+        } catch (e) { finish(e); return; }
         if (signal && signal.aborted) { onAbort(); return; }
         if (signal) signal.addEventListener('abort', onAbort);
         timing = gmBegin(url);
         timer = setTimeout(function () {
           cancel(new pageWindow.TypeError('Omnichannel request timed out after ' + GM_REQUEST_TIMEOUT + 'ms'));
         }, GM_REQUEST_TIMEOUT);
-        try {
-          gm = GM_xmlhttpRequest({
-            method: req.method || src.method || 'GET',
-            url: url,
-            headers: collectHeaders(req.headers || src.headers),
-            data: req.body !== undefined ? req.body : src.body,
+        function send(data) {
+          if (done) return;
+          if (request.body) console.log('[D365 TM] ' + request.method + ' body prepared: ' + (typeof data === 'string' ? 'text' : 'Blob'));
+          var options = {
+            method: request.method,
+            url: request.url,
+            headers: collectHeaders(request.headers),
             timeout: GM_REQUEST_TIMEOUT,
             responseType: 'arraybuffer',
             onload: function (r) {
               if (done) return;
               try {
                 if (!r.status) { finish(new pageWindow.TypeError('Failed to fetch')); return; }
-                var noBody = r.status === 204 || r.status === 205 || r.status === 304;
+                var noBody = request.method === 'HEAD' || r.status === 204 || r.status === 205 || r.status === 304;
                 finish(null, new pageWindow.Response(noBody ? null : r.response, {
                   status: r.status,
                   statusText: r.statusText || '',
@@ -14178,8 +14196,34 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             onerror: function () { finish(new pageWindow.TypeError('Failed to fetch')); },
             ontimeout: function () { cancel(new pageWindow.TypeError('Omnichannel request timed out after ' + GM_REQUEST_TIMEOUT + 'ms')); },
             onabort: function () { finish(new pageWindow.DOMException('The operation was aborted.', 'AbortError')); }
+          };
+          if (data !== undefined) options.data = data;
+          try { gm = GM_xmlhttpRequest(options); } catch (e) { finish(e); }
+        }
+        if (!request.body) { send(); return; }
+        if (typeof req.body === 'string') { send(req.body); return; }
+
+        // Request.body is a stream, not a GM data format. Buffer native Fetch bytes into a
+        // userscript-realm Blob so JSON, binary and multipart bodies cross the bridge intact.
+        var chunks = [];
+        try { reader = request.body.getReader(); } catch (e) { finish(e); return; }
+        function readBody() {
+          return reader.read().then(function (part) {
+            if (done) return;
+            if (part.done) {
+              reader.releaseLock();
+              reader = null;
+              send(new Blob(chunks, { type: request.headers.get('content-type') || '' }));
+              return;
+            }
+            if (Object.prototype.toString.call(part.value) !== '[object Uint8Array]') {
+              throw new pageWindow.TypeError('A byte stream is required for request bodies.');
+            }
+            chunks.push(part.value);
+            return readBody();
           });
-        } catch (e) { finish(e); }
+        }
+        readBody().catch(function (e) { finish(e); });
       });
     };
   }

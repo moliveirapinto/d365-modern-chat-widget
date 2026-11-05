@@ -9,10 +9,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 ## [Unreleased]
 
 ### Fixed
+- **Tampermonkey v1.17 request-body serialization.** The Custom Widget fetch proxy now normalizes requests through the native Fetch API and buffers non-string bodies into supported userscript-realm Blobs. This preserves Request-based JSON, binary bytes, multipart boundaries, URL inputs, and native header/method overrides instead of passing `Request.body` streams to the GM bridge. Cancellation and the watchdog also stop stalled body preparation before any network send.
 - **Tampermonkey v1.16 HTTP compatibility.** The Custom Widget's XHR proxy now uses real native XHR objects and event dispatch, preserving event targets and listener behavior for host-page instrumentation such as Bootstrap and Datadog. Native host requests remain on their original transport; Omnichannel requests still use the CSP-safe GM bridge.
 - **Stalled chat requests now fail explicitly.** The Tampermonkey bridge honors SDK fetch cancellation, bounds otherwise unresponsive HTTP requests to 30 seconds, cancels timed-out requests, and reports bridge failures. Failed text sends clear the waiting indicator and log the underlying error. Trouter push long-polls remain excluded so they cannot block message polling.
 
-Existing installed userscripts do not update automatically: after deploying these changes, hard-refresh the Studio, regenerate the Custom Widget Tampermonkey script, replace the installed script with **v1.16**, and reload the target website.
+### Added
+- Tampermonkey manager-version and prepared-body transport diagnostics, without logging message contents or authorization headers.
+
+Existing installed userscripts do not update automatically: after deploying these changes, hard-refresh the Studio, regenerate the Custom Widget Tampermonkey script, replace the installed script with **v1.17**, and reload the target website.
 
 Regression tests: `node --test tests/tampermonkey.test.js`.
 

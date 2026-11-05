@@ -83,7 +83,7 @@ Choose a deployment method:
 
 ## Tampermonkey Installation and Updates
 
-For the **Custom Widget**, the current generated userscript is **v1.16**. This is separate from the project's **v3.6.0** package version.
+For the **Custom Widget**, the current generated userscript is **v1.17**. This is separate from the project's **v3.6.0** package version.
 
 1. Configure the **Custom Widget** in Studio.
 2. Click **Generate TamperMonkey Code** and enter the target URL pattern, for example `https://example.com/*`.
@@ -92,7 +92,8 @@ For the **Custom Widget**, the current generated userscript is **v1.16**. This i
 5. Reload the target website and check DevTools Console for:
 
    ```text
-   [D365 TM] userscript v1.16 starting on <hostname>
+   [D365 TM] userscript v1.17 starting on <hostname>
+   [D365 TM] Tampermonkey v<manager-version>
    [D365 TM] Network proxy installed for Omnichannel hosts
    ```
 
@@ -100,7 +101,7 @@ For the **Custom Widget**, the current generated userscript is **v1.16**. This i
 
 **Installed userscripts do not automatically receive generator changes.** After a userscript update is published, hard-refresh Studio, generate a fresh script, verify its `@version`, replace the installed script, and reload the target page. Refreshing only the hosted runtime is not enough.
 
-Version 1.16 preserves native XHR event targets for host-page instrumentation and adds cancellation and timeout handling for the Omnichannel HTTP bridge. It fixes the reproduced null-target XHR incompatibility; customer-site behavior still needs to be tested.
+Version 1.16 fixed the reproduced null-target XHR incompatibility and added HTTP cancellation/timeouts. Version 1.17 also normalizes native Fetch requests and serializes streamed, binary, and multipart bodies into supported GM Blob data instead of forwarding `Request.body` streams. It logs the manager version and prepared body transport type, not message contents or authorization headers. Customer-site behavior still needs to be tested.
 
 On restrictive sites, the Custom Widget bridges supported Omnichannel HTTP requests through Tampermonkey. Real-time push connections may remain blocked by Content Security Policy (CSP), so the widget also polls for messages. Survey frames, images, or voice/video resources can have separate CSP restrictions. For production embedding, work with the site owner to allow the required resources rather than disabling CSP.
 
@@ -178,9 +179,9 @@ Live D365 conversations require a configured connection. A design preview is not
 | D365 doesn't recognize the contact | Make sure the email in Default Contact Email matches the D365 contact record exactly |
 | Pre-chat form shows when it shouldn't | Verify toggle is OFF and default contact info is filled in |
 | Emoji picker doesn't appear | Use your keyboard shortcut: `Win + .` on Windows, `Cmd + Ctrl + Space` on Mac |
-| Tampermonkey shows a greeting but no reply to a customer message | First verify the Custom Widget injector is v1.16 and old/duplicate scripts are disabled. Check Console and Network for the outgoing send failure; the greeting does not prove the message was delivered |
-| Console still says `userscript v1.15` after an update | Hard-refresh Studio, regenerate the script, replace its entire contents in Tampermonkey, and reload the target page |
-| Older Tampermonkey script reports `Cannot read properties of null (reading 'status')` | Upgrade the Custom Widget injector to v1.16, which fixes its null-target XHR event handling |
+| Tampermonkey shows a greeting but no reply to a customer message | First verify the Custom Widget injector is v1.17 and old/duplicate scripts are disabled. Check Console and Network for the outgoing send failure; the greeting does not prove the message was delivered |
+| Console still shows an older userscript version after an update | Hard-refresh Studio, regenerate the script, replace its entire contents in Tampermonkey, and reload the target page |
+| Older Tampermonkey script reports `Cannot read properties of null (reading 'status')` | Upgrade the Custom Widget injector to v1.17, which includes the native XHR event-target fix |
 | Console reports blocked CSP resources | Identify the blocked endpoint. Push-channel warnings can occur while message polling works; blocked chat HTTP calls or optional frames/media need separate investigation |
 | A send fails or an exception appears in `content.js` | Capture the userscript version, full source URL of the failing script, and relevant Console/Network errors. Remove tokens, credentials, and customer conversation data before sharing logs |
 
@@ -238,7 +239,7 @@ Run the dependency-free userscript tests with Node.js:
 node --test tests/tampermonkey.test.js
 ```
 
-These exercise generated proxy behavior, request cancellation/timeouts, native XHR compatibility, and failed-send feedback. They do not replace testing actual Tampermonkey on the customer's website.
+These exercise generated proxy behavior, request-body serialization, cancellation/timeouts during preparation and transport, native XHR compatibility, and failed-send feedback. They do not replace testing actual Tampermonkey on the customer's website.
 
 ### SDK Integration
 

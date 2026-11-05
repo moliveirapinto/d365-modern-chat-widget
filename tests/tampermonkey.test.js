@@ -78,6 +78,7 @@ for (const type of ['readystatechange', 'loadstart', 'progress', 'load', 'error'
 function setup(gmBehavior) {
     const requests = [];
     const warnings = [];
+    const logs = [];
     const timers = new Map();
     let timerId = 0;
     const nativeFetch = async () => new Response('native fetch response');
@@ -87,7 +88,8 @@ function setup(gmBehavior) {
     };
     const context = vm.createContext({
         pageWindow,
-        console: { log() {}, warn(...args) { warnings.push(args); }, error(...args) { warnings.push(args); } },
+        Blob,
+        console: { log(...args) { logs.push(args); }, warn(...args) { warnings.push(args); }, error(...args) { warnings.push(args); } },
         setTimeout(fn, ms) { const id = ++timerId; timers.set(id, { fn, ms }); return id; },
         clearTimeout(id) { timers.delete(id); },
         GM_xmlhttpRequest(options) {
@@ -99,7 +101,7 @@ function setup(gmBehavior) {
     });
     vm.runInContext(proxySource, context);
     return {
-        pageWindow, requests, warnings, timers, nativeFetch,
+        pageWindow, requests, warnings, logs, timers, nativeFetch,
         runTimers(ms) {
             for (const [id, timer] of [...timers]) {
                 if (timer.ms <= ms) { timers.delete(id); timer.fn(); }
@@ -191,6 +193,121 @@ test('fetch preserves POST data and HTTP error responses for the SDK', async () 
     assert.equal(await response.text(), '{"id":"message-1"}');
     assert.equal(requests[0].options.data, '{"content":"hello"}');
     assert.equal(requests[0].options.headers['content-type'], 'application/json');
+});
+
+test('fetch(Request) serializes JSON bytes into a supported Blob instead of forwarding a stream', async () => {
+    const harness = setup(options => queueMicrotask(() => respond(options)));
+    const content = '{"content":"hello \u00e9"}';
+    const request = new Request(chatUrl, {
+        method: 'POST', body: content,
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer test-token' }
+    });
+    const response = await harness.pageWindow.fetch(request);
+    const options = harness.requests[0].options;
+    assert.equal(response.status, 201);
+    assert.ok(options.data instanceof Blob, 'GM must receive a supported Blob, never Request.body');
+    assert.equal(await options.data.text(), content);
+    assert.equal(options.data.type, 'application/json');
+    assert.equal(options.method, 'POST');
+    assert.equal(options.url, chatUrl);
+    assert.equal(options.headers.authorization, 'Bearer test-token');
+    const diagnostic = harness.logs.flat().join(' ');
+    assert.ok(!diagnostic.includes(content));
+    assert.ok(!diagnostic.includes('test-token'));
+});
+
+test('fetch(Request, init) honors body, method and header overrides', async () => {
+    const harness = setup(options => queueMicrotask(() => respond(options)));
+    const request = new Request(chatUrl, { method: 'POST', body: 'original', headers: { 'X-Old': 'old' } });
+    await harness.pageWindow.fetch(request, { method: 'PUT', body: 'replacement', headers: { 'X-New': 'new' } });
+    const options = harness.requests[0].options;
+    assert.equal(options.method, 'PUT');
+    assert.equal(options.data, 'replacement');
+    assert.equal(options.headers['x-new'], 'new');
+    assert.equal(options.headers['x-old'], undefined);
+    assert.match(options.headers['content-type'], /^text\/plain/);
+    await request.body.cancel();
+});
+
+test('binary BodyInit data preserves every byte in a supported Blob', async () => {
+    const harness = setup(options => queueMicrotask(() => respond(options)));
+    const bytes = new Uint8Array([0, 255, 1, 233]);
+    await harness.pageWindow.fetch(chatUrl, { method: 'POST', body: bytes });
+    const body = harness.requests[0].options.data;
+    assert.ok(body instanceof Blob);
+    assert.deepEqual(new Uint8Array(await body.arrayBuffer()), bytes);
+});
+
+test('URL inputs and URLSearchParams bodies use native request serialization', async () => {
+    const harness = setup(options => queueMicrotask(() => respond(options)));
+    await harness.pageWindow.fetch(new URL(chatUrl), { method: 'POST', body: new URLSearchParams({ message: 'hello world' }) });
+    assert.equal(harness.requests.length, 1);
+    const options = harness.requests[0].options;
+    assert.ok(options.data instanceof Blob);
+    assert.equal(await options.data.text(), 'message=hello+world');
+    assert.match(options.headers['content-type'], /^application\/x-www-form-urlencoded/);
+});
+
+test('multipart Request bodies retain the native boundary and content bytes', async () => {
+    const harness = setup(options => queueMicrotask(() => respond(options)));
+    const form = new FormData();
+    form.append('message', 'hello');
+    const request = new Request(chatUrl, { method: 'POST', body: form });
+    const expected = await request.clone().arrayBuffer();
+    const contentType = request.headers.get('content-type');
+    await harness.pageWindow.fetch(request);
+    const options = harness.requests[0].options;
+    assert.ok(options.data instanceof Blob);
+    assert.equal(options.headers['content-type'], contentType);
+    assert.deepEqual(new Uint8Array(await options.data.arrayBuffer()), new Uint8Array(expected));
+});
+
+test('body read failures reject explicitly before starting a GM request', async () => {
+    const harness = setup(options => queueMicrotask(() => respond(options)));
+    const request = new Request(chatUrl, {
+        method: 'POST', duplex: 'half',
+        body: new ReadableStream({ start(controller) { controller.error(new Error('body read failed')); } })
+    });
+    await assert.rejects(harness.pageWindow.fetch(request), /body read failed/);
+    assert.equal(harness.requests.length, 0);
+    assert.equal(harness.timers.size, 0);
+    assert.ok(harness.warnings.length > 0);
+});
+
+test('cancelling while preparing a streamed body stops its reader and never starts GM', async () => {
+    const harness = setup();
+    const controller = new AbortController();
+    let cancelled = false;
+    const request = new Request(chatUrl, {
+        method: 'POST', duplex: 'half', signal: controller.signal,
+        body: new ReadableStream({ cancel() { cancelled = true; } })
+    });
+    const result = harness.pageWindow.fetch(request);
+    const rejected = assert.rejects(result, error => error.name === 'AbortError');
+    await new Promise(setImmediate);
+    controller.abort();
+    await rejected;
+    await new Promise(setImmediate);
+    assert.equal(cancelled, true);
+    assert.equal(harness.requests.length, 0);
+    assert.equal(harness.timers.size, 0);
+});
+
+test('the request watchdog also bounds stalled body preparation', async () => {
+    const harness = setup();
+    let cancelled = false;
+    const request = new Request(chatUrl, {
+        method: 'POST', duplex: 'half',
+        body: new ReadableStream({ cancel() { cancelled = true; } })
+    });
+    const rejected = assert.rejects(harness.pageWindow.fetch(request), /timed out/i);
+    await new Promise(setImmediate);
+    harness.runTimers(30000);
+    await rejected;
+    await new Promise(setImmediate);
+    assert.equal(cancelled, true);
+    assert.equal(harness.requests.length, 0);
+    assert.equal(harness.timers.size, 0);
 });
 
 test('aborting an SDK fetch aborts the GM request and rejects instead of hanging', async () => {
