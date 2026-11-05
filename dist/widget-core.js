@@ -2690,6 +2690,9 @@
         var sent = await chatSDK.sendMessage({ content: text });
         rememberOwnMessage(sent);
       } catch(e) {
+        console.error('D365 Widget send error:', e);
+        awaitingReply = false;
+        typing.classList.remove('active');
         addSystemMessage('Failed to send. Try again.');
       }
     }

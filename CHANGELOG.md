@@ -6,6 +6,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 
 ---
 
+## [Unreleased]
+
+### Fixed
+- **Tampermonkey v1.16 HTTP compatibility.** The Custom Widget's XHR proxy now uses real native XHR objects and event dispatch, preserving event targets and listener behavior for host-page instrumentation such as Bootstrap and Datadog. Native host requests remain on their original transport; Omnichannel requests still use the CSP-safe GM bridge.
+- **Stalled chat requests now fail explicitly.** The Tampermonkey bridge honors SDK fetch cancellation, bounds otherwise unresponsive HTTP requests to 30 seconds, cancels timed-out requests, and reports bridge failures. Failed text sends clear the waiting indicator and log the underlying error. Trouter push long-polls remain excluded so they cannot block message polling.
+
+Existing installed userscripts do not update automatically: after deploying these changes, hard-refresh the Studio, regenerate the Custom Widget Tampermonkey script, replace the installed script with **v1.16**, and reload the target website.
+
+Regression tests: `node --test tests/tampermonkey.test.js`.
+
+---
+
 ## [3.6.0] - 2026-07-15
 
 ### Added

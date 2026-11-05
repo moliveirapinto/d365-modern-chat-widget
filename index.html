@@ -13926,7 +13926,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
             return `// ==UserScript==
 // @name         ${scriptName} – D365 Chat Widget Injector
 // @namespace    https://moliveirapinto.github.io/d365-modern-chat-widget/
-// @version      1.15
+// @version      1.16
 // @description  Injects the D365 Modern Chat Widget with voice/video calling support.
 // @author       D365 Chat Widget Generator
 // @match        ${targetUrl}
@@ -14040,6 +14040,7 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
     'azureedge.net',
     'forms.office.com'
   ];
+  var GM_REQUEST_TIMEOUT = 30000;
 
   // Trouter's push channel is socket.io long-polling once the WebSocket is stubbed out: it
   // PARKS a request open for ~40s waiting to be handed a notification. Everything the widget
@@ -14121,25 +14122,64 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
       if (!shouldProxy(url)) return nativeFetch.apply(pageWindow, arguments);
       var req = init || {};
       var src = (input && typeof input === 'object') ? input : {};
+      var signal = req.signal !== undefined ? req.signal : src.signal;
       return new Promise(function (resolve, reject) {
-        GM_xmlhttpRequest({
-          method: req.method || src.method || 'GET',
-          url: url,
-          headers: collectHeaders(req.headers || src.headers),
-          data: req.body !== undefined ? req.body : src.body,
-          responseType: 'arraybuffer',
-          onload: function (r) {
-            if (!r.status) { reject(new pageWindow.TypeError('Failed to fetch')); return; }
-            var noBody = r.status === 204 || r.status === 304;
-            resolve(new pageWindow.Response(noBody ? null : r.response, {
-              status: r.status,
-              statusText: r.statusText || '',
-              headers: parseHeaderBlock(r.responseHeaders)
-            }));
-          },
-          onerror: function () { reject(new pageWindow.TypeError('Failed to fetch')); },
-          ontimeout: function () { reject(new pageWindow.TypeError('Failed to fetch')); }
-        });
+        var done = false;
+        var gm;
+        var timer;
+        var timing;
+        function finish(error, response) {
+          if (done) return;
+          done = true;
+          clearTimeout(timer);
+          if (signal) signal.removeEventListener('abort', onAbort);
+          if (timing) gmFinish(timing);
+          if (error) {
+            if (error.name !== 'AbortError') console.warn('[D365 TM] fetch failed: ' + url.split('?')[0], error);
+            reject(error);
+          } else {
+            resolve(response);
+          }
+        }
+        function cancel(error) {
+          if (done) return;
+          finish(error);
+          if (gm && typeof gm.abort === 'function') {
+            try { gm.abort(); } catch (e) { console.warn('[D365 TM] fetch abort failed', e); }
+          }
+        }
+        function onAbort() { cancel(new pageWindow.DOMException('The operation was aborted.', 'AbortError')); }
+        if (signal && signal.aborted) { onAbort(); return; }
+        if (signal) signal.addEventListener('abort', onAbort);
+        timing = gmBegin(url);
+        timer = setTimeout(function () {
+          cancel(new pageWindow.TypeError('Omnichannel request timed out after ' + GM_REQUEST_TIMEOUT + 'ms'));
+        }, GM_REQUEST_TIMEOUT);
+        try {
+          gm = GM_xmlhttpRequest({
+            method: req.method || src.method || 'GET',
+            url: url,
+            headers: collectHeaders(req.headers || src.headers),
+            data: req.body !== undefined ? req.body : src.body,
+            timeout: GM_REQUEST_TIMEOUT,
+            responseType: 'arraybuffer',
+            onload: function (r) {
+              if (done) return;
+              try {
+                if (!r.status) { finish(new pageWindow.TypeError('Failed to fetch')); return; }
+                var noBody = r.status === 204 || r.status === 205 || r.status === 304;
+                finish(null, new pageWindow.Response(noBody ? null : r.response, {
+                  status: r.status,
+                  statusText: r.statusText || '',
+                  headers: parseHeaderBlock(r.responseHeaders)
+                }));
+              } catch (e) { finish(e); }
+            },
+            onerror: function () { finish(new pageWindow.TypeError('Failed to fetch')); },
+            ontimeout: function () { cancel(new pageWindow.TypeError('Omnichannel request timed out after ' + GM_REQUEST_TIMEOUT + 'ms')); },
+            onabort: function () { finish(new pageWindow.DOMException('The operation was aborted.', 'AbortError')); }
+          });
+        } catch (e) { finish(e); }
       });
     };
   }
@@ -14147,167 +14187,162 @@ ${googleFontLink ? `\n<!-- Google Font -->\n<link href="${googleFontLink}" rel="
   function installXhrProxy() {
     var NativeXHR = pageWindow.XMLHttpRequest;
     if (typeof NativeXHR !== 'function') return;
-    var EVENTS = ['readystatechange', 'loadstart', 'progress', 'load', 'error', 'abort', 'timeout', 'loadend'];
 
     function ProxyXHR() {
-      var self = this;
-      this.__x = new NativeXHR();
-      this.__proxy = false;
-      this.__reqHeaders = {};
-      this.__resHeaders = '';
-      this.__listeners = {};
-      this.__aborted = false;
-      // Plain assignment would reach the inherited native accessors and throw Illegal invocation,
-      // so give the instance its own data properties that shadow them.
-      var own = {
-        readyState: 0, status: 0, statusText: '', responseText: '', response: '',
-        responseURL: '', responseXML: null, responseType: '', timeout: 0,
-        withCredentials: false, upload: this.__x.upload
-      };
-      EVENTS.forEach(function (t) { own['on' + t] = null; });
-      Object.keys(own).forEach(function (k) {
-        Object.defineProperty(self, k, { value: own[k], writable: true, enumerable: true, configurable: true });
-      });
-      EVENTS.forEach(function (t) {
-        self.__x.addEventListener(t, function () {
-          if (self.__proxy) return;
-          self.readyState = self.__x.readyState;
-          self.status = self.__x.status;
-          self.statusText = self.__x.statusText;
-          self.responseURL = self.__x.responseURL;
-          try { self.response = self.__x.response; } catch (e) { /* wrong responseType */ }
-          try { self.responseText = self.__x.responseText; } catch (e) { /* wrong responseType */ }
-          self.__emit(t);
+      // Return a real native EventTarget. Wrapping it and manually calling handlers left
+      // event.target null and broke Bootstrap/Datadog even on unrelated host requests.
+      var xhr = new NativeXHR();
+      var nativeOpen = xhr.open;
+      var nativeSend = xhr.send;
+      var nativeAbort = xhr.abort;
+      var nativeSetHeader = xhr.setRequestHeader;
+      var nativeGetHeaders = xhr.getAllResponseHeaders;
+      var nativeGetHeader = xhr.getResponseHeader;
+      var proxy = false;
+      var method;
+      var url;
+      var reqHeaders = {};
+      var resHeaders = '';
+      var responseState;
+      var responseDescriptors;
+      var cancelRequest;
+
+      function emit(type) { xhr.dispatchEvent(new pageWindow.Event(type)); }
+      function setResponseState(state) {
+        responseState = state;
+        if (responseDescriptors) return;
+        responseDescriptors = {};
+        Object.keys(state).forEach(function (key) {
+          responseDescriptors[key] = Object.getOwnPropertyDescriptor(xhr, key);
+          Object.defineProperty(xhr, key, {
+            configurable: true,
+            get: function () {
+              if (key === 'responseText' && xhr.responseType !== '' && xhr.responseType !== 'text') {
+                throw new pageWindow.DOMException('responseText requires a text responseType.', 'InvalidStateError');
+              }
+              return responseState[key];
+            }
+          });
         });
-      });
+      }
+      function resetResponseState() {
+        if (!responseDescriptors) return;
+        Object.keys(responseDescriptors).forEach(function (key) {
+          if (responseDescriptors[key]) Object.defineProperty(xhr, key, responseDescriptors[key]);
+          else delete xhr[key];
+        });
+        responseDescriptors = null;
+        responseState = null;
+      }
+      xhr.open = function (m, u) {
+        if (cancelRequest) cancelRequest();
+        resetResponseState();
+        method = m;
+        url = String(u);
+        proxy = shouldProxy(url);
+        reqHeaders = {};
+        resHeaders = '';
+        return nativeOpen.apply(xhr, arguments);
+      };
+      xhr.setRequestHeader = function (k, v) {
+        if (!proxy) return nativeSetHeader.apply(xhr, arguments);
+        k = String(k).toLowerCase();
+        reqHeaders[k] = reqHeaders[k] ? reqHeaders[k] + ', ' + v : String(v);
+      };
+      xhr.getAllResponseHeaders = function () {
+        return proxy ? resHeaders : nativeGetHeaders.call(xhr);
+      };
+      xhr.getResponseHeader = function (name) {
+        if (!proxy) return nativeGetHeader.apply(xhr, arguments);
+        var value = parseHeaderBlock(resHeaders)[String(name).toLowerCase()];
+        return value === undefined ? null : value;
+      };
+      xhr.abort = function () {
+        if (!proxy) return nativeAbort.call(xhr);
+        if (cancelRequest) cancelRequest();
+        nativeAbort.call(xhr);
+        setResponseState({
+          readyState: 0, status: 0, statusText: '', responseURL: '', responseXML: null,
+          responseText: '', response: xhr.responseType && xhr.responseType !== 'text' ? null : ''
+        });
+      };
+      xhr.send = function (body) {
+        if (!proxy) return nativeSend.apply(xhr, arguments);
+        if (cancelRequest || xhr.readyState !== NativeXHR.OPENED) {
+          throw new pageWindow.DOMException('The request is not opened or has already been sent.', 'InvalidStateError');
+        }
+        var wantBinary = xhr.responseType === 'blob' || xhr.responseType === 'arraybuffer';
+        var done = false;
+        var gm;
+        var timeout = xhr.timeout || GM_REQUEST_TIMEOUT;
+        var timing = gmBegin(url);
+        var timer = setTimeout(function () { cancel('timeout'); }, timeout);
+        function finish(type, r, error) {
+          if (done) return;
+          clearTimeout(timer);
+          if (timing) { gmFinish(timing); timing = null; }
+          var text = r && typeof r.responseText === 'string' ? r.responseText : '';
+          var response = wantBinary ? (r ? r.response : null) : text;
+          if (xhr.responseType === 'json') {
+            try { response = JSON.parse(text); } catch (e) { response = null; }
+          }
+          var state = {
+            readyState: 4, status: r ? r.status : 0, statusText: r ? r.statusText || '' : '',
+            responseURL: r ? r.finalUrl || url : '', responseXML: null,
+            responseText: text, response: response
+          };
+          resHeaders = r ? r.responseHeaders || '' : '';
+          if (type === 'load') {
+            state.readyState = 2;
+            setResponseState(state);
+            emit('readystatechange');
+            if (done) return;
+            state.readyState = 3;
+            emit('readystatechange');
+            if (done) return;
+            state.readyState = 4;
+          } else {
+            setResponseState(state);
+            if (type !== 'abort') console.warn('[D365 TM] XHR ' + type + ': ' + url.split('?')[0], error || type);
+          }
+          done = true;
+          cancelRequest = null;
+          emit('readystatechange');
+          if (type === 'load' && responseState !== state) return;
+          emit(type);
+          emit('loadend');
+        }
+        function cancel(type) {
+          finish(type || 'abort');
+          if (gm && typeof gm.abort === 'function') {
+            try { gm.abort(); } catch (e) { console.warn('[D365 TM] XHR abort failed', e); }
+          }
+        }
+        cancelRequest = cancel;
+        emit('loadstart');
+        if (done) return;
+        try {
+          gm = GM_xmlhttpRequest({
+            method: method || 'GET',
+            url: url,
+            headers: reqHeaders,
+            data: body,
+            timeout: timeout,
+            responseType: wantBinary ? xhr.responseType : 'text',
+            onload: function (r) { finish(r && r.status ? 'load' : 'error', r && r.status ? r : null); },
+            onerror: function (e) { finish('error', null, e); },
+            ontimeout: function () { cancel('timeout'); },
+            onabort: function () { finish('abort'); }
+          });
+        } catch (e) {
+          // SDK clients attach their error listener immediately after send() returns.
+          setTimeout(function () { finish('error', null, e); }, 0);
+        }
+      };
+      return xhr;
     }
 
-    // Inherit the native prototype so the page's own scripts still see a real XMLHttpRequest
-    // (instanceof checks and Symbol.toStringTag both keep working); every member below shadows it.
-    ProxyXHR.prototype = Object.create(NativeXHR.prototype);
-    ProxyXHR.prototype.constructor = ProxyXHR;
-
-    ProxyXHR.prototype.__emit = function (type) {
-      if (!type) return;
-      var evt;
-      try { evt = new pageWindow.Event(type); } catch (e) { evt = { type: type }; }
-      var handler = this['on' + type];
-      if (typeof handler === 'function') { try { handler.call(this, evt); } catch (e) { console.warn('[D365 TM] xhr handler', e); } }
-      var list = (this.__listeners[type] || []).slice();
-      for (var i = 0; i < list.length; i++) {
-        try { list[i].call(this, evt); } catch (e) { console.warn('[D365 TM] xhr listener', e); }
-      }
-    };
-
-    ProxyXHR.prototype.addEventListener = function (type, fn) {
-      if (typeof fn !== 'function') return;
-      (this.__listeners[type] = this.__listeners[type] || []).push(fn);
-    };
-
-    ProxyXHR.prototype.removeEventListener = function (type, fn) {
-      var list = this.__listeners[type];
-      if (!list) return;
-      var i = list.indexOf(fn);
-      if (i >= 0) list.splice(i, 1);
-    };
-
-    ProxyXHR.prototype.dispatchEvent = function (evt) { this.__emit(evt && evt.type); return true; };
-
-    ProxyXHR.prototype.open = function (method, url) {
-      this.__method = method;
-      this.__url = url;
-      this.__proxy = shouldProxy(url);
-      this.__reqHeaders = {};
-      this.__aborted = false;
-      if (!this.__proxy) return this.__x.open.apply(this.__x, arguments);
-      this.readyState = 1;
-      this.__emit('readystatechange');
-    };
-
-    ProxyXHR.prototype.setRequestHeader = function (k, v) {
-      if (!this.__proxy) return this.__x.setRequestHeader(k, v);
-      this.__reqHeaders[k] = v;
-    };
-
-    ProxyXHR.prototype.overrideMimeType = function (m) {
-      if (!this.__proxy) return this.__x.overrideMimeType(m);
-    };
-
-    ProxyXHR.prototype.getAllResponseHeaders = function () {
-      return this.__proxy ? this.__resHeaders : this.__x.getAllResponseHeaders();
-    };
-
-    ProxyXHR.prototype.getResponseHeader = function (name) {
-      if (!this.__proxy) return this.__x.getResponseHeader(name);
-      var v = parseHeaderBlock(this.__resHeaders)[String(name).toLowerCase()];
-      return v === undefined ? null : v;
-    };
-
-    ProxyXHR.prototype.abort = function () {
-      this.__aborted = true;
-      if (!this.__proxy) return this.__x.abort();
-      if (this.__gm && typeof this.__gm.abort === 'function') { try { this.__gm.abort(); } catch (e) { /* already done */ } }
-      this.readyState = 4;
-      this.__emit('abort');
-      this.__emit('loadend');
-    };
-
-    ProxyXHR.prototype.send = function (body) {
-      var self = this;
-      if (!this.__proxy) {
-        try { this.__x.responseType = this.responseType || ''; } catch (e) { /* ignore */ }
-        try { this.__x.timeout = this.timeout || 0; } catch (e) { /* ignore */ }
-        try { this.__x.withCredentials = !!this.withCredentials; } catch (e) { /* ignore */ }
-        return this.__x.send(body);
-      }
-      var wantBinary = this.responseType === 'blob' || this.responseType === 'arraybuffer';
-      this.__emit('loadstart');
-      var timing = gmBegin(this.__url);
-      this.__gm = GM_xmlhttpRequest({
-        method: this.__method || 'GET',
-        url: this.__url,
-        headers: this.__reqHeaders,
-        data: body,
-        timeout: this.timeout || undefined,
-        responseType: wantBinary ? this.responseType : undefined,
-        onload: function (r) {
-          gmFinish(timing);
-          if (self.__aborted) return;
-          self.status = r.status || 0;
-          self.statusText = r.statusText || '';
-          self.responseURL = r.finalUrl || self.__url;
-          self.__resHeaders = r.responseHeaders || '';
-          self.responseText = typeof r.responseText === 'string' ? r.responseText : '';
-          if (self.responseType === 'json') {
-            try { self.response = JSON.parse(self.responseText); } catch (e) { self.response = null; }
-          } else if (wantBinary) {
-            self.response = r.response;
-          } else {
-            self.response = self.responseText;
-          }
-          self.readyState = 4;
-          self.__emit('readystatechange');
-          self.__emit('load');
-          self.__emit('loadend');
-        },
-        onerror: function () {
-          gmFinish(timing);
-          if (self.__aborted) return;
-          self.readyState = 4;
-          self.__emit('readystatechange');
-          self.__emit('error');
-          self.__emit('loadend');
-        },
-        ontimeout: function () {
-          gmFinish(timing);
-          if (self.__aborted) return;
-          self.readyState = 4;
-          self.__emit('timeout');
-          self.__emit('loadend');
-        }
-      });
-    };
-
+    ProxyXHR.prototype = NativeXHR.prototype;
     ['UNSENT', 'OPENED', 'HEADERS_RECEIVED', 'LOADING', 'DONE'].forEach(function (name, i) {
       ProxyXHR[name] = i;
     });
