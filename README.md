@@ -147,6 +147,10 @@ If your website already knows who the customer is (e.g., they're logged into a p
 
 This lets a trusted website supply customer context and skip the form. **A default name or email is not proof of identity.** Authenticated chat requires the appropriate Dynamics 365 workstream authentication configuration; these defaults alone do not authenticate a customer.
 
+For the **New Standard Widget**, open **Advanced → Contact Authentication & Context**, enable **Pass Contact Details to D365**, and enter the default full name and email. Regenerate the embed or Tampermonkey script after changing these fields. The embed, live preview, userscript, and demo pages register a `setContextProvider` after `lcw:ready`, passing `Name` and `emailaddress1` as displayable `{ value, isDisplayable: true }` context entries. Blank fields are omitted, and disabling the toggle excludes contact context from the generated scripts. Contact matching depends on your D365 workstream configuration.
+
+Generated defaults are visible in page source and apply to every visitor. Use them for demos or replace them with per-user values from your trusted website in production; never embed credentials. Verified authentication uses a server-issued, signed JWT with [`setAuthTokenProvider`](https://learn.microsoft.com/en-us/dynamics365/customer-service/develop/reference/methods/setauthtokenprovider), not a name, email, or an `Authenticated` context flag.
+
 ---
 
 ## Demo Mode

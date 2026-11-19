@@ -3721,8 +3721,8 @@
                             <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                         </div>
                         <div>
-                            <h2>Contact Authentication</h2>
-                            <p>Automatically authenticate users with D365 contact records</p>
+                            <h2>Contact Authentication &amp; Context</h2>
+                            <p>Pass known customer details to D365</p>
                         </div>
                     </div>
                     <div class="card-body">
@@ -3732,30 +3732,30 @@
                                     <input type="checkbox" id="enableStandardAuth">
                                     <span class="toggle-slider"></span>
                                 </label>
-                                <span class="toggle-label">Enable Auto-Authentication</span>
+                                <label class="toggle-label" for="enableStandardAuth">Pass Contact Details to D365</label>
                             </div>
-                            <p class="form-help">When enabled, the widget will automatically authenticate users using the contact information below. This links chat sessions to existing D365 contact records without requiring a pre-chat form.</p>
+                            <p class="form-help">Include the name and email below as customer context in the embed, preview, and Tampermonkey script. Contact matching depends on your D365 workstream configuration. These values do not authenticate a user; verified authentication requires a signed JWT and a configured D365 authentication setting.</p>
                         </div>
                         <div id="standardAuthFields" class="hidden">
                             <div class="form-group">
-                                <label class="form-label">Default Contact Name</label>
+                                <label class="form-label" for="standardAuthName">Default Contact Full Name</label>
                                 <input type="text" class="form-input" id="standardAuthName" placeholder="e.g., John Smith">
-                                <p class="form-help">The name to authenticate with D365 (maps to 'Name' field in contact record)</p>
+                                <p class="form-help">Sent as the displayable 'Name' context variable. Leave blank to omit it.</p>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Default Contact Email</label>
+                                <label class="form-label" for="standardAuthEmail">Default Contact Email</label>
                                 <input type="email" class="form-input" id="standardAuthEmail" placeholder="e.g., john@example.com">
-                                <p class="form-help">The email to authenticate with D365 (maps to 'emailaddress1' field in contact record)</p>
+                                <p class="form-help">Sent as the displayable 'emailaddress1' context variable. Leave blank to omit it.</p>
                             </div>
                             <div class="info-box" style="margin-top: 16px;">
                                 <div class="info-icon">💡</div>
                                 <div>
                                     <strong>Use Cases:</strong>
                                     <ul style="margin: 8px 0 0 0; padding-left: 20px;">
-                                        <li>Authenticated portal users (pass their logged-in credentials)</li>
+                                        <li>Known customer context supplied by a trusted website</li>
                                         <li>Quick demos without form friction</li>
-                                        <li>Skip pre-chat form for known contacts</li>
-                                        <li>Single sign-on (SSO) scenarios</li>
+                                        <li>Display customer details in the conversation summary</li>
+                                        <li>Generated defaults are visible in page source and shared by every visitor; use per-user values in production, not credentials</li>
                                     </ul>
                                 </div>
                             </div>
@@ -9801,7 +9801,7 @@
             let appId, orgId, orgUrl, ver;
             try {
                 const doc = new DOMParser().parseFromString('<body>' + raw + '</body>', 'text/html');
-                const s = doc.querySelector('script');
+                const s = doc.querySelector('script[data-app-id][data-org-id][data-org-url]');
                 if (!s) throw new Error('No script element found');
                 appId = s.getAttribute('data-app-id');
                 orgId = s.getAttribute('data-org-id');
@@ -9843,6 +9843,8 @@
                 showLanding: cb('nsw-landing'), showAvatar: cb('nsw-avatar'), showAgentName: cb('nsw-agent-name'),
                 actionPlacement: sel ? sel.value : 'bottom',
                 tmMatch: g('nsw-tm-match') || '*://*/*',
+                enableStandardAuth: cb('enableStandardAuth'),
+                standardAuthName: g('standardAuthName'), standardAuthEmail: g('standardAuthEmail'),
             };
         }
 
@@ -9888,8 +9890,32 @@
             return Object.keys(brand).length ? brand : null;
         }
 
+        function nswGenerateContactContext(c) {
+            if (c.enableStandardAuth !== true) return '';
+            const context = {};
+            if (c.standardAuthName) context.Name = { value: c.standardAuthName, isDisplayable: true };
+            if (c.standardAuthEmail) context.emailaddress1 = { value: c.standardAuthEmail, isDisplayable: true };
+            // This source is embedded in HTML as well as a userscript.
+            const serialized = JSON.stringify(context, null, 2).replace(/</g, '\\u003c');
+            return [
+                "window.addEventListener('lcw:ready', function () {",
+                '  var omnichannel = window.Microsoft && window.Microsoft.Omnichannel;',
+                '  var sdk = omnichannel && omnichannel.LiveChatWidget && omnichannel.LiveChatWidget.SDK;',
+                "  if (!sdk || typeof sdk.setContextProvider !== 'function') {",
+                "    console.warn('D365 contact context could not be configured: setContextProvider is unavailable.');",
+                '    return;',
+                '  }',
+                '  sdk.setContextProvider(function () {',
+                '    return ' + serialized.split('\n').join('\n    ') + ';',
+                '  });',
+                '}, { once: true });'
+            ].join('\n');
+        }
+
         function nswGenerate(c, brand) {
             const lines = [];
+            const contactScript = nswGenerateContactContext(c);
+            if (contactScript) lines.push('<' + 'script>\n' + contactScript + '\n<' + '/scr' + 'ipt>');
             lines.push('<' + 'script');
             lines.push('  id="Microsoft_Omnichannel_LCWidget"');
             lines.push('  src="' + NSW_BOOTSTRAPPER + '"');
@@ -9959,6 +9985,7 @@
         // target site(s). Uses GM_addElement (CSP bypass) when available so the
         // widget loads even on pages with a strict Content-Security-Policy.
         function nswGenerateTampermonkey(c, brand) {
+            const contactScript = nswGenerateContactContext(c);
             const attrs = {
                 'id': 'Microsoft_Omnichannel_LCWidget',
                 'src': NSW_BOOTSTRAPPER,
@@ -9979,7 +10006,7 @@
                 '// ==UserScript==',
                 '// @name         ' + name + ' \u2013 D365 NextGen Widget',
                 '// @namespace    https://moliveirapinto.github.io/d365-modern-chat-widget/',
-                '// @version      1.0',
+                '// @version      1.1',
                 '// @description  Injects the Microsoft D365 NextGen Modern Web Messaging widget.',
                 '// @match        ' + (c.tmMatch || '*://*/*'),
                 '// @run-at       document-idle',
@@ -9997,14 +10024,18 @@
                 "  'use strict';",
                 "  if (document.getElementById('Microsoft_Omnichannel_LCWidget')) return;",
                 '  var attrs = ' + JSON.stringify(attrs, null, 2).split('\n').join('\n  ') + ';',
-                '  function inject() {',
+                '  function injectScript(attributes) {',
                 "    if (typeof GM_addElement === 'function') {",
-                "      GM_addElement(document.body || document.documentElement, 'scr' + 'ipt', attrs);",
+                "      GM_addElement(document.body || document.documentElement, 'scr' + 'ipt', attributes);",
                 '    } else {',
                 "      var s = document.createElement('scr' + 'ipt');",
-                "      Object.keys(attrs).forEach(function (k) { if (k === 'src') { s.src = attrs[k]; } else { s.setAttribute(k, attrs[k]); } });",
+                "      Object.keys(attributes).forEach(function (k) { if (k === 'src' || k === 'textContent') { s[k] = attributes[k]; } else { s.setAttribute(k, attributes[k]); } });",
                 '      (document.body || document.documentElement).appendChild(s);',
                 '    }',
+                '  }',
+                '  function inject() {',
+                ...(contactScript ? ['    injectScript({ textContent: ' + JSON.stringify(contactScript) + ' });'] : []),
+                '    injectScript(attrs);',
                 '  }',
                 "  if (document.body) { inject(); } else { document.addEventListener('DOMContentLoaded', inject); }",
                 '})();',

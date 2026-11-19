@@ -128,22 +128,21 @@
         return widgetScript;
     }
 
-    function configureAuthentication(config, pageName) {
+    function configureContactContext(config, pageName) {
         if (config.enableStandardAuth !== true) return;
 
         const omnichannel = window.Microsoft && window.Microsoft.Omnichannel;
         const sdk = omnichannel && omnichannel.LiveChatWidget && omnichannel.LiveChatWidget.SDK;
         if (!sdk || typeof sdk.setContextProvider !== 'function') {
-            console.warn(`Context provider is unavailable on ${pageName}; skipping authentication.`);
+            console.warn(`Contact context could not be configured on ${pageName}: setContextProvider is unavailable.`);
             return;
         }
 
         sdk.setContextProvider(function contextProvider() {
-            return {
-                emailaddress1: config.standardAuthEmail || 'anonymous@example.com',
-                Name: { value: config.standardAuthName || 'Anonymous User', isDisplayable: true },
-                Authenticated: { value: 'Authenticated', isDisplayable: true }
-            };
+            const context = {};
+            if (config.standardAuthName) context.Name = { value: config.standardAuthName, isDisplayable: true };
+            if (config.standardAuthEmail) context.emailaddress1 = { value: config.standardAuthEmail, isDisplayable: true };
+            return context;
         });
     }
 
@@ -161,7 +160,7 @@
 
         window.addEventListener('lcw:ready', function handleLivechatReadyEvent() {
             console.log(`New Standard Widget ready on ${pageName}`);
-            configureAuthentication(config, pageName);
+            configureContactContext(config, pageName);
         }, { once: true });
 
         widgetScript.addEventListener('error', function () {
